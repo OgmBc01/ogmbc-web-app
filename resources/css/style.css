@@ -1635,3 +1635,71 @@ footer .brand { font-size:1.2rem; font-weight:700; }
   justify-content: center;
 }
 
+/* Container for card content — forces consistent centering */
+.control-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* horizontal centering */
+  justify-content: center;  /* vertical centering inside card */
+  text-align: center;
+  gap: .5rem;
+  min-height: 220px;        /* ensures vertical centering look — tweak if you want taller cards */
+  padding: 1.75rem;
+}
+
+/* Circular icon style (uses your site gold; falls back to hex if --secondary missing) */
+.control-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--secondary, #f1bf70);
+  color: #081126;
+  font-size: 1.4rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Force the <i> inside to be white/dark-appropriate */
+.control-icon i {
+  color: var(--bg-light); /* dark icon on gold background for legibility */
+  font-size: 1.2rem;
+}
+
+/* Heading spacing */
+.control-card-body h5 {
+  margin: .25rem 0 0.5rem;
+  line-height: 1.15;
+}
+
+/* Keep paragraph muted, slightly smaller */
+.control-card-body p.text-muted {
+  margin: 0;
+  font-size: .95rem;
+  color: #6b7280; /* a muted gray similar to your theme */
+}
+
+/* Small responsive tweak: reduce min-height on narrow screens */
+@media (max-width: 575px) {
+  .control-card-body { min-height: 180px; padding: 1.25rem; }
+  .control-icon { width:52px; height:52px; }
+}
+
+.service-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;   /* reduced from 60px */
+  height: 46px;  /* reduced from 60px */
+  border-radius: 50%;
+  background: #d0aa4b; /* gold */
+  color: #0b1224;
+  font-size: 1.1rem;  /* reduced from 1.5rem */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.service-icon i {
+  font-size: 1rem;  /* reduced from 1.3rem */
+}
+

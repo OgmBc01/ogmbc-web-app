@@ -264,20 +264,20 @@ include 'includes/header-1.php'
     </div>
   </section>
 
-<!-- Floating Action Buttons -->
-<div class="floating-buttons">
-    <!-- WhatsApp Button -->
-    <a href="https://wa.me/+971509860136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
-        <i class="bi bi-whatsapp"></i>
-    </a>
-    
-    <!-- Back to Top Button -->
-    <a href="#" class="floating-btn back-to-top">
-        <i class="bi bi-arrow-up"></i>
-    </a>
-</div>
+  <!-- Floating Action Buttons -->
+  <div class="floating-buttons">
+      <!-- WhatsApp Button -->
+      <a href="https://wa.me/+971509860136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
+          <i class="bi bi-whatsapp"></i>
+      </a>
+      
+      <!-- Back to Top Button -->
+      <a href="#" class="floating-btn back-to-top">
+          <i class="bi bi-arrow-up"></i>
+      </a>
+  </div>
 
-  <!-- Footer (same as home page) -->
+<!-- Footer (same as home page) -->
 <?php
 include 'includes/footer.php'
 ?>
