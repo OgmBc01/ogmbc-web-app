@@ -28,7 +28,7 @@ include 'includes/header-1.php'
           <img src="resources/img/residency service.jpg" class="img-fluid rounded shadow" alt="residency service">
         </div>
         <div class="col-lg-6">
-          <h2 class="fw-bold" style="color:#f1bf70;">Residency Services</h2>
+          <h2 class="fw-bold" style="color:#d0aa4b;">Residency Services</h2>
           <p class="text-start">
             With our guidance, you can explore various residency options tailored to your specific needs and circumstances. Whether you're looking to
             establish long term residency or obtain the coveted Golden Visa, we offer personalized solutions to meet your goals.
@@ -44,57 +44,86 @@ include 'includes/header-1.php'
     </div>
   </section>
 
-<section class="section checked py-5" >
+  <!-- Trade License Renewal Section -->
+<section class="py-5 bg-light">
   <div class="container">
-    <div class="form-wrapper mx-auto p-4 p-md-5">
-      <h2 class="fw-bold text-white mb-4 text-center">Get Started With OGMBC</h2>
-      <form>
-        <div class="row g-3">
-          <!-- First Name -->
-          <div class="col-md-6">
-            <label class="form-label text-white">First Name</label>
-            <input type="text" class="form-control" placeholder="Enter first name" required>
-          </div>
-          <!-- Last Name -->
-          <div class="col-md-6">
-            <label class="form-label text-white">Last Name</label>
-            <input type="text" class="form-control" placeholder="Enter last name" required>
-          </div>
-          <!-- Email -->
-          <div class="col-md-6">
-            <label class="form-label text-white">Email ID</label>
-            <input type="email" class="form-control" placeholder="example@email.com" required>
-          </div>
-          <!-- Contact Number -->
-          <div class="col-md-6">
-            <label class="form-label text-white">Contact Number</label>
-            <input type="tel" class="form-control" placeholder="+971 50 123 4567" required>
-          </div>
-          <!-- Business Activity -->
-          <div class="col-12">
-            <label class="form-label text-white">What is your business activity?</label>
-            <input type="text" class="form-control" placeholder="e.g., Trading, Consulting, IT Services" required>
-          </div>
-          <!-- Number of Visas -->
-          <div class="col-12">
-            <label class="form-label text-white">How many visas will be required?</label>
-            <input type="number" class="form-control" placeholder="Enter number of visas" required>
-          </div>
-          <!-- Shareholder Type -->
-          <div class="col-12">
-            <label class="form-label text-white">Type of shareholder</label>
-            <select class="form-select" required>
-              <option value="">Select...</option>
-              <option value="individual">Individual</option>
-              <option value="corporate">Corporate</option>
-            </select>
-          </div>
-          <!-- Submit -->
-          <div class="col-12 text-center mt-4">
-            <button type="submit" class="btn btn-primary cta-glow px-4">Submit Details</button>
+    <div class="text-center mb-5">
+      <h2 class="fw-bold text-dark">Trade License <span style="color:#d0aa4b;">Renewal</span></h2>
+      <p class="text-muted">
+        Stay compliant and keep your business running smoothly with our efficient license and PRO renewal services.
+      </p>
+    </div>
+
+    <div class="text-center mb-4">
+      <h4 class="fw-bold text-dark">
+        <i class="fas fa-file-contract me-2" style="color:#d0aa4b; font-size:1.2rem;"></i> Trade License Renewal
+      </h4>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 text-center p-3">
+          <div class="card-body">
+            <i class="fas fa-building mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
+            <h5 class="fw-bold">UAE</h5>
+            <p class="text-muted">Annual business trade license renewal in the UAE.</p>
           </div>
         </div>
-      </form>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 text-center p-3">
+          <div class="card-body">
+            <i class="fas fa-flag-usa mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
+            <h5 class="fw-bold">USA</h5>
+            <p class="text-muted">Annual business trade license renewal in the USA.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 text-center p-3">
+          <div class="card-body">
+            <i class="fas fa-flag mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
+            <h5 class="fw-bold">UK</h5>
+            <p class="text-muted">Annual business trade license renewal in the UK.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mb-4">
+      <h4 class="fw-bold text-dark">
+        <i class="fas fa-user-tie me-2" style="color:#d0aa4b; font-size:1.2rem;"></i> PRO Renewal Services
+      </h4>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 text-center p-3">
+          <div class="card-body">
+            <i class="fas fa-map-marker-alt mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
+            <h5 class="fw-bold">UAE / Dubai</h5>
+            <p class="text-muted">Comprehensive PRO service renewal in the UAE and Dubai.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 text-center p-3">
+          <div class="card-body">
+            <i class="fas fa-city mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
+            <h5 class="fw-bold">USA / Delaware & New York</h5>
+            <p class="text-muted">PRO service renewal in Delaware and New York.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm border-0 text-center p-3">
+          <div class="card-body">
+            <i class="fas fa-landmark mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
+            <h5 class="fw-bold">UK / England</h5>
+            <p class="text-muted">PRO service renewal in the UK (England).</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -112,7 +141,7 @@ include 'includes/header-1.php'
     </a>
 </div>
 
-  <!-- Footer (same as home page) -->
+<!-- Footer (same as home page) -->
 <?php
 include 'includes/footer.php'
 ?>
