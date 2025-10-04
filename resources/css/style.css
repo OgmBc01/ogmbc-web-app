@@ -238,7 +238,7 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
    ------------------------- */
 @media (max-width: 991px) {
   .menu-toggle {
-    display: flex; /* show burger only on mobile */
+    display: flex;
     z-index: 2100;
   }
 
@@ -1537,12 +1537,21 @@ footer .brand { font-size:1.2rem; font-weight:700; }
 .why-choose-us .feature-modern {
   position: relative;
   background: #fff;
-  padding: 2rem 2.2rem 2rem 2rem;
+  padding: 2rem 2rem 2rem 2.7rem;
   border-left: 8px solid #d0aa4b;
   border-top-left-radius: 32px;
   border-bottom-left-radius: 32px;
-  /* Optional: add a subtle box-shadow for depth */
-  box-shadow: 0 2px 12px rgba(208,170,75,0.07);
+  box-shadow: 0 4px 24px rgba(208,170,75,0.09);
+}
+
+.feature-modern {
+  position: relative;
+  background: #fff;
+  padding: 2rem 2rem 2rem 2.7rem;
+  border-left: 8px solid #d0aa4b;
+  border-top-left-radius: 32px;
+  border-bottom-left-radius: 32px;
+  box-shadow: 0 4px 24px rgba(208,170,75,0.09);
 }
 
 /* Remove the previous ::after divider */
