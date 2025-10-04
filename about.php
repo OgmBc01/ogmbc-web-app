@@ -44,7 +44,7 @@ include 'includes/header-1.php'
   </section>
 
   <!-- Mission, Vision & Values Section -->
-  <section class="py-5 text-white" style="background-color: #111827;">
+  <section class="py-5 text-white">
     <div class="container">
       <!-- Mission & Vision -->
       <div class="row g-4 mb-5">
@@ -81,7 +81,7 @@ include 'includes/header-1.php'
   <section class="section team-section">
    <div class="container text-center">
         <h2 class="mb-4">Our Team</h2>
-        <p class="mb-5 text-center">
+        <p class="lead mb-5 text-center">
             Our strength lies in our people—qualified, experienced, and committed to your success.
         </p>
 
@@ -131,11 +131,11 @@ include 'includes/header-1.php'
   </section>
 
   <!-- Our Values -->
-<section class="py-5 text-white" style="background-color: #111827;">
+<section class="py-5 text-white">
   <div class="container">
     <div class="text-center mb-4">
       <h3 class="fw-bold">Our <span style="color:#f1bf70;">Values</span></h3>
-      <p class="text-muted">The principles that guide us in every engagement and client relationship.</p>
+      <p class="lead">The principles that guide us in every engagement and client relationship.</p>
     </div>
 
     <div class="row g-4">

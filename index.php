@@ -18,7 +18,7 @@ include 'includes/header.php'
       <div class="carousel-item active">
         <div class="container">
           <div class="row align-items-center gy-4">
-            <div class="col-lg-7 mb-5">
+            <div class="col-lg-7 mb-5" style="margin-top: 5rem;">
               <span class="chip">Auditing • Accounting • Advisory</span>
               <h1 class="hero-title">Trusted audits & financial clarity for growing businesses.</h1>
               <p class="lead hero-lead">We deliver ISA-compliant audits, IFRS reporting, and practical advisory so you can make confident decisions and satisfy stakeholders.</p>
@@ -27,11 +27,27 @@ include 'includes/header.php'
                 <a class="btn btn-ghost" href="#services">Explore services</a>
               </div>
             </div>
-            <!--div class="col-lg-5">
-              <div class="hero-illustration card">
-                <img src="images/hero1.jpg" alt="Audit working session" class="img-fluid rounded-3">
+            <div class="col-lg-5">
+              <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+                <div class="d-flex flex-column gap-3 contact-info">
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
+                    <span>+971 50 986 0136</span>
+                  </div>
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
+                    <span>info@ogmbc.ae</span>
+                  </div>
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
+                    <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
+                  </div>
+                </div>
+                <a href="contact.php" class="btn btn-secondary mt-3 text-white">
+                  Request Proposal
+                </a>
               </div>
-            </div-->
+            </div>
           </div>
         </div>
       </div>
@@ -48,11 +64,27 @@ include 'includes/header.php'
                 <a class="btn btn-primary" href="#contact">Get IFRS support</a>
               </div>
             </div>
-            <!--div class="col-lg-5">
-              <div class="hero-illustration card">
-                <img src="images/hero2.jpg" alt="Financial reporting" class="img-fluid rounded-3">
+            <div class="col-lg-5">
+              <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+                <div class="d-flex flex-column gap-3 contact-info">
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
+                    <span>+971 50 986 0136</span>
+                  </div>
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
+                    <span>info@ogmbc.ae</span>
+                  </div>
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
+                    <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
+                  </div>
+                </div>
+                <a href="contact.php" class="btn btn-secondary mt-3 text-white">
+                  Request Proposal
+                </a>
               </div>
-            </div-->
+            </div>
           </div>
         </div>
       </div>
@@ -69,11 +101,27 @@ include 'includes/header.php'
                 <a class="btn btn-primary" href="#contact">Talk to an advisor</a>
               </div>
             </div>
-            <!--div class="col-lg-5">
-              <div class="hero-illustration card">
-                <img src="images/hero3.jpg" alt="Advisory session" class="img-fluid rounded-3">
+           <div class="col-lg-5">
+              <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+                <div class="d-flex flex-column gap-3 contact-info">
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
+                    <span>+971 50 986 0136</span>
+                  </div>
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
+                    <span>info@ogmbc.ae</span>
+                  </div>
+                  <div class="info-box d-flex align-items-center gap-2">
+                    <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
+                    <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
+                  </div>
+                </div>
+                <a href="contact.php" class="btn btn-secondary mt-3 text-white">
+                  Request Proposal
+                </a>
               </div>
-            </div-->
+            </div>
           </div>
         </div>
       </div>
@@ -91,32 +139,6 @@ include 'includes/header.php'
   </div>
 </section>
 
-<!-- Overlapping Contact CTA -->
-<div class="contact-cta container position-relative">
-  <div class="contact-cta-inner d-flex flex-column flex-md-row align-items-center justify-content-between p-4 rounded-4 shadow-lg">
-    <!-- Contact Info -->
-    <div class="d-flex flex-column flex-md-row align-items-center gap-4 text-white contact-info">
-      <div class="info-box d-flex align-items-center gap-2">
-        <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-        <span>+971 50 986 0136</span>
-      </div>
-      <div class="info-box d-flex align-items-center gap-2">
-        <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
-        <span>info@ogmbc.ae</span>
-      </div>
-      <div class="info-box d-flex align-items-center gap-2">
-        <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
-        <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
-      </div>
-    </div>
-
-    <!-- CTA Button -->
-    <a href="contact.php" class="btn btn-glow mt-3 mt-md-0 text-white">
-      Request Proposal
-    </a>
-  </div>
-</div>
-
 <!-- Services -->
 <section id="services" class="section">
   <div class="container">
@@ -128,14 +150,13 @@ include 'includes/header.php'
     </div> 
     <div class="row g-4 services">
       <!-- Audit & Assurance -->
-      <div class="col-lg-4 col-md-6">
+      <div class="col-lg-4 col-md-6 justify-content-center">
         <article class="service card h-100">
-          <div class="card-body">
-            <div class="chip">Audit & Assurance</div>
+          <div class="card-body d-flex flex-column align-items-center text-center">
+            <!-- <div class="chip">Audit & Assurance</div> -->
             <div class="service-icon">
               <i class="bi bi-clipboard-check"></i>
             </div>
-            
             <h3>External Audit (ISA)</h3>
             <p>Annual audits, limited reviews, and agreed-upon procedures with clear management letters and board-ready reports.</p>
             <a href="audit-&-audit-support.php" class="btn btn-outline-primary mt-3">Learn More</a>
@@ -146,8 +167,8 @@ include 'includes/header.php'
       <!-- Financial Reporting -->
       <div class="col-lg-4 col-md-6">
         <article class="service card h-100">
-          <div class="card-body">
-            <div class="chip">Financial Reporting</div>
+          <div class="card-body d-flex flex-column align-items-center text-center">
+            <!-- <div class="chip">Financial Reporting</div> -->
             <div class="service-icon">
               <i class="bi bi-file-earmark-bar-graph"></i>
             </div>
@@ -161,8 +182,8 @@ include 'includes/header.php'
       <!-- Advisory -->
       <div class="col-lg-4 col-md-6">
         <article class="service card h-100">
-          <div class="card-body">
-            <div class="chip">Advisory</div>
+          <div class="card-body d-flex flex-column align-items-center text-center">
+            <!-- <div class="chip">Advisory</div> -->
             <div class="service-icon">
               <i class="bi bi-shield-check"></i>
             </div>
@@ -176,8 +197,8 @@ include 'includes/header.php'
       <!-- Tax -->
       <div class="col-lg-4 col-md-6">
         <article class="service card h-100">
-          <div class="card-body">
-            <div class="chip">Tax</div>
+          <div class="card-body d-flex flex-column align-items-center text-center">
+            <!-- <div class="chip">Tax</div> -->
             <div class="service-icon">
               <i class="bi bi-calculator"></i>
             </div>
@@ -191,8 +212,8 @@ include 'includes/header.php'
       <!-- Outsourcing -->
       <div class="col-lg-4 col-md-6">
         <article class="service card h-100">
-          <div class="card-body">
-            <div class="chip">Outsourcing</div>
+          <div class="card-body d-flex flex-column align-items-center text-center">
+            <!-- <div class="chip">Outsourcing</div> -->
             <div class="service-icon">
               <i class="bi bi-gear"></i>
             </div>
@@ -206,8 +227,8 @@ include 'includes/header.php'
       <!-- Training -->
       <div class="col-lg-4 col-md-6">
         <article class="service card h-100">
-          <div class="card-body">
-            <div class="chip">Training</div>
+          <div class="card-body d-flex flex-column align-items-center text-center">
+            <!-- <div class="chip">Training</div> -->
             <div class="service-icon">
               <i class="bi bi-person-video3"></i>
             </div>
@@ -222,45 +243,48 @@ include 'includes/header.php'
 </section>
 
 <!-- Why Choose US -->
-<section class="checked py-5">
+<section class="why-choose-us py-5" style="background:#fff;">
   <div class="container text-center">
-    <h2 class="mb-4">Why Choose Us</h2>
+    <h2 class="mb-4" style="color:#d0aa4b;">Why Choose Us</h2>
     <p class="lead mb-5">
       We are committed to making a positive impact on our clients' businesses and helping them 
       navigate the complexities of today's business environment with confidence and success.
     </p>
-
-    <div class="row g-4">
+    <div class="row g-4 justify-content-center">
       <!-- Feature 1 -->
       <div class="col-md-4">
-        <div class="feature-card p-4 h-100">
-          <i class="bi bi-graph-up-arrow feature-icon"></i>
-          <h4 class="mt-3">Financial Clarity</h4>
-          <p>
+        <div class="feature-modern d-flex flex-column align-items-center">
+          <span class="feature-icon-modern mb-3">
+            <i class="bi bi-graph-up-arrow"></i>
+          </span>
+          <h4 class="mb-2" style="color:#091e3e;">Financial Clarity</h4>
+          <p style="color:#747576;">
             From IFRS reporting to statutory audits, we deliver insights that 
             enhance transparency and decision-making.
           </p>
         </div>
       </div>
-
       <!-- Feature 2 -->
       <div class="col-md-4">
-        <div class="feature-card p-4 h-100">
-          <i class="bi bi-shield-check feature-icon"></i>
-          <h4 class="mt-3">Compliance & Assurance</h4>
-          <p>
+        <div class="feature-modern d-flex flex-column align-items-center">
+          <span class="feature-icon-modern mb-3">
+            <i class="bi bi-shield-check"></i>
+          </span>
+          <h4 class="mb-2" style="color:#313131;">Compliance & Assurance</h4>
+          <p style="color:#747576;">
             Our experienced team ensures adherence to international standards, 
             regulatory frameworks, and tax obligations.
           </p>
         </div>
       </div>
-
       <!-- Feature 3 -->
       <div class="col-md-4">
-        <div class="feature-card p-4 h-100">
-          <i class="bi bi-people feature-icon"></i>
-          <h4 class="mt-3">Client-Centered Approach</h4>
-          <p>
+        <div class="feature-modern d-flex flex-column align-items-center">
+          <span class="feature-icon-modern mb-3">
+            <i class="bi bi-people"></i>
+          </span>
+          <h4 class="mb-2" style="color:#313131;">Client-Centered Approach</h4>
+          <p style="color:#747576;">
             We partner with you, offering personalized advisory, outsourcing, 
             and training solutions to fit your growth needs.
           </p>
@@ -271,31 +295,36 @@ include 'includes/header.php'
 </section>
 
 <!-- Stats -->
-<section id="stats" class="section">
+<section id="stats" class="section stats-modern">
   <div class="container">
-    <div class="row g-4 text-center">
-      <div class="col-sm-6 col-md-3">
-        <div class="stat card p-3">
-          <div class="num display-6" data-target="150+">0</div>
-          <div class="label muted">Engagements delivered</div>
-        </div>
+    <div class="stats-modern-bg p-5 rounded-5 shadow-lg d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+      <div class="stats-intro text-center text-md-start flex-grow-1">
+        <h2 class="fw-bold mb-3" style="color:#313131;">Empowering Your Financial Growth</h2>
+        <p class="mb-0" style="color:#747576;">
+          We deliver clarity, compliance, and confidence for ambitious businesses. 
+          Our expertise in audit, reporting, and advisory unlocks your next level.
+        </p>
       </div>
-      <div class="col-sm-6 col-md-3">
-        <div class="stat card p-3">
-          <div class="num display-6" data-target="98%">0</div>
-          <div class="label muted">On-time completion</div>
+      <div class="stats-numbers row row-cols-2 g-4 flex-grow-1 justify-content-center">
+        <div class="col text-center">
+          <div class="stat-icon mb-2"><i class="bi bi-bar-chart-fill"></i></div>
+          <div class="num display-5 fw-bold" data-target="150">0</div>
+          <div class="label" style="color:#747576;">Projects Delivered</div>
         </div>
-      </div>
-      <div class="col-sm-6 col-md-3">
-        <div class="stat card p-3">
-          <div class="num display-6" data-target="40+">0</div>
-          <div class="label muted">Industries served</div>
+        <div class="col text-center">
+          <div class="stat-icon mb-2"><i class="bi bi-clock-history"></i></div>
+          <div class="num display-5 fw-bold" data-target="98">0</div>
+          <div class="label" style="color:#747576;">On-Time Completion (%)</div>
         </div>
-      </div>
-      <div class="col-sm-6 col-md-3">
-        <div class="stat card p-3">
-          <div class="num display-6" data-target="A+">0</div>
-          <div class="label muted">Client satisfaction</div>
+        <div class="col text-center">
+          <div class="stat-icon mb-2"><i class="bi bi-building"></i></div>
+          <div class="num display-5 fw-bold" data-target="40">0</div>
+          <div class="label" style="color:#747576;">Industries Served</div>
+        </div>
+        <div class="col text-center">
+          <div class="stat-icon mb-2"><i class="bi bi-star-fill"></i></div>
+          <div class="num display-5 fw-bold" data-target="100">0</div>
+          <div class="label" style="color:#747576;">Client Satisfaction (%)</div>
         </div>
       </div>
     </div>
@@ -303,32 +332,59 @@ include 'includes/header.php'
 </section>
 
 <!-- Testimonials -->
-<section class="section">
-  <div class="container">
-    <h2>What clients say</h2>
-    <div class="d-flex justify-content-center">
-      <p class="lead text-center">
-        Board-ready insights, clear communication, and pragmatic recommendations.
-      </p>
-    </div>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <article class="quote card p-4">
-          <p>“OGM helped us convert to IFRS and tightened our controls before our fundraise. Smooth end-to-end.”</p>
-          <div class="text-light mt-3">CFO, Growth-stage Fintech</div>
-        </article>
-      </div>
-      <div class="col-md-4">
-        <article class="quote card p-4">
-          <p>“Their audit team kept us informed and on schedule. The management letter was practical and prioritized.”</p>
-          <div class="text-light mt-3">Chair, Audit Committee</div>
-        </article>
-      </div>
-      <div class="col-md-4">
-        <article class="quote card p-4">
-          <p>“Reliable partner for compliance and reporting. Responsive, meticulous, and easy to work with.”</p>
-          <div class="text-light mt-3">MD, Manufacturing Group</div>
-        </article>
+<section class="section testimonials-section" style="padding: 0;">
+  <div class="testimonials-bg">
+    <div class="container py-5">
+      <h2 class="mb-5" style="color: #091e3e; font-weight: 700;">What Clients Say</h2>
+      <div class="row g-4 justify-content-center">
+        <!-- Testimonial 1 -->
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="testimonial-quote">
+              <i class="bi bi-quote" style="font-size:4rem; color:#d0aa4b;"></i>
+            </div>
+            <p class="testimonial-text">
+              OGBC’s team delivered clear, actionable audit insights that helped us streamline our processes.
+            </p>
+            <div class="testimonial-avatar mx-auto mb-3">
+              <img src="assets/img/testimonial1.jpg" alt="Client 1" />
+            </div>
+            <div class="testimonial-author fw-bold">Sasha Grey</div>
+            <div class="testimonial-role">Business Owner</div>
+          </div>
+        </div>
+        <!-- Testimonial 2 -->
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="testimonial-quote">
+              <i class="bi bi-quote" style="font-size:4rem; color:#d0aa4b;"></i>
+            </div>
+            <p class="testimonial-text">
+              Their financial reporting expertise gave us confidence in our numbers and compliance.
+            </p>
+            <div class="testimonial-avatar mx-auto mb-3">
+              <img src="assets/img/testimonial2.jpg" alt="Client 2" />
+            </div>
+            <div class="testimonial-author fw-bold">Nat Reynolds</div>
+            <div class="testimonial-role">Chief Accountant</div>
+          </div>
+        </div>
+        <!-- Testimonial 3 -->
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="testimonial-quote">
+              <i class="bi bi-quote" style="font-size:4rem; color:#d0aa4b;"></i>
+            </div>
+            <p class="testimonial-text">
+              OGBC’s advisory and training helped our team grow and adapt to new standards.
+            </p>
+            <div class="testimonial-avatar mx-auto mb-3">
+              <img src="assets/img/testimonial3.jpg" alt="Client 3" />
+            </div>
+            <div class="testimonial-author fw-bold">Bob Roberts</div>
+            <div class="testimonial-role">Sales Manager</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -426,16 +482,66 @@ if ($result) {
 ?>
 
 
-<!-- CTA -->
-<section class="section">
+<!-- CTA Section -->
+<section class="cta-section py-5">
   <div class="container">
-    <div class="cta card p-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-      <div>
-        <h2>Ready to get started?</h2>
-        <p class="text-light">Share your current needs and timeline—our team will propose a clear scope, fees, and deliverables.</p>
+    <div class="row align-items-stretch g-0">
+      <!-- Left: Info -->
+      <div class="col-lg-7 bg-white p-5 d-flex flex-column justify-content-center cta-info">
+        <h5 class="fw-bold mb-2" style="color:#d0aa4b;">REQUEST A QUOTE</h5>
+        <h2 class="fw-bold mb-3" style="color:#091e3e;">Need A Free Quote? Please Feel Free to Contact Us</h2>
+        <div class="cta-divider mb-4" style="height:4px; width:120px; background:#d0aa4b; border-radius:2px;"></div>
+        <div class="d-flex gap-4 mb-3 flex-wrap">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-return-left" style="color:#d0aa4b; font-size:1.5rem;"></i>
+            <span class="fw-semibold" style="color:#091e3e;">Reply within 24 hours</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-telephone" style="color:#d0aa4b; font-size:1.5rem;"></i>
+            <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
+          </div>
+        </div>
+        <p class="mb-4" style="color:#747576;">
+          We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
+        </p>
+        <div class="d-flex align-items-center gap-3 mt-2">
+          <div class="cta-phone-icon d-flex align-items-center justify-content-center" style="background:#d0aa4b; width:48px; height:48px; border-radius:8px;">
+            <i class="bi bi-telephone-fill" style="color:#fff; font-size:1.5rem;"></i>
+          </div>
+          <div>
+            <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
+            <span class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971502923136</span>
+          </div>
+        </div>
       </div>
-      <div>
-        <a class="btn btn-primary" href="#contact">Request a proposal</a>
+      <!-- Right: Form -->
+      <div class="col-lg-5 bg-cta-gold p-5 d-flex align-items-center">
+        <form class="w-100">
+          <div class="mb-3">
+            <input type="text" class="form-control cta-input" placeholder="Your Name">
+          </div>
+          <div class="mb-3">
+            <input type="email" class="form-control cta-input" placeholder="Your Email">
+          </div>
+          <div class="mb-3">
+            <select class="form-select cta-input">
+              <option selected>Select A Service</option>
+              <option value="audit">Audit & Assurance</option>
+              <option value="reporting">Financial Reporting</option>
+              <option value="advisory">Advisory</option>
+              <option value="tax">Tax Consulting</option>
+              <option value="outsourcing">Outsourced Finance</option>
+              <option value="training">Training</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control cta-input" placeholder="Sub-Service">
+          </div>
+          <div class="mb-3">
+            <textarea class="form-control cta-input" rows="3" placeholder="Message"></textarea>
+          </div>
+          <button type="submit" class="btn btn-dark w-100 py-2 fw-bold" style="background:#091e3e;">Request A Quote</button>
+        </form>
       </div>
     </div>
   </div>
