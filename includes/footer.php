@@ -30,7 +30,7 @@
     <div>
       <h4>Contact</h4>
       <p>Email: info@ogmbc.ae</p>
-      <p>Phone: +971 50 986 0136</p>
+      <p>Phone: +971 50 292 3136</p>
       <p>Address: Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</p>
 
       <!-- Social Media -->

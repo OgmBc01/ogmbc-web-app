@@ -45,7 +45,7 @@ include 'includes/header-1.php'
   <div class="container">
     <div class="text-center mb-5">
       <h2 class="fw-bold">Legal Types of Entities</h2>
-      <p class="text-muted text-center">Choose the right structure that aligns with your business goals and compliance needs.</p>
+      <p class="lead text-center">Choose the right structure that aligns with your business goals and compliance needs.</p>
     </div>
 
     <div class="row g-4 text-dark">
@@ -126,11 +126,11 @@ include 'includes/header-1.php'
     </div>
   </div>
 </section>
-<section class="section py-5" style="background:#111827;">
+<section class="section py-5">
   <div class="container">
-    <div class="text-center mb-5 text-white">
+    <div class="text-center mb-5">
       <h2 class="fw-bold">Required Documents & Package Inclusions</h2>
-      <p class="text-light ">Everything you need to get started with your company formation, simplified.</p>
+      <p class="lead text-center">Everything you need to get started with your company formation, simplified.</p>
     </div>
 
     <div class="row g-4 text-dark">
@@ -168,60 +168,68 @@ include 'includes/header-1.php'
   </div>
 </section>
 
-<section class="section checked py-5" >
-  <div class="container">
-    <div class="form-wrapper mx-auto p-4 p-md-5">
-      <h2 class="fw-bold text-white mb-4 text-center">Get Started With OGMBC</h2>
-      <form>
-        <div class="row g-3">
-          <!-- First Name -->
-          <div class="col-md-6">
-            <label class="form-label text-white">First Name</label>
-            <input type="text" class="form-control" placeholder="Enter first name" required>
+  <!-- CTA Section -->
+  <section class="cta-section py-5">
+    <div class="container">
+      <div class="row align-items-stretch g-0">
+        <div class="col-lg-7 bg-white p-5 d-flex flex-column justify-content-center cta-info">
+          <h5 class="fw-bold mb-2" style="color:#d0aa4b;">REQUEST A QUOTE</h5>
+          <h2 class="fw-bold mb-3" style="color:#091e3e;">Need A Free Quote? Please Feel Free to Contact Us</h2>
+          <div class="cta-divider mb-4" style="height:4px; width:120px; background:#d0aa4b; border-radius:2px;"></div>
+          <div class="d-flex gap-4 mb-3 flex-wrap">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-arrow-return-left" style="color:#d0aa4b; font-size:1.5rem;"></i>
+              <span class="fw-semibold" style="color:#091e3e;">Reply within 24 hours</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-telephone" style="color:#d0aa4b; font-size:1.5rem;"></i>
+              <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
+            </div>
           </div>
-          <!-- Last Name -->
-          <div class="col-md-6">
-            <label class="form-label text-white">Last Name</label>
-            <input type="text" class="form-control" placeholder="Enter last name" required>
-          </div>
-          <!-- Email -->
-          <div class="col-md-6">
-            <label class="form-label text-white">Email ID</label>
-            <input type="email" class="form-control" placeholder="example@email.com" required>
-          </div>
-          <!-- Contact Number -->
-          <div class="col-md-6">
-            <label class="form-label text-white">Contact Number</label>
-            <input type="tel" class="form-control" placeholder="+971 50 123 4567" required>
-          </div>
-          <!-- Business Activity -->
-          <div class="col-12">
-            <label class="form-label text-white">What is your business activity?</label>
-            <input type="text" class="form-control" placeholder="e.g., Trading, Consulting, IT Services" required>
-          </div>
-          <!-- Number of Visas -->
-          <div class="col-12">
-            <label class="form-label text-white">How many visas will be required?</label>
-            <input type="number" class="form-control" placeholder="Enter number of visas" required>
-          </div>
-          <!-- Shareholder Type -->
-          <div class="col-12">
-            <label class="form-label text-white">Type of shareholder</label>
-            <select class="form-select" required>
-              <option value="">Select...</option>
-              <option value="individual">Individual</option>
-              <option value="corporate">Corporate</option>
-            </select>
-          </div>
-          <!-- Submit -->
-          <div class="col-12 text-center mt-4">
-            <button type="submit" class="btn btn-primary cta-glow px-4">Submit Details</button>
+          <p class="mb-4" style="color:#747576;">
+            We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
+          </p>
+          <div class="d-flex align-items-center gap-3 mt-2">
+            <div class="cta-phone-icon d-flex align-items-center justify-content-center" style="background:#d0aa4b; width:48px; height:48px; border-radius:8px;">
+              <i class="bi bi-telephone-fill" style="color:#fff; font-size:1.5rem;"></i>
+            </div>
+            <div>
+              <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
+              <span class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971502923136</span>
+            </div>
           </div>
         </div>
-      </form>
+        <div class="col-lg-5 bg-cta-gold p-5 d-flex align-items-center">
+          <form class="w-100">
+            <div class="mb-3">
+              <input type="text" class="form-control cta-input" placeholder="Your Name">
+            </div>
+            <div class="mb-3">
+              <input type="email" class="form-control cta-input" placeholder="Your Email">
+            </div>
+            <div class="mb-3">
+              <select class="form-select cta-input">
+                <option selected>Select A Service</option>
+                <option value="audit">Audit & Assurance</option>
+                <option value="reporting">Financial Reporting</option>
+                <option value="advisory">Advisory</option>
+                <option value="tax">Tax Consulting</option>
+                <option value="outsourcing">Outsourced Finance</option>
+                <option value="training">Training</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <input type="text" class="form-control cta-input" placeholder="Sub-Service">
+            </div>
+            <div class="mb-3">
+              <textarea class="form-control cta-input" rows="3" placeholder="Message"></textarea>
+            </div>
+            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold" style="background:#091e3e;">Request A Quote</button>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
 <!-- Floating Action Buttons -->
 <div class="floating-buttons">

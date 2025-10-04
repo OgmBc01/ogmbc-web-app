@@ -643,12 +643,12 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: #d0aa4b;
   color: #fff;
-  font-size: 2.5rem;
+  font-size: 2rem;
   box-shadow: 0 4px 16px rgba(208,170,75,0.08);
 }
 
@@ -1138,7 +1138,7 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
   }
 
   .cost-card {
-    background: #111827;
+    background: #091e3e;
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.12);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -1147,6 +1147,18 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.18);
   }
+
+  .cost-card i {
+  font-size: 2.3rem;
+  color: #fff !important;
+  background: #d0aa4b;
+  border-radius: 50%;
+  padding: 0.6rem;
+  margin-right: 0.7rem;
+  box-shadow: 0 2px 8px rgba(208,170,75,0.12);
+  vertical-align: middle;
+}
+
   .services-list {
     list-style: none;
     padding-left: 1.2rem;
@@ -1604,3 +1616,21 @@ footer .brand { font-size:1.2rem; font-weight:700; }
     padding: 2rem !important;
   }
 }
+
+.entity-card i,
+.doc-card i {
+  font-size: 2.3rem;
+  color: #fff !important;
+  background: #d0aa4b;
+  border-radius: 50%;
+  padding: 0.6rem;
+  margin-right: 0.7rem;
+  box-shadow: 0 2px 8px rgba(208,170,75,0.12);
+  vertical-align: middle;
+  width: 3.2rem;
+  height: 3.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
