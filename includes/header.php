@@ -123,11 +123,20 @@
 </head>
 <body>
   <section class="hero position-relative">
-  <!-- Background Video -->
-  <video autoplay muted loop playsinline class="hero-bg-video">
-    <source src="resources/video/hero.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+  <!-- Background Media -->
+  <?php
+    // Set this to true to use video, false to use image
+    $useVideo = false;
+    $heroImage = "resources/img/bookkeeping.jpg"; // Change to your image path
+  ?>
+  <?php if ($useVideo): ?>
+    <video autoplay muted loop playsinline class="hero-bg-video">
+      <source src="resources/video/hero.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  <?php else: ?>
+    <img src="<?php echo $heroImage; ?>" alt="Hero Background" class="hero-bg-image" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:0;">
+  <?php endif; ?>
 
   <!-- Overlay for better text readability -->
   <div class="hero-overlay"></div>
@@ -225,7 +234,7 @@
 
           <!-- CTA -->
           <li class="nav-item">
-              <a href="login" target="_blank" class="btn btn-ghost">Login</a>
+              <a href="login.php" target="_blank" class="btn btn-ghost">Login</a>
           </li>
         </ul>
       </div>

@@ -21,7 +21,7 @@ include 'includes/header.php'
             <div class="col-lg-7 mb-5" style="margin-top: 5rem;">
               <span class="chip">Auditing • Accounting • Advisory</span>
               <h1 class="hero-title">Trusted audits & financial clarity for growing businesses.</h1>
-              <p class="lead hero-lead">We deliver ISA-compliant audits, IFRS reporting, and practical advisory so you can make confident decisions and satisfy stakeholders.</p>
+              <p class="text-light">We deliver ISA-compliant audits, IFRS reporting, and practical advisory so you can make confident decisions and satisfy stakeholders.</p>
               <div class="d-flex gap-3 flex-wrap">
                 <a class="btn btn-primary" href="#contact">Book a discovery call</a>
                 <a class="btn btn-ghost" href="#services">Explore services</a>
@@ -32,11 +32,11 @@ include 'includes/header.php'
                 <div class="d-flex flex-column gap-3 contact-info">
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                    <span>+971 50 292 3136</span>
+                    <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
                   </div>
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
-                    <span>info@ogmbc.ae</span>
+                    <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
                   </div>
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
@@ -59,7 +59,7 @@ include 'includes/header.php'
             <div class="col-lg-7 mb-5">
               <span class="chip">Financial Reporting</span>
               <h1 class="hero-title">Clear, compliant, and timely IFRS reporting.</h1>
-              <p class="lead hero-lead">Accurate preparation, conversion, and consolidation of financial statements aligned with global standards.</p>
+              <p class="text-light">Accurate preparation, conversion, and consolidation of financial statements aligned with global standards.</p>
               <div class="d-flex gap-3 flex-wrap">
                 <a class="btn btn-primary" href="#contact">Get IFRS support</a>
               </div>
@@ -96,7 +96,7 @@ include 'includes/header.php'
             <div class="col-lg-7 mb-5">
               <span class="chip">Advisory & Compliance</span>
               <h1 class="hero-title">Strengthen governance & controls with OGMBC.</h1>
-              <p class="lead hero-lead">Risk assessments, SOPs, internal audits, and tax compliance tailored to your sector.</p>
+              <p class="text-light">Risk assessments, SOPs, internal audits, and tax compliance tailored to your sector.</p>
               <div class="d-flex gap-3 flex-wrap">
                 <a class="btn btn-primary" href="#contact">Talk to an advisor</a>
               </div>
@@ -507,35 +507,27 @@ include 'includes/header.php'
             </div>
             <div>
               <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
-              <span class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971502923136</span>
+              <a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a>
             </div>
           </div>
         </div>
         <!-- Right: Form -->
         <div class="col-lg-5 bg-cta-gold p-5 d-flex align-items-center">
-          <form class="w-100">
+          <form action="send_mail.php" method="POST" class="w-100">
             <div class="mb-3">
-              <input type="text" class="form-control cta-input" placeholder="Your Name">
+                <input type="text" name="name" class="form-control cta-input" placeholder="Name" required>
             </div>
             <div class="mb-3">
-              <input type="email" class="form-control cta-input" placeholder="Your Email">
+                <input type="email" name="email" class="form-control cta-input" placeholder="Email" required>
             </div>
             <div class="mb-3">
-              <select class="form-select cta-input">
-                <option selected>Select A Service</option>
-                <option value="audit">Audit & Assurance</option>
-                <option value="reporting">Financial Reporting</option>
-                <option value="advisory">Advisory</option>
-                <option value="tax">Tax Consulting</option>
-                <option value="outsourcing">Outsourced Finance</option>
-                <option value="training">Training</option>
-              </select>
+                <input type="text" name="contact" class="form-control cta-input" placeholder="Contact" required>
             </div>
             <div class="mb-3">
-              <input type="text" class="form-control cta-input" placeholder="Sub-Service">
+                <input type="text" name="subject" class="form-control cta-input" placeholder="Subject" required>
             </div>
             <div class="mb-3">
-              <textarea class="form-control cta-input" rows="3" placeholder="Message"></textarea>
+                <textarea name="message" class="form-control cta-input" rows="3" placeholder="Message" required></textarea>
             </div>
             <button type="submit" class="btn btn-dark w-100 py-2 fw-bold" style="background:#091e3e;">Request A Quote</button>
           </form>

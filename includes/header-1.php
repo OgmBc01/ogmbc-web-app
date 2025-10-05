@@ -104,7 +104,7 @@
 
         <!-- CTA -->
             <li class="nav-item">
-                <a href="login" target="_blank" class="btn btn-ghost">Login</a>
+                <a href="login.php" target="_blank" class="btn btn-ghost">Login</a>
             </li>
             </ul>
         </div>

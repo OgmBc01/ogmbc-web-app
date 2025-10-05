@@ -371,8 +371,6 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
   -webkit-tap-highlight-color: transparent;
 }
 
-
-
 /* ================================
    Hero Carousel (Bootstrap override)
    ================================ */
@@ -454,6 +452,15 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
   margin: 0 0 1.2rem;
 }
 
+/* Add to resources/css/style.css */
+.hero-bg-image {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 .actions {
   display: flex;
   gap: .8rem;
@@ -472,12 +479,83 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
   align-items: center; /* vertically center content */
 }
 
+/* ================================
+   About Us
+   ================================ */
 
-/* Overlapping container */
-.contact-cta {
-  margin-top: -4rem; /* overlaps hero slightly */
-  z-index: 2;
+/* Dynamic mesh + curved-lines background for hero */
+.about-hero {
+  height: 60vh;
   position: relative;
+  margin-top: -85px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background-color: #091e3e; /* fallback color */
+}
+
+/* Animated gradient blobs (mesh) */
+.about-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(241,191,112,0.36), transparent 45%),
+    radial-gradient(circle at 80% 20%, rgba(56,189,248,0.22), transparent 55%),
+    radial-gradient(circle at 52% 78%, rgba(139,92,246,0.20), transparent 55%),
+    radial-gradient(circle at 92% 70%, rgba(15,23,42,0.85), transparent 78%),
+    #0f172a; /* base fallback */
+  mix-blend-mode: screen;
+  animation: meshShift 18s ease-in-out infinite alternate;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Curved lines overlay — SVG embedded as base64 to avoid encoding issues */
+.about-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* base64-encoded SVG (curved lines). This avoids browser parsing problems. */
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxNDQwIDYwMCcgcHJlc2VydmVBc3BlY3RSYXRpbz0neE1pZEd5TWlkIHNsaWNlJz4gPHBhdGggZD0nTTAsMzIwIEM0ODAsNDAwIDk2MCwyNDAgMTQ0MCwzMjAnIGZpbGw9J25vbmUnIHN0cm9rZT0ncmdiYSgyNDEsMTkxLDExMiwwLjI1KScgc3Ryb2tlLXdpZHRoPScyJy8+IDxwYXRoIGQ9J00wLDQwMCBDNDgwLDQ4MCA5NjAsMzIwIDE0NDAsNDAwJyBmaWxsPSdub25lJyBzdHJva2U9J3JnYmEoNTYsMTg5LDI0OCwwLjIpJyBzdHJva2Utd2lkdGg9JzEuNScvPiA8cGF0aCBkPSdNMCw1MDAgQzQ4MCw1ODAgOTYwLDQyMCAxNDQwLDUwMCcgZmlsbD0nbm9uZScgc3Ryb2tlPSdyZ2JhKDEzOSw5MiwyNDYsMC4yKScgc3Ryb2tlLXdpZHRoPScxLjUnLz4gPC9zdmc+");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.72;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* make sure text sits above effects */
+.about-hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* animate gradient blob positions for subtle motion */
+@keyframes meshShift {
+  0% {
+    background-position: 18% 28%, 80% 20%, 52% 78%, 92% 70%;
+  }
+  100% {
+    background-position: 22% 34%, 76% 24%, 56% 74%, 86% 66%;
+  }
+}
+
+.about-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55); /* overlay for readability */
+  z-index: 1;
+}
+
+.about-hero .container {
+  position: relative;
+  z-index: 2; /* ensures text appears above overlay */
+  color: #fff;
 }
 
 .contact-cta-inner {
@@ -517,7 +595,6 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
   flex-shrink: 0;
 }
   
-
 /* Glowing CTA button */
 .btn-glow {
   position: relative;
@@ -572,7 +649,6 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
     transform: rotate(360deg);
   }
 }
-
 
 
 /* ================================
@@ -885,86 +961,6 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
 .cta { text-align:center; padding:4rem 2rem; background: linear-gradient(135deg, var(--secondary), var(--primary)); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
 .cta h2 { color:#000; margin-bottom:1rem; }
 .cta p { color:#111; margin-bottom:2rem; }
-
-
-/* ================================
-   About Us
-   ================================ */
-
-/* Dynamic mesh + curved-lines background for hero */
-.about-hero {
-  height: 60vh;
-  position: relative;
-  margin-top: -70px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-}
-
-/* Animated gradient blobs (mesh) */
-.about-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 18% 28%, rgba(241,191,112,0.36), transparent 45%),
-    radial-gradient(circle at 80% 20%, rgba(56,189,248,0.22), transparent 55%),
-    radial-gradient(circle at 52% 78%, rgba(139,92,246,0.20), transparent 55%),
-    radial-gradient(circle at 92% 70%, rgba(15,23,42,0.85), transparent 78%),
-    #0f172a; /* base fallback */
-  mix-blend-mode: screen;
-  animation: meshShift 18s ease-in-out infinite alternate;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Curved lines overlay — SVG embedded as base64 to avoid encoding issues */
-.about-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* base64-encoded SVG (curved lines). This avoids browser parsing problems. */
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxNDQwIDYwMCcgcHJlc2VydmVBc3BlY3RSYXRpbz0neE1pZEd5TWlkIHNsaWNlJz4gPHBhdGggZD0nTTAsMzIwIEM0ODAsNDAwIDk2MCwyNDAgMTQ0MCwzMjAnIGZpbGw9J25vbmUnIHN0cm9rZT0ncmdiYSgyNDEsMTkxLDExMiwwLjI1KScgc3Ryb2tlLXdpZHRoPScyJy8+IDxwYXRoIGQ9J0cwLDQwMCBDNDgwLDQ4MCA5NjAsMzIwIDE0NDAsNDAwJyBmaWxsPSdub25lJyBzdHJva2U9J3JnYmEoNTYsMTg5LDI0OCwwLjIpJyBzdHJva2Utd2lkdGg9JzEuNScvPiA8cGF0aCBkPSdNMCw1MDAgQzQ4MCw1ODAgOTYwLDQyMCAxNDQwLDUwMCcgZmlsbD0nbm9uZScgc3Ryb2tlPSdyZ2JhKDEzOSw5MiwyNDYsMC4yKScgc3Ryb2tlLXdpZHRoPScxLjUnLz4gPC9zdmc+");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  opacity: 0.72;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* make sure text sits above effects */
-.about-hero .container {
-  position: relative;
-  z-index: 2;
-}
-
-/* animate gradient blob positions for subtle motion */
-@keyframes meshShift {
-  0% {
-    background-position: 18% 28%, 80% 20%, 52% 78%, 92% 70%;
-  }
-  100% {
-    background-position: 22% 34%, 76% 24%, 56% 74%, 86% 66%;
-  }
-}
-
-.about-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.55); /* overlay for readability */
-  z-index: 1;
-}
-
-.about-hero .container {
-  position: relative;
-  z-index: 2; /* ensures text appears above overlay */
-  color: #fff;
-}
-
 
 /* Team Section */
 .team-section {
@@ -1702,4 +1698,3 @@ footer .brand { font-size:1.2rem; font-weight:700; }
 .service-icon i {
   font-size: 1rem;  /* reduced from 1.3rem */
 }
-
