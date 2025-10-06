@@ -69,11 +69,11 @@ include 'includes/header.php'
                 <div class="d-flex flex-column gap-3 contact-info">
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                    <span>+971 50 986 0136</span>
+                    <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
                   </div>
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
-                    <span>info@ogmbc.ae</span>
+                    <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
                   </div>
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
@@ -101,16 +101,16 @@ include 'includes/header.php'
                 <a class="btn btn-primary" href="#contact">Talk to an advisor</a>
               </div>
             </div>
-           <div class="col-lg-5">
+            <div class="col-lg-5">
               <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
                 <div class="d-flex flex-column gap-3 contact-info">
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                    <span>+971 50 986 0136</span>
+                    <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
                   </div>
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
-                    <span>info@ogmbc.ae</span>
+                    <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
                   </div>
                   <div class="info-box d-flex align-items-center gap-2">
                     <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
@@ -539,7 +539,7 @@ include 'includes/header.php'
   <!-- Floating Action Buttons -->
   <div class="floating-buttons">
       <!-- WhatsApp Button -->
-      <a href="https://wa.me/+971509860136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
+      <a href="https://wa.me/+971502923136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
           <i class="bi bi-whatsapp"></i>
       </a>
       
