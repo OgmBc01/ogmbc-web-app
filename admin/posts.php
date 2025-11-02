@@ -7,30 +7,30 @@ include 'includes/sidebar.php';
 <div class="row">
     <div class="col-md-12">
       <?php
-    if (isset($_GET['source'])) {
-        $source = $_GET['source'];
-    } else {
-        $source = '';
-    }
+        if (isset($_GET['source'])) {
+            $source = $_GET['source'];
+        } else {
+            $source = '';
+        }
 
-    switch ($source) {
-        case 'add_post':
-            include "includes/add_post.php";
-            break;
+        switch ($source) {
+            case 'add_post':
+                include "includes/add_post.php";
+                break;
 
-        case 'edit_post':
-            include "includes/edit_post.php";
-            break;
+            case 'edit_post':
+                include "includes/edit_post.php";
+                break;
 
-        case 'delete_post':
-            include "includes/delete_post.php";
-            break;
+            case 'delete_post':
+                include "includes/delete_post.php";
+                break;
 
-        default:
-            include "includes/view_all_posts.php";
-            break;
-    }
-    ?>
+            default:
+                include "includes/view_all_posts.php";
+                break;
+        }
+      ?>
     </div>
   </div>  
 </div>

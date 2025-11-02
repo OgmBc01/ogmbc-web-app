@@ -1,7 +1,7 @@
-        <!-- Back to Top Button -->
-        <a href="#" class="back-to-top btn btn-primary rounded-circle">
-            <i class="bi bi-arrow-up"></i>
-        </a>
+<!-- Back to Top Button -->
+<a href="#" class="back-to-top btn btn-primary rounded-circle">
+    <i class="bi bi-arrow-up"></i>
+</a>
 
 <footer id="contact">
   <div class="container footer-grid">

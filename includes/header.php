@@ -222,6 +222,11 @@
             </ul>
           </li>
 
+          <!-- Profile -->
+          <li class="nav-item">
+              <a class="nav-link" href="ogmbc-profile.php">Profile</a>
+          </li>
+
           <!-- Blog -->
           <li class="nav-item">
               <a class="nav-link" href="blog.php">Blog</a>
