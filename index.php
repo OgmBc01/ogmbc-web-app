@@ -23,7 +23,7 @@ include 'includes/header.php'
               <h1 class="hero-title">Trusted audits & financial clarity for growing businesses.</h1>
               <p class="text-light">We deliver ISA-compliant audits, IFRS reporting, and practical advisory so you can make confident decisions and satisfy stakeholders.</p>
               <div class="d-flex gap-3 flex-wrap">
-                <a class="btn btn-primary" href="#contact">Book a discovery call</a>
+                <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
                 <a class="btn btn-ghost" href="#services">Explore services</a>
               </div>
             </div>
@@ -61,7 +61,8 @@ include 'includes/header.php'
               <h1 class="hero-title">Clear, compliant, and timely IFRS reporting.</h1>
               <p class="text-light">Accurate preparation, conversion, and consolidation of financial statements aligned with global standards.</p>
               <div class="d-flex gap-3 flex-wrap">
-                <a class="btn btn-primary" href="#contact">Get IFRS support</a>
+                <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
+                <a class="btn btn-ghost" href="ifrs.php">Get IFRS support</a>
               </div>
             </div>
             <div class="col-lg-5">
@@ -98,7 +99,8 @@ include 'includes/header.php'
               <h1 class="hero-title">Strengthen governance & controls with OGMBC.</h1>
               <p class="text-light">Risk assessments, SOPs, internal audits, and tax compliance tailored to your sector.</p>
               <div class="d-flex gap-3 flex-wrap">
-                <a class="btn btn-primary" href="#contact">Talk to an advisor</a>
+                <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
+                <a class="btn btn-ghost" href="contact.php">Talk to an advisor</a>
               </div>
             </div>
             <div class="col-lg-5">
@@ -264,19 +266,7 @@ include 'includes/header.php'
             </p>
           </div>
         </div>
-        <!-- Feature 2 -->
-        <div class="col-md-4">
-          <div class="feature-modern d-flex flex-column align-items-center">
-            <span class="feature-icon-modern mb-3">
-              <i class="bi bi-shield-check"></i>
-            </span>
-            <h4 class="mb-2" style="color:#313131;">Compliance & Assurance</h4>
-            <p style="color:#747576;">
-              Our experienced team ensures adherence to international standards, 
-              regulatory frameworks, and tax obligations.
-            </p>
-          </div>
-        </div>
+
         <!-- Feature 3 -->
         <div class="col-md-4">
           <div class="feature-modern d-flex flex-column align-items-center">
@@ -287,6 +277,20 @@ include 'includes/header.php'
             <p style="color:#747576;">
               We partner with you, offering personalized advisory, outsourcing, 
               and training solutions to fit your growth needs.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="col-md-4">
+          <div class="feature-modern d-flex flex-column align-items-center">
+            <span class="feature-icon-modern mb-3">
+              <i class="bi bi-shield-check"></i>
+            </span>
+            <h4 class="mb-2" style="color:#313131;">Compliance & Assurance</h4>
+            <p style="color:#747576;">
+              Our experienced team ensures adherence to international standards, 
+              regulatory frameworks, and tax obligations.
             </p>
           </div>
         </div>

@@ -227,6 +227,11 @@
               <a class="nav-link" href="ogmbc-profile.php">Profile</a>
           </li>
 
+          <!-- Ratios -->
+          <li class="nav-item">
+              <a class="nav-link" href="ratios.php">Ratios</a>
+          </li>
+
           <!-- Blog -->
           <li class="nav-item">
               <a class="nav-link" href="blog.php">Blog</a>

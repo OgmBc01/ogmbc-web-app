@@ -139,12 +139,12 @@ include 'includes/header-1.php'
   <section class="py-5 text-white">
     <div class="container">
       <div class="text-center mb-4">
-        <h3 class="fw-bold">Our <span style="color:#d0aa4b;">Values</span></h3>
+        <h3 class="fw-bold">Our <span style="color:#d0aa4b;">Our Values</span></h3>
         <p class="lead">The principles that guide us in every engagement and client relationship.</p>
       </div>
       <div class="row g-4 justify-content-center">
         <div class="col-md-4">
-          <div class="feature-modern d-flex flex-column align-items-center bg-white p-4 rounded-4 shadow-sm h-100">
+          <div class="feature-modern d-flex flex-column align-items-center p-4 rounded-4 shadow-sm h-100">
             <span class="feature-icon-modern mb-3">
               <i class="fas fa-balance-scale"></i>
             </span>
@@ -153,7 +153,7 @@ include 'includes/header-1.php'
           </div>
         </div>
         <div class="col-md-4">
-          <div class="feature-modern d-flex flex-column align-items-center bg-white p-4 rounded-4 shadow-sm h-100">
+          <div class="feature-modern d-flex flex-column align-items-center p-4 rounded-4 shadow-sm h-100">
             <span class="feature-icon-modern mb-3">
               <i class="fas fa-star"></i>
             </span>
@@ -162,7 +162,7 @@ include 'includes/header-1.php'
           </div>
         </div>
         <div class="col-md-4">
-          <div class="feature-modern d-flex flex-column align-items-center bg-white p-4 rounded-4 shadow-sm h-100">
+          <div class="feature-modern d-flex flex-column align-items-center p-4 rounded-4 shadow-sm h-100">
             <span class="feature-icon-modern mb-3">
               <i class="fas fa-users"></i>
             </span>
@@ -171,7 +171,7 @@ include 'includes/header-1.php'
           </div>
         </div>
         <div class="col-md-6">
-          <div class="feature-modern d-flex flex-column align-items-center bg-white p-4 rounded-4 shadow-sm h-100">
+          <div class="feature-modern d-flex flex-column align-items-center p-4 rounded-4 shadow-sm h-100">
             <span class="feature-icon-modern mb-3">
               <i class="fas fa-handshake"></i>
             </span>
@@ -180,7 +180,7 @@ include 'includes/header-1.php'
           </div>
         </div>
         <div class="col-md-6">
-          <div class="feature-modern d-flex flex-column align-items-center bg-white p-4 rounded-4 shadow-sm h-100">
+          <div class="feature-modern d-flex flex-column align-items-center p-4 rounded-4 shadow-sm h-100">
             <span class="feature-icon-modern mb-3">
               <i class="fas fa-lightbulb"></i>
             </span>
