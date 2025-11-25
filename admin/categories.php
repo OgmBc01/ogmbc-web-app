@@ -26,6 +26,11 @@ include 'includes/sidebar.php'
                             <label for="cat_title">Service Name</label>
                             <input type="text" id="cat_title" name="cat_title" class="form-control" required>
                         </div>
+
+                        <div class="form-group">
+                            <label for="cat_price">Price</label>
+                            <input type="number" step="0.01" id="cat_price" name="cat_price" class="form-control" required>
+                        </div>
                         
                         <button type="submit" name="submit" class="btn">
                             <i class="bi bi-check-lg"></i> Add Service
@@ -50,6 +55,7 @@ include 'includes/sidebar.php'
                             <tr>
                                 <th>ID</th>
                                 <th>Service Name</th>
+                                <th>Price</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>

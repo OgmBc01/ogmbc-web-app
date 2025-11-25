@@ -74,8 +74,8 @@ img { max-width: 100%; display: block; }
 /* ================================
    Header / Navbar
    ================================ */
-header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); padding: .5rem 0; }
-.nav { display:flex; align-items:center; justify-content:space-between; padding:.8rem 1rem; background: rgba(15,23,42,.8); border-radius:50px; border:1px solid rgba(255,255,255,.08); }
+header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
+.nav { display:flex; align-items:center; justify-content:space-between; padding:.8rem 1rem; background: #0f172a; border-radius:50px; border:1px solid rgba(255,255,255,.08); }
 .brand { display:flex; align-items:center; font-weight:800; color:var(--secondary); }
 .brand .logo { width:36px; height:36px; border-radius:10px; background: conic-gradient(from 140deg, var(--primary), var(--secondary)); display:grid; place-items:center; box-shadow:var(--shadow); }
 .menu { display:flex; align-items:center; gap:1rem; }
@@ -118,7 +118,7 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
   align-items: center;
   gap: 1rem;
   padding: .8rem 1rem;
-  background: rgba(15,23,42,.8);
+  background: rgb(15, 23, 42);
   border-radius: 50px;
   border: 1px solid rgba(255,255,255,.08);
 }
@@ -468,11 +468,42 @@ header { position:sticky; top:0; z-index:100; backdrop-filter: blur(10px); paddi
 }
 
 /* Bootstrap carousel control overrides */
+#heroCarousel {
+  position: relative;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  z-index: 100; /* Higher z-index to ensure controls are on top */
+  width: 8%; /* Wider control area */
+  opacity: 0.8;
+  color: var(--secondary);
+}
+
+.carousel-control-prev {
+  left: -2%; /* Extend further to the left edge */
+}
+
+.carousel-control-next {
+  right: -2%; /* Extend further to the right edge */
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 1;
+}
+
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
   filter: invert(80%) sepia(60%) saturate(400%) hue-rotate(15deg);
+  width: 3rem; /* Larger icons */
+  height: 3rem; /* Larger icons */
 }
 
+/* Ensure carousel indicators are also on top */
+.carousel-indicators {
+  z-index: 99;
+}
 .hero .carousel-item > .container {
   height: 100%; /* container spans full height */
   display: flex;

@@ -29,12 +29,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->bind_result($user_id, $db_username, $db_email, $db_password);
                     
                     if ($stmt->fetch()) {
-                        // Compare password (plain text for now)
-                        if ($password === $db_password) { 
-                            // Save into session
+                        // Use password_verify for hashed passwords
+                        if (password_verify($password, $db_password)) { 
+                            // Regenerate session ID for security
+                            session_regenerate_id(true);
+                            
+                            // Save into session (don't store password in session)
                             $_SESSION['user_id'] = $user_id;
                             $_SESSION['username'] = $db_username;
                             $_SESSION['user_email'] = $db_email;
+                            // Do NOT store password in session for security
+                            
+                            // Update last login time (optional)
+                            $update_sql = "UPDATE users SET last_login = NOW() WHERE user_id = ?";
+                            if ($update_stmt = $connection->prepare($update_sql)) {
+                                $update_stmt->bind_param("i", $user_id);
+                                $update_stmt->execute();
+                                $update_stmt->close();
+                            }
                             
                             header("Location: admin/dashboard.php");
                             exit();

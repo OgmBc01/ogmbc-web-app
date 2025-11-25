@@ -28,6 +28,14 @@
                 </a>
             </li>
 
+            <!-- Bank Accounts Menu -->
+            <li class="nav-item">
+                <a class="nav-link" href="bank_accounts.php" data-menu="bank-accounts">
+                    <i class="bi bi-bank nav-icon"></i>
+                    <span class="nav-text">Bank Accounts</span>
+                </a>
+            </li>
+
             <!-- Posts Menu -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn" href="#" data-menu="posts">

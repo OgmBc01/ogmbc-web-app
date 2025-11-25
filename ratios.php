@@ -8,51 +8,149 @@ include 'includes/header-1.php'
         --gold: #f1bf70;
         --primary: #0b1224;
         --muted: #94a3b8;
+        --success: #10b981;
+        --success-light: rgba(16, 185, 129, 0.1);
     }
 
-    .card-app { background: rgba(255,255,255,0.04); border:1px solid rgba(241,191,112,0.06); }
+    .card-app { background: #ffffff12; border:1px solid rgba(241, 192, 112, 0.21); margin-top: -70px; }
     .stepper { counter-reset: step; }
     .step { position: relative; padding-left:3rem; margin-bottom:1.25rem; }
     .step::before { counter-increment: step; content: counter(step); width:2rem; height:2rem; border-radius:50%; background:var(--gold); color:var(--primary); display:inline-grid; place-items:center; position:absolute; left:0; top:0; font-weight:700; }
     
-    /* Ratio card styling */
+    /* Ratio card styling - UPDATED FOR RESPONSIVE */
     .ratio-card {
         background: #0b1224;
         border-radius: 10px;
         padding: 1rem;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         color: #e2e8f0;
         border: 2px solid transparent;
+        flex: 1 1 calc(50% - 0.5rem); /* Two cards per row on mobile */
+        min-width: 0; /* Allow flex shrinking */
+        position: relative;
+        overflow: hidden;
     }
+    
+    /* Desktop: 3-4 cards per row */
+    @media (min-width: 768px) {
+        .ratio-card {
+            flex: 0 0 auto;
+            min-width: 240px;
+        }
+    }
+    
+    /* Mobile: 2 cards per row */
+    @media (max-width: 767.98px) {
+        .ratio-card {
+            flex: 1 1 calc(50% - 0.5rem);
+            min-width: 0;
+            padding: 0.75rem;
+        }
+    }
+    
+    /* Small mobile: 1 card per row */
+    @media (max-width: 575.98px) {
+        .ratio-card {
+            flex: 1 1 100%;
+        }
+    }
+
     .ratio-card:hover {
         transform: translateY(-4px);
         border-color: var(--gold);
         box-shadow: 0 0 8px rgba(241,191,112,0.4);
     }
+    
+    /* Enhanced selected state with green animation */
     .ratio-card.selected {
-        border-color: var(--gold);
-        box-shadow: 0 0 10px rgba(241,191,112,0.7);
+        border-color: var(--success);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        background: var(--success-light);
+        animation: pulse-selected 1.5s ease-in-out;
+    }
+    
+    @keyframes pulse-selected {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    
+    /* Green tick mark for selected ratios */
+    .selected-tick {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 20px;
+        height: 20px;
+        background: var(--success);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.3s ease;
+    }
+    
+    .ratio-card.selected .selected-tick {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    .selected-tick i {
+        color: white;
+        font-size: 12px;
     }
 
-    /* Abbreviation square patch */
+    /* Abbreviation square patch - UPDATED FOR MOBILE */
     .ratio-abbr {
-        width: 48px;
-        height: 48px;
+        width: 40px;
+        height: 40px;
         border-radius: 8px;
         background: #f1c070ff;
         display: grid;
         place-items: center;
         color: #fff;
         font-weight: 700;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    @media (min-width: 768px) {
+        .ratio-abbr {
+            width: 48px;
+            height: 48px;
+            font-size: 1.1rem;
+        }
     }
 
-    /* Ratio title golden */
+    /* Ratio title golden - UPDATED FOR MOBILE */
     .ratio-name {
         color: var(--gold);
         font-weight: 600;
-        font-size: 1.05rem;
+        font-size: 0.95rem;
+        line-height: 1.3;
+    }
+    
+    @media (min-width: 768px) {
+        .ratio-name {
+            font-size: 1.05rem;
+        }
+    }
+
+    /* Ratio grid container - UPDATED FOR RESPONSIVE */
+    #ratiosGrid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    /* Ensure proper spacing on mobile */
+    @media (max-width: 767.98px) {
+        #ratiosGrid {
+            gap: 0.5rem;
+        }
     }
 
     .badge-good { background: #16a34a; color: #fff; }
@@ -65,6 +163,39 @@ include 'includes/header-1.php'
 
     .saved-table td, .saved-table th { color: #0f172a; }
     .bg-paper { background: #f7f6f2; color: #0f172a; }
+    
+    /* Enhanced instruction styling */
+    .step-instruction {
+        background: rgba(241, 191, 112, 0.1);
+        border-left: 3px solid var(--gold);
+        padding: 12px 15px;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 15px;
+    }
+    
+    .step-instruction p {
+        margin-bottom: 0;
+        color: #e2e8f0;
+    }
+    
+    .step-instruction .instruction-icon {
+        color: var(--gold);
+        margin-right: 8px;
+    }
+    
+    /* Selected ratios counter */
+    .selected-counter {
+        background: var(--success);
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        margin-left: 8px;
+    }
 </style>
 
 <!-- Hero Section -->
@@ -88,7 +219,7 @@ include 'includes/header-1.php'
         <div class="card card-app shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="mb-0">Get Started</h3>
+                    <h3 class="mb-0">Calculate</h3>
                 </div>
 
                 <!-- Stepper -->
@@ -97,15 +228,21 @@ include 'includes/header-1.php'
                     <div class="step" data-step="1">
                         <h5 class="mb-1">Step 1 — Select Ratio(s)</h5>
                         <p class="small-muted mb-2">Choose one or more ratios to calculate.</p>
+                        
+                        <!-- Enhanced instructions -->
+                        <div class="step-instruction">
+                            <p class="text-dark"><i class="bi bi-info-circle instruction-icon"></i> Click on any ratio card to select it. Selected ratios will show a green checkmark and animated border.</p>
+                        </div>
 
                         <div class="row g-3">
                             <div class="col-12">
-                                <div class="row g-2">
-                                    <div id="ratiosGrid" class="d-flex flex-wrap gap-2"></div>
-                                </div>
+                                <div id="ratiosGrid"></div>
                             </div>
                             <div class="col-12 text-end mt-2">
-                                <button id="toStep2" class="btn btn-primary" disabled>Next: Enter Inputs</button>
+                                <button id="toStep2" class="btn btn-primary" disabled>
+                                    Next: Enter Inputs 
+                                    <span id="selectedCount" class="selected-counter" style="display: none;">0</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -113,7 +250,12 @@ include 'includes/header-1.php'
                     <!-- STEP 2 -->
                     <div class="step" data-step="2" style="display:none;">
                         <h5 class="mb-1">Step 2 — Enter Inputs</h5>
-                        <p class="small-muted mb-2">You will be calculating the ratios for the below listed categories.</br>Only fields required for the chosen ratios are shown.</p>
+                        <p class="small-muted mb-2">Only fields required for the chosen ratios are shown.</p>
+                        
+                        <!-- Enhanced instructions -->
+                        <div class="step-instruction">
+                            <p class="text-dark"><i class="bi bi-pencil-square instruction-icon"></i> Fill in all required financial values. All fields are necessary for accurate calculations.</p>
+                        </div>
 
                         <!-- Display selected ratio names -->
                         <div id="selectedRatiosHeader" class="p-3 mb-3 rounded-3" style="background:#0b1224; color:var(--gold); font-weight:600; display:none;">
@@ -198,7 +340,6 @@ include 'includes/header-1.php'
   /* =========================
     Ratio Definitions + UI data
     ========================= */
-  /* ======= REPLACE THE RATIOS BLOCK WITH THIS CLEAN VERSION ======= */
   const RATIOS = {
     current_ratio: {
       label: "Current Ratio",
@@ -412,32 +553,47 @@ include 'includes/header-1.php'
     return '<span class="badge bg-secondary me-1">N/A</span>';
   };
 
-  /* ===== RENDER RATIO OPTIONS (updated for golden name + square patch) ===== */
+  /* ===== RENDER RATIO OPTIONS (updated with green tick and animation) ===== */
   function renderRatioOptions(){
     const container = document.getElementById('ratiosGrid');
     container.innerHTML = '';
     Object.keys(RATIOS).forEach(key=>{
       const r = RATIOS[key];
       const card = document.createElement('div');
-      card.className = 'ratio-card p-3';
-      card.style.minWidth = '240px';
-      card.style.flex = '0 0 auto';
+      card.className = 'ratio-card';
       card.dataset.ratio = key;
       card.innerHTML = `
+        <div class="selected-tick">
+          <i class="bi bi-check-lg"></i>
+        </div>
         <div class="d-flex align-items-start">
           <div class="me-3 ratio-abbr">${r.label.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
           <div>
             <div class="ratio-name">${r.label}</div>
-            <div class="small-muted">${r.inputs.map(i=>i.label).join(' • ')}</div>
+            <div class="small-muted" style="font-size:0.85rem;">${r.inputs.map(i=>i.label).join(' • ')}</div>
           </div>
         </div>
       `;
       card.addEventListener('click', function(){
         this.classList.toggle('selected');
+        updateSelectedCounter();
         updateNextButton();
       });
       container.appendChild(card);
     });
+  }
+
+  /* Update selected counter */
+  function updateSelectedCounter() {
+    const selectedCount = document.querySelectorAll('#ratiosGrid .ratio-card.selected').length;
+    const counter = document.getElementById('selectedCount');
+    
+    if (selectedCount > 0) {
+      counter.textContent = selectedCount;
+      counter.style.display = 'inline-flex';
+    } else {
+      counter.style.display = 'none';
+    }
   }
 
   /* Show selected ratios on Step 2 */
@@ -445,7 +601,7 @@ include 'includes/header-1.php'
     const selected = Array.from(document.querySelectorAll('#ratiosGrid .ratio-card.selected')).map(el=>el.dataset.ratio);
     if(selected.length === 0) return;
     const header = document.getElementById('selectedRatiosHeader');
-    header.innerHTML = selected.map(k=>RATIOS[k].label).join(' • ');
+    header.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>Selected Ratios: ${selected.map(k=>RATIOS[k].label).join(' • ')}`;
     header.style.display = 'block';
     showStep(2);
     renderInputsFor(selected);
@@ -491,8 +647,9 @@ include 'includes/header-1.php'
       const col = document.createElement('div');
       col.className = 'col-md-6';
       col.innerHTML = `
-        <label class="form-label">${f.label}</label>
-        <input type="number" step="any" class="form-control ratio-input" name="${f.k}" id="input_${f.k}" placeholder="Enter ${f.label}">
+        <label class="form-label">${f.label} <span class="text-warning">*</span></label>
+        <input type="number" step="any" class="form-control ratio-input" name="${f.k}" id="input_${f.k}" placeholder="Enter ${f.label}" required>
+        <div class="form-text text-muted">Required for calculation</div>
       `;
       inputsContainer.appendChild(col);
     });
@@ -622,54 +779,245 @@ include 'includes/header-1.php'
     }
 
     /* Generate PDF using jsPDF and html2canvas for the resultsContainer */
-    async function downloadPdf(results, inputs){
-      // create a temporary element with nicer paper styling
-      const paper = document.createElement('div');
-      paper.style.width = '800px';
-      paper.style.padding = '24px';
-      paper.style.background = '#fff';
-      paper.style.color = '#0f172a';
-      paper.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div>
-            <h3 style="margin:0;">OGMBC Consultants</h3>
-            <div style="font-size:12px;color:#444;">Financial Ratios Report</div>
-          </div>
-          <div style="text-align:right;font-size:12px;color:#444;">
-            Generated: ${new Date().toLocaleString()}
-          </div>
-        </div>
-        <hr style="border-color:#eee;">
-        <div style="margin-bottom:12px;">
-          <strong>Inputs</strong>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
-            ${Object.keys(inputs).map(k=>`<div style="min-width:180px;"><small style="color:#666;">${k.replace(/_/g,' ')}:</small><div><strong>${formatNumber(inputs[k])}</strong></div></div>`).join('')}
-          </div>
-        </div>
-        <div>
-          <strong>Results</strong>
-          <table style="width:100%;border-collapse:collapse;margin-top:8px;">
-            <thead><tr><th style="text-align:left;border-bottom:1px solid #eee;padding:6px 0">Ratio</th><th style="text-align:left;border-bottom:1px solid #eee;padding:6px 0">Value</th><th style="text-align:left;border-bottom:1px solid #eee;padding:6px 0">Status</th></tr></thead>
-            <tbody>
-              ${results.map(r=>`<tr><td style="padding:6px 0">${r.label}</td><td style="padding:6px 0">${r.formatted}</td><td style="padding:6px 0">${r.status}</td></tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-        <hr style="border-color:#eee;">
-        <div style="font-size:12px;color:#666;">Generated by OGMBC Consultants — contact: info@ogmconsultants.com</div>
-      `;
+    /* Generate PDF on company letterhead */
+async function downloadPdf(results, inputs) {
+    try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-      document.body.appendChild(paper);
-      // use html2canvas to render paper to image then to jsPDF
-      const canvas = await html2canvas(paper, {scale:2, backgroundColor:'#ffffff'});
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({orientation:'portrait', unit:'px', format:[canvas.width, canvas.height]});
-      pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
-      const name = `OGMBC_ratios_${new Date().toISOString().slice(0,19).replaceAll(':','-')}.pdf`;
-      pdf.save(name);
-      document.body.removeChild(paper);
+        // Letterhead image path - UPDATE THIS PATH TO MATCH YOUR FILE LOCATION
+        const letterheadPath = 'resources/img/letter-head/lh.png'; // Change this path
+        
+        // Add letterhead background
+        try {
+            // You can either use an image or create a styled header
+            // For now, we'll create a professional header
+            pdf.setFillColor(15, 40, 75); // Dark blue background
+            pdf.rect(0, 0, 210, 40, 'F');
+            
+            // Company name
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(20);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('OGMBC CONSULTANTS', 105, 20, { align: 'center' });
+            
+            // Tagline
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('Financial Advisory & Business Consulting', 105, 28, { align: 'center' });
+            
+            // Contact info
+            pdf.setTextColor(200, 200, 200);
+            pdf.setFontSize(8);
+            pdf.text('Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE', 105, 34, { align: 'center' });
+            pdf.text('Tel: +971 50 292 3136 | Email: info@ogmbc.ae', 105, 38, { align: 'center' });
+            
+        } catch (error) {
+            console.warn('Could not load letterhead image, using styled header instead');
+        }
+
+        // Report title
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('FINANCIAL RATIOS ANALYSIS REPORT', 105, 60, { align: 'center' });
+
+        // Date and reference
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 70);
+        pdf.text(`Reference: R${Date.now().toString().slice(-6)}`, 20, 75);
+
+        // Client info section (you can customize this)
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('CLIENT INFORMATION', 20, 85);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Client: [Client Name]', 20, 92);
+        pdf.text('Period: [Reporting Period]', 20, 98);
+        pdf.text('Prepared by: OGMBC Financial Analysis Team', 20, 104);
+
+        // Executive summary
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('EXECUTIVE SUMMARY', 20, 120);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        const goodCount = results.filter(r => r.status === 'good').length;
+        const warnCount = results.filter(r => r.status === 'warn').length;
+        const riskCount = results.filter(r => r.status === 'risk').length;
+        
+        const summaryText = [
+            `This analysis covers ${results.length} key financial ratios.`,
+            `• ${goodCount} ratios indicate healthy financial position`,
+            `• ${warnCount} ratios require monitoring and improvement`,
+            `• ${riskCount} ratios need immediate attention`
+        ];
+        
+        summaryText.forEach((line, index) => {
+            pdf.text(line, 20, 127 + (index * 6));
+        });
+
+        // Input data section
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('INPUT DATA', 20, 155);
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'normal');
+        
+        let inputY = 162;
+        const inputKeys = Object.keys(inputs);
+        const midPoint = Math.ceil(inputKeys.length / 2);
+        
+        // Create two columns for inputs
+        inputKeys.slice(0, midPoint).forEach((key, index) => {
+            const label = key.replace(/_/g, ' ').toUpperCase();
+            pdf.text(`${label}:`, 25, inputY);
+            pdf.text(`${formatNumber(inputs[key])}`, 70, inputY);
+            inputY += 5;
+        });
+        
+        inputY = 162;
+        inputKeys.slice(midPoint).forEach((key, index) => {
+            const label = key.replace(/_/g, ' ').toUpperCase();
+            pdf.text(`${label}:`, 120, inputY);
+            pdf.text(`${formatNumber(inputs[key])}`, 165, inputY);
+            inputY += 5;
+        });
+
+        // Results table - start new page if needed
+        if (inputY > 240) {
+            pdf.addPage();
+            pdf.setFontSize(16);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('FINANCIAL RATIOS ANALYSIS REPORT (CONTINUED)', 105, 20, { align: 'center' });
+            pdf.setFontSize(10);
+            pdf.text(`Page 2 of 2 - Reference: R${Date.now().toString().slice(-6)}`, 105, 28, { align: 'center' });
+        } else {
+            pdf.setFontSize(12);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('RATIO ANALYSIS RESULTS', 20, inputY + 15);
+        }
+
+        // Table headers
+        const tableTop = (inputY > 240 ? 40 : inputY + 22);
+        pdf.setFillColor(241, 191, 112); // Gold color
+        pdf.rect(20, tableTop, 170, 8, 'F');
+        
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('RATIO', 25, tableTop + 6);
+        pdf.text('VALUE', 90, tableTop + 6);
+        pdf.text('STATUS', 130, tableTop + 6);
+        pdf.text('ASSESSMENT', 160, tableTop + 6);
+
+        // Table rows
+        let currentY = tableTop + 15;
+        results.forEach((result, index) => {
+            if (currentY > 270 && index < results.length - 1) {
+                pdf.addPage();
+                currentY = 40;
+                
+                // Add table header on new page
+                pdf.setFillColor(241, 191, 112);
+                pdf.rect(20, currentY - 8, 170, 8, 'F');
+                pdf.setTextColor(0, 0, 0);
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('RATIO', 25, currentY - 2);
+                pdf.text('VALUE', 90, currentY - 2);
+                pdf.text('STATUS', 130, currentY - 2);
+                pdf.text('ASSESSMENT', 160, currentY - 2);
+                
+                currentY += 7;
+            }
+
+            // Alternate row background
+            if (index % 2 === 0) {
+                pdf.setFillColor(245, 245, 245);
+                pdf.rect(20, currentY - 4, 170, 8, 'F');
+            }
+
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'normal');
+            
+            // Ratio name (truncate if too long)
+            const ratioName = result.label.length > 25 ? result.label.substring(0, 25) + '...' : result.label;
+            pdf.text(ratioName, 25, currentY);
+            
+            // Value
+            pdf.text(result.formatted, 90, currentY);
+            
+            // Status with color coding
+            if (result.status === 'good') pdf.setTextColor(0, 128, 0);
+            else if (result.status === 'warn') pdf.setTextColor(255, 165, 0);
+            else if (result.status === 'risk') pdf.setTextColor(255, 0, 0);
+            else pdf.setTextColor(128, 128, 128);
+            
+            pdf.text(result.status.toUpperCase(), 130, currentY);
+            
+            // Reset color for assessment
+            pdf.setTextColor(0, 0, 0);
+            const assessment = result.status === 'good' ? 'HEALTHY' : 
+                             result.status === 'warn' ? 'NEEDS ATTENTION' : 
+                             result.status === 'risk' ? 'URGENT ACTION' : 'INSUFFICIENT DATA';
+            pdf.text(assessment, 160, currentY);
+            
+            currentY += 8;
+        });
+
+        // Recommendations section
+        const recY = currentY + 15;
+        if (recY < 250) {
+            pdf.setFontSize(12);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('KEY RECOMMENDATIONS', 20, recY);
+            
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'normal');
+            
+            let recommendationY = recY + 8;
+            const riskRatios = results.filter(r => r.status === 'risk');
+            const topRecommendations = riskRatios.slice(0, 3).map(r => r.actions[0]);
+            
+            if (topRecommendations.length > 0) {
+                topRecommendations.forEach((rec, index) => {
+                    if (recommendationY < 280) {
+                        pdf.text(`• ${rec}`, 25, recommendationY);
+                        recommendationY += 6;
+                    }
+                });
+            } else {
+                pdf.text('• Maintain current financial practices and monitor ratios regularly', 25, recommendationY);
+            }
+        }
+
+        // Footer
+        pdf.setFontSize(8);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text('Confidential - For Client Use Only', 105, 285, { align: 'center' });
+        pdf.text('This report was generated automatically by OGMBC Financial Analysis System', 105, 290, { align: 'center' });
+        pdf.text('Contact: info@ogmbc.ae | Tel: +971 50 292 3136', 105, 295, { align: 'center' });
+
+        // Save the PDF
+        const fileName = `OGMBC_Financial_Analysis_${new Date().toISOString().slice(0,10)}.pdf`;
+        pdf.save(fileName);
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again or contact support.');
     }
+}
+
+    
 
     /* Save results to localStorage */
     function saveResult(results, inputs){

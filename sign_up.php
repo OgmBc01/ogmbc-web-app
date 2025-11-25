@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Username can only contain letters, numbers, and underscores.";
     } elseif (empty($user_email)) {
         $error = "Please enter an email address.";
-    } elseif (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) { // Fixed variable name from $email to $user_email
+    } elseif (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
         $error = "Please enter a valid email address.";
     } elseif (empty($password)) {
         $error = "Please enter a password.";
@@ -51,15 +51,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             if ($stmt->num_rows == 1) {
                                 $error = "This email is already registered.";
                             } else {
-                                // Insert new user
+                                // Insert new user with hashed password
                                 $sql = "INSERT INTO users (username, user_email, password) VALUES (?, ?, ?)";
                                 
                                 if ($stmt = $connection->prepare($sql)) {
-                                    // Note: In a real application, you should hash the password
-                                    $stmt->bind_param("sss", $username, $user_email, $password);
+                                    // Hash the password before storing
+                                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                                    
+                                    $stmt->bind_param("sss", $username, $user_email, $hashed_password);
                                     
                                     if ($stmt->execute()) {
-                                        header("Location: login.php?registered=true");
+                                        // Get the new user's ID
+                                        $new_user_id = $stmt->insert_id;
+                                        
+                                        // Log the user in automatically after registration (optional)
+                                        $_SESSION['user_id'] = $new_user_id;
+                                        $_SESSION['username'] = $username;
+                                        $_SESSION['user_email'] = $user_email;
+                                        
+                                        header("Location: admin/dashboard.php?registered=true");
                                         exit();
                                     } else {
                                         $error = "Something went wrong. Please try again later.";

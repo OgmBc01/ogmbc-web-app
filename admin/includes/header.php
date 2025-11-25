@@ -18,3 +18,75 @@ include 'functions.php';
     <link rel="stylesheet" href="resources/style.css">
 </head>
 <body>
+
+<!-- Password Authentication Modal -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Authentication Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Please enter your password to access Bank Accounts module.</p>
+                <form id="authForm">
+                    <div class="mb-3">
+                        <label for="user_password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="user_password" name="user_password" required>
+                    </div>
+                    <div id="authError" class="alert alert-danger d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitAuth">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bankAccountsLink = document.querySelector('a[href="bank_accounts.php"]');
+    if(bankAccountsLink) {
+        bankAccountsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+            authModal.show();
+        });
+    }
+
+    document.getElementById('submitAuth').addEventListener('click', function() {
+        const password = document.getElementById('user_password').value;
+        const errorDiv = document.getElementById('authError');
+        
+        if(!password) {
+            errorDiv.textContent = 'Please enter your password';
+            errorDiv.classList.remove('d-none');
+            return;
+        }
+
+        // AJAX request to verify password
+        fetch('verify_password.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'user_password=' + encodeURIComponent(password)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                window.location.href = 'bank_accounts.php';
+            } else {
+                errorDiv.textContent = data.message || 'Invalid password';
+                errorDiv.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            errorDiv.textContent = 'Authentication failed. Please try again.';
+            errorDiv.classList.remove('d-none');
+        });
+    });
+});
+</script>

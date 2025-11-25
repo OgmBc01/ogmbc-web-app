@@ -6,140 +6,154 @@ include 'includes/header.php'
 <!-- Hero Section (Carousel) -->
 
   <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-    <!-- indicators (optional) -->
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-    </div>
-
-    <div class="carousel-inner">
-      <!-- Slide 1 -->
-      <div class="carousel-item active">
-        <div class="container">
-          <div class="row align-items-center gy-4">
-            <div class="col-lg-7 mb-5" style="margin-top: 5rem;">
-              <span class="chip">Auditing • Accounting • Advisory</span>
-              <h1 class="hero-title">Trusted audits & financial clarity for growing businesses.</h1>
-              <p class="text-light">We deliver ISA-compliant audits, IFRS reporting, and practical advisory so you can make confident decisions and satisfy stakeholders.</p>
-              <div class="d-flex gap-3 flex-wrap">
-                <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
-                <a class="btn btn-ghost" href="#services">Explore services</a>
-              </div>
-            </div>
-            <div class="col-lg-5">
-              <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
-                <div class="d-flex flex-column gap-3 contact-info">
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                    <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
-                  </div>
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
-                    <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
-                  </div>
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
-                    <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
-                  </div>
-                </div>
-                <a href="contact.php" class="btn btn-secondary mt-3 text-white">
-                  Request Proposal
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 2 -->
-      <div class="carousel-item">
-        <div class="container">
-          <div class="row align-items-center gy-4">
-            <div class="col-lg-7 mb-5">
-              <span class="chip">Financial Reporting</span>
-              <h1 class="hero-title">Clear, compliant, and timely IFRS reporting.</h1>
-              <p class="text-light">Accurate preparation, conversion, and consolidation of financial statements aligned with global standards.</p>
-              <div class="d-flex gap-3 flex-wrap">
-                <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
-                <a class="btn btn-ghost" href="ifrs.php">Get IFRS support</a>
-              </div>
-            </div>
-            <div class="col-lg-5">
-              <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
-                <div class="d-flex flex-column gap-3 contact-info">
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                    <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
-                  </div>
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
-                    <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
-                  </div>
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
-                    <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
-                  </div>
-                </div>
-                <a href="contact.php" class="btn btn-secondary mt-3 text-white">
-                  Request Proposal
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 3 -->
-      <div class="carousel-item">
-        <div class="container">
-          <div class="row align-items-center gy-4">
-            <div class="col-lg-7 mb-5">
-              <span class="chip">Advisory & Compliance</span>
-              <h1 class="hero-title">Strengthen governance & controls with OGMBC.</h1>
-              <p class="text-light">Risk assessments, SOPs, internal audits, and tax compliance tailored to your sector.</p>
-              <div class="d-flex gap-3 flex-wrap">
-                <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
-                <a class="btn btn-ghost" href="contact.php">Talk to an advisor</a>
-              </div>
-            </div>
-            <div class="col-lg-5">
-              <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
-                <div class="d-flex flex-column gap-3 contact-info">
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                    <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
-                  </div>
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
-                    <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
-                  </div>
-                  <div class="info-box d-flex align-items-center gap-2">
-                    <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
-                    <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
-                  </div>
-                </div>
-                <a href="contact.php" class="btn btn-secondary mt-3 text-white">
-                  Request Proposal
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Controls -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
+  <!-- indicators (optional) -->
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
   </div>
-</section>
+
+  <div class="carousel-inner">
+    <!-- Slide 1 -->
+    <div class="carousel-item active" data-bs-interval="3000">
+      <div class="container">
+        <div class="row align-items-center gy-4">
+          <div class="col-lg-7 mb-5" style="margin-top: 5rem;">
+            <span class="chip">Auditing • Accounting • Taxation • Advisory</span>
+            <h1 class="hero-title">Empowering growth through strategic advisory and financial transparency</h1>
+            <p class="text-light">We providing IFRS-based reporting and strategic advisory that empower informed decisions and strengthen stakeholder trust</p>
+            <div class="d-flex gap-3 flex-wrap">
+              <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
+              <a class="btn btn-ghost" href="#services">Explore services</a>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+              <!-- Global presence row -->
+              <div class="global-presence d-flex align-items-center justify-content-center py-2">
+                <span class="fw-bold" style="color:#d0aa4b; font-size:1.1rem;">Our global presence: UAE, UK, USA</span>
+              </div>
+              
+              <div class="d-flex flex-column gap-3 contact-info">
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
+                  <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
+                </div>
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
+                  <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
+                </div>
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
+                  <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
+                </div>
+              </div>
+              <a href="contact.php" class="btn btn-secondary mt-3 text-white">
+                Request Proposal
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="carousel-item" data-bs-interval="3000">
+      <div class="container">
+        <div class="row align-items-center gy-4">
+          <div class="col-lg-7 mb-5">
+            <span class="chip">Advisory & Compliance</span>
+            <h1 class="hero-title">Strengthen governance & controls with OGMBC.</h1>
+            <p class="text-light">Risk assessments, SOPs, internal audits, and tax compliance tailored to your sector.</p>
+            <div class="d-flex gap-3 flex-wrap">
+              <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
+              <a class="btn btn-ghost" href="contact.php">Talk to an advisor</a>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+              <!-- Global presence row -->
+              <div class="global-presence d-flex align-items-center justify-content-center py-2">
+                <span class="fw-bold" style="color:#d0aa4b; font-size:1.1rem;">Our global presence: UAE, UK, USA</span>
+              </div>
+              <div class="d-flex flex-column gap-3 contact-info">
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
+                  <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
+                </div>
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
+                  <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
+                </div>
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
+                  <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
+                </div>
+              </div>
+              <a href="contact.php" class="btn btn-secondary mt-3 text-white">
+                Request Proposal
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="carousel-item" data-bs-interval="3000">
+      <div class="container">
+        <div class="row align-items-center gy-4">
+          <div class="col-lg-7 mb-5">
+            <span class="chip">Global Business Formation</span>
+            <h1 class="hero-title">Clear, compliant, and timely IFRS reporting.</h1>
+            <p class="text-light">We make business setup simple, compliant, and stress-free so you can focus on growth.</p>
+            <div class="d-flex gap-3 flex-wrap">
+              <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
+              <a class="btn btn-ghost" href="ifrs.php">Get IFRS support</a>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+              <!-- Global presence row -->
+              <div class="global-presence d-flex align-items-center justify-content-center py-2">
+                <span class="fw-bold" style="color:#d0aa4b; font-size:1.1rem;">Our global presence: UAE, UK, USA</span>
+              </div>
+              
+              <div class="d-flex flex-column gap-3 contact-info">
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
+                  <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
+                </div>
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
+                  <span><a href="mailto:info@ogmbc.ae" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">info@ogmbc.ae</a></span>
+                </div>
+                <div class="info-box d-flex align-items-center gap-2">
+                  <div class="icon-circle"><i class="bi bi-geo-alt-fill"></i></div>
+                  <span>Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</span>
+                </div>
+              </div>
+              <a href="contact.php" class="btn btn-secondary mt-3 text-white">
+                Request Proposal
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls - Updated with higher z-index and wider positioning -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+  </section>
 
   <!-- Services -->
   <section id="services" class="section">
@@ -147,96 +161,90 @@ include 'includes/header.php'
       <h2>Services</h2>
       <div class="d-flex justify-content-center">
         <p class="lead text-center">
-          From statutory audits to outsourced finance, we tailor our engagement to your governance and growth needs.
+          Whether it’s auditing, accounting, taxation, company setup, or strategic advisory, we customize our approach to fit your business vision, governance needs, and growth plans.
         </p>
       </div> 
       <div class="row g-4 services">
-        <!-- Audit & Assurance -->
+        <!-- Auditing & Compliance -->
         <div class="col-lg-4 col-md-6 justify-content-center">
           <article class="service card h-100">
             <div class="card-body d-flex flex-column align-items-center text-center">
-              <!-- <div class="chip">Audit & Assurance</div> -->
               <div class="service-icon">
-                <i class="bi bi-clipboard-check"></i>
+                <i class="bi bi-shield-check"></i>
               </div>
-              <h3>External Audit (ISA)</h3>
-              <p>Annual audits, limited reviews, and agreed-upon procedures with clear management letters and board-ready reports.</p>
+              <h3>Auditing & Compliance</h3>
+              <p>Beyond audits - empowering governance and control</p>
               <a href="audit-&-audit-support.php" class="btn btn-outline-primary mt-3">Learn More</a>
             </div>
           </article>
         </div>
 
-        <!-- Financial Reporting -->
+        <!-- Accounting & CFO -->
         <div class="col-lg-4 col-md-6">
           <article class="service card h-100">
             <div class="card-body d-flex flex-column align-items-center text-center">
-              <!-- <div class="chip">Financial Reporting</div> -->
               <div class="service-icon">
-                <i class="bi bi-file-earmark-bar-graph"></i>
+                <i class="bi bi-graph-up"></i>
               </div>
-              <h3>IFRS Financial Statements</h3>
-              <p>Preparation, conversion, and consolidation under IFRS with strong controls and documentation.</p>
+              <h3>Accounting & CFO</h3>
+              <p>Excellence in numbers, confidence in growth</p>
               <a href="financial-statement-reporting.php" class="btn btn-outline-primary mt-3">Learn More</a>
             </div>
           </article>
         </div>
 
-        <!-- Advisory -->
+        <!-- Taxation -->
         <div class="col-lg-4 col-md-6">
           <article class="service card h-100">
             <div class="card-body d-flex flex-column align-items-center text-center">
-              <!-- <div class="chip">Advisory</div> -->
-              <div class="service-icon">
-                <i class="bi bi-shield-check"></i>
-              </div>
-              <h3>Internal Control & Compliance</h3>
-              <p>Risk assessments, SOPs, internal audit setup, and regulatory compliance (FIRS, CAC, SEC where applicable).</p>
-              <a href="internal-controlling.php" class="btn btn-outline-primary mt-3">Learn More</a>
-            </div>
-          </article>
-        </div>
-
-        <!-- Tax -->
-        <div class="col-lg-4 col-md-6">
-          <article class="service card h-100">
-            <div class="card-body d-flex flex-column align-items-center text-center">
-              <!-- <div class="chip">Tax</div> -->
               <div class="service-icon">
                 <i class="bi bi-calculator"></i>
               </div>
-              <h3>Tax Compliance & Planning</h3>
-              <p>Company income tax, PAYE/VAT, WHT, and liaison with authorities; efficient, compliant tax positions.</p>
+              <h3>Taxation</h3>
+              <p>From registration to reporting — we've got you covered</p>
               <a href="tax-consultancy.php" class="btn btn-outline-primary mt-3">Learn More</a>
             </div>
           </article>
         </div>
 
-        <!-- Outsourcing -->
+        <!-- IFRS Advisory -->
         <div class="col-lg-4 col-md-6">
           <article class="service card h-100">
             <div class="card-body d-flex flex-column align-items-center text-center">
-              <!-- <div class="chip">Outsourcing</div> -->
               <div class="service-icon">
-                <i class="bi bi-gear"></i>
+                <i class="bi bi-file-earmark-bar-graph"></i>
               </div>
-              <h3>Virtual/Outsourced Finance</h3>
-              <p>Bookkeeping, management accounts, cash-flow, and board packs—technology-enabled and timely.</p>
-              <a href="bookkeeping.php" class="btn btn-outline-primary mt-3">Learn More</a>
+              <h3>IFRS Advisory</h3>
+              <p>Your IFRS partner for precise financial storytelling</p>
+              <a href="ifrs-advisory.php" class="btn btn-outline-primary mt-3">Learn More</a>
             </div>
           </article>
         </div>
 
-        <!-- Training -->
+        <!-- Company Setup -->
         <div class="col-lg-4 col-md-6">
           <article class="service card h-100">
             <div class="card-body d-flex flex-column align-items-center text-center">
-              <!-- <div class="chip">Training</div> -->
               <div class="service-icon">
-                <i class="bi bi-person-video3"></i>
+                <i class="bi bi-building"></i>
               </div>
-              <h3>Finance Team Upskilling</h3>
-              <p>Workshops and clinics in Excel, controls, close process, and IFRS for finance teams.</p>
-              <a href="ifrs-advisory.php" class="btn btn-outline-primary mt-3">Learn More</a>
+              <h3>Company Setup</h3>
+              <p>From trade license to bank account — we handle every step so you can focus on growth</p>
+              <a href="uae-bussiness-formation.php" class="btn btn-outline-primary mt-3">Learn More</a>
+            </div>
+          </article>
+        </div>
+
+        <!-- Management Advisory -->
+        <div class="col-lg-4 col-md-6">
+          <article class="service card h-100">
+            <div class="card-body d-flex flex-column align-items-center text-center">
+              <div class="service-icon">
+                <i class="bi bi-person-gear"></i>
+              </div>
+              <h3>Management Advisory</h3>
+              <p>Our management advisors help you streamline operations, boost performance, and make better business decisions</p>
+              <a href="management-accounting-&-kpi.php" class="btn btn-outline-primary mt-3">Learn More</a>
             </div>
           </article>
         </div>
