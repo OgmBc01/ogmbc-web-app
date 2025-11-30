@@ -469,42 +469,6 @@
             to { opacity: 0; }
         }
         
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .modal-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .modal-footer {
-            margin-top: 1.5rem;
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-        }
-        
         .btn-cancel {
             background-color: var(--muted);
             color: white;
@@ -747,6 +711,9 @@
     /* Fix modal showing behind backdrop */
     .modal {
         z-index: 1055 !important;
+        display: none;
+        position: fixed;
+        border-radius: 12px 12px 0 0 !important;
     }
 
     .modal-backdrop {

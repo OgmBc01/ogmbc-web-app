@@ -1,6 +1,5 @@
 <?php
 // update_activity.php
-session_start();
 header('Content-Type: application/json');
 
 // Verify access for edit page

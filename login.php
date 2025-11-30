@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $_SESSION['user_id'] = $user_id;
                             $_SESSION['username'] = $db_username;
                             $_SESSION['user_email'] = $db_email;
+                            $_SESSION['user_role'] = $db_role;
                             // Do NOT store password in session for security
                             
                             // Update last login time (optional)
