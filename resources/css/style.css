@@ -1884,3 +1884,778 @@ footer .brand { font-size:1.2rem; font-weight:700; }
   border-radius: 0;
   padding: 20px;
 }
+
+
+/* ================================
+   omni Chat Widget
+   ================================ */
+
+.omni-floating-btn {
+    position: fixed;
+    bottom: 140px;
+    right: 20px;
+    width: 64px;
+    height: 64px;
+    background:var(--secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 10000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.omni-floating-btn:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 20px 40px rgba(235, 219, 37, 0.438);
+}
+
+.omni-avatar {
+    width: 40px;
+    height: 40px;
+    color: var(--text);
+}
+
+.omni-pulse {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    background: var(--secondary);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: omni-pulse 2s infinite;
+}
+
+@keyframes omni-pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    70% { transform: scale(1.3); opacity: 0; }
+    100% { transform: scale(1.3); opacity: 0; }
+}
+
+.omni-chat-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 380px;
+    height: 600px;
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 40px rgba(235, 143, 37, 0.3);
+    display: flex;
+    flex-direction: column;
+    z-index: 10001;
+    overflow: hidden;
+}
+
+.omni-hidden {
+    display: none;
+}
+
+.omni-header {
+    background: var(--card);
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.omni-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.omni-avatar-sm {
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+}
+
+.omni-header-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.omni-title {
+    color: var(--secondary);
+    font-weight: 600;
+    margin: 0;
+    font-size: 14px;
+}
+
+.omni-status {
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.omni-close-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.omni-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+}
+
+.omni-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: var(--bg);
+}
+
+.omni-welcome-message {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.omni-welcome-avatar {
+    flex-shrink: 0;
+}
+
+.omni-welcome-text h4 {
+    color: var(--secondary);
+    margin: 0 0 8px 0;
+    font-size: 16px;
+}
+
+.omni-welcome-text p {
+    color: var(--text);
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.omni-message {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+}
+
+.omni-message-user {
+    flex-direction: row-reverse;
+}
+
+.omni-message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.omni-message-bot .omni-message-avatar {
+    background: #0d274d;
+    color: var(--text);
+}
+
+.omni-message-user .omni-message-avatar {
+    background: var(--secondary);
+    color: var(--bg);
+}
+
+.omni-message-content {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.omni-message-bot .omni-message-content {
+    background: var(--card);
+    color: #ffffff;
+    border-bottom-left-radius: 6px;
+}
+
+.omni-message-user .omni-message-content {
+    background: linear-gradient(135deg, var(--primary), var(--primary-700));
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+.omni-typing {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.omni-typing-dots {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: var(--card);
+    border-radius: 18px;
+    border-bottom-left-radius: 6px;
+}
+
+.omni-typing-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: omni-typing 1.4s infinite;
+}
+
+.omni-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.omni-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes omni-typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+}
+
+.omni-prompts {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--card);
+}
+
+.omni-prompts-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.omni-prompts-title {
+    color: var(--heading);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.omni-refresh-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.omni-refresh-btn:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.omni-prompts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.omni-prompt-btn {
+    background: rgba(255, 231, 164, 0.1);
+    border: 1px solid rgba(255, 172, 29, 0.1);
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.omni-prompt-btn:hover {
+    background: rgba(255, 219, 102, 0.123);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.omni-prompt-used {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.omni-prompt-used:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.omni-input-area {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--surface);
+}
+
+.omni-input-container {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.omni-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid rgba(206, 158, 0, 0.164);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    color: #ffffff;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    transition: all 0.2s;
+    min-height: 44px;
+    max-height: 120px;
+}
+
+.omni-input:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 2px rgba(235, 182, 37, 0.2);
+}
+
+.omni-input::placeholder {
+    color: var(--muted);
+}
+
+.omni-send-btn {
+    background: linear-gradient(135deg, #0d274d, #081126);
+    border: solid 1px rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color:var(--secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.omni-send-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(113, 37, 235, 0.4);
+}
+
+.omni-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.omni-input-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.omni-char-count {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.omni-powered-by {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Scrollbar Styling */
+.omni-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.omni-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.omni-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.omni-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced Message Styles */
+.omni-message-content {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.omni-message-bot .omni-message-content {
+    background: linear-gradient(135deg, #0d274d, #081126);
+    color: #ffffff;
+    border-bottom-left-radius: 6px;
+    text-align: left;
+}
+
+.omni-message-user .omni-message-content {
+    background: linear-gradient(135deg, #ffd260, #d0aa4b);
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+/* Enhanced Text Formatting */
+.omni-message-content h3,
+.omni-message-content h4 {
+    color: var(--heading);
+    margin: 8px 0 4px 0;
+    font-weight: 600;
+}
+
+.omni-message-content h3 {
+    font-size: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+}
+
+.omni-message-content h4 {
+    font-size: 14px;
+}
+
+.omni-message-content strong {
+    color: var(--heading);
+    font-weight: 600;
+}
+
+.omni-message-content em {
+    font-style: italic;
+    color: var(--muted);
+}
+
+.omni-message-content ul.omni-list {
+    margin: 8px 0;
+    padding-left: 20px;
+    list-style: none;
+}
+
+.omni-message-content ul.omni-list li {
+    position: relative;
+    margin: 4px 0;
+    padding-left: 16px;
+}
+
+.omni-message-content ul.omni-list li::before {
+    content: "•";
+    color: var(--primary);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.omni-message-content code.omni-code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--secondary);
+}
+
+.omni-message-content .omni-fraction {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Thinking Indicator Styles */
+.omni-thinking {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+}
+
+.omni-thinking-content {
+    background: var(--card);
+    border-radius: 18px;
+    border-bottom-left-radius: 6px;
+    padding: 12px 16px;
+    min-width: 120px;
+}
+
+.omni-thinking-dots {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.omni-thinking-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: omni-thinking-pulse 1.4s infinite;
+}
+
+.omni-thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.omni-thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.omni-thinking-text {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+@keyframes omni-thinking-pulse {
+    0%, 60%, 100% { 
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+    30% { 
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+/* Typing Animation */
+.omni-typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--primary);
+    margin-left: 2px;
+    animation: omni-cursor-blink 1s infinite;
+}
+
+@keyframes omni-cursor-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Status Animation */
+.omni-status {
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+/* Enhanced Scrollbar */
+.omni-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.omni-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.omni-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary), var(--primary-700));
+    border-radius: 4px;
+}
+
+.omni-messages::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--primary-700), var(--primary));
+}
+
+/* Message Animation */
+.omni-message {
+    animation: omni-message-slide 0.3s ease-out;
+}
+
+@keyframes omni-message-slide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .omni-chat-widget {
+        width: calc(100vw - 40px);
+        height: 70vh;
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+    }
+    
+    .omni-message-content {
+        max-width: 85%;
+        font-size: 13px;
+    }
+}
+
+/* Enhanced Prompts Section with Collapse */
+.omni-prompts {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--card);
+    transition: all 0.3s ease;
+}
+
+.omni-prompts-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+    transition: margin-bottom 0.3s ease;
+}
+
+.omni-prompts-title-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.omni-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    transform: rotate(0deg);
+}
+
+.omni-toggle-btn:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.omni-toggle-btn.collapsed {
+    transform: rotate(-90deg);
+}
+
+.omni-prompts-title {
+    color: var(--secondary);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+.omni-prompts-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.omni-prompts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+}
+
+.omni-prompts-container.omni-prompts-collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    pointer-events: none;
+}
+
+.omni-prompts-container.omni-prompts-expanded {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 12px;
+    pointer-events: all;
+}
+
+/* Smooth expansion animation */
+.omni-prompts-container {
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.2s ease,
+                margin-top 0.3s ease;
+}
+
+/* Compact mode when collapsed */
+.omni-prompts.omni-compact {
+    padding: 8px 20px;
+}
+
+.omni-prompts.omni-compact .omni-prompts-header {
+    margin-bottom: 0;
+}
+
+/* Enhanced prompt buttons */
+.omni-prompt-btn {
+    background: rgba(255, 201, 115, 0.129);
+    border: 1px solid rgba(206, 158, 0, 0.164);
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    line-height: 1.4;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.omni-prompts-collapsed .omni-prompt-btn {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.omni-prompt-btn:hover {
+    background: rgba(255, 168, 37, 0.208);
+    border-color: var(--secondary);
+    transform: translateY(-1px);
+}
+
+.omni-prompt-used {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.omni-prompt-used:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: none !important;
+}
+
+/* Save space in messages when prompts are collapsed */
+.omni-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: var(--bg);
+    transition: padding-bottom 0.3s ease;
+}
+
+.omni-prompts-collapsed ~ .omni-input-area ~ .omni-messages {
+    padding-bottom: 10px;
+}
+
+/* Collapse indicator */
+.omni-collapse-indicator {
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: 4px;
+    transition: opacity 0.3s ease;
+}
