@@ -296,11 +296,13 @@ function verifyBankAccess() {
 //////////////// CLIENT MANAGEMENT FUNCTIONS ////////////////
 
 // Function to insert/update clients
+// Function to insert/update clients
 function insert_clients() {
     global $connection;
 
-    if(isset($_POST['submit_client'])) {
+    if (isset($_POST['submit_client'])) {
         // Sanitize and validate inputs
+        $client_id = intval($_POST['client_id'] ?? 0);
         $company_name = mysqli_real_escape_string($connection, trim($_POST['company_name']));
         $trade_license_no = mysqli_real_escape_string($connection, trim($_POST['trade_license_no'] ?? ''));
         $country = mysqli_real_escape_string($connection, trim($_POST['country']));
@@ -318,13 +320,10 @@ function insert_clients() {
         $payment_term = mysqli_real_escape_string($connection, trim($_POST['payment_term'] ?? 'Monthly'));
         $service_total_fee = floatval($_POST['service_total_fee'] ?? 0.00);
         $lead_source = mysqli_real_escape_string($connection, trim($_POST['lead_source'] ?? 'website'));
-        $client_id = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
-        
-        $assigned_sales_id = $_SESSION['user_id'];
-        $created_by = $_SESSION['user_id'];
+        $client_status = mysqli_real_escape_string($connection, trim($_POST['client_status'] ?? 'New Lead'));
 
         // Validation
-        if(empty($company_name) || empty($contact_name) || empty($contact_mobile) || empty($contact_email)) {
+        if (empty($company_name) || empty($contact_name) || empty($contact_mobile) || empty($contact_email)) {
             echo "<script>showAlert('Please fill in all required fields', 'error');</script>";
             return;
         }
@@ -353,33 +352,20 @@ function insert_clients() {
                      payment_currency = '{$payment_currency}', 
                      payment_term = '{$payment_term}', 
                      service_total_fee = {$service_total_fee}, 
-                     lead_source = '{$lead_source}'
+                     lead_source = '{$lead_source}',
+                     client_status = '{$client_status}'
                      WHERE client_id = {$client_id}";
-            
+
             $success_message = "Client updated successfully!";
             $redirect_param = "updated=true";
         } else {
-            // Insert new client
-            $query = "INSERT INTO clients (
-                     company_name, trade_license_no, country, emirate_zone, business_activity, 
-                     address, contact_name, contact_designation, contact_mobile, contact_email, 
-                     service_id, service_description, expected_start_date, payment_currency, 
-                     payment_term, service_total_fee, lead_source, assigned_sales_id, created_by
-                     ) VALUES (
-                     '{$company_name}', '{$trade_license_no}', '{$country}', '{$emirate_zone}', 
-                     '{$business_activity}', '{$address}', '{$contact_name}', '{$contact_designation}', 
-                     '{$contact_mobile}', '{$contact_email}', {$service_id}, '{$service_description}', 
-                     " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
-                     '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', 
-                     {$assigned_sales_id}, {$created_by})";
-            
-            $success_message = "Client added successfully!";
-            $redirect_param = "added=true";
+            echo "<script>showAlert('Invalid client ID', 'error');</script>";
+            return;
         }
 
         $client_query = mysqli_query($connection, $query);
 
-        if(!$client_query) {
+        if (!$client_query) {
             die('Query Failed: ' . mysqli_error($connection));
         } else {
             echo "<script>showAlert('{$success_message}', 'success');</script>";

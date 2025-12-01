@@ -1,64 +1,146 @@
 <?php
+// Begin output buffering so accidental output doesn't break JSON
+ob_start();
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 include dirname(__DIR__) . '/includes/database.php';
 
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
-    exit();
-}
-
-// Enable detailed error reporting for debugging
+// Turn on verbose errors for debugging (remove or lower in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Log the start of the script
+// Log the start
 error_log("=== UPLOAD DOCUMENT SCRIPT STARTED ===");
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    // Log all received data
-    error_log("POST data received: " . print_r($_POST, true));
-    error_log("FILES data received: " . print_r($_FILES, true));
-    
-    // Check if all required fields are present
-    if (!isset($_POST['client_id']) || !isset($_POST['document_title']) || !isset($_POST['document_type'])) {
-        $response = ['success' => false, 'message' => 'Missing required fields'];
-        error_log("Missing fields: " . json_encode($response));
-        echo json_encode($response);
-        exit();
-    }
-    
-    $client_id = intval($_POST['client_id']);
-    $document_title = trim($_POST['document_title']);
-    $document_type = $_POST['document_type'];
-    $user_id = $_SESSION['user_id'];
-    
-    error_log("Processing upload - Client: $client_id, Title: $document_title, Type: $document_type, User: $user_id");
+// Always return JSON
+header('Content-Type: application/json');
 
-    // Validate inputs
-    if (empty($document_title) || $client_id <= 0) {
-        $response = ['success' => false, 'message' => 'All fields are required and valid'];
-        error_log("Validation failed: " . json_encode($response));
-        echo json_encode($response);
-        exit();
+// Helper to send JSON and exit (cleans buffer first)
+function send_json_and_exit($payload) {
+    // Capture and log any stray output
+    $extra = ob_get_clean();
+    if ($extra !== '') {
+        error_log("Stray output detected (will not be sent to client): " . $extra);
     }
-    
-    // Check if file was uploaded
-    if (!isset($_FILES['document_file']) || $_FILES['document_file']['error'] === UPLOAD_ERR_NO_FILE) {
-        $response = ['success' => false, 'message' => 'No file was selected'];
-        error_log("No file uploaded: " . json_encode($response));
-        echo json_encode($response);
-        exit();
+    echo json_encode($payload);
+    error_log("=== UPLOAD DOCUMENT SCRIPT ENDED ===");
+    exit;
+}
+
+// Check login
+if (!isset($_SESSION['user_id'])) {
+    send_json_and_exit(['success' => false, 'message' => 'Unauthorized access']);
+}
+
+$user_id = intval($_SESSION['user_id']);
+
+// Only accept POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    send_json_and_exit(['success' => false, 'message' => 'Invalid request method. Use POST.']);
+}
+
+// Log incoming data
+error_log("POST data received: " . print_r($_POST, true));
+error_log("FILES data received: " . print_r($_FILES, true));
+
+// Validate client_id
+if (!isset($_POST['client_id']) || empty($_POST['client_id'])) {
+    send_json_and_exit(['success' => false, 'message' => 'Client ID is missing']);
+}
+$client_id = intval($_POST['client_id']);
+if ($client_id <= 0) {
+    send_json_and_exit(['success' => false, 'message' => 'Invalid client ID']);
+}
+
+// Normalize inputs to arrays so code can handle single or multiple uploads
+$titles = [];
+$types = [];
+$files = [];
+
+// Case A: new multi-upload form with arrays: document_title[], document_type[], document_file[]
+if (isset($_POST['document_title']) && is_array($_POST['document_title'])) {
+    $titles = $_POST['document_title'];
+} elseif (isset($_POST['document_title'])) {
+    // single value
+    $titles = [$_POST['document_title']];
+}
+
+if (isset($_POST['document_type']) && is_array($_POST['document_type'])) {
+    $types = $_POST['document_type'];
+} elseif (isset($_POST['document_type'])) {
+    $types = [$_POST['document_type']];
+}
+
+// Files: handle both single-file and multi-file index structure
+if (isset($_FILES['document_file'])) {
+    // If single upload, $_FILES['document_file']['name'] is a string
+    if (!is_array($_FILES['document_file']['name'])) {
+        // convert to arrays
+        $files = [
+            'name' => [$_FILES['document_file']['name']],
+            'type' => [$_FILES['document_file']['type']],
+            'tmp_name' => [$_FILES['document_file']['tmp_name']],
+            'error' => [$_FILES['document_file']['error']],
+            'size' => [$_FILES['document_file']['size']],
+        ];
+    } else {
+        // already arrays (multi)
+        $files = $_FILES['document_file'];
     }
-    
-    $file = $_FILES['document_file'];
-    error_log("File details - Name: {$file['name']}, Size: {$file['size']}, Error: {$file['error']}, Temp: {$file['tmp_name']}");
-    
-    // Check if file was uploaded successfully
-    if ($file['error'] !== UPLOAD_ERR_OK) {
+} else {
+    // No uploaded files at all
+    send_json_and_exit(['success' => false, 'message' => 'No files uploaded (document_file missing)']);
+}
+
+// Make sure titles and types arrays are at least as long as files
+$totalFiles = count($files['name']);
+error_log("Total files found: $totalFiles");
+
+// If titles/types are shorter, pad with empty strings to keep indexes aligned
+while (count($titles) < $totalFiles) $titles[] = '';
+while (count($types) < $totalFiles) $types[] = 'other';
+
+// Prepare results
+$allowed_extensions = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+$max_size = 10 * 1024 * 1024; // 10 MB - keep same as your previous rule
+$upload_dir = dirname(__DIR__) . '/uploads/client_documents/';
+
+if (!file_exists($upload_dir)) {
+    if (!mkdir($upload_dir, 0755, true)) {
+        send_json_and_exit(['success' => false, 'message' => 'Failed to create upload directory']);
+    }
+}
+
+if (!is_writable($upload_dir)) {
+    send_json_and_exit(['success' => false, 'message' => 'Upload directory is not writable']);
+}
+
+$uploaded_count = 0;
+$errors = [];
+$inserted_ids = [];
+
+for ($i = 0; $i < $totalFiles; $i++) {
+    $title = isset($titles[$i]) ? trim($titles[$i]) : '';
+    $type = isset($types[$i]) ? trim($types[$i]) : 'other';
+
+    $origName = $files['name'][$i];
+    $tmpName = $files['tmp_name'][$i];
+    $fileError = $files['error'][$i];
+    $fileSize = $files['size'][$i];
+
+    // Skip empty file inputs
+    if ($origName === '' || $fileError === UPLOAD_ERR_NO_FILE) {
+        $errors[] = ($origName ?: "File #".($i+1)) . ": No file provided";
+        continue;
+    }
+
+    error_log("Processing file index $i: $origName, size: $fileSize, error: $fileError");
+
+    // Check upload error
+    if ($fileError !== UPLOAD_ERR_OK) {
         $upload_errors = [
             UPLOAD_ERR_INI_SIZE => 'File too large (server limit)',
             UPLOAD_ERR_FORM_SIZE => 'File too large (form limit)',
@@ -68,125 +150,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
             UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
         ];
-        $error_msg = $upload_errors[$file['error']] ?? 'Unknown upload error (Code: ' . $file['error'] . ')';
-        $response = ['success' => false, 'message' => 'Upload error: ' . $error_msg];
-        error_log("Upload error: " . $error_msg);
-        echo json_encode($response);
-        exit();
+        $msg = $upload_errors[$fileError] ?? 'Unknown upload error (Code: ' . $fileError . ')';
+        $errors[] = "$origName: $msg";
+        continue;
     }
-    
-    // File validation
-    $allowed_types = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
-    $max_size = 10 * 1024 * 1024; // 10MB
-    
-    $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    error_log("File extension: " . $file_extension);
-    
-    if (!in_array($file_extension, $allowed_types)) {
-        $response = ['success' => false, 'message' => 'Invalid file type. Allowed: PDF, JPG, PNG, DOC, DOCX'];
-        error_log("Invalid file type: " . $file_extension);
-        echo json_encode($response);
-        exit();
+
+    // Validate title
+    if (empty($title)) {
+        $errors[] = "$origName: Missing document title";
+        continue;
     }
-    
-    if ($file['size'] > $max_size) {
-        $response = ['success' => false, 'message' => 'File too large. Maximum size: 10MB'];
-        error_log("File too large: " . $file['size'] . " bytes");
-        echo json_encode($response);
-        exit();
+
+    // Validate extension
+    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowed_extensions)) {
+        $errors[] = "$origName: Invalid file type ($ext)";
+        continue;
     }
-    
-    // Define upload directory
-    $upload_dir = dirname(__DIR__) . '/uploads/client_documents/';
-    error_log("Upload directory: " . $upload_dir);
-    
-    // Ensure directory exists and is writable
-    if (!file_exists($upload_dir)) {
-        if (!mkdir($upload_dir, 0755, true)) {
-            $response = ['success' => false, 'message' => 'Failed to create upload directory'];
-            error_log("Directory creation failed");
-            echo json_encode($response);
-            exit();
-        }
-        error_log("Directory created: " . $upload_dir);
+
+    // Validate size
+    if ($fileSize > $max_size) {
+        $errors[] = "$origName: File too large (max 10MB)";
+        continue;
     }
-    
-    if (!is_writable($upload_dir)) {
-        $response = ['success' => false, 'message' => 'Upload directory is not writable'];
-        error_log("Directory not writable: " . $upload_dir);
-        echo json_encode($response);
-        exit();
-    }
-    
-    error_log("Directory check passed - exists: " . (file_exists($upload_dir) ? 'yes' : 'no') . ", writable: " . (is_writable($upload_dir) ? 'yes' : 'no'));
-    
-    // Generate unique filename
-    $filename = "doc_" . time() . "_" . rand(1000, 9999) . "." . $file_extension;
-    $file_path = $upload_dir . $filename;
-    
-    error_log("Generated filename: " . $filename);
-    error_log("Full file path: " . $file_path);
-    error_log("Temp file exists: " . (file_exists($file['tmp_name']) ? 'yes' : 'no'));
-    
+
+    // Build unique filename
+    $safeName = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', pathinfo($origName, PATHINFO_FILENAME));
+    $newFilename = "doc_" . $client_id . "_" . time() . "_" . rand(1000,9999) . "_" . $safeName . "." . $ext;
+    $destination = $upload_dir . $newFilename;
+
     // Move uploaded file
-    if (move_uploaded_file($file['tmp_name'], $file_path)) {
-        error_log("File moved successfully to: " . $file_path);
-        error_log("File exists after move: " . (file_exists($file_path) ? 'yes' : 'no'));
-        error_log("File size after move: " . filesize($file_path) . " bytes");
-        
-        // Prepare database path (relative for web access)
-        $db_file_path = 'uploads/client_documents/' . $filename;
-        
-        // Save to database
-        $sql = "INSERT INTO client_documents (client_id, document_title, document_type, file_path, uploaded_by) 
-                VALUES (?, ?, ?, ?, ?)";
-        
-        error_log("SQL: " . $sql);
-        error_log("Params: $client_id, $document_title, $document_type, $db_file_path, $user_id");
-        
-        $stmt = $connection->prepare($sql);
-        
-        if (!$stmt) {
-            $error = $connection->error;
-            unlink($file_path); // Clean up file
-            $response = ['success' => false, 'message' => 'Database prepare failed: ' . $error];
-            error_log("Database prepare failed: " . $error);
-            echo json_encode($response);
-            exit();
-        }
-        
-        $stmt->bind_param("isssi", $client_id, $document_title, $document_type, $db_file_path, $user_id);
-        
-        if ($stmt->execute()) {
-            $insert_id = $stmt->insert_id;
-            error_log("Database insert successful! Insert ID: " . $insert_id);
-            $response = ['success' => true, 'message' => 'Document uploaded successfully'];
-            echo json_encode($response);
-        } else {
-            $error = $stmt->error;
-            unlink($file_path); // Clean up file
-            $response = ['success' => false, 'message' => 'Database insert failed: ' . $error];
-            error_log("Database insert failed: " . $error);
-            echo json_encode($response);
-        }
-        
-        $stmt->close();
-        
-    } else {
-        $last_error = error_get_last();
-        error_log("File move failed! Error: " . ($last_error ? $last_error['message'] : 'Unknown error'));
-        error_log("Temp file: " . $file['tmp_name']);
-        error_log("Target: " . $file_path);
-        
-        $response = ['success' => false, 'message' => 'Failed to move uploaded file. Check server permissions.'];
-        echo json_encode($response);
+    if (!move_uploaded_file($tmpName, $destination)) {
+        $last_err = error_get_last();
+        error_log("move_uploaded_file failed for $origName to $destination. last_err: " . print_r($last_err, true));
+        $errors[] = "$origName: Failed to move uploaded file. Check server permissions.";
+        continue;
     }
-    
-} else {
-    $response = ['success' => false, 'message' => 'Invalid request method. Expected POST.'];
-    error_log("Invalid request method: " . $_SERVER['REQUEST_METHOD']);
-    echo json_encode($response);
+
+    // Prepare DB path relative to web root (same as original)
+    $db_file_path = 'uploads/client_documents/' . $newFilename;
+
+    // Insert into DB
+    $sql = "INSERT INTO client_documents (client_id, document_title, document_type, file_path, uploaded_by) 
+            VALUES (?, ?, ?, ?, ?)";
+    $stmt = $connection->prepare($sql);
+    if (!$stmt) {
+        $db_err = $connection->error;
+        // Clean up file if DB prepare fails
+        if (file_exists($destination)) unlink($destination);
+        $errors[] = "$origName: Database prepare failed: " . $db_err;
+        error_log("DB prepare failed: " . $db_err);
+        continue;
+    }
+
+    $stmt->bind_param("isssi", $client_id, $title, $type, $db_file_path, $user_id);
+    if ($stmt->execute()) {
+        $insert_id = $stmt->insert_id;
+        $inserted_ids[] = $insert_id;
+        $uploaded_count++;
+        error_log("Inserted doc record ID: $insert_id for file $origName");
+    } else {
+        $stmt_err = $stmt->error;
+        // Remove file if DB insert fails
+        if (file_exists($destination)) unlink($destination);
+        $errors[] = "$origName: Database insert failed: " . $stmt_err;
+        error_log("DB insert failed: " . $stmt_err);
+    }
+
+    $stmt->close();
 }
 
-error_log("=== UPLOAD DOCUMENT SCRIPT ENDED ===");
-?>
+// Final response
+$response = [
+    'success' => $uploaded_count > 0,
+    'uploaded' => $uploaded_count,
+    'failed' => count($errors),
+    'errors' => $errors,
+    'inserted_ids' => $inserted_ids,
+    'message' => $uploaded_count > 0 ? "$uploaded_count document(s) uploaded successfully." : "No documents uploaded."
+];
+
+send_json_and_exit($response);

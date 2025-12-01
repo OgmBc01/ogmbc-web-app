@@ -96,7 +96,7 @@ if (isset($_GET['id'])) {
                 <!-- Client Information -->
                 <div class="col-md-6">
                     <div class="card mb-4">
-                        <div class="card-header bg-primary text-white">
+                        <div class="card-header text-white">
                             <h6 class="mb-0"><i class="bi bi-building me-2"></i>Company Information</h6>
                         </div>
                         <div class="card-body">
@@ -137,7 +137,7 @@ if (isset($_GET['id'])) {
                 <!-- Contact Information -->
                 <div class="col-md-6">
                     <div class="card mb-4">
-                        <div class="card-header bg-info text-white">
+                        <div class="card-header text-white">
                             <h6 class="mb-0"><i class="bi bi-person me-2"></i>Contact Information</h6>
                         </div>
                         <div class="card-body">
@@ -197,7 +197,7 @@ if (isset($_GET['id'])) {
             <div class="row">
                 <div class="col-12">
                     <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
+                        <div class="card-header text-white">
                             <h6 class="mb-0"><i class="bi bi-briefcase me-2"></i>Service Details</h6>
                         </div>
                         <div class="card-body">
@@ -238,11 +238,12 @@ if (isset($_GET['id'])) {
             <div class="row">
                 <div class="col-12">
                     <div class="card mb-4">
-                        <div class="card-header bg-warning">
+                        <div class="card-header text-white">
                             <h6 class="mb-0"><i class="bi bi-file-earmark me-2"></i>Document Actions</h6>
                         </div>
                         <div class="card-body">
                             <div class="row text-center">
+                                <!-- Replace the button sections in get_client_details.php -->
                                 <div class="col-md-6 mb-3">
                                     <h6>Proposal</h6>
                                     <?php if ($latest_proposal): ?>
@@ -258,11 +259,9 @@ if (isset($_GET['id'])) {
                                         </a>
                                     <?php else: ?>
                                         <p class="text-muted">No proposal generated yet</p>
-                                        <?php if ($_SESSION['user_role'] === 'sales' && in_array($client['client_status'], ['Qualified', 'Proposal Drafted'])): ?>
-                                            <button class="btn btn-primary btn-sm" onclick="generateProposal(<?php echo $client_id; ?>)">
-                                                <i class="bi bi-file-earmark-plus"></i> Generate Proposal
-                                            </button>
-                                        <?php endif; ?>
+                                        <a href="clients.php?source=generate_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-file-earmark-plus"></i> Generate Proposal
+                                        </a>
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -279,12 +278,10 @@ if (isset($_GET['id'])) {
                                             <i class="bi bi-download"></i> Download
                                         </a>
                                     <?php else: ?>
-                                        <p class="text-muted">No proforma invoice generated yet</p>
-                                        <?php if ($_SESSION['user_role'] === 'sales' && in_array($client['client_status'], ['Qualified', 'Proposal Drafted'])): ?>
-                                            <button class="btn btn-primary btn-sm" onclick="generateProforma(<?php echo $client_id; ?>)">
-                                                <i class="bi bi-receipt"></i> Generate Proforma
-                                            </button>
-                                        <?php endif; ?>
+                                        <p class="text-muted">No proforma invoice generated yet</p>    
+                                        <a href="clients.php?source=generate_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-receipt"></i> Generate Proforma
+                                        </a>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -297,7 +294,7 @@ if (isset($_GET['id'])) {
             <div class="row">
                 <div class="col-12">
                     <div class="card mb-4">
-                        <div class="card-header bg-secondary text-white">
+                        <div class="card-header text-white">
                             <h6 class="mb-0"><i class="bi bi-chat-left-text me-2"></i>Recent Notes</h6>
                         </div>
                         <div class="card-body">
@@ -328,7 +325,7 @@ if (isset($_GET['id'])) {
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header bg-info text-white">
+                        <div class="card-header text-white">
                             <h6 class="mb-0"><i class="bi bi-files me-2"></i>Client Documents</h6>
                         </div>
                         <div class="card-body">
@@ -336,34 +333,54 @@ if (isset($_GET['id'])) {
                             <div class="mb-4">
                                 <form id="documentUploadForm" enctype="multipart/form-data" onsubmit="return false;">
                                     <input type="hidden" name="client_id" value="<?php echo $client_id; ?>">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label for="document_title" class="form-label">Document Title</label>
-                                                <input type="text" id="document_title" name="document_title" class="form-control" required>
+
+                                    <div id="documentFieldsWrapper">
+
+                                        <!-- Single document upload block (template) -->
+                                        <div class="document-field-set border rounded p-3 mb-3">
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Document Title</label>
+                                                    <input type="text" name="document_title[]" class="form-control" required>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Document Type</label>
+                                                    <select name="document_type[]" class="form-control">
+                                                        <option value="trade_license">Trade License</option>
+                                                        <option value="bank_statement">Bank Statement</option>
+                                                        <option value="signed_proposal">Signed Proposal</option>
+                                                        <option value="signed_proforma">Signed Proforma</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Select File</label>
+                                                    <input type="file" name="document_file[]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
+                                                </div>
                                             </div>
+
+                                            <!-- Remove button (except for the first field set) -->
+                                            <button type="button" class="btn btn-danger mt-3 removeFieldBtn" style="display:none;">
+                                                <i class="bi bi-x-circle"></i> Remove
+                                            </button>
+
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label for="document_type" class="form-label">Document Type</label>
-                                                <select id="document_type" name="document_type" class="form-control">
-                                                    <option value="trade_license">Trade License</option>
-                                                    <option value="bank_statement">Bank Statement</option>
-                                                    <option value="signed_proposal">Signed Proposal</option>
-                                                    <option value="signed_proforma">Signed Proforma</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label for="document_file" class="form-label">Select File</label>
-                                                <input type="file" id="document_file" name="document_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
-                                            </div>
-                                        </div>
+
                                     </div>
+
+                                    <!-- Add more button -->
+                                    <button type="button" id="addDocumentField" class="btn btn-primary mb-3">
+                                        <i class="bi bi-plus-circle"></i> Add Another Document
+                                    </button>
+
+                                    <br>
+
+                                    <!-- Submit -->
                                     <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-upload me-1"></i> Upload Document
+                                        <i class="bi bi-upload me-1"></i> Upload Documents
                                     </button>
                                 </form>
                             </div>
@@ -393,30 +410,36 @@ if (isset($_GET['id'])) {
                                                     <td><?php echo htmlspecialchars($doc['first_name'] . ' ' . $doc['last_name']); ?></td>
                                                     <td><?php echo date('M j, Y H:i', strtotime($doc['uploaded_at'])); ?></td>
                                                     <td>
-                                                        <?php 
-                                                        // Fix the file path - prepend ../ if needed
-                                                        $file_path = $doc['file_path'];
-                                                        $full_file_path = '../' . $file_path; // Since files are stored as 'uploads/client_documents/filename'
-                                                        
-                                                        // Check if file exists using the full path
-                                                        $file_exists = file_exists($full_file_path);
-                                                        ?>
-                                                        <?php if (!empty($doc['file_path']) && $file_exists): ?>
-                                                            <a href="<?php echo $full_file_path; ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                                <i class="bi bi-eye"></i> View
-                                                            </a>
-                                                            <a href="<?php echo $full_file_path; ?>" download class="btn btn-sm btn-outline-success">
-                                                                <i class="bi bi-download"></i> Download
-                                                            </a>
-                                                        <?php else: ?>
-                                                            <span class="text-muted">
-                                                                <?php if (empty($doc['file_path'])): ?>
-                                                                    No file path
-                                                                <?php else: ?>
-                                                                    File not found (<?php echo htmlspecialchars($doc['file_path']); ?>)
-                                                                <?php endif; ?>
-                                                            </span>
-                                                        <?php endif; ?>
+                                                    <?php 
+                                                    // Full file path for server
+                                                    $file_path = $doc['file_path'];
+                                                    $full_file_path = '../' . $file_path; // Adjust if files are stored as 'uploads/client_documents/filename'
+
+                                                    // Check if file exists on server
+                                                    $file_exists = file_exists($full_file_path);
+
+                                                    if (!empty($doc['file_path']) && $file_exists):
+                                                    ?>
+                                                        <a href="<?php echo $full_file_path; ?>" target="_blank" class="btn btn-sm btn-outline-primary mb-1">
+                                                            <i class="bi bi-eye"></i> View
+                                                        </a>
+                                                        <a href="<?php echo $full_file_path; ?>" download class="btn btn-sm btn-outline-success mb-1">
+                                                            <i class="bi bi-download"></i> Download
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">
+                                                            <?php if (empty($doc['file_path'])): ?>
+                                                                No file path
+                                                            <?php else: ?>
+                                                                File not found (<?php echo htmlspecialchars($doc['file_path']); ?>)
+                                                            <?php endif; ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(<?php echo $doc['doc_id']; ?>)">
+                                                            <i class="bi bi-trash"></i> Delete
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             <?php endwhile; ?>

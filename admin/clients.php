@@ -22,6 +22,14 @@ include "includes/sidebar.php";
         include "includes/edit_client.php";
         break;
 
+        case 'generate_proposal';
+        include "includes/generate_proposal.php";
+        break;
+
+        case 'generate_proforma';
+        include "includes/generate_proforma.php";
+        break;
+
         default:
         include "includes/view_all_clients.php";
         break;
@@ -111,64 +119,16 @@ function loadReviewDetails(clientId) {
     });
 }
 
-// Handle proposal generation
+// Handle proposal generation - REDIRECT VERSION
 function generateProposal(clientId) {
-    $.ajax({
-        url: 'generate_proposal.php',
-        type: 'POST',
-        data: { client_id: clientId },
-        success: function(response) {
-            try {
-                var result = JSON.parse(response);
-                if(result.success) {
-                    showAlert('Proposal generated successfully!', 'success');
-                    // Open proposal in new tab
-                    if(result.file_path) {
-                        window.open(result.file_path, '_blank');
-                    }
-                    // Reload client details
-                    loadClientDetails(clientId);
-                } else {
-                    showAlert('Error generating proposal: ' + result.message, 'error');
-                }
-            } catch (e) {
-                showAlert('Error parsing response: ' + e, 'error');
-            }
-        },
-        error: function(xhr, status, error) {
-            showAlert('Error generating proposal: ' + error, 'error');
-        }
-    });
+    // Redirect to generate proposal page
+    window.location.href = 'clients.php?source=generate_proposal&client_id=' + clientId;
 }
 
-// Handle proforma generation
+// Handle proforma generation - REDIRECT VERSION
 function generateProforma(clientId) {
-    $.ajax({
-        url: 'generate_proforma.php',
-        type: 'POST',
-        data: { client_id: clientId },
-        success: function(response) {
-            try {
-                var result = JSON.parse(response);
-                if(result.success) {
-                    showAlert('Proforma invoice generated successfully!', 'success');
-                    // Open proforma in new tab
-                    if(result.file_path) {
-                        window.open(result.file_path, '_blank');
-                    }
-                    // Reload client details
-                    loadClientDetails(clientId);
-                } else {
-                    showAlert('Error generating proforma: ' + result.message, 'error');
-                }
-            } catch (e) {
-                showAlert('Error parsing response: ' + e, 'error');
-            }
-        },
-        error: function(xhr, status, error) {
-            showAlert('Error generating proforma: ' + error, 'error');
-        }
-    });
+    // Redirect to generate proforma page
+    window.location.href = 'clients.php?source=generate_proforma&client_id=' + clientId;
 }
 
 ////////////////// Handle document upload (for AJAX-loaded modal content)////////////////////
@@ -241,6 +201,37 @@ function reloadClientDocuments(clientId) {
         }
     });
 }
+
+
+// Add new document input set
+$(document).on("click", "#addDocumentField", function() {
+
+    let clone = $(".document-field-set").first().clone();
+
+    // Clear values
+    clone.find("input").val("");
+    clone.find("select").val("trade_license");
+
+    // Show remove button on cloned sets
+    clone.find(".removeFieldBtn").show();
+
+    $("#documentFieldsWrapper").append(clone);
+});
+
+// Remove a document field set
+$(document).on("click", ".removeFieldBtn", function() {
+    $(this).closest(".document-field-set").remove();
+});
+
+
+
+
+
+// Remove old AJAX-based generate functions (keep only the redirect versions above)
+
+
+
+
 </script>
 
 

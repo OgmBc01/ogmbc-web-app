@@ -1,5 +1,7 @@
 <?php
-// Call the function
+session_start();
+
+// Call the function to handle insert/update
 insert_clients();
 
 // Check if user is logged in
@@ -17,6 +19,7 @@ $payment_currency = 'AED';
 $payment_term = 'Monthly';
 $service_total_fee = '0.00';
 $lead_source = 'website';
+$client_status = 'New Lead'; // default status
 $message = '';
 $message_type = '';
 
@@ -27,7 +30,7 @@ if ($client_id > 0) {
     $stmt->bind_param("i", $client_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows === 1) {
         $client = $result->fetch_assoc();
         $company_name = $client['company_name'];
@@ -47,6 +50,7 @@ if ($client_id > 0) {
         $payment_term = $client['payment_term'];
         $service_total_fee = $client['service_total_fee'];
         $lead_source = $client['lead_source'];
+        $client_status = $client['client_status'] ?? 'New Lead';
     } else {
         $message = "Client not found.";
         $message_type = "error";
@@ -56,6 +60,7 @@ if ($client_id > 0) {
     $message = "Invalid client ID.";
     $message_type = "error";
 }
+
 ?>
 
 <div class="main-content" id="mainContent">
@@ -267,6 +272,26 @@ if ($client_id > 0) {
                                     <div class="mb-3">
                                         <label for="service_description" class="form-label">Service Description</label>
                                         <textarea id="service_description" name="service_description" class="form-control" rows="3"><?php echo htmlspecialchars($service_description); ?></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="client_status" class="form-label">Client Status</label>
+                                        <select id="client_status" name="client_status" class="form-control">
+                                            <?php
+                                            $statuses = [
+                                                'New Lead', 'Contacted', 'Qualified', 'Proposal Drafted',
+                                                'Under Manager Review', 'Rejected by Manager', 'Approved by Manager',
+                                                'Under CEO Review', 'Rejected by CEO', 'Final Proposal Ready',
+                                                'Proposal Sent to Client', 'Awaiting Client Action', 'Signed – Move to Finance'
+                                            ];
+                                            foreach ($statuses as $statusOption) {
+                                                $selected = ($client_status == $statusOption) ? 'selected' : '';
+                                                echo "<option value='{$statusOption}' {$selected}>{$statusOption}</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

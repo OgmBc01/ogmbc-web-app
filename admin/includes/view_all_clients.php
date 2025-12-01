@@ -301,6 +301,9 @@ document.addEventListener('click', function(e) {
         modalBody.innerHTML = '<div class="alert alert-danger">Failed to load client details. ' + (err.message || '') + '</div>';
     });
 });
+
+
+
 </script>
 
 <!-- Client Details Modal -->

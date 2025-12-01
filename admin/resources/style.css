@@ -221,7 +221,7 @@
         }
         
         .card-header {
-            background-color: var(--dark-blue);
+            background-color: var(--medium-blue);
             color: var(--gold);
             border-bottom: 2px solid var(--gold);
             font-weight: 600;
