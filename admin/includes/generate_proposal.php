@@ -165,7 +165,7 @@ if(!$client) {
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-8">
-                                <div class="alert alert-info">
+                                <div class="alert alert-info" style="animation: none;">
                                     <h6><i class="bi bi-info-circle me-2"></i>Important Information</h6>
                                     <ul class="mb-0">
                                         <li>This will create a professionally formatted proposal PDF</li>
@@ -305,7 +305,7 @@ if(!$client) {
                         $table_check = $connection->query("SHOW TABLES LIKE 'proposals'");
                         if($table_check && $table_check->num_rows > 0) {
                             // Get existing proposals for this client
-                            $proposals_sql = "SELECT proposal_id, proposal_ref, version, created_at, total_amount, file_path FROM proposals WHERE client_id = ? ORDER BY created_at DESC LIMIT 5";
+                            $proposals_sql = "SELECT proposal_id, proposal_ref, version, prepared_at, total_amount, file_path FROM proposals WHERE client_id = ? ORDER BY prepared_at DESC LIMIT 5";
                             $proposals_stmt = $connection->prepare($proposals_sql);
                             
                             if($proposals_stmt) {
@@ -320,7 +320,7 @@ if(!$client) {
                                                 <tr>
                                                     <th>Reference</th>
                                                     <th>Version</th>
-                                                    <th>Created Date</th>
+                                                    <th>prepared Date</th>
                                                     <th>Amount</th>
                                                     <th>Status</th>
                                                 </tr>
@@ -330,7 +330,7 @@ if(!$client) {
                                                 <tr>
                                                     <td><?php echo htmlspecialchars($proposal['proposal_ref']); ?></td>
                                                     <td><span class="badge bg-secondary">V<?php echo $proposal['version']; ?></span></td>
-                                                    <td><?php echo date('M j, Y H:i', strtotime($proposal['created_at'])); ?></td>
+                                                    <td><?php echo date('M j, Y H:i', strtotime($proposal['prepared_at'])); ?></td>
                                                     <td><?php echo number_format($proposal['total_amount'], 2); ?></td>
                                                     <td>
                                                         <?php if(!empty($proposal['file_path']) && file_exists("../" . $proposal['file_path'])): ?>
