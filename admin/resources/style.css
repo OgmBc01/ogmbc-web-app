@@ -106,10 +106,6 @@
             display: inline-block;
         }
         
-        .logo-text {
-           
-        }
-        
         .sidebar.collapsed .logo-text {
             opacity: 0;
             display: none;
@@ -708,16 +704,29 @@
         border-radius: 12px 12px 0 0 !important;
     }
 
-    /* Fix modal showing behind backdrop */
+    /* Remove or modify these styles */
     .modal {
         z-index: 1055 !important;
-        display: none;
+        /* Remove display: none - Bootstrap handles this */
+        /* display: none; */
         position: fixed;
         border-radius: 12px 12px 0 0 !important;
     }
 
     .modal-backdrop {
         z-index: 1050 !important;
+        /* Add backdrop-filter for modern browsers */
+        backdrop-filter: blur(2px);
+    }
+
+    /* Ensure modal is properly positioned */
+    .modal.fade .modal-dialog {
+        transform: translate(0, -50px);
+        transition: transform 0.3s ease-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: none;
     }
     
     .stat-icon {

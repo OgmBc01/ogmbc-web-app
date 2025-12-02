@@ -224,13 +224,100 @@ $(document).on("click", ".removeFieldBtn", function() {
 });
 
 
+// Properly handle modal closing
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all modals
+    const modals = document.querySelectorAll('.modal');
+    
+    modals.forEach(modal => {
+        // Listen for hidden event
+        modal.addEventListener('hidden.bs.modal', function (event) {
+            // Remove any remaining backdrop
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
+            
+            // Reset body class
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            // Remove modal-open class from body
+            document.body.classList.remove('modal-open');
+        });
+        
+        // Listen for show event
+        modal.addEventListener('show.bs.modal', function (event) {
+            // Remove any existing backdrop before showing new modal
+            const existingBackdrops = document.querySelectorAll('.modal-backdrop');
+            existingBackdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
+        });
+    });
+    
+    // Fix for close buttons
+    const closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"]');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                // Use Bootstrap's modal method to hide
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                } else {
+                    // Fallback
+                    modal.classList.remove('show');
+                    modal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                    
+                    // Remove backdrop
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
+                }
+            }
+        });
+    });
+});
 
+// Alternative: Force hide all modals function
+function hideAllModals() {
+    // Hide all Bootstrap modals
+    const modals = document.querySelectorAll('.modal.show');
+    modals.forEach(modal => {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+            bsModal.hide();
+        } else {
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+        }
+    });
+    
+    // Remove backdrop
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+        backdrop.remove();
+    }
+    
+    // Reset body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
 
-
-// Remove old AJAX-based generate functions (keep only the redirect versions above)
-
-
-
+// Call this when page loads to clear any stuck modals
+window.addEventListener('load', function() {
+    // Clean up any stuck modals
+    const stuckModals = document.querySelectorAll('.modal.show');
+    if (stuckModals.length > 0) {
+        hideAllModals();
+    }
+});
 
 </script>
 

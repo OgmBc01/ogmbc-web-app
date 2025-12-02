@@ -416,16 +416,34 @@ function findAllClients() {
         echo "<td>{$created_at}</td>";
         echo "<td class='action-links'>";
         
-        // View button
-        echo "<a href='' data-bs-toggle='modal' data-bs-target='#clientDetailsModal' data-id='{$client_id}' onclick='loadClientDetails({$client_id})' title='View Details'><i class='bi bi-eye'></i></a>";
-        
-        // Edit button
-        echo "<a href='clients.php?source=edit_client&id={$client_id}' title='Edit'><i class='bi bi-pencil'></i></a>";
-        
-        // Review button (for Manager/CEO)
-        if (shouldShowReviewButton($row)) {
-            echo "<a href='' data-bs-toggle='modal' data-bs-target='#reviewModal' data-id='{$client_id}' onclick='loadReviewDetails({$client_id})' title='Review' class='text-warning'><i class='bi bi-clipboard-check'></i></a>";
-        }
+       // Action buttons container - icon only version
+        echo "<div class='d-flex gap-1'>";
+            
+            // View button
+            echo "<a href='' data-bs-toggle='modal' data-bs-target='#clientDetailsModal' data-id='{$client_id}' onclick='loadClientDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='View Details' data-bs-toggle='tooltip'>
+                    <i class='bi bi-eye text-primary'></i>
+                </a>";
+            
+            // Edit button
+            echo "<a href='clients.php?source=edit_client&id={$client_id}' class='btn btn-light btn-sm rounded-circle p-2' title='Edit' data-bs-toggle='tooltip'>
+                    <i class='bi bi-pencil text-info'></i>
+                </a>";
+            
+            // Review button (for Manager/CEO)
+            if (shouldShowReviewButton($row)) {
+                echo "<a href='' data-bs-toggle='modal' data-bs-target='#reviewModal' data-id='{$client_id}' onclick='loadReviewDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='Review' data-bs-toggle='tooltip'>
+                        <i class='bi bi-clipboard-check text-warning'></i>
+                    </a>";
+            }
+
+        echo "</div>";
+
+        // Initialize tooltips if using that version
+        echo "<script>
+        $(document).ready(function(){
+            $('[data-bs-toggle=\"tooltip\"]').tooltip();
+        });
+        </script>";
         
         echo "</td>";
         echo "</tr>";

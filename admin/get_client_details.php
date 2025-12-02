@@ -37,7 +37,7 @@ if (isset($_GET['id'])) {
     
     if ($client = $result->fetch_assoc()) {
         // Get latest proposal and proforma
-        $proposal_sql = "SELECT * FROM proposals WHERE client_id = ? ORDER BY created_at DESC LIMIT 1";
+        $proposal_sql = "SELECT * FROM proposals WHERE client_id = ? ORDER BY prepared_at DESC LIMIT 1";
         $proposal_stmt = $connection->prepare($proposal_sql);
         if ($proposal_stmt) {
             $proposal_stmt->bind_param("i", $client_id);
@@ -48,7 +48,7 @@ if (isset($_GET['id'])) {
             $latest_proposal = null;
         }
         
-        $proforma_sql = "SELECT * FROM proforma_invoices WHERE client_id = ? ORDER BY created_at DESC LIMIT 1";
+        $proforma_sql = "SELECT * FROM proforma_invoices WHERE client_id = ? ORDER BY prepared_at DESC LIMIT 1";
         $proforma_stmt = $connection->prepare($proforma_sql);
         if ($proforma_stmt) {
             $proforma_stmt->bind_param("i", $client_id);
@@ -249,13 +249,19 @@ if (isset($_GET['id'])) {
                                     <?php if ($latest_proposal): ?>
                                         <div class="mb-2">
                                             <small class="text-muted">Version: <?php echo $latest_proposal['version']; ?></small><br>
-                                            <small class="text-muted">Created: <?php echo date('M j, Y H:i', strtotime($latest_proposal['created_at'])); ?></small>
+                                            <small class="text-muted">Prepared: <?php echo date('M j, Y H:i', strtotime($latest_proposal['prepared_at'])); ?></small>
                                         </div>
-                                        <a href="<?php echo $latest_proposal['file_path']; ?>" target="_blank" class="btn btn-outline-primary btn-sm me-1">
+                                        <a href="<?php echo $latest_proposal['file_path']; ?>" target="_blank" class="btn btn-outline-primary btn-sm m-2">
                                             <i class="bi bi-eye"></i> View
                                         </a>
-                                        <a href="<?php echo $latest_proposal['file_path']; ?>" download class="btn btn-outline-success btn-sm">
+                                        <a href="<?php echo $latest_proposal['file_path']; ?>" download class="btn btn-outline-success btn-sm m-2">
                                             <i class="bi bi-download"></i> Download
+                                        </a>
+                                        <a href="clients.php?source=review_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm m-2">
+                                            <i class="bi bi-file-earmark-plus"></i> Review
+                                        </a>
+                                         <a href="clients.php?source=generate_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm m-2">
+                                            <i class="bi bi-file-earmark-plus"></i> Regenerate
                                         </a>
                                     <?php else: ?>
                                         <p class="text-muted">No proposal generated yet</p>
@@ -269,19 +275,25 @@ if (isset($_GET['id'])) {
                                     <?php if ($latest_proforma): ?>
                                         <div class="mb-2">
                                             <small class="text-muted">Version: <?php echo $latest_proforma['version']; ?></small><br>
-                                            <small class="text-muted">Created: <?php echo date('M j, Y H:i', strtotime($latest_proforma['created_at'])); ?></small>
+                                            <small class="text-muted">Prepared: <?php echo date('M j, Y H:i', strtotime($latest_proforma['prepared_at'])); ?></small>
                                         </div>
-                                        <a href="<?php echo $latest_proforma['file_path']; ?>" target="_blank" class="btn btn-outline-primary btn-sm me-1">
+                                        <a href="<?php echo $latest_proforma['file_path']; ?>" target="_blank" class="btn btn-outline-primary btn-xs m-2">
                                             <i class="bi bi-eye"></i> View
                                         </a>
-                                        <a href="<?php echo $latest_proforma['file_path']; ?>" download class="btn btn-outline-success btn-sm">
+                                        <a href="<?php echo $latest_proforma['file_path']; ?>" download class="btn btn-outline-success btn-sm m-2">
                                             <i class="bi bi-download"></i> Download
+                                        </a>
+                                        <a href="clients.php?source=review_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm m-2">
+                                            <i class="bi bi-receipt"></i> Review
+                                        </a>
+                                        <a href="clients.php?source=generate_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm m-2">
+                                            <i class="bi bi-receipt"></i> Regenerate
                                         </a>
                                     <?php else: ?>
                                         <p class="text-muted">No proforma invoice generated yet</p>    
-                                        <a href="clients.php?source=generate_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm">
-                                            <i class="bi bi-receipt"></i> Generate Proforma
-                                        </a>
+                                            <a href="clients.php?source=generate_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm">
+                                                <i class="bi bi-receipt"></i> Generate Proforma
+                                            </a>
                                     <?php endif; ?>
                                 </div>
                             </div>

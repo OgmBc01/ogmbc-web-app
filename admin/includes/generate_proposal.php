@@ -39,7 +39,7 @@ if(!$client) {
 
         <!-- Client Information Card -->
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light">
+            <div class="card-header">
                 <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Client Information</h5>
             </div>
             <div class="card-body">
@@ -159,7 +159,7 @@ if(!$client) {
         <div class="row">
             <div class="col-md-12">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header text-white">
                         <h5 class="mb-0"><i class="bi bi-magic me-2"></i>Generate New Proposal</h5>
                     </div>
                     <div class="card-body">
@@ -205,7 +205,7 @@ if(!$client) {
         <div class="row mt-4" id="documentArea" style="display: none;">
             <div class="col-md-12">
                 <div class="card shadow-sm border-success">
-                    <div class="card-header bg-success text-white">
+                    <div class="card-header text-white">
                         <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Proposal Generated Successfully</h5>
                     </div>
                     <div class="card-body">
@@ -296,7 +296,7 @@ if(!$client) {
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-light">
+                    <div class="card-header">
                         <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Document History</h6>
                     </div>
                     <div class="card-body">
