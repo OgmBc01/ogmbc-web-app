@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
     
     if (!empty($username) && !empty($password)) {
-        // Include email in the SELECT
-        $sql = "SELECT user_id, username, user_email, password FROM users WHERE username = ?";
+        // Include user_role in the SELECT query
+        $sql = "SELECT user_id, username, user_email, user_role, password FROM users WHERE username = ?";
         
         if ($stmt = $connection->prepare($sql)) {
             $stmt->bind_param("s", $username);
@@ -25,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt->store_result();
                 
                 if ($stmt->num_rows == 1) {
-                    // Bind user_id, username, email, and password
-                    $stmt->bind_result($user_id, $db_username, $db_email, $db_password);
+                    // Bind user_id, username, email, user_role, and password
+                    $stmt->bind_result($user_id, $db_username, $db_email, $db_role, $db_password);
                     
                     if ($stmt->fetch()) {
                         // Use password_verify for hashed passwords

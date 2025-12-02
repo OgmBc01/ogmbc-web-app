@@ -1,3 +1,4 @@
+// this page will be deleted
 <?php
 include '../includes/database.php';
 
@@ -98,7 +99,7 @@ if (isset($_GET['id'])) {
                                         <!-- Approve Section -->
                                         <div class="approve-section">
                                             <h6 class="text-success">Approve Proposal</h6>
-                                            <p class="text-muted small">Click approve if the proposal meets all requirements.</p>
+                                            <p class="text-muted small">Click approve if all details are included and correct, and if the proposal meets all requirements.</p>
                                             
                                             <?php if ($user_role === 'manager'): ?>
                                                 <div class="mb-3" id="managerSignatureSection" style="display: none;">

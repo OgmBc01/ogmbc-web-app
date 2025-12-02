@@ -245,57 +245,68 @@ if (isset($_GET['id'])) {
                             <div class="row text-center">
                                 <!-- Replace the button sections in get_client_details.php -->
                                 <div class="col-md-6 mb-3">
-                                    <h6>Proposal</h6>
-                                    <?php if ($latest_proposal): ?>
-                                        <div class="mb-2">
-                                            <small class="text-muted">Version: <?php echo $latest_proposal['version']; ?></small><br>
-                                            <small class="text-muted">Prepared: <?php echo date('M j, Y H:i', strtotime($latest_proposal['prepared_at'])); ?></small>
-                                        </div>
-                                        <a href="<?php echo $latest_proposal['file_path']; ?>" target="_blank" class="btn btn-outline-primary btn-sm m-2">
-                                            <i class="bi bi-eye"></i> View
+                                <h6>Proposal</h6>
+                                <?php if ($latest_proposal): ?>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Version: <?php echo $latest_proposal['version']; ?></small><br>
+                                        <small class="text-muted">Prepared: <?php echo date('M j, Y H:i', strtotime($latest_proposal['prepared_at'])); ?></small>
+                                    </div>
+                                    <div class="btn-group-vertical w-100" role="group">
+                                        <a href="<?php echo $latest_proposal['file_path']; ?>" target="_blank" class="btn btn-outline-primary btn-sm mb-1">
+                                            <i class="bi bi-eye me-1"></i> View
                                         </a>
-                                        <a href="<?php echo $latest_proposal['file_path']; ?>" download class="btn btn-outline-success btn-sm m-2">
-                                            <i class="bi bi-download"></i> Download
+                                        <a href="<?php echo $latest_proposal['file_path']; ?>" download class="btn btn-outline-success btn-sm mb-1">
+                                            <i class="bi bi-download me-1"></i> Download
                                         </a>
-                                        <a href="clients.php?source=review_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm m-2">
-                                            <i class="bi bi-file-earmark-plus"></i> Review
-                                        </a>
-                                         <a href="clients.php?source=generate_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm m-2">
-                                            <i class="bi bi-file-earmark-plus"></i> Regenerate
-                                        </a>
-                                    <?php else: ?>
-                                        <p class="text-muted">No proposal generated yet</p>
-                                        <a href="clients.php?source=generate_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm">
-                                            <i class="bi bi-file-earmark-plus"></i> Generate Proposal
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <h6>Proforma Invoice</h6>
-                                    <?php if ($latest_proforma): ?>
-                                        <div class="mb-2">
-                                            <small class="text-muted">Version: <?php echo $latest_proforma['version']; ?></small><br>
-                                            <small class="text-muted">Prepared: <?php echo date('M j, Y H:i', strtotime($latest_proforma['prepared_at'])); ?></small>
-                                        </div>
-                                        <a href="<?php echo $latest_proforma['file_path']; ?>" target="_blank" class="btn btn-outline-primary btn-xs m-2">
-                                            <i class="bi bi-eye"></i> View
-                                        </a>
-                                        <a href="<?php echo $latest_proforma['file_path']; ?>" download class="btn btn-outline-success btn-sm m-2">
-                                            <i class="bi bi-download"></i> Download
-                                        </a>
-                                        <a href="clients.php?source=review_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm m-2">
-                                            <i class="bi bi-receipt"></i> Review
-                                        </a>
-                                        <a href="clients.php?source=generate_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm m-2">
-                                            <i class="bi bi-receipt"></i> Regenerate
-                                        </a>
-                                    <?php else: ?>
-                                        <p class="text-muted">No proforma invoice generated yet</p>    
-                                            <a href="clients.php?source=generate_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm">
-                                                <i class="bi bi-receipt"></i> Generate Proforma
+                                        
+                                        <?php if(in_array($client['client_status'], ['Proposal Drafted', 'Manager Approved Proposal'])): ?>
+                                            <a href="clients.php?source=review_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-warning btn-sm mb-1">
+                                                <i class="bi bi-clipboard-check me-1"></i> Review
                                             </a>
-                                    <?php endif; ?>
-                                </div>
+                                        <?php endif; ?>
+                                        
+                                        <a href="clients.php?source=generate_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-info btn-sm">
+                                            <i class="bi bi-arrow-repeat me-1"></i> Regenerate
+                                        </a>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-muted">No proposal generated yet</p>
+                                    <a href="clients.php?source=generate_proposal&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-file-earmark-plus me-1"></i> Generate Proposal
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6>Proforma Invoice</h6>
+                                <?php if ($latest_proforma): ?>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Version: <?php echo $latest_proforma['version']; ?></small><br>
+                                        <small class="text-muted">Prepared: <?php echo date('M j, Y H:i', strtotime($latest_proforma['prepared_at'])); ?></small>
+                                    </div>
+                                    <div class="btn-group-vertical w-100" role="group">
+                                        <a href="<?php echo $latest_proforma['file_path']; ?>" target="_blank" class="btn btn-outline-primary btn-sm mb-1">
+                                            <i class="bi bi-eye me-1"></i> View
+                                        </a>
+                                        <a href="<?php echo $latest_proforma['file_path']; ?>" download class="btn btn-outline-success btn-sm mb-1">
+                                            <i class="bi bi-download me-1"></i> Download
+                                        </a>
+                                        
+                                        <?php if(in_array($client['client_status'], ['Proforma Drafted', 'Manager Approved Proforma'])): ?>
+                                            <a href="clients.php?source=review_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-warning btn-sm mb-1">
+                                                <i class="bi bi-clipboard-check me-1"></i> Review
+                                            </a>
+                                        <?php endif; ?>
+                                        
+                                        <a href="clients.php?source=generate_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-info btn-sm">
+                                            <i class="bi bi-arrow-repeat me-1"></i> Regenerate
+                                        </a>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-muted">No proforma invoice generated yet</p>    
+                                    <a href="clients.php?source=generate_proforma&client_id=<?php echo $client_id; ?>" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-receipt me-1"></i> Generate Proforma
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

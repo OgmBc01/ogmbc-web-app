@@ -2,6 +2,7 @@
 include "includes/header.php";
 include "includes/nav.php";
 include "includes/sidebar.php";
+include "status_helper.php"
 ?>
 
 <div class="row">
@@ -9,32 +10,39 @@ include "includes/sidebar.php";
       <?php
         if(isset($_GET['source'])) {
           $source = $_GET['source'];
-        } else {
-          $source = '';
-        }
+        }   else    {
+            $source = '';
+    }
 
-        switch($source) {
+    switch($source) {
         case 'add_client';
-        include "includes/add_client.php";
-        break;
+            include "includes/add_client.php";
+            break;
 
         case 'edit_client';
-        include "includes/edit_client.php";
-        break;
+            include "includes/edit_client.php";
+            break;
 
         case 'generate_proposal';
-        include "includes/generate_proposal.php";
-        break;
+            include "includes/generate_proposal.php";
+            break;
 
         case 'generate_proforma';
-        include "includes/generate_proforma.php";
-        break;
+            include "includes/generate_proforma.php";
+            break;
+
+        case 'review_proposal';
+            include "includes/review_proposal.php";
+            break;
+
+        case 'review_proforma';
+            include "includes/review_proforma.php";
+            break;
 
         default:
-        include "includes/view_all_clients.php";
-        break;
-      }
-
+            include "includes/view_all_clients.php";
+            break;
+        }
       ?>
     </div>
   </div>  
