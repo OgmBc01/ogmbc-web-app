@@ -561,23 +561,25 @@ include 'includes/header.php'
       </a>
   </div>
 
-      <!-- Floating Chat Button -->
-      <div id="omni-floating-btn" class="omni-floating-btn">
-          <div class="omni-avatar">
-              <img src="resources/img/omni-2.svg" alt="omni Assistant" width="40" height="40" />
-          </div>
-          <span class="omni-pulse"></span>
+  <!-- Floating Chat Button -->
+  <div id="omni-floating-btn" class="omni-floating-btn">
+      <div class="omni-avatar">
+          <img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />
       </div>
+      <span class="omni-pulse"></span>
+  </div>
 
   <!-- omni Chat Widget -->
   <div id="omni-chat-widget" class="omni-chat-widget omni-hidden">
       <!-- Chat Header -->
       <div class="omni-header">
           <div class="omni-header-content">
-              <img src="resources/img/omni-2.svg" alt="omni Assistant" width="25" height="25" />
+              <div class="omni-avatar-sm">
+                  <img src="resources/img/omni.svg" alt="omni Assistant" width="25" height="25" />
+              </div>
               <div class="omni-header-text">
                   <h6 class="omni-title">OmniOGM Assistant</h6>
-                  <span class="omni-status">Online</span>
+                  <span id="omni-status" class="omni-status">Online</span>
               </div>
           </div>
           <button id="omni-close" class="omni-close-btn">
@@ -591,7 +593,7 @@ include 'includes/header.php'
       <div id="omni-messages" class="omni-messages">
           <div class="omni-welcome-message">
               <div class="omni-welcome-avatar">
-                  <img src="resources/img/omni-2.svg" alt="omni Assistant" width="40" height="40" />
+                  <img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />
               </div>
               <div class="omni-welcome-text">
                   <h4>Hello! I'm OmniOGM 👋</h4>
@@ -603,15 +605,25 @@ include 'includes/header.php'
       <!-- Dynamic Prompts -->
       <div id="omni-prompts" class="omni-prompts">
           <div class="omni-prompts-header">
-              <span class="omni-prompts-title">Quick Questions</span>
-              <button id="omni-refresh-prompts" class="omni-refresh-btn" title="Refresh suggestions">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M23 4v6h-6M1 20v-6h6"/>
-                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-                  </svg>
-              </button>
+              <div class="omni-prompts-title-container">
+                  <button id="omni-toggle-prompts" class="omni-toggle-btn" title="Toggle quick questions">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M6 9l6 6 6-6"/>
+                      </svg>
+                  </button>
+                  <span class="omni-prompts-title">Quick Questions</span>
+                  <span id="omni-collapse-indicator" class="omni-collapse-indicator">(click to expand)</span>
+              </div>
+              <div class="omni-prompts-actions">
+                  <button id="omni-refresh-prompts" class="omni-refresh-btn" title="Refresh suggestions">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M23 4v6h-6M1 20v-6h6"/>
+                          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                      </svg>
+                  </button>
+              </div>
           </div>
-          <div id="omni-prompts-container" class="omni-prompts-container">
+          <div id="omni-prompts-container" class="omni-prompts-container omni-prompts-expanded">
               <!-- Dynamic prompts will be inserted here -->
           </div>
       </div>
@@ -619,7 +631,7 @@ include 'includes/header.php'
       <!-- Chat Input Area -->
       <div class="omni-input-area">
           <div class="omni-input-container">
-              <input type="text" id="omni-user-input" class="omni-input" placeholder="Message omni..." maxlength="500">
+              <textarea id="omni-user-input" class="omni-input" placeholder="Message omni..." maxlength="500" rows="1"></textarea>
               <button id="omni-send-btn" class="omni-send-btn">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
@@ -628,22 +640,26 @@ include 'includes/header.php'
           </div>
           <div class="omni-input-footer">
               <span class="omni-char-count">0/500</span>
-              <span class="omni-powered-by"></span>
+              <span class="omni-powered-by">Powered by OmniOGM</span>
           </div>
       </div>
   </div>
-
 
 <?php
 include 'includes/footer.php'
 ?>
 
 <script>
-  // omni Chat Widget JavaScript
-  class omniChat {
-      constructor() {
+// omni Chat Widget JavaScript
+class omniChat {
+    constructor() {
         this.conversationHistory = [];
         this.usedPrompts = new Set();
+        this.promptsCollapsed = false;
+        this.isThinking = false;
+        this.isTypingResponse = false;
+        this.currentTypingInterval = null;
+        
         this.availablePrompts = [
             "What business setup services do you offer?",
             "Tell me about UAE company formation",
@@ -679,225 +695,540 @@ include 'includes/footer.php'
         
         this.initializeElements();
         this.bindEvents();
+        this.setupAutoResize();
         this.generatePrompts();
+        this.updateStatus();
     }
 
-      initializeElements() {
-          this.floatingBtn = document.getElementById('omni-floating-btn');
-          this.chatWidget = document.getElementById('omni-chat-widget');
-          this.messagesContainer = document.getElementById('omni-messages');
-          this.userInput = document.getElementById('omni-user-input');
-          this.sendBtn = document.getElementById('omni-send-btn');
-          this.closeBtn = document.getElementById('omni-close');
-          this.promptsContainer = document.getElementById('omni-prompts-container');
-          this.refreshPromptsBtn = document.getElementById('omni-refresh-prompts');
-          this.charCount = document.querySelector('.omni-char-count');
-      }
+    initializeElements() {
+        this.floatingBtn = document.getElementById('omni-floating-btn');
+        this.chatWidget = document.getElementById('omni-chat-widget');
+        this.messagesContainer = document.getElementById('omni-messages');
+        this.userInput = document.getElementById('omni-user-input');
+        this.sendBtn = document.getElementById('omni-send-btn');
+        this.closeBtn = document.getElementById('omni-close');
+        this.promptsContainer = document.getElementById('omni-prompts-container');
+        this.promptsSection = document.getElementById('omni-prompts');
+        this.refreshPromptsBtn = document.getElementById('omni-refresh-prompts');
+        this.togglePromptsBtn = document.getElementById('omni-toggle-prompts');
+        this.collapseIndicator = document.getElementById('omni-collapse-indicator');
+        this.charCount = document.querySelector('.omni-char-count');
+        this.statusElement = document.getElementById('omni-status');
+    }
 
-      bindEvents() {
-          this.floatingBtn.addEventListener('click', () => this.toggleChat());
-          this.closeBtn.addEventListener('click', () => this.hideChat());
-          this.sendBtn.addEventListener('click', () => this.sendMessage());
-          this.userInput.addEventListener('keypress', (e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  this.sendMessage();
-              }
-          });
-          
-          this.userInput.addEventListener('input', () => this.updateCharCount());
-          this.refreshPromptsBtn.addEventListener('click', () => this.generatePrompts());
-          
-          // Click outside to close
-          document.addEventListener('click', (e) => {
-              if (!this.chatWidget.contains(e.target) && !this.floatingBtn.contains(e.target)) {
-                  this.hideChat();
-              }
-          });
-      }
+    bindEvents() {
+        this.floatingBtn.addEventListener('click', () => this.toggleChat());
+        this.closeBtn.addEventListener('click', () => this.hideChat());
+        this.sendBtn.addEventListener('click', () => this.sendMessage());
+        
+        this.userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+        
+        this.userInput.addEventListener('input', () => {
+            this.updateCharCount();
+            this.autoResizeTextarea();
+        });
+        
+        this.refreshPromptsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.generatePrompts();
+        });
+        
+        this.togglePromptsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.togglePrompts();
+        });
+        
+        // Click outside to close
+        document.addEventListener('click', (e) => {
+            if (!this.chatWidget.contains(e.target) && !this.floatingBtn.contains(e.target)) {
+                this.hideChat();
+            }
+        });
+        
+        // Toggle prompts on header click
+        this.promptsSection.addEventListener('click', (e) => {
+            if (e.target.closest('.omni-prompts-header') && !e.target.closest('.omni-prompts-actions')) {
+                this.togglePrompts();
+            }
+        });
+    }
 
-      toggleChat() {
-          this.chatWidget.classList.toggle('omni-hidden');
-          if (!this.chatWidget.classList.contains('omni-hidden')) {
-              this.userInput.focus();
-          }
-      }
+    setupAutoResize() {
+        this.userInput.style.height = 'auto';
+        this.userInput.style.height = (this.userInput.scrollHeight) + 'px';
+    }
 
-      hideChat() {
-          this.chatWidget.classList.add('omni-hidden');
-      }
-
-      updateCharCount() {
-          const count = this.userInput.value.length;
-          this.charCount.textContent = `${count}/500`;
-          
-          if (count > 450) {
-              this.charCount.style.color = 'var(--secondary)';
-          } else {
-              this.charCount.style.color = 'var(--muted)';
-          }
-      }
-
-      generatePrompts() {
-          this.promptsContainer.innerHTML = '';
-          
-          // Filter out used prompts and get 3 random ones
-          const unusedPrompts = this.availablePrompts.filter(prompt => !this.usedPrompts.has(prompt));
-          const randomPrompts = this.shuffleArray([...unusedPrompts]).slice(0, 3);
-          
-          // If we don't have enough unused prompts, reuse some
-          if (randomPrompts.length < 3) {
-              const additional = this.shuffleArray([...this.usedPrompts]).slice(0, 3 - randomPrompts.length);
-              randomPrompts.push(...additional);
-          }
-
-          randomPrompts.forEach(prompt => {
-              const button = document.createElement('button');
-              button.className = `omni-prompt-btn ${this.usedPrompts.has(prompt) ? 'omni-prompt-used' : ''}`;
-              button.textContent = prompt;
-              button.addEventListener('click', () => {
-                  if (!this.usedPrompts.has(prompt)) {
-                      this.usedPrompts.add(prompt);
-                      button.classList.add('omni-prompt-used');
-                      this.sendMessage(prompt);
-                  }
-              });
-              this.promptsContainer.appendChild(button);
-          });
-      }
-
-      shuffleArray(array) {
-          for (let i = array.length - 1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1));
-              [array[i], array[j]] = [array[j], array[i]];
-          }
-          return array;
-      }
-
-      addMessage(content, isUser) {
-          const messageDiv = document.createElement('div');
-          messageDiv.className = `omni-message ${isUser ? 'omni-message-user' : 'omni-message-bot'}`;
-          
-          const avatar = document.createElement('div');
-          avatar.className = 'omni-message-avatar';
-          avatar.innerHTML = isUser ? 'You' : `
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="currentColor"/>
-                  <path d="M12 6C9.79 6 8 7.79 8 10C8 12.21 9.79 14 12 14C14.21 14 16 12.21 16 10C16 7.79 14.21 6 12 6Z" fill="var(--surface)"/>
-                  <path d="M12 16C8.67 16 6 18.13 6 20.67C6 21.4 6.6 22 7.33 22H16.67C17.4 22 18 21.4 18 20.67C18 18.13 15.33 16 12 16Z" fill="var(--surface)"/>
-              </svg>
-          `;
-          
-          const contentDiv = document.createElement('div');
-          contentDiv.className = 'omni-message-content';
-          contentDiv.textContent = content;
-          
-          messageDiv.appendChild(avatar);
-          messageDiv.appendChild(contentDiv);
-          this.messagesContainer.appendChild(messageDiv);
-          
-          this.scrollToBottom();
-      }
-
-      showTypingIndicator() {
-          const typingDiv = document.createElement('div');
-          typingDiv.className = 'omni-typing';
-          typingDiv.id = 'omni-typing';
-          
-          const avatar = document.createElement('div');
-          avatar.className = 'omni-message-avatar';
-          avatar.innerHTML = `
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="currentColor"/>
-                  <path d="M12 6C9.79 6 8 7.79 8 10C8 12.21 9.79 14 12 14C14.21 14 16 12.21 16 10C16 7.79 14.21 6 12 6Z" fill="var(--surface)"/>
-                  <path d="M12 16C8.67 16 6 18.13 6 20.67C6 21.4 6.6 22 7.33 22H16.67C17.4 22 18 21.4 18 20.67C18 18.13 15.33 16 12 16Z" fill="var(--surface)"/>
-              </svg>
-          `;
-          
-          const dotsDiv = document.createElement('div');
-          dotsDiv.className = 'omni-typing-dots';
-          dotsDiv.innerHTML = `
-              <div class="omni-typing-dot"></div>
-              <div class="omni-typing-dot"></div>
-              <div class="omni-typing-dot"></div>
-          `;
-          
-          typingDiv.appendChild(avatar);
-          typingDiv.appendChild(dotsDiv);
-          this.messagesContainer.appendChild(typingDiv);
-          
-          this.scrollToBottom();
-      }
-
-      removeTypingIndicator() {
-          const typing = document.getElementById('omni-typing');
-          if (typing) {
-              typing.remove();
-          }
-      }
-
-      scrollToBottom() {
-          this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
-      }
-
-      async sendMessage(prefilledMessage = null) {
-          const messageText = prefilledMessage || this.userInput.value.trim();
-          
-          if (!messageText) return;
-
-          // Add user message to UI and history
-          this.addMessage(messageText, true);
-          this.conversationHistory.push({ role: 'user', content: messageText });
-
-          // Clear input and update prompts if it's a new message
-          if (!prefilledMessage) {
-              this.userInput.value = '';
-              this.updateCharCount();
-              this.usedPrompts.add(messageText);
-              this.generatePrompts();
-          }
-
-          // Disable UI
-          this.userInput.disabled = true;
-          this.sendBtn.disabled = true;
-
-          // Show typing indicator
-          this.showTypingIndicator();
-
-          try {
-              const response = await fetch('chat_proxy.php', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                      message: messageText,
-                      history: this.conversationHistory
-                  })
-              });
-
-              const data = await response.json();
-              this.removeTypingIndicator();
-
-              if (data.error) {
-                  this.addMessage(`Error: ${data.error}`, false);
-              } else {
-                  this.addMessage(data.reply, false);
-                  this.conversationHistory.push({ role: 'assistant', content: data.reply });
-              }
-          } catch (error) {
-              this.removeTypingIndicator();
-              this.addMessage('Sorry, there was a connection error. Please try again.', false);
-              console.error('omni Error:', error);
-          }
-
-          // Re-enable UI
-          this.userInput.disabled = false;
-          this.sendBtn.disabled = false;
-          this.userInput.focus();
-      }
+    autoResizeTextarea() {
+    this.userInput.style.height = 'auto';
+    const newHeight = Math.min(this.userInput.scrollHeight, 120);
+    this.userInput.style.height = newHeight + 'px';
+    this.userInput.style.overflowY = 'hidden'; // Always hide overflow
   }
 
-  // Initialize omni when the page loads
-  document.addEventListener('DOMContentLoaded', () => {
-      new omniChat();
-  });
-  </script>
+    toggleChat() {
+        this.chatWidget.classList.toggle('omni-hidden');
+        if (!this.chatWidget.classList.contains('omni-hidden')) {
+            this.userInput.focus();
+            this.updateStatus('Online');
+        } else {
+            this.updateStatus('Offline');
+        }
+    }
+
+    hideChat() {
+        this.chatWidget.classList.add('omni-hidden');
+        this.updateStatus('Offline');
+    }
+
+    updateStatus(status) {
+        if (this.statusElement) {
+            this.statusElement.textContent = status;
+            
+            // Add status animation
+            this.statusElement.style.opacity = '0.5';
+            setTimeout(() => {
+                this.statusElement.style.opacity = '1';
+            }, 300);
+        }
+    }
+
+    updateCharCount() {
+        const count = this.userInput.value.length;
+        this.charCount.textContent = `${count}/500`;
+        
+        if (count > 450) {
+            this.charCount.style.color = 'var(--secondary)';
+        } else if (count > 400) {
+            this.charCount.style.color = 'var(--primary)';
+        } else {
+            this.charCount.style.color = 'var(--muted)';
+        }
+    }
+
+    togglePrompts() {
+        this.promptsCollapsed = !this.promptsCollapsed;
+        
+        if (this.promptsCollapsed) {
+            this.promptsContainer.classList.remove('omni-prompts-expanded');
+            this.promptsContainer.classList.add('omni-prompts-collapsed');
+            this.togglePromptsBtn.classList.add('collapsed');
+            this.promptsSection.classList.add('omni-compact');
+            this.collapseIndicator.textContent = '(click to expand)';
+        } else {
+            this.promptsContainer.classList.remove('omni-prompts-collapsed');
+            this.promptsContainer.classList.add('omni-prompts-expanded');
+            this.togglePromptsBtn.classList.remove('collapsed');
+            this.promptsSection.classList.remove('omni-compact');
+            this.collapseIndicator.textContent = '(click to collapse)';
+        }
+    }
+
+    generatePrompts() {
+        this.promptsContainer.innerHTML = '';
+        
+        // Filter out used prompts and get 3 random ones
+        const unusedPrompts = this.availablePrompts.filter(prompt => !this.usedPrompts.has(prompt));
+        const randomPrompts = this.shuffleArray([...unusedPrompts]).slice(0, 3);
+        
+        // If we don't have enough unused prompts, reuse some
+        if (randomPrompts.length < 3) {
+            const additional = this.shuffleArray([...this.usedPrompts]).slice(0, 3 - randomPrompts.length);
+            randomPrompts.push(...additional);
+        }
+
+        randomPrompts.forEach(prompt => {
+            const button = document.createElement('button');
+            button.className = `omni-prompt-btn ${this.usedPrompts.has(prompt) ? 'omni-prompt-used' : ''}`;
+            button.textContent = prompt;
+            button.addEventListener('click', () => {
+                if (!this.usedPrompts.has(prompt)) {
+                    this.usedPrompts.add(prompt);
+                    button.classList.add('omni-prompt-used');
+                    this.sendMessage(prompt);
+                }
+            });
+            this.promptsContainer.appendChild(button);
+        });
+    }
+
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    addMessage(content, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `omni-message ${isUser ? 'omni-message-user' : 'omni-message-bot'}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'omni-message-avatar';
+        
+        if (isUser) {
+            avatar.textContent = 'You';
+            avatar.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-700))';
+        } else {
+            // Use omni image for bot avatar
+            avatar.innerHTML = `<img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />`;
+        }
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'omni-message-content';
+        contentDiv.textContent = content;
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(contentDiv);
+        this.messagesContainer.appendChild(messageDiv);
+        
+        this.scrollToBottom();
+        return contentDiv;
+    }
+
+    typeMessage(contentDiv, fullContent) {
+        return new Promise((resolve) => {
+            this.isTypingResponse = true;
+            this.updateStatus('Typing...');
+            
+            let index = 0;
+            const baseSpeed = 40; // Slower base speed: 40ms per character (was 20ms)
+            let currentSpeed = baseSpeed;
+            const maxChunkSize = 3; // Smaller chunks for slower typing
+            
+            // First clear any existing typing interval
+            if (this.currentTypingInterval) {
+                clearInterval(this.currentTypingInterval);
+                this.currentTypingInterval = null;
+            }
+            
+            const typeNextChunk = () => {
+                if (index >= fullContent.length) {
+                    // Typing complete
+                    this.isTypingResponse = false;
+                    this.updateStatus('Online');
+                    resolve();
+                    return;
+                }
+                
+                // Determine chunk size and speed based on upcoming characters
+                let chunkSize = 1; // Start with 1 character
+                let nextChars = fullContent.substring(index, Math.min(index + 5, fullContent.length));
+                
+                // Analyze next characters to determine typing behavior
+                if (nextChars.match(/^[.,!?;:]/)) {
+                    // Punctuation - type slowly and pause after
+                    chunkSize = 1;
+                    currentSpeed = 80; // Very slow for punctuation
+                    
+                    // Add extra pause after certain punctuation
+                    if (/[.!?]/.test(nextChars[0])) {
+                        currentSpeed = 160; // Even slower for sentence endings
+                    }
+                } else if (nextChars.match(/^\s\s+/)) {
+                    // Multiple spaces or tabs
+                    chunkSize = Math.min(2, nextChars.match(/^\s+/)[0].length);
+                    currentSpeed = 20; // Faster for multiple spaces
+                } else if (nextChars.match(/^\s/)) {
+                    // Single space
+                    chunkSize = 1;
+                    currentSpeed = 30; // Fast for spaces
+                } else if (nextChars.match(/^[a-zA-Z]{3,}/)) {
+                    // Word with 3+ letters - type slightly faster
+                    chunkSize = 3;
+                    currentSpeed = 25;
+                } else {
+                    // Default speed for other characters
+                    chunkSize = 1;
+                    currentSpeed = baseSpeed;
+                }
+                
+                // Add the chunk
+                const chunk = fullContent.substring(index, index + chunkSize);
+                contentDiv.textContent += chunk;
+                index += chunkSize;
+                
+                // Apply formatting to the current text
+                contentDiv.innerHTML = this.formatMessage(contentDiv.textContent);
+                
+                // Scroll to bottom
+                this.scrollToBottom();
+                
+                // Schedule next chunk with variable delay
+                let nextDelay = currentSpeed;
+                
+                // Add random variation to make it more human-like (±10ms)
+                nextDelay += Math.random() * 20 - 10;
+                
+                // Ensure minimum delay
+                nextDelay = Math.max(20, nextDelay);
+                
+                // Add longer pauses at natural breakpoints
+                if (chunk.match(/[.!?]/)) {
+                    nextDelay += 150; // Longer pause after sentences
+                } else if (chunk.match(/[,;:]/)) {
+                    nextDelay += 80; // Medium pause after commas/semicolons
+                } else if (index < fullContent.length && fullContent.charAt(index) === ' ') {
+                    nextDelay += 30; // Small pause before next word
+                }
+                
+                // Schedule next chunk
+                this.currentTypingInterval = setTimeout(typeNextChunk, nextDelay);
+            };
+            
+            // Start typing
+            typeNextChunk();
+        });
+    }
+
+    formatMessage(content) {
+        // Create a temporary div to parse the content
+        const tempDiv = document.createElement('div');
+        
+        // First, handle code blocks separately
+        const codeRegex = /`([^`]+)`/g;
+        let formatted = content;
+        let match;
+        const codeParts = [];
+        
+        // Store and replace code blocks with placeholders
+        let codeIndex = 0;
+        while ((match = codeRegex.exec(content)) !== null) {
+            codeParts.push(match[1]);
+            formatted = formatted.replace(match[0], `__CODE${codeIndex}__`);
+            codeIndex++;
+        }
+        
+        // Process the formatted text
+        let result = formatted;
+        
+        // Replace headers
+        result = result.replace(/### (.*?)(?:\n|$)/g, '<h4>$1</h4>');
+        result = result.replace(/## (.*?)(?:\n|$)/g, '<h3>$1</h3>');
+        
+        // Process line by line for better list handling
+        const lines = result.split('\n');
+        let htmlLines = [];
+        let inList = false;
+        let listItems = [];
+        
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            
+            // Check for list items
+            const listMatch = line.match(/^([•\-*]|\d+\.)\s+(.+)/);
+            
+            if (listMatch) {
+                if (!inList) {
+                    inList = true;
+                    listItems = [];
+                }
+                listItems.push(listMatch[2]);
+                
+                // If next line is not a list item, close the list
+                if (i === lines.length - 1 || !lines[i + 1].match(/^([•\-*]|\d+\.)\s/)) {
+                    htmlLines.push('<ul class="omni-list">');
+                    listItems.forEach(item => {
+                        htmlLines.push(`<li>${this.applyInlineFormatting(item)}</li>`);
+                    });
+                    htmlLines.push('</ul>');
+                    inList = false;
+                }
+            } else {
+                // Not a list item
+                if (inList) {
+                    // We were in a list but this line isn't a list item
+                    htmlLines.push('<ul class="omni-list">');
+                    listItems.forEach(item => {
+                        htmlLines.push(`<li>${this.applyInlineFormatting(item)}</li>`);
+                    });
+                    htmlLines.push('</ul>');
+                    inList = false;
+                    listItems = [];
+                }
+                
+                // Apply inline formatting to regular lines
+                if (line.trim()) {
+                    htmlLines.push(this.applyInlineFormatting(line));
+                } else {
+                    htmlLines.push('<br>');
+                }
+            }
+        }
+        
+        // Join all lines
+        result = htmlLines.join('');
+        
+        // Restore code blocks
+        codeParts.forEach((code, index) => {
+            result = result.replace(`__CODE${index}__`, `<code class="omni-code">${this.escapeHtml(code)}</code>`);
+        });
+        
+        // Replace newlines with <br> tags (except where we already have HTML)
+        result = result.replace(/\n/g, '<br>');
+        
+        return result;
+    }
+
+    applyInlineFormatting(text) {
+        // Apply bold formatting
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Apply italic formatting
+        text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Apply emphasis for underscores (optional)
+        text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+        
+        return text;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    showThinkingIndicator() {
+        this.removeTypingIndicator();
+        this.isThinking = true;
+        
+        const thinkingDiv = document.createElement('div');
+        thinkingDiv.className = 'omni-thinking';
+        thinkingDiv.id = 'omni-thinking';
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'omni-message-avatar';
+        // Use omni image for thinking avatar as well
+        avatar.innerHTML = `<img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />`;
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'omni-thinking-content';
+        
+        const dotsDiv = document.createElement('div');
+        dotsDiv.className = 'omni-thinking-dots';
+        dotsDiv.innerHTML = `
+            <div class="omni-thinking-dot"></div>
+            <div class="omni-thinking-dot"></div>
+            <div class="omni-thinking-dot"></div>
+        `;
+        
+        const textDiv = document.createElement('div');
+        textDiv.className = 'omni-thinking-text';
+        textDiv.textContent = 'Thinking...';
+        
+        contentDiv.appendChild(dotsDiv);
+        contentDiv.appendChild(textDiv);
+        
+        thinkingDiv.appendChild(avatar);
+        thinkingDiv.appendChild(contentDiv);
+        this.messagesContainer.appendChild(thinkingDiv);
+        
+        this.scrollToBottom();
+    }
+
+    removeTypingIndicator() {
+        const typing = document.getElementById('omni-typing');
+        if (typing) typing.remove();
+        
+        const thinking = document.getElementById('omni-thinking');
+        if (thinking) {
+            thinking.remove();
+            this.isThinking = false;
+        }
+        
+        // Clear any ongoing typing interval
+        if (this.currentTypingInterval) {
+            clearTimeout(this.currentTypingInterval);
+            this.currentTypingInterval = null;
+        }
+        this.isTypingResponse = false;
+    }
+
+    scrollToBottom() {
+        setTimeout(() => {
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        }, 50);
+    }
+
+    async sendMessage(prefilledMessage = null) {
+        const messageText = prefilledMessage || this.userInput.value.trim();
+        
+        if (!messageText) return;
+
+        // Add user message to UI and history
+        this.addMessage(messageText, true);
+        this.conversationHistory.push({ role: 'user', content: messageText });
+
+        // Clear input and update prompts if it's a new message
+        if (!prefilledMessage) {
+            this.userInput.value = '';
+            this.updateCharCount();
+            this.setupAutoResize();
+            this.usedPrompts.add(messageText);
+            this.generatePrompts();
+        }
+
+        // Disable UI
+        this.userInput.disabled = true;
+        this.sendBtn.disabled = true;
+
+        // Show thinking indicator
+        this.showThinkingIndicator();
+        this.updateStatus('Thinking...');
+
+        try {
+            const response = await fetch('chat_proxy.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: messageText,
+                    history: this.conversationHistory
+                })
+            });
+
+            const data = await response.json();
+            this.removeTypingIndicator(); // Remove thinking indicator
+
+            if (data.error) {
+                this.addMessage(`Error: ${data.error}`, false);
+                this.updateStatus('Online');
+            } else {
+                // Create the bot message container (initially empty)
+                const messageContentDiv = this.addMessage('', false);
+                
+                // Type out the response character by character with slower speed
+                await this.typeMessage(messageContentDiv, data.reply);
+                
+                // Add to conversation history after typing is complete
+                this.conversationHistory.push({ role: 'assistant', content: data.reply });
+                
+                // Status is already updated to Online by typeMessage when done
+            }
+        } catch (error) {
+            this.removeTypingIndicator();
+            this.updateStatus('Online');
+            this.addMessage('Sorry, there was a connection error. Please try again.', false);
+            console.error('omni Error:', error);
+        }
+
+        // Re-enable UI
+        this.userInput.disabled = false;
+        this.sendBtn.disabled = false;
+        this.userInput.focus();
+    }
+}
+
+// Initialize omni when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    const omni = new omniChat();
+    
+    // Make omni globally accessible if needed
+    window.omniChatInstance = omni;
+});
+</script>
