@@ -3,11 +3,14 @@
     <i class="bi bi-arrow-up"></i>
 </a>
 
+<!-- Add to your HTML head section -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <footer id="contact">
-  <div class="container footer-grid">
+  <div class="container footer-grid lead">
     <div>
       <a class="brand" href="#">OGMBC Consultants</a>
-      <p>
+      <p class="lead">
         This company was founded with the mission to provide clarity, compliance, and confidence 
         to businesses navigating today’s financial and regulatory landscapes. With years of 
         expertise in audit, tax, and advisory, our professionals bring industry insight, 

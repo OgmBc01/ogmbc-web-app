@@ -23,27 +23,44 @@ include 'includes/header-1.php'
   <!-- UAE Bank Account Opening Section -->
   <section class="py-5 bg-light">
     <div class="container">
+
+      <!-- Section Header -->
       <div class="text-center mb-5">
-        <h2 class="fw-bold text-dark">UAE <span style="color:#d0aa4b;">Bank Account Opening</span></h2>
-        <p class="text-muted">
+        <h2 class="fw-bold text-dark">
+          UAE <span style="color:#d0aa4b;">Bank Account Opening</span>
+        </h2>
+        <p class="lead">
           Establish your banking relationship in one of the world’s leading business hubs with ease and efficiency.
         </p>
       </div>
 
-      <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-8">
+      <!-- Content Row -->
+      <div class="row align-items-center g-5">
+
+        <!-- Image Column -->
+        <div class="col-md-6">
+          <img 
+            src="resources/img/uae-bank-account.jpg" 
+            class="img-fluid rounded shadow" 
+            alt="UAE Bank Account Opening">
+        </div>
+
+        <!-- Text Column -->
+        <div class="col-md-6">
           <div class="card shadow-sm border-0 h-100">
             <div class="card-body p-4">
               <h5 class="fw-bold mb-3">
-                <i class="fas fa-university me-2" style="color:#d0aa4b;"></i> Banking in the UAE
+                <i class="fas fa-university me-2" style="color:#d0aa4b;"></i>
+                Banking in the UAE
               </h5>
-              <p class="mb-0 text-dark">
+              <p class="mb-0 lead">
                 Opening a bank account in the UAE is a streamlined process, typically requiring standard documents such as a passport and proof of address. 
                 With a wide range of account options and efficient service, establishing banking relationships in the UAE provides access to a robust financial ecosystem in one of the world's leading business hubs.
               </p>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -66,7 +83,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">
@@ -128,4 +145,3 @@ include 'includes/header-1.php'
 <?php
 include 'includes/footer.php'
 ?>
-

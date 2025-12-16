@@ -39,92 +39,91 @@ include 'includes/header-1.php'
     </div>
   </section>
 
-<!-- Internal Controls Section -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold" style="color:#0b1224;">Services We Offer</h2>
-      <p class="text-muted">
-        At OGMBC Consultants, we design and strengthen internal control frameworks that protect assets,
-        enhance transparency, and promote compliance. Our tailored solutions ensure your organization
-        remains resilient, efficient, and integrity-driven.
-      </p>
+  <!-- Internal Controls Section -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold" style="color:#0b1224;">Services We Offer</h2>
+        <p class="lead">
+          At OGMBC Consultants, we design and strengthen internal control frameworks that protect assets,
+          enhance transparency, and promote compliance. Our tailored solutions ensure your organization
+          remains resilient, efficient, and integrity-driven.
+        </p>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <!-- Card 1 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body control-card-body">
+              <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-exclamation-triangle"></i></span>
+              <h5 class="fw-bold">Risk Assessment & Control Design</h5>
+              <p class="lead mb-0">
+                Identify and assess financial, operational and compliance risks. We design frameworks
+                to mitigate risks effectively while optimizing efficiency.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body control-card-body">
+              <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-project-diagram"></i></span>
+              <h5 class="fw-bold">Process Documentation & Optimization</h5>
+              <p class="lead mb-0">
+                Document and streamline processes for greater transparency, accountability
+                and efficiency—reducing risks while maximizing productivity.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body control-card-body">
+              <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-user-shield"></i></span>
+              <h5 class="fw-bold">Segregation of Duties Analysis</h5>
+              <p class="lead mb-0">
+                Analyze roles and responsibilities to prevent fraud and errors, ensuring proper
+                checks and balances across your organisation.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body control-card-body">
+              <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-search"></i></span>
+              <h5 class="fw-bold">Internal Audit Support</h5>
+              <p class="lead mb-0">
+                Support for risk-based audit planning, execution and reporting — establish or
+                enhance your internal audit function.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body control-card-body">
+              <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-chalkboard-teacher"></i></span>
+              <h5 class="fw-bold">Training & Awareness Programs</h5>
+              <p class="lead mb-0">
+                Educate employees on their roles in safeguarding assets and maintaining a strong control
+                environment through targeted training.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div class="row g-4 justify-content-center">
-      <!-- Card 1 -->
-      <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body control-card-body">
-            <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-exclamation-triangle"></i></span>
-            <h5 class="fw-bold">Risk Assessment & Control Design</h5>
-            <p class="text-muted mb-0">
-              Identify and assess financial, operational and compliance risks. We design frameworks
-              to mitigate risks effectively while optimizing efficiency.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body control-card-body">
-            <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-project-diagram"></i></span>
-            <h5 class="fw-bold">Process Documentation & Optimization</h5>
-            <p class="text-muted mb-0">
-              Document and streamline processes for greater transparency, accountability
-              and efficiency—reducing risks while maximizing productivity.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body control-card-body">
-            <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-user-shield"></i></span>
-            <h5 class="fw-bold">Segregation of Duties Analysis</h5>
-            <p class="text-muted mb-0">
-              Analyze roles and responsibilities to prevent fraud and errors, ensuring proper
-              checks and balances across your organisation.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body control-card-body">
-            <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-search"></i></span>
-            <h5 class="fw-bold">Internal Audit Support</h5>
-            <p class="text-muted mb-0">
-              Support for risk-based audit planning, execution and reporting — establish or
-              enhance your internal audit function.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 5 -->
-      <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body control-card-body">
-            <span class="control-icon mb-3" aria-hidden="true"><i class="fas fa-chalkboard-teacher"></i></span>
-            <h5 class="fw-bold">Training & Awareness Programs</h5>
-            <p class="text-muted mb-0">
-              Educate employees on their roles in safeguarding assets and maintaining a strong control
-              environment through targeted training.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
+  </section>
 
   <!-- Internal Controls FAQs -->
   <section class="py-5">

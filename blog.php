@@ -112,9 +112,9 @@ $result = $stmt->get_result();
                     <?php else: ?>
                         <div class="col-12">
                             <div class="text-center py-5">
-                                <i class="bi bi-file-earmark-post display-1 text-muted"></i>
+                                <i class="bi bi-file-earmark-post display-1 lead"></i>
                                 <h3 class="mt-3">No posts found</h3>
-                                <p class="text-muted">Check back later for new content.</p>
+                                <p class="lead">Check back later for new content.</p>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -201,7 +201,7 @@ $result = $stmt->get_result();
                                     <div class="d-flex w-100 justify-content-between">
                                         <h6 class="mb-1"><?php echo htmlspecialchars($recent['post_title']); ?></h6>
                                     </div>
-                                    <small class="text-muted"><?php echo date('M j, Y', strtotime($recent['created_at'])); ?></small>
+                                    <small class="lead"><?php echo date('M j, Y', strtotime($recent['created_at'])); ?></small>
                                 </a>
                             <?php endwhile; ?>
                         </div>

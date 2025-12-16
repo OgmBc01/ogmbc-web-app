@@ -108,7 +108,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

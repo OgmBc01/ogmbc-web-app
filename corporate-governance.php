@@ -44,7 +44,7 @@ include 'includes/header-1.php'
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">Approach</span></h2>
-        <p class="text-muted">
+        <p class="lead">
           We believe that effective corporate governance is more than just compliance—it's about creating 
           a culture of integrity and ethical behavior throughout an organization. Our holistic approach is 
           tailored to meet the unique needs of each client. We work closely with boards, executives, and 
@@ -58,7 +58,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0">
             <div class="card-body">
               <h5 class="fw-bold"><i class="fas fa-balance-scale me-2" style="color:#d0aa4b;"></i> Governance Framework Development</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Establish robust governance frameworks, including policies, board structures, and committees, 
                 tailored to your industry and organizational complexity.
               </p>
@@ -69,7 +69,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0">
             <div class="card-body">
               <h5 class="fw-bold"><i class="fas fa-users me-2" style="color:#d0aa4b;"></i> Board Effectiveness Evaluation</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Conduct thorough assessments of board performance through surveys, interviews, and benchmarking, 
                 with actionable strategies for improvement.
               </p>
@@ -80,7 +80,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0">
             <div class="card-body">
               <h5 class="fw-bold"><i class="fas fa-shield-alt me-2" style="color:#d0aa4b;"></i> Risk Management & Compliance</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Identify, assess, and mitigate risks with tailored frameworks, internal controls, and ongoing 
                 monitoring to ensure compliance and protect reputation.
               </p>
@@ -91,7 +91,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0">
             <div class="card-body">
               <h5 class="fw-bold"><i class="fas fa-hand-holding-heart me-2" style="color:#d0aa4b;"></i> Ethics & Corporate Responsibility</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Develop ethical codes of conduct, whistleblower policies, and sustainability initiatives to 
                 promote responsible business practices.
               </p>
@@ -102,48 +102,11 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0">
             <div class="card-body">
               <h5 class="fw-bold"><i class="fas fa-handshake me-2" style="color:#d0aa4b;"></i> Stakeholder Engagement</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Facilitate meaningful dialogues with shareholders, employees, and communities to build trust, 
                 enhance communication, and align interests.
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why Choose OGMBC -->
-  <section class="py-5">
-    <div class="container text-center">
-      <h2 class="fw-bold">Why Choose <span style="color:#d0aa4b;">OGMBC Consultants?</span></h2>
-      <div class="row g-4 mt-4">
-        <div class="col-md-6 col-lg-3">
-          <div class="p-4 bg-white shadow-sm rounded h-100">
-            <i class="fas fa-user-tie fa-2x mb-3" style="color:#d0aa4b;"></i>
-            <h6 class="fw-bold" style="color:#0b1224;">Expertise</h6>
-            <p class="text-muted">Seasoned professionals with extensive governance, compliance, and risk management experience.</p>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="p-4 bg-white shadow-sm rounded h-100">
-            <i class="fas fa-cogs fa-2x mb-3" style="color:#d0aa4b;"></i>
-            <h6 class="fw-bold" style="color:#0b1224;">Customized Solutions</h6>
-            <p class="text-muted">Tailored approaches that address your organization's specific governance challenges and goals.</p>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="p-4 bg-white shadow-sm rounded h-100">
-            <i class="fas fa-chart-line fa-2x mb-3" style="color:#d0aa4b;"></i>
-            <h6 class="fw-bold" style="color:#0b1224;">Results-Driven</h6>
-            <p class="text-muted">Practical solutions that deliver tangible improvements and long-term value creation.</p>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="p-4 bg-white shadow-sm rounded h-100">
-            <i class="fas fa-shield-alt fa-2x mb-3" style="color:#d0aa4b;"></i>
-            <h6 class="fw-bold" style="color:#0b1224;">Sustainability</h6>
-            <p class="text-muted">Focused on building resilient governance structures that ensure lasting success.</p>
           </div>
         </div>
       </div>
@@ -155,7 +118,7 @@ include 'includes/header-1.php'
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="fw-bold" style="color:#0b1224;">Frequently Asked Questions</h2>
-        <p class="text-muted">Get answers to the most common corporate governance queries.</p>
+        <p class="lead text-dark">Get answers to the most common corporate governance queries.</p>
       </div>
 
       <div class="accordion" id="govFaq">
@@ -237,7 +200,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

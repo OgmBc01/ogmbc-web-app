@@ -46,7 +46,7 @@ include 'includes/header-1.php'
       <!-- Section Header -->
       <div class="text-center mb-5">
         <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">IFRS Advisory Services</span> Include</h2>
-        <p class="text-muted">
+        <p class="lead">
           At OGMBC Consultants, we provide end-to-end IFRS advisory services tailored to your business needs. 
           From implementation and training to compliance reviews and advisory support, our team ensures accuracy, 
           transparency, and global compliance in your financial reporting.
@@ -61,7 +61,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-cogs"></i></span>
               <h5 class="fw-bold">IFRS Implementation Assistance</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Hands-on support from assessment to final adoption, helping you seamlessly 
                 integrate IFRS into your reporting framework.
               </p>
@@ -75,7 +75,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-chalkboard-teacher"></i></span>
               <h5 class="fw-bold">IFRS Training & Workshops</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Interactive sessions designed for finance professionals at all levels, covering 
                 IFRS principles, updates, and best practices.
               </p>
@@ -89,7 +89,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-check-circle"></i></span>
               <h5 class="fw-bold">IFRS Compliance Reviews</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Thorough reviews to ensure accuracy and consistency in financial statements, 
                 with actionable recommendations for improvement.
               </p>
@@ -103,7 +103,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-lightbulb"></i></span>
               <h5 class="fw-bold">IFRS Advisory Support</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Personalized guidance on complex IFRS issues, transactions, and reporting, 
                 ensuring compliance and strategic decision-making.
               </p>
@@ -128,7 +128,7 @@ include 'includes/header-1.php'
               </button>
             </h2>
             <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#ifrsFAQ">
-              <div class="accordion-body text-muted">
+              <div class="accordion-body lead">
                 IFRSs are global accounting standards developed by IASB to enhance transparency, comparability, 
                 and reliability in financial reporting.
               </div>
@@ -142,7 +142,7 @@ include 'includes/header-1.php'
               </button>
             </h2>
             <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#ifrsFAQ">
-              <div class="accordion-body text-muted">
+              <div class="accordion-body lead">
                 Compliance boosts credibility, improves transparency, fosters investor confidence, and ensures 
                 comparability for global stakeholders.
               </div>
@@ -156,7 +156,7 @@ include 'includes/header-1.php'
               </button>
             </h2>
             <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#ifrsFAQ">
-              <div class="accordion-body text-muted">
+              <div class="accordion-body lead">
                 We offer implementation, training, compliance reviews, and advisory services tailored to your 
                 unique reporting needs and challenges.
               </div>
@@ -170,7 +170,7 @@ include 'includes/header-1.php'
               </button>
             </h2>
             <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#ifrsFAQ">
-              <div class="accordion-body text-muted">
+              <div class="accordion-body lead">
                 Our deep IFRS expertise, client-focused approach, and commitment to excellence set us apart. 
                 We deliver practical, results-oriented solutions.
               </div>
@@ -184,7 +184,7 @@ include 'includes/header-1.php'
               </button>
             </h2>
             <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#ifrsFAQ">
-              <div class="accordion-body text-muted">
+              <div class="accordion-body lead">
                 Simply contact us for a consultation. We’ll assess your needs and tailor our services 
                 to ensure smooth IFRS compliance and reporting success.
               </div>
@@ -224,7 +224,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

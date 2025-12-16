@@ -31,8 +31,24 @@
                 </li>
 
                 <!-- About -->
-                <li class="nav-item">
-                    <a class="nav-link" href="about.php">About</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    About
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item" href="about.php">About Us</a>
+                        </li>
+
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item" href="our-team.php">Our Team</a>
+                        </li>
+
+                        <!-- Profile -->
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item" href="ogmbc-profile.php">Company Profile</a>
+                        </li>
+                    </ul>
                 </li>
 
                 <!-- Services Dropdown -->
@@ -60,6 +76,7 @@
                         <a class="dropdown-item dropdown-toggle" href="#">Accounting & Taxation</a>
                         <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="bookkeeping.php">Bookkeeping</a></li>
+                        <li><a class="dropdown-item" href="cfo-services.php">CFO Services</a></li>
                         <li><a class="dropdown-item" href="management-accounting-&-kpi.php">Management Accounting & KPIs</a></li>
                         <li><a class="dropdown-item" href="tax-consultancy.php">Tax Consultancy</a></li>
                         <li><a class="dropdown-item" href="business-planning.php">Business Planning</a></li>
@@ -89,16 +106,10 @@
                         <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="bank-account-opening.php">Bank Account Opening</a></li>
                         <li><a class="dropdown-item" href="annual-renewal-services.php">Annual Renewal Services</a></li>
-                        <li><a class="dropdown-item" href="residency-service.php">Residency Services</a></li>
                         <li><a class="dropdown-item" href="office-space.php">Office Space Provision</a></li>
                         </ul>
                     </li>
                     </ul>
-                </li>
-
-                <!-- Profile -->
-                <li class="nav-item">
-                    <a class="nav-link" href="ogmbc-profile.php">Profile</a>
                 </li>
 
                 <!-- Ratios -->

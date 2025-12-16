@@ -47,7 +47,7 @@ include 'includes/header-1.php'
         <p class="lead">At OGMBC Consultants, we conduct thorough due diligence assessments to ensure compliance, transparency, and reliable decision-making.</p>
       </div>
 
-      <div class="row g-4">
+      <div class="row g-4" style="font-size: 1.1rem;">
         <!-- Card 1 -->
         <div class="col-md-6 col-lg-4">
           <div class="card h-100 shadow-sm border-0 text-dark service-card">
@@ -151,32 +151,6 @@ include 'includes/header-1.php'
     </div>
   </section>
 
-  <!-- UBO Compliance Section -->
-  <section class="py-5 bg-light">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2 class="fw-bold text-dark">The Ultimate Beneficial Owner (UBO)</h2>
-        <p class="text-muted">
-          The UBO is the individual who ultimately owns or controls a company, playing a crucial role in transparency and compliance.
-        </p>
-      </div>
-
-      <div class="row justify-content-center">
-        <div class="col-lg-8">
-          <h5 class="fw-bold mb-3 text-dark">Why is UBO Compliance Required?</h5>
-          <ul class="list-unstyled text-muted">
-            <li><i class="fas fa-check-circle me-2" style="color:#d0aa4b;"></i> UBO information is essential for regulatory compliance and due diligence processes.</li>
-            <li><i class="fas fa-check-circle me-2" style="color:#d0aa4b;"></i> Knowing the UBO provides insight into potential risks and ensures responsible business dealings.</li>
-            <li><i class="fas fa-check-circle me-2" style="color:#d0aa4b;"></i> Properly documenting UBOs enhances governance and trust in business relationships.</li>
-            <li><i class="fas fa-check-circle me-2" style="color:#d0aa4b;"></i> Compliance with UBO disclosure requirements prevents illicit activities.</li>
-            <li><i class="fas fa-check-circle me-2" style="color:#d0aa4b;"></i> Understanding UBOs facilitates better risk management and decision-making.</li>
-            <li><i class="fas fa-check-circle me-2" style="color:#d0aa4b;"></i> Transparency regarding UBOs fosters integrity and accountability in the corporate sector.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- CTA Section -->
   <section class="cta-section py-5">
     <div class="container">
@@ -195,7 +169,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

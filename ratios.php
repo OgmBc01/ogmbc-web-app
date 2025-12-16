@@ -3,206 +3,14 @@ include 'includes/database.php';
 include 'includes/header-1.php'
 ?> 
 
-<style>
-    :root {
-        --gold: #f1bf70;
-        --primary: #0b1224;
-        --muted: #94a3b8;
-        --success: #10b981;
-        --success-light: rgba(16, 185, 129, 0.1);
-    }
-
-    .card-app { background: #ffffff12; border:1px solid rgba(241, 192, 112, 0.21); margin-top: -70px; }
-    .stepper { counter-reset: step; }
-    .step { position: relative; padding-left:3rem; margin-bottom:1.25rem; }
-    .step::before { counter-increment: step; content: counter(step); width:2rem; height:2rem; border-radius:50%; background:var(--gold); color:var(--primary); display:inline-grid; place-items:center; position:absolute; left:0; top:0; font-weight:700; }
-    
-    /* Ratio card styling - UPDATED FOR RESPONSIVE */
-    .ratio-card {
-        background: #0b1224;
-        border-radius: 10px;
-        padding: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: #e2e8f0;
-        border: 2px solid transparent;
-        flex: 1 1 calc(50% - 0.5rem); /* Two cards per row on mobile */
-        min-width: 0; /* Allow flex shrinking */
-        position: relative;
-        overflow: hidden;
-    }
-    
-    /* Desktop: 3-4 cards per row */
-    @media (min-width: 768px) {
-        .ratio-card {
-            flex: 0 0 auto;
-            min-width: 240px;
-        }
-    }
-    
-    /* Mobile: 2 cards per row */
-    @media (max-width: 767.98px) {
-        .ratio-card {
-            flex: 1 1 calc(50% - 0.5rem);
-            min-width: 0;
-            padding: 0.75rem;
-        }
-    }
-    
-    /* Small mobile: 1 card per row */
-    @media (max-width: 575.98px) {
-        .ratio-card {
-            flex: 1 1 100%;
-        }
-    }
-
-    .ratio-card:hover {
-        transform: translateY(-4px);
-        border-color: var(--gold);
-        box-shadow: 0 0 8px rgba(241,191,112,0.4);
-    }
-    
-    /* Enhanced selected state with green animation */
-    .ratio-card.selected {
-        border-color: var(--success);
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-        background: var(--success-light);
-        animation: pulse-selected 1.5s ease-in-out;
-    }
-    
-    @keyframes pulse-selected {
-        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-    
-    /* Green tick mark for selected ratios */
-    .selected-tick {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 20px;
-        height: 20px;
-        background: var(--success);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transform: scale(0);
-        transition: all 0.3s ease;
-    }
-    
-    .ratio-card.selected .selected-tick {
-        opacity: 1;
-        transform: scale(1);
-    }
-    
-    .selected-tick i {
-        color: white;
-        font-size: 12px;
-    }
-
-    /* Abbreviation square patch - UPDATED FOR MOBILE */
-    .ratio-abbr {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: #f1c070ff;
-        display: grid;
-        place-items: center;
-        color: #fff;
-        font-weight: 700;
-        font-size: 1rem;
-        flex-shrink: 0;
-    }
-    
-    @media (min-width: 768px) {
-        .ratio-abbr {
-            width: 48px;
-            height: 48px;
-            font-size: 1.1rem;
-        }
-    }
-
-    /* Ratio title golden - UPDATED FOR MOBILE */
-    .ratio-name {
-        color: var(--gold);
-        font-weight: 600;
-        font-size: 0.95rem;
-        line-height: 1.3;
-    }
-    
-    @media (min-width: 768px) {
-        .ratio-name {
-            font-size: 1.05rem;
-        }
-    }
-
-    /* Ratio grid container - UPDATED FOR RESPONSIVE */
-    #ratiosGrid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-    
-    /* Ensure proper spacing on mobile */
-    @media (max-width: 767.98px) {
-        #ratiosGrid {
-            gap: 0.5rem;
-        }
-    }
-
-    .badge-good { background: #16a34a; color: #fff; }
-    .badge-warn { background: #f59e0b; color: #fff; }
-    .badge-risk { background: #dc2626; color: #fff; }
-    .small-muted { color: var(--muted); font-size:.95rem; }
-
-    .modal { z-index: 99999; }
-    .modal-backdrop.show { z-index: 99998; }
-
-    .saved-table td, .saved-table th { color: #0f172a; }
-    .bg-paper { background: #f7f6f2; color: #0f172a; }
-    
-    /* Enhanced instruction styling */
-    .step-instruction {
-        background: rgba(241, 191, 112, 0.1);
-        border-left: 3px solid var(--gold);
-        padding: 12px 15px;
-        border-radius: 0 8px 8px 0;
-        margin-bottom: 15px;
-    }
-    
-    .step-instruction p {
-        margin-bottom: 0;
-        color: #e2e8f0;
-    }
-    
-    .step-instruction .instruction-icon {
-        color: var(--gold);
-        margin-right: 8px;
-    }
-    
-    /* Selected ratios counter */
-    .selected-counter {
-        background: var(--success);
-        color: white;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        margin-left: 8px;
-    }
-</style>
-
 <!-- Hero Section -->
 <section class="about-hero d-flex align-items-center text-center text-white">
     <div class="container">
-        <h1 class="display-4 fw-bold">Free Ratio Calculator</h1>
-        <p class="lead">Easily find out the status or faith of your business with our comprehensive & easy to use ratio calculator.</p>
+        <h1 class="display-4 fw-bold">Financial Rations</h1>
+        <h3>Numbers tell stories — and we help you read them.</h3>
+        <p class="lead">OGM is offering complimentary financial ratio calculations, so you can assess 
+          your financial health and plan with confidence.
+        </p>
         <nav aria-label="breadcrumb">
             <!-- <ol class="breadcrumb justify-content-center">
                 <li class="breadcrumb-item"><a href="#" class="text-white text-decoration-none"></a></li>
@@ -334,7 +142,6 @@ include 'includes/header-1.php'
 </div>
 
 <?php include 'includes/footer.php' ?>
-
 
 <script>
   /* =========================

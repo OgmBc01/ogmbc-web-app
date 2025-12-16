@@ -53,7 +53,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm text-start p-4">
             <i class="fas fa-piggy-bank fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Tax Advantages</h5>
-            <p class="">A tax-neutral environment offering efficiency and asset protection.</p>
+            <p class="lead">A tax-neutral environment offering efficiency and asset protection.</p>
           </div>
         </div>
 
@@ -61,7 +61,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm text-start p-4">
             <i class="fas fa-user-shield fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Financial Privacy</h5>
-            <p class="">Strict confidentiality laws ensure the security of business affairs.</p>
+            <p class="lead">Strict confidentiality laws ensure the security of business affairs.</p>
           </div>
         </div>
 
@@ -69,7 +69,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm text-start p-4">
             <i class="fas fa-balance-scale fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Stability & Reputation</h5>
-            <p class="">A politically stable jurisdiction with strong regulatory compliance.</p>
+            <p class="lead">A politically stable jurisdiction with strong regulatory compliance.</p>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm text-start p-4">
             <i class="fas fa-globe-americas fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Global Accessibility</h5>
-            <p class="">Strategically located for easy access to international markets.</p>
+            <p class="lead">Strategically located for easy access to international markets.</p>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ include 'includes/header-1.php'
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="fw-bold" style="color: #f1bf70;">Legal Types of Companies in Cayman</h2>
-        <p class="">Explore the main legal structures available for Cayman company formation.</p>
+        <p class="lead">Explore the main legal structures available for Cayman company formation.</p>
       </div>
 
       <div class="row g-4">
@@ -97,7 +97,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm text-start p-4">
             <i class="fas fa-file-contract fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Exempted Company</h5>
-            <p class="">Ideal for businesses conducting activities outside the Cayman Islands.</p>
+            <p class="lead">Ideal for businesses conducting activities outside the Cayman Islands.</p>
           </div>
         </div>
 
@@ -105,7 +105,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm text-start p-4">
             <i class="fas fa-users fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Limited Liability Company (LLC)</h5>
-            <p class="">Flexible structuring with separate legal personality and multiple memberships.</p>
+            <p class="lead">Flexible structuring with separate legal personality and multiple memberships.</p>
           </div>
         </div>
 
@@ -113,7 +113,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm text-start p-4">
             <i class="fas fa-layer-group fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Segregated Portfolio Company (SPC)</h5>
-            <p class="">Ideal for investment funds, allowing segregation of assets and liabilities.</p>
+            <p class="lead">Ideal for investment funds, allowing segregation of assets and liabilities.</p>
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@ include 'includes/header-1.php'
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="fw-bold" style="color: #f1bf70;">Required Documents for Cayman Company Formation</h2>
-        <p class="">Navigating the process is simplified with OGMBC. Here are the key documents you'll need:</p>
+        <p class="lead">Navigating the process is simplified with OGMBC. Here are the key documents you'll need:</p>
       </div>
 
       <div class="row g-4">
@@ -133,74 +133,28 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm p-4 text-start">
             <i class="fas fa-file-alt fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold" style="color:#f1bf70;">Memorandum & Articles</h5>
-            <p class="">Outlines company details and internal regulations.</p>
+            <p class="lead">Outlines company details and internal regulations.</p>
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
           <div class="card h-100 shadow-sm p-4 text-start">
             <i class="fas fa-users fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold" style="color:#f1bf70;">Directors & Shareholders</h5>
-            <p class="">Details of individuals involved in the company.</p>
+            <p class="lead">Details of individuals involved in the company.</p>
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
           <div class="card h-100 shadow-sm p-4 text-start">
             <i class="fas fa-map-marker-alt fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold" style="color:#f1bf70;">Registered Office</h5>
-            <p class="">Official address for receiving legal correspondence.</p>
+            <p class="lead">Official address for receiving legal correspondence.</p>
           </div>
         </div>
         <div class="col-md-6 col-lg-3">
           <div class="card h-100 shadow-sm p-4 text-start">
             <i class="fas fa-id-card fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold" style="color:#f1bf70;">KYC Documentation</h5>
-            <p class="">Proof of identity and address for all directors and shareholders.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Estimated Costs & Processing Time -->
-  <section class="py-5 bg-light">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2 class="fw-bold" style="color: #111827;">Estimated Costs & Processing Time</h2>
-        <p class="text-muted">Our transparent approach ensures you have a clear understanding of the costs and timelines involved.</p>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div class="card h-100 shadow-sm p-4 text-start">
-            <i class="fas fa-coins fa-2x mb-3" style="color:#f1bf70;"></i>
-            <h5 class="fw-bold">Government Fees</h5>
-            <p class="text-muted">Covers registration and ongoing compliance with CIMA.</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card h-100 shadow-sm p-4 text-start">
-            <i class="fas fa-briefcase fa-2x mb-3" style="color:#f1bf70;"></i>
-            <h5 class="fw-bold">Professional Services</h5>
-            <p class="text-muted">Competitive packages including document prep, filing, and compliance support.</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card h-100 shadow-sm p-4 text-start">
-            <i class="fas fa-clock fa-2x mb-3" style="color:#f1bf70;"></i>
-            <h5 class="fw-bold">Processing Time</h5>
-            <p class="text-muted">Typically 4–6 weeks, subject to regulatory approvals.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Why Choose OGMBC -->
-      <div class="mt-5">
-        <div class="card p-4 shadow-sm text-start">
-          <h4 class="fw-bold"><i class="fas fa-handshake me-2" style="color:#f1bf70;"></i> Why Choose OGMBC?</h4>
-          <p class="text-muted">At OGMBC, we pride ourselves on delivering personalized and efficient services. Our experienced team ensures your Cayman Company Formation is seamless, compliant, and tailored to your goals.</p>
-          <p class="text-muted">Embark on your international business journey with confidence. Contact OGMBC today, and let us guide you through the process of establishing your business presence in the Cayman Islands.</p>
-          <div class="text-end">
-            <a href="#contact" class="btn btn-primary px-4" style="background:#f1bf70; border:none; color:#111827; font-weight:600;">Contact OGMBC Today</a>
+            <p class="lead">Proof of identity and address for all directors and shareholders.</p>
           </div>
         </div>
       </div>
@@ -225,7 +179,7 @@ include 'includes/header-1.php'
               <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
             </div>
           </div>
-          <p class="mb-4" style="color:#747576;">
+          <p class="lead mb-4" style="color:#747576;">
             We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
           </p>
           <div class="d-flex align-items-center gap-3 mt-2">

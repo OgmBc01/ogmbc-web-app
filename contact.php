@@ -76,9 +76,9 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0" style="background-color:#f7f0d9;">
             <div class="card-body">
               <h5 class="fw-bold text-dark">Dubai, UAE</h5>
-              <p class="text-muted mb-1">OGM Business Consultants FZCO</p>
-              <p class="text-muted mb-1">Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai,</p>
-              <p class="text-muted mb-1">United Arab Emirates. P.O. Box 33418</p>
+              <p class="lead mb-1">OGM Business Consultants FZCO</p>
+              <p class="lead mb-1">Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai,</p>
+              <p class="lead mb-1">United Arab Emirates. P.O. Box 33418</p>
               <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmbc.ae" class="text-decoration-none">info@ogmbc.ae</a></p>
               <p class="mb-0"><strong>Tel:</strong> +971509860136</p>
             </div>
@@ -89,9 +89,9 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0" style="background-color:#f7f0d9;">
             <div class="card-body">
               <h5 class="fw-bold text-dark">Delaware, USA</h5>
-              <p class="text-muted mb-1">OGMBC Holding Co. Ltd</p>
-              <p class="text-muted mb-1">16192 Coastal Highway, Lewes</p>
-              <p class="text-muted mb-1">P.O. Box 19958, Delaware, United States</p>
+              <p class="lead mb-1">OGMBC Holding Co. Ltd</p>
+              <p class="lead mb-1">16192 Coastal Highway, Lewes</p>
+              <p class="lead mb-1">P.O. Box 19958, Delaware, United States</p>
               <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmholding.com" class="text-decoration-none">info@ogmholding.com</a></p>
               <p class="mb-0"><strong>Tel:</strong> +971509860136</p>
             </div>
@@ -103,9 +103,9 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0" style="background-color:#f7f0d9;">
             <div class="card-body">
               <h5 class="fw-bold text-dark">London, UK</h5>
-              <p class="text-muted mb-1">OGMBC UK Ltd</p>
-              <p class="text-muted mb-1">128 City Road, EC1V 2NX</p>
-              <p class="text-muted mb-1">London, United Kingdom</p>
+              <p class="lead mb-1">OGMBC UK Ltd</p>
+              <p class="lead mb-1">128 City Road, EC1V 2NX</p>
+              <p class="lead mb-1">London, United Kingdom</p>
               <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmconsultants.com" class="text-decoration-none">info@ogmconsultants.com</a></p>
               <p class="mb-0"><strong>Tel:</strong> +971509860136</p>
             </div>
@@ -133,7 +133,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

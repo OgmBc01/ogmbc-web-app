@@ -53,7 +53,7 @@ include 'includes/header-1.php'
           <div class="feature-card p-4 h-100">
             <i class="bi bi-laptop feature-icon"></i>
             <h4 class="mt-3">Digital Advancements</h4>
-            <p>
+            <p class="lead">
               Estonia is renowned for its advanced digital infrastructure. The country embraces cutting
               edge technology, offering a paperless and efficient
               business environment. This digital approach streamlines administrative processes, making it convenient for entrepreneurs to m ana ge their
@@ -67,10 +67,10 @@ include 'includes/header-1.php'
           <div class="feature-card p-4 h-100">
             <i class="bi bi-passport feature-icon"></i>
             <h4 class="mt-3">E-Residency Program</h4>
-            <p>
+            <p class="lead">
               Estonia's E-Residency program allows non residents to establish and manage a business online. This unique feature 
-              enables entrep reneurs to conduct business globally without physically residing in Estonia, opening up a world of 
-              possibilities for international busin ess owners.
+              enables entrepreneurs to conduct business globally without physically residing in Estonia, opening up a world of 
+              possibilities for international business owners.
             </p>
           </div>
         </div>
@@ -80,7 +80,7 @@ include 'includes/header-1.php'
           <div class="feature-card p-4 h-100">
             <i class="bi bi-cash feature-icon"></i>
             <h4 class="mt-3">Favorable Tax Environment</h4>
-            <p>
+            <p class="lead">
               Estonia boasts one of the most attractive tax systems in Europe. With a flat corporate income tax rate of 20%, no 
               VAT on retained earnings, and no tax on reinvested profits, it provides an optimal environment for businesses 
               seeking tax efficiency.
@@ -105,7 +105,7 @@ include 'includes/header-1.php'
             <i class="fas fa-building fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">For Residents</h5>
             <h6 class="fw-bold">Osaühing (OÜ) Private Limited Company</h6>
-            <ul class="text-muted">
+            <ul class="lead">
               <li>Minimum share capital: 2,500 EUR</li>
               <li>Limited liability, providing financial protection for shareholders</li>
               <li>Suitable for small to medium sized enterprises</li>
@@ -119,7 +119,7 @@ include 'includes/header-1.php'
             <i class="fas fa-globe fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">For Non-Residents</h5>
             <h6 class="fw-bold">Estonian Branch</h6>
-            <ul class="text-muted">
+            <ul class="lead">
               <li>Ideal for companies expanding operations to Estonia</li>
               <li>Parent company is liable for the Estonian branch</li>
             </ul>
@@ -141,7 +141,7 @@ include 'includes/header-1.php'
           <div class="card h-100 p-4 shadow-sm">
             <i class="fas fa-user-check fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold" style="color:#f1bf70;">Resident Company</h5>
-            <ul class="">
+            <ul lead>
               <li>At least one shareholder and one director</li>
               <li>Registered office address in Estonia</li>
             </ul>
@@ -152,43 +152,9 @@ include 'includes/header-1.php'
           <div class="card h-100 p-4 shadow-sm">
             <i class="fas fa-passport fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold" style="color:#f1bf70;">Non-Resident Company</h5>
-            <ul class="">
+            <ul lead>
               <li>Registration documents from home country</li>
               <li>Legalized power of attorney for representation</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Estimated Costs -->
-  <section class="py-5 bg-light">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2 class="fw-bold" style="color:#d0aa4b;">Estimated Costs</h2>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-md-6">
-          <div class="card h-100 p-4 shadow-sm">
-            <i class="fas fa-coins fa-2x mb-3" style="color:#f1bf70;"></i>
-            <h5 class="fw-bold">Resident Company</h5>
-            <ul class="text-muted">
-              <li>Government fees: 190 EUR</li>
-              <li>Notary fees: ~200–300 EUR</li>
-              <li>Ongoing maintenance costs</li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="card h-100 p-4 shadow-sm">
-            <i class="fas fa-money-check-alt fa-2x mb-3" style="color:#f1bf70;"></i>
-            <h5 class="fw-bold">Non-Resident Company</h5>
-            <ul class="text-muted">
-              <li>Government fees: 190 EUR</li>
-              <li>Legalization & translation costs</li>
-              <li>Ongoing maintenance costs</li>
             </ul>
           </div>
         </div>
@@ -208,14 +174,14 @@ include 'includes/header-1.php'
           <div class="card h-100 p-4 shadow-sm">
             <i class="fas fa-map-marker-alt fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Office Address</h5>
-            <p class="text-muted">We assist in providing a registered office address in Estonia, fulfilling the legal requirement for company registration.</p>
+            <p class="lead">We assist in providing a registered office address in Estonia, fulfilling the legal requirement for company registration.</p>
           </div>
         </div>
         <div class="col-md-6">
           <div class="card h-100 p-4 shadow-sm">
             <i class="fas fa-university fa-2x mb-3" style="color:#f1bf70;"></i>
             <h5 class="fw-bold">Bank Account Opening</h5>
-            <p class="text-muted">We guide you through the process of opening a business bank account in Estonia, ensuring smooth financial transactions for your company.</p>
+            <p class="lead">We guide you through the process of opening a business bank account in Estonia, ensuring smooth financial transactions for your company.</p>
           </div>
         </div>
       </div>
@@ -240,7 +206,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-          <p class="mb-4" style="color:#747576;">
+          <p class="lead mb-4" style="color:#747576;">
             We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
           </p>
           <div class="d-flex align-items-center gap-3 mt-2">

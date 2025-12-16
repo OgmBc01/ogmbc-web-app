@@ -152,7 +152,7 @@ include 'includes/header.php'
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="visually-hidden">Next</span>
   </button>
-</div>
+  </div>
   </section>
 
   <!-- Services -->
@@ -267,15 +267,15 @@ include 'includes/header.php'
             <span class="feature-icon-modern mb-3">
               <i class="bi bi-graph-up-arrow"></i>
             </span>
-            <h4 class="mb-2" style="color:#091e3e;">Financial Clarity</h4>
+            <h4 class="mb-2" style="color:#091e3e;">Compliance Clarity</h4>
             <p style="color:#747576;">
-              From IFRS reporting to statutory audits, we deliver insights that 
-              enhance transparency and decision-making.
+              From Auditing, Accounting, Taxation, and IFRS Reporting, we deliver 
+              compliance clarity with insights that strengthen transparency and drive confident decision-making.
             </p>
           </div>
         </div>
 
-        <!-- Feature 3 -->
+        <!-- Feature 2 -->
         <div class="col-md-4">
           <div class="feature-modern d-flex flex-column align-items-center">
             <span class="feature-icon-modern mb-3">
@@ -289,7 +289,7 @@ include 'includes/header.php'
           </div>
         </div>
 
-        <!-- Feature 2 -->
+        <!-- Feature 3 -->
         <div class="col-md-4">
           <div class="feature-modern d-flex flex-column align-items-center">
             <span class="feature-icon-modern mb-3">
@@ -320,7 +320,7 @@ include 'includes/header.php'
         <div class="stats-numbers row row-cols-2 g-4 flex-grow-1 justify-content-center">
           <div class="col text-center">
             <div class="stat-icon mb-2"><i class="bi bi-bar-chart-fill"></i></div>
-            <div class="num display-5 fw-bold" data-target="150">0</div>
+            <div class="num display-5 fw-bold" data-target="1890">0</div>
             <div class="label" style="color:#747576;">Projects Delivered</div>
           </div>
           <div class="col text-center">
@@ -330,12 +330,12 @@ include 'includes/header.php'
           </div>
           <div class="col text-center">
             <div class="stat-icon mb-2"><i class="bi bi-building"></i></div>
-            <div class="num display-5 fw-bold" data-target="40">0</div>
+            <div class="num display-5 fw-bold" data-target="38">0</div>
             <div class="label" style="color:#747576;">Industries Served</div>
           </div>
           <div class="col text-center">
             <div class="stat-icon mb-2"><i class="bi bi-star-fill"></i></div>
-            <div class="num display-5 fw-bold" data-target="100">0</div>
+            <div class="num display-5 fw-bold" data-target="95">0</div>
             <div class="label" style="color:#747576;">Client Satisfaction (%)</div>
           </div>
         </div>
@@ -343,13 +343,13 @@ include 'includes/header.php'
     </div>
   </section>
 
-  <!-- Testimonials -->
+  <!-- Testimonials 
   <section class="section testimonials-section" style="padding: 0;">
     <div class="testimonials-bg">
       <div class="container py-5">
         <h2 class="mb-5" style="color: #091e3e; font-weight: 700;">What Clients Say</h2>
         <div class="row g-4 justify-content-center">
-          <!-- Testimonial 1 -->
+          <!-- Testimonial 1 
           <div class="col-md-4">
             <div class="testimonial-card">
               <div class="testimonial-quote">
@@ -365,7 +365,7 @@ include 'includes/header.php'
               <div class="testimonial-role">Business Owner</div>
             </div>
           </div>
-          <!-- Testimonial 2 -->
+          <!-- Testimonial 2 
           <div class="col-md-4">
             <div class="testimonial-card">
               <div class="testimonial-quote">
@@ -381,7 +381,7 @@ include 'includes/header.php'
               <div class="testimonial-role">Chief Accountant</div>
             </div>
           </div>
-          <!-- Testimonial 3 -->
+          <!-- Testimonial 3 
           <div class="col-md-4">
             <div class="testimonial-card">
               <div class="testimonial-quote">
@@ -400,7 +400,7 @@ include 'includes/header.php'
         </div>
       </div>
     </div>
-  </section>
+  </section -->
 
   <!-- Blog Section Posts Fetching Query -->
   <?php
@@ -510,7 +510,7 @@ include 'includes/header.php'
               <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
             </div>
           </div>
-          <p class="mb-4" style="color:#747576;">
+          <p class="lead mb-4" style="color:#747576;">
             We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
           </p>
           <div class="d-flex align-items-center gap-3 mt-2">
@@ -561,89 +561,105 @@ include 'includes/header.php'
       </a>
   </div>
 
-  <!-- Floating Chat Button -->
-  <div id="omni-floating-btn" class="omni-floating-btn">
-      <div class="omni-avatar">
-          <img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />
-      </div>
-      <span class="omni-pulse"></span>
-  </div>
+<!-- Floating Button (Should be outside the chat widget) -->
+<div id="omni-floating-btn" class="omni-floating-btn">
+    <div class="omni-pulse"></div>
+    <div class="omni-avatar">
+        <img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />
+    </div>
+</div>
 
-  <!-- omni Chat Widget -->
-  <div id="omni-chat-widget" class="omni-chat-widget omni-hidden">
-      <!-- Chat Header -->
-      <div class="omni-header">
-          <div class="omni-header-content">
-              <div class="omni-avatar-sm">
-                  <img src="resources/img/omni.svg" alt="omni Assistant" width="25" height="25" />
-              </div>
-              <div class="omni-header-text">
-                  <h6 class="omni-title">OmniOGM Assistant</h6>
-                  <span id="omni-status" class="omni-status">Online</span>
-              </div>
-          </div>
-          <button id="omni-close" class="omni-close-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 6L6 18M6 6l12 12"/>
-              </svg>
-          </button>
-      </div>
+<!-- omni Chat Widget -->
+<div id="omni-chat-widget" class="omni-chat-widget omni-hidden">
+    <!-- Chat Header -->
+    <div class="omni-header">
+        <div class="omni-header-content">
+            <div class="omni-avatar-sm">
+                <img src="resources/img/omni.svg" alt="omni Assistant" width="25" height="25" />
+            </div>
+            <div class="omni-header-text">
+                <h6 class="omni-title">OmniOGM Assistant</h6>
+                <span id="omni-status" class="omni-status">Online</span>
+            </div>
+        </div>
+        <div class="omni-header-actions">
+            <button id="omni-download-btn" class="omni-action-btn" title="Download conversation">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </button>
+            <button id="omni-maximize-btn" class="omni-action-btn" title="Maximize window">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+            </button>
+            <button id="omni-close" class="omni-close-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 
-      <!-- Chat Messages Container -->
-      <div id="omni-messages" class="omni-messages">
-          <div class="omni-welcome-message">
-              <div class="omni-welcome-avatar">
-                  <img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />
-              </div>
-              <div class="omni-welcome-text">
-                  <h4>Hello! I'm OmniOGM 👋</h4>
-                  <p>OGMBC AI Assistant. I'm here to help you learn about OGMBC's services and answer any questions you might have.</p>
-              </div>
-          </div>
-      </div>
+    <!-- Chat Messages Container -->
+    <div id="omni-messages" class="omni-messages">
+        <div class="omni-welcome-message">
+            <div class="omni-welcome-avatar">
+                <img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />
+            </div>
+            <div class="omni-welcome-text">
+                <h4>Hello! I'm OmniOGM 👋</h4>
+                <p>OGMBC AI Assistant. I'm here to help you learn about OGMBC's services and answer any questions you might have.</p>
+            </div>
+        </div>
+    </div>
 
-      <!-- Dynamic Prompts -->
-      <div id="omni-prompts" class="omni-prompts">
-          <div class="omni-prompts-header">
-              <div class="omni-prompts-title-container">
-                  <button id="omni-toggle-prompts" class="omni-toggle-btn" title="Toggle quick questions">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M6 9l6 6 6-6"/>
-                      </svg>
-                  </button>
-                  <span class="omni-prompts-title">Quick Questions</span>
-                  <span id="omni-collapse-indicator" class="omni-collapse-indicator">(click to expand)</span>
-              </div>
-              <div class="omni-prompts-actions">
-                  <button id="omni-refresh-prompts" class="omni-refresh-btn" title="Refresh suggestions">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M23 4v6h-6M1 20v-6h6"/>
-                          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-                      </svg>
-                  </button>
-              </div>
-          </div>
-          <div id="omni-prompts-container" class="omni-prompts-container omni-prompts-expanded">
-              <!-- Dynamic prompts will be inserted here -->
-          </div>
-      </div>
+    <!-- Dynamic Prompts -->
+    <div id="omni-prompts" class="omni-prompts">
+        <div class="omni-prompts-header">
+            <div class="omni-prompts-title-container">
+                <button id="omni-toggle-prompts" class="omni-toggle-btn" title="Toggle quick questions">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </button>
+                <span class="omni-prompts-title">Quick Questions</span>
+                <span id="omni-collapse-indicator" class="omni-collapse-indicator">(click to expand)</span>
+            </div>
+            <div class="omni-prompts-actions">
+                <button id="omni-refresh-prompts" class="omni-refresh-btn" title="Refresh suggestions">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="omni-prompts-container" class="omni-prompts-container omni-prompts-expanded">
+            <!-- Dynamic prompts will be inserted here -->
+        </div>
+    </div>
 
-      <!-- Chat Input Area -->
-      <div class="omni-input-area">
-          <div class="omni-input-container">
-              <textarea id="omni-user-input" class="omni-input" placeholder="Message omni..." maxlength="500" rows="1"></textarea>
-              <button id="omni-send-btn" class="omni-send-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-                  </svg>
-              </button>
-          </div>
-          <div class="omni-input-footer">
-              <span class="omni-char-count">0/500</span>
-              <span class="omni-powered-by">Powered by OmniOGM</span>
-          </div>
-      </div>
-  </div>
+    <!-- Chat Input Area -->
+    <div class="omni-input-area">
+        <div class="omni-input-container">
+            <textarea id="omni-user-input" class="omni-input" placeholder="Message omni..." maxlength="500" rows="1"></textarea>
+            <button id="omni-send-btn" class="omni-send-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="omni-input-footer">
+            <span class="omni-char-count">0/500</span>
+            <span class="omni-powered-by">Powered by OmniOGM</span>
+        </div>
+    </div>
+</div>
+
+
 
 <?php
 include 'includes/footer.php'
@@ -659,6 +675,8 @@ class omniChat {
         this.isThinking = false;
         this.isTypingResponse = false;
         this.currentTypingInterval = null;
+        this.isMaximized = false;
+        this.originalPosition = null;
         
         this.availablePrompts = [
             "What business setup services do you offer?",
@@ -698,6 +716,7 @@ class omniChat {
         this.setupAutoResize();
         this.generatePrompts();
         this.updateStatus();
+        this.createDownloadOverlay();
     }
 
     initializeElements() {
@@ -714,6 +733,8 @@ class omniChat {
         this.collapseIndicator = document.getElementById('omni-collapse-indicator');
         this.charCount = document.querySelector('.omni-char-count');
         this.statusElement = document.getElementById('omni-status');
+        this.maximizeBtn = document.getElementById('omni-maximize-btn');
+        this.downloadBtn = document.getElementById('omni-download-btn');
     }
 
     bindEvents() {
@@ -743,19 +764,351 @@ class omniChat {
             this.togglePrompts();
         });
         
-        // Click outside to close
+        this.maximizeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleMaximize();
+        });
+        
+        this.downloadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.showDownloadModal();
+        });
+        
         document.addEventListener('click', (e) => {
             if (!this.chatWidget.contains(e.target) && !this.floatingBtn.contains(e.target)) {
                 this.hideChat();
             }
         });
         
-        // Toggle prompts on header click
         this.promptsSection.addEventListener('click', (e) => {
             if (e.target.closest('.omni-prompts-header') && !e.target.closest('.omni-prompts-actions')) {
                 this.togglePrompts();
             }
         });
+    }
+
+    createDownloadOverlay() {
+        this.downloadOverlay = document.createElement('div');
+        this.downloadOverlay.className = 'omni-download-overlay';
+        this.downloadOverlay.innerHTML = `
+            <div class="omni-download-modal">
+                <h3 class="omni-download-title">Download Conversation</h3>
+                <input type="text" class="omni-download-input" value="Omni-OGM_Conversation_${this.getFormattedDate()}" placeholder="Enter file name">
+                <div class="omni-download-actions">
+                    <button class="omni-cancel-btn">Cancel</button>
+                    <button class="omni-download-btn">Download PDF</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(this.downloadOverlay);
+        
+        this.downloadOverlay.querySelector('.omni-cancel-btn').addEventListener('click', () => {
+            this.hideDownloadModal();
+        });
+        
+        this.downloadOverlay.querySelector('.omni-download-btn').addEventListener('click', () => {
+            this.downloadPDF();
+        });
+        
+        this.downloadOverlay.addEventListener('click', (e) => {
+            if (e.target === this.downloadOverlay) {
+                this.hideDownloadModal();
+            }
+        });
+    }
+
+    getFormattedDate() {
+        const now = new Date();
+        const date = now.getDate().toString().padStart(2, '0');
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const year = now.getFullYear();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        return `${date}-${month}-${year}_${hours}-${minutes}`;
+    }
+
+    showDownloadModal() {
+        this.downloadOverlay.classList.add('active');
+        const input = this.downloadOverlay.querySelector('.omni-download-input');
+        setTimeout(() => {
+            input.focus();
+            input.select();
+        }, 100);
+    }
+
+    hideDownloadModal() {
+        this.downloadOverlay.classList.remove('active');
+    }
+
+    async downloadPDF() {
+        const filename = this.downloadOverlay.querySelector('.omni-download-input').value || `Omni-OGM_Conversation_${this.getFormattedDate()}`;
+        
+        // Get all messages from the conversation history
+        let htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>${filename}</title>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 40px; 
+                        color: #333; 
+                        line-height: 1.6;
+                    }
+                    .header { 
+                        text-align: center; 
+                        margin-bottom: 30px; 
+                        border-bottom: 2px solid #0d274d; 
+                        padding-bottom: 10px;
+                    }
+                    .logo { 
+                        color: #0d274d; 
+                        font-size: 24px; 
+                        font-weight: bold; 
+                        margin-bottom: 5px;
+                    }
+                    .subtitle { 
+                        color: #666; 
+                        font-size: 14px; 
+                        margin-bottom: 20px;
+                    }
+                    .meta { 
+                        font-size: 12px; 
+                        color: #888; 
+                        text-align: center; 
+                        margin-bottom: 30px;
+                    }
+                    .message { 
+                        margin-bottom: 15px; 
+                        padding: 10px; 
+                        border-radius: 8px; 
+                        display: flex;
+                    }
+                    .user-message { 
+                        background: #f5f5f5; 
+                        border-left: 4px solid #ffd260; 
+                        margin-left: 20%;
+                    }
+                    .bot-message { 
+                        background: #eef5ff; 
+                        border-left: 4px solid #0d274d; 
+                        margin-right: 20%;
+                    }
+                    .avatar { 
+                        width: 30px; 
+                        height: 30px; 
+                        border-radius: 50%; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        font-size: 12px; 
+                        font-weight: bold; 
+                        margin-right: 10px; 
+                        flex-shrink: 0;
+                    }
+                    .user-avatar { 
+                        background: #ffd260; 
+                        color: #333; 
+                    }
+                    .bot-avatar { 
+                        background: #0d274d; 
+                        color: white; 
+                    }
+                    .content { 
+                        flex: 1;
+                        font-size: 14px;
+                    }
+                    .time { 
+                        font-size: 11px; 
+                        color: #888; 
+                        margin-top: 5px; 
+                        text-align: right;
+                    }
+                    h2, h3, h4 { 
+                        color: #0d274d; 
+                        margin-top: 15px; 
+                        margin-bottom: 8px;
+                        font-weight: 600;
+                    }
+                    h2 { font-size: 18px; }
+                    h3 { font-size: 16px; }
+                    h4 { font-size: 14px; }
+                    ul, ol { 
+                        margin: 8px 0 8px 20px; 
+                        padding-left: 0;
+                    }
+                    li { 
+                        margin: 4px 0;
+                        line-height: 1.4;
+                    }
+                    ul { list-style-type: disc; }
+                    ol { list-style-type: decimal; }
+                    strong { font-weight: bold; }
+                    em { font-style: italic; }
+                    .footer { 
+                        margin-top: 40px; 
+                        padding-top: 20px; 
+                        border-top: 1px solid #ddd; 
+                        font-size: 12px; 
+                        color: #666; 
+                        text-align: center;
+                    }
+                    .separator {
+                        height: 1px;
+                        background: #eee;
+                        margin: 10px 0;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="logo">OmniOGM Assistant</div>
+                    <div class="subtitle">OGM Business Consultants - Conversation History</div>
+                    <div class="meta">Downloaded on: ${new Date().toLocaleString()}</div>
+                </div>
+                <div class="conversation">
+        `;
+        
+        // Include welcome message
+        htmlContent += `
+            <div class="message bot-message">
+                <div class="avatar bot-avatar">AI</div>
+                <div class="content">
+                    <strong>Hello! I'm OmniOGM 👋</strong><br>
+                    OGMBC AI Assistant. I'm here to help you learn about OGMBC's services and answer any questions you might have.
+                </div>
+            </div>
+        `;
+        
+        // Add all conversation messages
+        this.conversationHistory.forEach((msg, index) => {
+            const isUser = msg.role === 'user';
+            const content = msg.content;
+            
+            htmlContent += `
+                <div class="message ${isUser ? 'user-message' : 'bot-message'}">
+                    <div class="avatar ${isUser ? 'user-avatar' : 'bot-avatar'}">
+                        ${isUser ? 'You' : 'AI'}
+                    </div>
+                    <div class="content">
+                        ${this.formatContentForPDF(content)}
+                        <div class="time">Message ${index + 1}</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        htmlContent += `
+                </div>
+                <div class="footer">
+                    © ${new Date().getFullYear()} OGM Business Consultants. All rights reserved.<br>
+                    This conversation was generated by the OmniOGM Assistant.
+                </div>
+            </body>
+            </html>
+        `;
+        
+        try {
+            if (typeof html2pdf !== 'undefined') {
+                const options = {
+                    margin: [10, 10, 10, 10],
+                    filename: `${filename}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true,
+                        logging: true
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait' 
+                    }
+                };
+                
+                console.log('Generating PDF...');
+                const pdf = await html2pdf().set(options).from(htmlContent).save();
+                this.hideDownloadModal();
+            } else {
+                console.log('html2pdf not found, using print method');
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(htmlContent);
+                printWindow.document.close();
+                printWindow.print();
+                this.hideDownloadModal();
+            }
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            alert('Failed to generate PDF. Please try printing the page instead.');
+        }
+    }
+
+    formatContentForPDF(text) {
+        if (!text) return '';
+        
+        // Apply basic formatting
+        let result = text;
+        
+        // Convert markdown-like formatting
+        result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        result = result.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Convert line breaks to <br>
+        result = result.replace(/\n/g, '<br>');
+        
+        // Process numbered lists
+        result = result.replace(/(\d+)\.\s+(.+?)(?=(\d+\.|$))/g, function(match, num, content) {
+            return '<br>' + num + '. ' + content.trim();
+        });
+        
+        // Process bulleted lists
+        result = result.replace(/([•\-*])\s+(.+?)(?=([•\-*]|$))/g, function(match, bullet, content) {
+            return '<br>' + bullet + ' ' + content.trim();
+        });
+        
+        return result;
+    }
+
+    toggleMaximize() {
+        this.isMaximized = !this.isMaximized;
+        
+        if (this.isMaximized) {
+            if (!this.originalPosition) {
+                const rect = this.chatWidget.getBoundingClientRect();
+                this.originalPosition = {
+                    bottom: this.chatWidget.style.bottom,
+                    right: this.chatWidget.style.right,
+                    width: this.chatWidget.style.width,
+                    height: this.chatWidget.style.height
+                };
+            }
+            
+            this.chatWidget.classList.add('omni-maximized');
+            this.maximizeBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+                </svg>
+            `;
+            this.maximizeBtn.title = 'Restore window';
+        } else {
+            this.chatWidget.classList.remove('omni-maximized');
+            this.maximizeBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+            `;
+            this.maximizeBtn.title = 'Maximize window';
+            
+            if (this.originalPosition) {
+                this.chatWidget.style.bottom = this.originalPosition.bottom;
+                this.chatWidget.style.right = this.originalPosition.right;
+                this.chatWidget.style.width = this.originalPosition.width;
+                this.chatWidget.style.height = this.originalPosition.height;
+            }
+        }
     }
 
     setupAutoResize() {
@@ -764,11 +1117,11 @@ class omniChat {
     }
 
     autoResizeTextarea() {
-    this.userInput.style.height = 'auto';
-    const newHeight = Math.min(this.userInput.scrollHeight, 120);
-    this.userInput.style.height = newHeight + 'px';
-    this.userInput.style.overflowY = 'hidden'; // Always hide overflow
-  }
+        this.userInput.style.height = 'auto';
+        const newHeight = Math.min(this.userInput.scrollHeight, 120);
+        this.userInput.style.height = newHeight + 'px';
+        this.userInput.style.overflowY = 'hidden';
+    }
 
     toggleChat() {
         this.chatWidget.classList.toggle('omni-hidden');
@@ -788,8 +1141,6 @@ class omniChat {
     updateStatus(status) {
         if (this.statusElement) {
             this.statusElement.textContent = status;
-            
-            // Add status animation
             this.statusElement.style.opacity = '0.5';
             setTimeout(() => {
                 this.statusElement.style.opacity = '1';
@@ -831,11 +1182,9 @@ class omniChat {
     generatePrompts() {
         this.promptsContainer.innerHTML = '';
         
-        // Filter out used prompts and get 3 random ones
         const unusedPrompts = this.availablePrompts.filter(prompt => !this.usedPrompts.has(prompt));
         const randomPrompts = this.shuffleArray([...unusedPrompts]).slice(0, 3);
         
-        // If we don't have enough unused prompts, reuse some
         if (randomPrompts.length < 3) {
             const additional = this.shuffleArray([...this.usedPrompts]).slice(0, 3 - randomPrompts.length);
             randomPrompts.push(...additional);
@@ -875,13 +1224,14 @@ class omniChat {
             avatar.textContent = 'You';
             avatar.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-700))';
         } else {
-            // Use omni image for bot avatar
             avatar.innerHTML = `<img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />`;
         }
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'omni-message-content';
-        contentDiv.textContent = content;
+        
+        // Use the enhanced formatContent method
+        contentDiv.innerHTML = this.formatContent(content);
         
         messageDiv.appendChild(avatar);
         messageDiv.appendChild(contentDiv);
@@ -891,17 +1241,254 @@ class omniChat {
         return contentDiv;
     }
 
+    // NEW: IMPROVED FORMAT CONTENT METHOD WITH BETTER SPACING FIX
+    formatContent(text) {
+        if (!text) return '';
+        
+        console.log('Original text:', text);
+        
+        // FIX 1: Add spaces between words that are stuck together
+        let cleanedText = this.fixSpacingIssues(text);
+        
+        // FIX 2: Ensure list items preserve their numbers/bullets
+        cleanedText = this.preserveListMarkers(cleanedText);
+        
+        // Split into lines
+        const lines = cleanedText.split('\n');
+        let result = '';
+        let inList = false;
+        let listType = '';
+        let listItems = [];
+        
+        for (let line of lines) {
+            line = line.trim();
+            
+            if (!line) {
+                // Empty line - close any open list
+                if (inList && listItems.length > 0) {
+                    result += this.createListHTML(listType, listItems);
+                    listItems = [];
+                    inList = false;
+                }
+                result += '<br>';
+                continue;
+            }
+            
+            // Check for numbered list (more robust matching)
+            const numberedMatch = line.match(/^(\d+)[\.\)]\s+(.+)$/);
+            // Check for bulleted list
+            const bulletedMatch = line.match(/^([•\-*])\s+(.+)$/);
+            
+            if (numberedMatch) {
+                const [, number, content] = numberedMatch;
+                if (!inList || listType !== 'numbered') {
+                    if (inList && listItems.length > 0) {
+                        result += this.createListHTML(listType, listItems);
+                        listItems = [];
+                    }
+                    inList = true;
+                    listType = 'numbered';
+                }
+                // Preserve the number in the content
+                listItems.push(this.applyInlineFormatting(content));
+            } 
+            else if (bulletedMatch) {
+                const [, bullet, content] = bulletedMatch;
+                if (!inList || listType !== 'bulleted') {
+                    if (inList && listItems.length > 0) {
+                        result += this.createListHTML(listType, listItems);
+                        listItems = [];
+                    }
+                    inList = true;
+                    listType = 'bulleted';
+                }
+                listItems.push(this.applyInlineFormatting(content));
+            } 
+            else {
+                // Not a list item - close any open list
+                if (inList && listItems.length > 0) {
+                    result += this.createListHTML(listType, listItems);
+                    listItems = [];
+                    inList = false;
+                }
+                
+                // Check for headers
+                if (line.startsWith('### ')) {
+                    result += `<h4>${this.applyInlineFormatting(line.substring(4))}</h4>`;
+                } else if (line.startsWith('## ')) {
+                    result += `<h3>${this.applyInlineFormatting(line.substring(3))}</h3>`;
+                } else if (line.startsWith('# ')) {
+                    result += `<h2>${this.applyInlineFormatting(line.substring(2))}</h2>`;
+                } else if (line.startsWith('**') && line.endsWith('**')) {
+                    result += `<strong>${this.applyInlineFormatting(line.substring(2, line.length - 2))}</strong><br>`;
+                } else {
+                    result += `<p>${this.applyInlineFormatting(line)}</p>`;
+                }
+            }
+        }
+        
+        // Close any remaining list
+        if (inList && listItems.length > 0) {
+            result += this.createListHTML(listType, listItems);
+        }
+        
+        console.log('Formatted result:', result);
+        return result;
+    }
+
+    // NEW METHOD: Fix spacing issues in text
+    fixSpacingIssues(text) {
+        let result = text;
+        
+        // Fix common spacing issues:
+        
+        // 1. Add space after period if missing (but not for decimals)
+        result = result.replace(/([a-zA-Z])\.([A-Z])/g, '$1. $2');
+        
+        // 2. Add space after colon if missing
+        result = result.replace(/:(?=[A-Za-z])/g, ': ');
+        
+        // 3. Fix "word1.word2" -> "word1. word2"
+        result = result.replace(/([a-z])\.([A-Z])/g, '$1. $2');
+        
+        // 4. Fix "word1,word2" -> "word1, word2"
+        result = result.replace(/([a-z]),([A-Za-z])/g, '$1, $2');
+        
+        // 5. Fix "Service:" becoming "Service:"
+        result = result.replace(/([A-Z][a-z]+):([A-Z])/g, '$1: $2');
+        
+        // 6. Fix specific pattern from your example: "Services:" at end of line
+        result = result.replace(/([A-Za-z]+):$/gm, '$1: ');
+        
+        return result;
+    }
+
+    // NEW METHOD: Preserve list markers
+    preserveListMarkers(text) {
+        let result = text;
+        
+        // Ensure list items have proper formatting
+        // Fix: "1.BoardFormation" -> "1. Board Formation"
+        result = result.replace(/(\d+)[\.\)]([A-Z][a-z]+)/g, '$1. $2');
+        
+        // Fix: "•Assistancewith" -> "• Assistance with"
+        result = result.replace(/([•\-*])([A-Z][a-z]+)/g, '$1 $2');
+        
+        // Fix the specific example from image: split long concatenated text
+        // This handles cases where the AI returns text without spaces
+        result = this.splitConcatenatedText(result);
+        
+        return result;
+    }
+
+    // NEW METHOD: Split concatenated text into proper words
+    splitConcatenatedText(text) {
+        // This is a simple word splitter - in production you might want a more sophisticated solution
+        // Common patterns from your example:
+        
+        // Fix "CorporateGovernanceServices:" -> "Corporate Governance Services:"
+        text = text.replace(/([a-z])([A-Z])/g, '$1 $2');
+        
+        // Fix "AI" at beginning (should stay as "AI")
+        text = text.replace(/^AI\s+/, '');
+        text = text.replace(/\s+AI\s+/, ' ');
+        
+        // Fix "OGMBC" (should stay together)
+        text = text.replace(/O G M B C/g, 'OGMBC');
+        text = text.replace(/O G M/g, 'OGM');
+        
+        // Fix specific known concatenations
+        const knownWords = {
+            'rangoot': 'a range of',
+            'compilance': 'compliance',
+            'sevices': 'services',
+            'recordstand': 'records and',
+            'iterinstitutions': 'international institutions',
+            'de': 'ae'
+        };
+        
+        Object.entries(knownWords).forEach(([wrong, correct]) => {
+            text = text.replace(new RegExp(wrong, 'gi'), correct);
+        });
+        
+        return text;
+    }
+
+    createListHTML(type, items) {
+        if (type === 'numbered') {
+            return `<ol class="omni-list">${items.map((item, index) => `<li>${item}</li>`).join('')}</ol>`;
+        } else {
+            return `<ul class="omni-list">${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+        }
+    }
+
+    applyInlineFormatting(text) {
+        if (!text) return '';
+        
+        let result = text;
+        
+        // Apply bold formatting
+        result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Apply italic formatting
+        result = result.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Apply code formatting
+        result = result.replace(/`([^`]+)`/g, '<code class="omni-code">$1</code>');
+        
+        return result;
+    }
+
+    cleanupAIText(text) {
+        // Fix common formatting issues
+        let result = text;
+        
+        // Fix: "1. Item1. Item2" -> "1. Item\n2. Item"
+        result = result.replace(/(\d+)\.\s*([^.]+?)(?=\d+\.)/g, function(match, num, content) {
+            return num + '. ' + content.trim() + '\n';
+        });
+        
+        // Fix: "• Item• Item" -> "• Item\n• Item"
+        result = result.replace(/([•\-*])\s*([^•\-*\n]+?)(?=[•\-*])/g, function(match, bullet, content) {
+            return bullet + ' ' + content.trim() + '\n';
+        });
+        
+        // Add spaces after periods if missing
+        result = result.replace(/([a-z])\.([A-Z])/g, '$1. $2');
+        
+        // Add line breaks before lists
+        result = result.replace(/:\s*(\d+\.)/g, ':\n\n$1');
+        result = result.replace(/:\s*([•\-*])/g, ':\n\n$1');
+        
+        // Ensure proper spacing for list items
+        result = result.replace(/^(\d+)\.(\S)/gm, '$1. $2');
+        result = result.replace(/^([•\-*])(\S)/gm, '$1 $2');
+        
+        // Split into lines and clean up
+        const lines = result.split('\n');
+        const cleanedLines = [];
+        
+        for (const line of lines) {
+            const cleanedLine = line.trim();
+            if (cleanedLine) {
+                cleanedLines.push(cleanedLine);
+            }
+        }
+        
+        return cleanedLines.join('\n');
+    }
+
     typeMessage(contentDiv, fullContent) {
         return new Promise((resolve) => {
             this.isTypingResponse = true;
             this.updateStatus('Typing...');
             
-            let index = 0;
-            const baseSpeed = 40; // Slower base speed: 40ms per character (was 20ms)
-            let currentSpeed = baseSpeed;
-            const maxChunkSize = 3; // Smaller chunks for slower typing
+            contentDiv.innerHTML = '';
             
-            // First clear any existing typing interval
+            let index = 0;
+            const baseSpeed = 40;
+            let currentSpeed = baseSpeed;
+            
             if (this.currentTypingInterval) {
                 clearInterval(this.currentTypingInterval);
                 this.currentTypingInterval = null;
@@ -909,189 +1496,65 @@ class omniChat {
             
             const typeNextChunk = () => {
                 if (index >= fullContent.length) {
-                    // Typing complete
                     this.isTypingResponse = false;
                     this.updateStatus('Online');
                     resolve();
                     return;
                 }
                 
-                // Determine chunk size and speed based on upcoming characters
-                let chunkSize = 1; // Start with 1 character
+                let chunkSize = 1;
                 let nextChars = fullContent.substring(index, Math.min(index + 5, fullContent.length));
                 
-                // Analyze next characters to determine typing behavior
                 if (nextChars.match(/^[.,!?;:]/)) {
-                    // Punctuation - type slowly and pause after
                     chunkSize = 1;
-                    currentSpeed = 80; // Very slow for punctuation
+                    currentSpeed = 80;
                     
-                    // Add extra pause after certain punctuation
                     if (/[.!?]/.test(nextChars[0])) {
-                        currentSpeed = 160; // Even slower for sentence endings
+                        currentSpeed = 160;
                     }
                 } else if (nextChars.match(/^\s\s+/)) {
-                    // Multiple spaces or tabs
                     chunkSize = Math.min(2, nextChars.match(/^\s+/)[0].length);
-                    currentSpeed = 20; // Faster for multiple spaces
+                    currentSpeed = 20;
                 } else if (nextChars.match(/^\s/)) {
-                    // Single space
                     chunkSize = 1;
-                    currentSpeed = 30; // Fast for spaces
+                    currentSpeed = 30;
                 } else if (nextChars.match(/^[a-zA-Z]{3,}/)) {
-                    // Word with 3+ letters - type slightly faster
                     chunkSize = 3;
                     currentSpeed = 25;
                 } else {
-                    // Default speed for other characters
                     chunkSize = 1;
                     currentSpeed = baseSpeed;
                 }
                 
-                // Add the chunk
                 const chunk = fullContent.substring(index, index + chunkSize);
-                contentDiv.textContent += chunk;
+                
+                // Get the current text
+                const currentText = contentDiv.textContent || '';
+                const newText = currentText + chunk;
+                
+                // Format the complete text so far
+                contentDiv.innerHTML = this.formatContent(newText);
+                
                 index += chunkSize;
-                
-                // Apply formatting to the current text
-                contentDiv.innerHTML = this.formatMessage(contentDiv.textContent);
-                
-                // Scroll to bottom
                 this.scrollToBottom();
                 
-                // Schedule next chunk with variable delay
                 let nextDelay = currentSpeed;
-                
-                // Add random variation to make it more human-like (±10ms)
                 nextDelay += Math.random() * 20 - 10;
-                
-                // Ensure minimum delay
                 nextDelay = Math.max(20, nextDelay);
                 
-                // Add longer pauses at natural breakpoints
                 if (chunk.match(/[.!?]/)) {
-                    nextDelay += 150; // Longer pause after sentences
+                    nextDelay += 150;
                 } else if (chunk.match(/[,;:]/)) {
-                    nextDelay += 80; // Medium pause after commas/semicolons
+                    nextDelay += 80;
                 } else if (index < fullContent.length && fullContent.charAt(index) === ' ') {
-                    nextDelay += 30; // Small pause before next word
+                    nextDelay += 30;
                 }
                 
-                // Schedule next chunk
                 this.currentTypingInterval = setTimeout(typeNextChunk, nextDelay);
             };
             
-            // Start typing
             typeNextChunk();
         });
-    }
-
-    formatMessage(content) {
-        // Create a temporary div to parse the content
-        const tempDiv = document.createElement('div');
-        
-        // First, handle code blocks separately
-        const codeRegex = /`([^`]+)`/g;
-        let formatted = content;
-        let match;
-        const codeParts = [];
-        
-        // Store and replace code blocks with placeholders
-        let codeIndex = 0;
-        while ((match = codeRegex.exec(content)) !== null) {
-            codeParts.push(match[1]);
-            formatted = formatted.replace(match[0], `__CODE${codeIndex}__`);
-            codeIndex++;
-        }
-        
-        // Process the formatted text
-        let result = formatted;
-        
-        // Replace headers
-        result = result.replace(/### (.*?)(?:\n|$)/g, '<h4>$1</h4>');
-        result = result.replace(/## (.*?)(?:\n|$)/g, '<h3>$1</h3>');
-        
-        // Process line by line for better list handling
-        const lines = result.split('\n');
-        let htmlLines = [];
-        let inList = false;
-        let listItems = [];
-        
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
-            
-            // Check for list items
-            const listMatch = line.match(/^([•\-*]|\d+\.)\s+(.+)/);
-            
-            if (listMatch) {
-                if (!inList) {
-                    inList = true;
-                    listItems = [];
-                }
-                listItems.push(listMatch[2]);
-                
-                // If next line is not a list item, close the list
-                if (i === lines.length - 1 || !lines[i + 1].match(/^([•\-*]|\d+\.)\s/)) {
-                    htmlLines.push('<ul class="omni-list">');
-                    listItems.forEach(item => {
-                        htmlLines.push(`<li>${this.applyInlineFormatting(item)}</li>`);
-                    });
-                    htmlLines.push('</ul>');
-                    inList = false;
-                }
-            } else {
-                // Not a list item
-                if (inList) {
-                    // We were in a list but this line isn't a list item
-                    htmlLines.push('<ul class="omni-list">');
-                    listItems.forEach(item => {
-                        htmlLines.push(`<li>${this.applyInlineFormatting(item)}</li>`);
-                    });
-                    htmlLines.push('</ul>');
-                    inList = false;
-                    listItems = [];
-                }
-                
-                // Apply inline formatting to regular lines
-                if (line.trim()) {
-                    htmlLines.push(this.applyInlineFormatting(line));
-                } else {
-                    htmlLines.push('<br>');
-                }
-            }
-        }
-        
-        // Join all lines
-        result = htmlLines.join('');
-        
-        // Restore code blocks
-        codeParts.forEach((code, index) => {
-            result = result.replace(`__CODE${index}__`, `<code class="omni-code">${this.escapeHtml(code)}</code>`);
-        });
-        
-        // Replace newlines with <br> tags (except where we already have HTML)
-        result = result.replace(/\n/g, '<br>');
-        
-        return result;
-    }
-
-    applyInlineFormatting(text) {
-        // Apply bold formatting
-        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        // Apply italic formatting
-        text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        // Apply emphasis for underscores (optional)
-        text = text.replace(/_(.*?)_/g, '<em>$1</em>');
-        
-        return text;
-    }
-
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     showThinkingIndicator() {
@@ -1104,7 +1567,6 @@ class omniChat {
         
         const avatar = document.createElement('div');
         avatar.className = 'omni-message-avatar';
-        // Use omni image for thinking avatar as well
         avatar.innerHTML = `<img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />`;
         
         const contentDiv = document.createElement('div');
@@ -1142,7 +1604,6 @@ class omniChat {
             this.isThinking = false;
         }
         
-        // Clear any ongoing typing interval
         if (this.currentTypingInterval) {
             clearTimeout(this.currentTypingInterval);
             this.currentTypingInterval = null;
@@ -1161,11 +1622,9 @@ class omniChat {
         
         if (!messageText) return;
 
-        // Add user message to UI and history
         this.addMessage(messageText, true);
         this.conversationHistory.push({ role: 'user', content: messageText });
 
-        // Clear input and update prompts if it's a new message
         if (!prefilledMessage) {
             this.userInput.value = '';
             this.updateCharCount();
@@ -1174,11 +1633,9 @@ class omniChat {
             this.generatePrompts();
         }
 
-        // Disable UI
         this.userInput.disabled = true;
         this.sendBtn.disabled = true;
 
-        // Show thinking indicator
         this.showThinkingIndicator();
         this.updateStatus('Thinking...');
 
@@ -1193,22 +1650,15 @@ class omniChat {
             });
 
             const data = await response.json();
-            this.removeTypingIndicator(); // Remove thinking indicator
+            this.removeTypingIndicator();
 
             if (data.error) {
                 this.addMessage(`Error: ${data.error}`, false);
                 this.updateStatus('Online');
             } else {
-                // Create the bot message container (initially empty)
                 const messageContentDiv = this.addMessage('', false);
-                
-                // Type out the response character by character with slower speed
                 await this.typeMessage(messageContentDiv, data.reply);
-                
-                // Add to conversation history after typing is complete
                 this.conversationHistory.push({ role: 'assistant', content: data.reply });
-                
-                // Status is already updated to Online by typeMessage when done
             }
         } catch (error) {
             this.removeTypingIndicator();
@@ -1217,7 +1667,6 @@ class omniChat {
             console.error('omni Error:', error);
         }
 
-        // Re-enable UI
         this.userInput.disabled = false;
         this.sendBtn.disabled = false;
         this.userInput.focus();
@@ -1227,8 +1676,7 @@ class omniChat {
 // Initialize omni when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     const omni = new omniChat();
-    
-    // Make omni globally accessible if needed
     window.omniChatInstance = omni;
 });
 </script>
+

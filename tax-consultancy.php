@@ -41,7 +41,7 @@ include 'includes/header-1.php'
               <h5 class="fw-bold mb-3">
                 <i class="fas fa-file-invoice-dollar me-2" style="color:#d0aa4b;"></i> UAE VAT & CT Services
               </h5>
-              <ul class="list-unstyled text-muted">
+              <ul class="list-unstyled lead">
                 <li>VAT Registration</li>
                 <li>VAT Return Filing</li>
                 <li>VAT Refund</li>
@@ -61,7 +61,7 @@ include 'includes/header-1.php'
               <h5 class="fw-bold mb-3">
                 <i class="fas fa-id-card me-2" style="color:#d0aa4b;"></i> USA EIN Services
               </h5>
-              <ul class="list-unstyled text-muted">
+              <ul class="list-unstyled lead">
                 <li>EIN Registration</li>
                 <li>Tax Return Filing</li>
               </ul>
@@ -76,7 +76,7 @@ include 'includes/header-1.php'
               <h5 class="fw-bold mb-3">
                 <i class="fas fa-landmark me-2" style="color:#d0aa4b;"></i> UK VAT Services
               </h5>
-              <ul class="list-unstyled text-muted">
+              <ul class="list-unstyled lead">
                 <li>VAT Registration</li>
                 <li>Corporate Tax</li>
                 <li>CIS Return Filing</li>
@@ -156,7 +156,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

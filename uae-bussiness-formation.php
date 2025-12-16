@@ -28,13 +28,66 @@ include 'includes/header-1.php'
           <img src="resources/img/uae-company-formation.jpg" class="img-fluid rounded shadow" alt="uae company formation">
         </div>
         <div class="col-lg-6">
-          <h2 class="fw-bold">Our Story</h2>
+          <h2 class="fw-bold">UAE Company Setup</h2>
           <p class="text-start">
             At OGMBC, we understand that navigating the complex landscape of company formation in the United Arab Emirates (UAE) requires ex pertise and
             precision. With years of experience and a commitment to excellence, we offer comprehensive solutions to guide you through the pr ocess of establishing
             your business in the UAE. Whether you're a startup or an established enterprise, our team is dedicated to providing tailored ser vices to meet your
             specific needs.
           </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="uae-services section py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold">UAE Company Formation Types</h2>
+        <p class="text-muted">Explore the main jurisdictions available for company formation in the UAE.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Dubai Mainland -->
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h4 class="card-title fw-bold">UAE Mainland Company</h4>
+              <ul class="list-unstyled">
+                <li>✔️ Ideal for businesses targeting the local market.</li>
+                <li>✔️ Full access to UAE and international markets.</li>
+                <li>✔️ Various legal structures available, including LLC, Sole Proprietorship, and more.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Free Zones -->
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h4 class="card-title fw-bold">Free Zones Company</h4>
+              <ul class="list-unstyled">
+                <li>✔️ Offers 100% foreign ownership.</li>
+                <li>✔️ Specialized zones catering to industries such as technology, media, finance, and logistics.</li>
+                <li>✔️ Tax incentives and simplified customs procedures.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offshore Companies -->
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h4 class="card-title fw-bold">Offshore Company</h4>
+              <ul class="list-unstyled">
+                <li>✔️ Ideal for international businesses not requiring a physical presence in the UAE.</li>
+                <li>✔️ Full repatriation of profits and capital.</li>
+                <li>✔️ Complete confidentiality and asset protection.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -54,9 +107,9 @@ include 'includes/header-1.php'
           <div class="col-md-4">
               <div class="feature-card p-4 h-100">
               <i class="bi bi-graph-up-arrow feature-icon"></i>
-              <h4 class="mt-3">Financial Clarity</h4>
-              <p>
-                  Our team of seasoned professionals possesses in depth knowledge of the UAE business environment, ensuring that your company form ation journey
+              <h4 class="mt-3">UAE Regulatory Expertise</h4>
+              <p class="lead">
+                  Our team of seasoned professionals possesses in depth knowledge of the UAE business environment, ensuring that your company formation journey
                   is seamless and compliant with local regulations. We stay abreast of the latest developments in UAE corporate law to provide you with accurate and up
                   to date advice.
               </p>
@@ -68,7 +121,7 @@ include 'includes/header-1.php'
               <div class="feature-card p-4 h-100">
               <i class="bi bi-shield-check feature-icon"></i>
               <h4 class="mt-3">Proactive Support</h4>
-              <p>
+              <p class="lead">
                   At OGMBC , we pride ourselves on providing proactive support throughout the entire company formation process.
                   Our team is readily available to address your queries, offer guidance, and ensure that your business is set up efficiently
                   and effectively.
@@ -81,7 +134,7 @@ include 'includes/header-1.php'
               <div class="feature-card p-4 h-100">
               <i class="bi bi-people feature-icon"></i>
               <h4 class="mt-3">Tailored Solutions</h4>
-              <p>
+               <p class="lead">
                   We recognize that every business is unique. Our consultants work closely with you to understand your objectives and design a cus tomized company
                   formation strategy. From choosing the right legal structure to assisting with documentation, we offer end to end solutions that align with your business
                   goals.  
@@ -90,59 +143,6 @@ include 'includes/header-1.php'
           </div>
           </div>
       </div>
-  </section>
-
-  <section class="uae-services section py-5">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2 class="fw-bold">UAE Company Formation Services</h2>
-        <p class="text-muted">Explore the main jurisdictions available for company formation in the UAE.</p>
-      </div>
-
-      <div class="row g-4">
-        <!-- Dubai Mainland -->
-        <div class="col-md-4">
-          <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-              <h4 class="card-title fw-bold">Dubai Mainland</h4>
-              <ul class="list-unstyled">
-                <li>✔️ Ideal for businesses targeting the local market.</li>
-                <li>✔️ Full access to UAE and international markets.</li>
-                <li>✔️ Various legal structures available, including LLC, Sole Proprietorship, and more.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Free Zones -->
-        <div class="col-md-4">
-          <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-              <h4 class="card-title fw-bold">Free Zones</h4>
-              <ul class="list-unstyled">
-                <li>✔️ Offers 100% foreign ownership.</li>
-                <li>✔️ Specialized zones catering to industries such as technology, media, finance, and logistics.</li>
-                <li>✔️ Tax incentives and simplified customs procedures.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Offshore Companies -->
-        <div class="col-md-4">
-          <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-              <h4 class="card-title fw-bold">Offshore Companies</h4>
-              <ul class="list-unstyled">
-                <li>✔️ Ideal for international businesses not requiring a physical presence in the UAE.</li>
-                <li>✔️ Full repatriation of profits and capital.</li>
-                <li>✔️ Complete confidentiality and asset protection.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </section>
 
   <section class="section process-section">
@@ -158,7 +158,7 @@ include 'includes/header-1.php'
             <div class="icon mb-3 fs-1" style="color:#f1bf70;">
               <i class="fas fa-comments"></i>
             </div>
-            <h5 class="fw-semibol text-center">Consultation</h5>
+            <h4 class="fw-semibol text-center">Consultation</h4>
             <p class="text-muted small">
               We begin with an in-depth consultation to understand your business requirements and goals.
             </p>
@@ -171,7 +171,7 @@ include 'includes/header-1.php'
             <div class="icon mb-3 fs-1" style="color:#f1bf70;">
               <i class="fas fa-file-alt"></i>
             </div>
-            <h5 class="fw-semibold text-center">Documentation</h5>
+            <h4 class="fw-semibold text-center">Documentation</h4>
             <p class="text-muted small">
               Our experts assist you in preparing and organizing the necessary documentation for the chosen jurisdiction.
             </p>
@@ -184,7 +184,7 @@ include 'includes/header-1.php'
             <div class="icon mb-3 fs-1" style="color:#f1bf70;">
               <i class="fas fa-paper-plane"></i>
             </div>
-            <h5 class="fw-semibold text-center">Application Submission</h5>
+            <h4 class="fw-semibold text-center">Application Submission</h4>
             <p class="text-muted small">
               We handle the submission of your application to the relevant authorities, ensuring accuracy and compliance.
             </p>
@@ -197,7 +197,7 @@ include 'includes/header-1.php'
             <div class="icon mb-3 fs-1" style="color:#f1bf70;">
               <i class="fas fa-id-card"></i>
             </div>
-            <h5 class="fw-semibold text-center">License Acquisition</h5>
+            <h4 class="fw-semibold text-center">License Acquisition</h4>
             <p class="text-muted small">
               Once approved, we facilitate the acquisition of your business license.
             </p>
@@ -210,7 +210,7 @@ include 'includes/header-1.php'
             <div class="icon fs-1" style="color:#f1bf70;">
               <i class="fas fa-headset"></i>
             </div>
-            <h5 class="fw-semibold text-center">Post-Formation Support</h5>
+            <h4 class="fw-semibold text-center">Post-Formation Support</h4>
             <p class="text-muted small">
               OGMBC Consultants provides ongoing support to address any post-formation requirements or concerns.
             </p>
@@ -223,7 +223,7 @@ include 'includes/header-1.php'
             <div class="icon mb-3 fs-1" style="color:#f1bf70;">
               <i class="fas fa-rocket"></i>
             </div>
-            <h5 class="fw-semibold text-center">Get Started</h5>
+            <h4 class="fw-semibold text-center">Get Started</h4>
             <p class="text-muted small">
               Ready to launch your business? Start today and let OGMBC guide you through every step of the journey.
             </p>
@@ -260,7 +260,7 @@ include 'includes/header-1.php'
               <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
             </div>
           </div>
-          <p class="mb-4" style="color:#747576;">
+          <p class="lead mb-4" style="color:#747576;">
             We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
           </p>
           <div class="d-flex align-items-center gap-3 mt-2">

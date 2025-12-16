@@ -30,8 +30,8 @@ include 'includes/header-1.php'
         <div class="col-lg-6">
           <h2 class="fw-bold">UK Company Formation</h2>
           <p class="text-start">
-            Whether you are currently residing in the UK or Non
-            UK resident you can set up your own company in the United Kingdom. Congratu lations on
+            Whether you are currently residing in the UK or none
+            UK resident you can set up your own company in the United Kingdom. Congratulations on
             taking the first step towards entrepreneurial success!
             At OGMBC , we are here to guide you through the seamless process of UK company formation, ensuring a smooth and efficient ex
             pe rience for you.
@@ -58,7 +58,7 @@ include 'includes/header-1.php'
     <div class="container">
       <div class="text-center mb-5 text-white">
         <h2 class="fw-bold">Required Documents for UK Company Formation</h2>
-        <p class="lead text-center">To get your business up and running, you'll need to gather a few essential documents. Don't worry — we're here to simplify the process for you.</p>
+        <p class="text-muted text-center">To get your business up and running, you'll need to gather a few essential documents. Don't worry — we're here to simplify the process for you.</p>
       </div>
 
       <div class="row justify-content-center text-dark">
@@ -93,70 +93,38 @@ include 'includes/header-1.php'
     </div>
   </section>
 
-  <section class="section py-5" style="background:#f8fafc;">
-    <div class="container">
-      <!-- Heading -->
-      <div class="text-center mb-5 text-white">
-        <h2 class="fw-bold">Estimated Costs of UK Company Formation</h2>
-        <p class="text-dark text-center">We understand that budgeting is crucial, especially when starting a new venture. Here's a breakdown of the estimated costs involved in forming your company:</p>
-      </div>
-
-      <div class="row g-4">
-        <!-- Government Filing Fees -->
-        <div class="col-md-6">
-          <div class="cost-card p-4 text-light text-start">
-            <h5 class="text-light"><i class="fas fa-file-invoice-dollar me-2" style="color:#f1bf70;"></i> Government Filing Fees</h5>
-            <p class="text-light text-start mb-0">These fees cover the processing of your company formation documents. Costs may vary depending on the type of company.</p>
-          </div>
-        </div>
-        <!-- Registered Office -->
-        <div class="col-md-6">
-          <div class="cost-card p-4">
-            <h5 class="text-light"><i class="fas fa-map-marker-alt me-2" style="color:#f1bf70;"></i> Registered Office Address</h5>
-            <p class="text-light text-start mb-0">The cost of securing a registered office address, which is a legal requirement for your company.</p>
-          </div>
-        </div>
-        <!-- Professional Services -->
-        <div class="col-md-6">
-          <div class="cost-card p-4">
-            <h5 class="text-light"><i class="fas fa-user-tie me-2" style="color:#f1bf70;"></i> Professional Services</h5>
-            <p class="text-light text-start mb-0">Engaging professional services, such as legal or accounting advice, can contribute to a smoother company formation process.</p>
-          </div>
-        </div>
-        <!-- Packages -->
-        <div class="col-md-6">
-          <div class="cost-card p-4">
-            <h5 class="text-light"><i class="fas fa-box-open me-2" style="color:#f1bf70;"></i> Company Formation Packages</h5>
-            <p class="text-light text-start mb-0">Consider opting for our comprehensive company formation packages, which can include various services like document preparation, filing, and ongoing support.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- How OGMBC Can Help -->
   <section class="section py-5" style="background:#fff;"> 
     <div class="container">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-6 mb-4 mb-5 d-flex flex-column align-items-center text-center">
+        <span class="feature-icon-modern mb-3">
+          <i class="fas fa-hands-helping"></i>
+        </span>
+        <h3 class="fw-bold mb-3" style="color:#d0aa4b;">
+          How OGMBC Can Help
+        </h3>
+        <p class="lead text-muted mb-4">
+          Our team is dedicated to making your UK company formation journey seamless and stress-free.
+          We offer tailored solutions, expert guidance, and ongoing support—so you can focus on growing your business.
+        </p>
+        <a href="#contact" class="btn btn-primary px-4"
+          style="background:#d0aa4b; border:none; color:#091e3e; font-weight:600;">
+          Contact OGMBC Today
+        </a>
+      </div>
+
+
+      </div>
       <div class="row align-items-center g-5">
-        <div class="col-lg-5 mb-4 mb-lg-0 d-flex flex-column justify-content-center">
-          <h3 class="fw-bold mb-3" style="color:#d0aa4b;">
-            <i class="fas fa-hands-helping me-2 feature-icon-modern"></i> How OGMBC Can Help
-          </h3>
-          <p class="lead text-muted mb-4">
-            Our team is dedicated to making your UK company formation journey seamless and stress-free. We offer tailored solutions, expert guidance, and ongoing support—so you can focus on growing your business.
-          </p>
-          <a href="#contact" class="btn btn-primary px-4" style="background:#d0aa4b; border:none; color:#091e3e; font-weight:600;">
-            Contact OGMBC Today
-          </a>
-        </div>
-        <div class="col-lg-7">
+        <div class="col-lg-12">
           <div class="row g-4">
             <div class="col-md-6">
               <div class="feature-modern bg-light p-4 rounded-4 h-100 d-flex flex-column align-items-center text-center">
                 <span class="feature-icon-modern mb-3">
                   <i class="fas fa-file-alt"></i>
                 </span>
-                <h5 class="fw-bold mb-2 text-dark">Document Preparation & Filing</h5>
+                <h4 class="fw-bold mb-2 text-dark">Document Preparation & Filing</h4>
                 <p class="text-muted mb-0">We handle all paperwork and filings, ensuring accuracy and compliance from start to finish.</p>
               </div>
             </div>
@@ -165,7 +133,7 @@ include 'includes/header-1.php'
                 <span class="feature-icon-modern mb-3">
                   <i class="fas fa-sitemap"></i>
                 </span>
-                <h5 class="fw-bold mb-2 text-dark">Company Structure Guidance</h5>
+                <h4 class="fw-bold mb-2 text-dark">Company Structure Guidance</h4>
                 <p class="text-muted mb-0">Expert advice to help you choose the best legal structure for your business goals.</p>
               </div>
             </div>
@@ -174,7 +142,7 @@ include 'includes/header-1.php'
                 <span class="feature-icon-modern mb-3">
                   <i class="fas fa-shield-alt"></i>
                 </span>
-                <h5 class="fw-bold mb-2 text-dark">Compliance Support</h5>
+                <h4 class="fw-bold mb-2 text-dark">Compliance Support</h4>
                 <p class="text-muted mb-0">Stay compliant with UK regulations through our ongoing support and reminders.</p>
               </div>
             </div>
@@ -183,7 +151,7 @@ include 'includes/header-1.php'
                 <span class="feature-icon-modern mb-3">
                   <i class="fas fa-map-marker-alt"></i>
                 </span>
-                <h5 class="fw-bold mb-2 text-dark">Registered Office Services</h5>
+                <h4 class="fw-bold mb-2 text-dark">Registered Office Services</h4>
                 <p class="text-muted mb-0">We provide registered office and director’s service address solutions for your company.</p>
               </div>
             </div>
@@ -192,7 +160,7 @@ include 'includes/header-1.php'
                 <span class="feature-icon-modern mb-3">
                   <i class="fas fa-user-tie"></i>
                 </span>
-                <h5 class="fw-bold mb-2 text-dark">Access to Professional Advice</h5>
+                <h4 class="fw-bold mb-2 text-dark">Access to Professional Advice</h4>
                 <p class="text-muted mb-0">Tap into our network of legal and accounting experts for ongoing business support.</p>
               </div>
             </div>
@@ -220,7 +188,7 @@ include 'includes/header-1.php'
               <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
             </div>
           </div>
-          <p class="mb-4" style="color:#747576;">
+          <p class="lead mb-4" style="color:#747576;">
             We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
           </p>
           <div class="d-flex align-items-center gap-3 mt-2">

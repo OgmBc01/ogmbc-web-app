@@ -24,12 +24,12 @@ include 'includes/header-1.php'
     <div class="container">
       <div class="row align-items-center g-5">
         <div class="col-lg-6">
-          <img src="resources/img/blog-1.jpg" class="img-fluid rounded shadow" alt="Our Story">
+          <img src="resources/img/business-planning.jpg" class="img-fluid rounded shadow" alt="Our Story">
         </div>
         <div class="col-lg-6">
           <h2 class="fw-bold">Our Story</h2>
           <p class="text-start">
-            OGMBC Consultants was founded with the mission to provide clarity, compliance, and confidence 
+            <span class="highlight-strong">OGM Business Consultants</span> was founded with the mission to provide clarity, compliance, and confidence 
             to businesses navigating today’s financial and regulatory landscapes. With years of expertise 
             in audit, tax, and advisory, our professionals bring industry insight, technical know-how, 
             and a client-first approach to every engagement.
@@ -55,8 +55,8 @@ include 'includes/header-1.php'
                 <i class="fas fa-bullseye"></i>
               </div>
               <h3 class="fw-bold text-dark">Our Mission</h3>
-              <p class="text-muted">
-                Our mission at OGMBC Consultants is to provide exceptional financial and business advisory services that enable our clients 
+              <p class="lead" style="font-size: 1.1rem;">
+                Our mission at <span class="highlight-strong">OGM Business Consultants</span> is to provide exceptional financial and business advisory services that enable our clients 
                 to achieve their goals and realize their full potential. We are committed to delivering personalized solutions that drive 
                 growth, profitability, and long-term success for businesses of all sizes.
               </p>
@@ -71,63 +71,11 @@ include 'includes/header-1.php'
                 <i class="fas fa-eye"></i>
               </div>
               <h3 class="fw-bold text-dark">Our Vision</h3>
-              <p class="text-muted">
+              <p class="lead" style="font-size: 1.1rem;">
                 Our vision is to be the trusted partner of choice for businesses seeking expert guidance and support in navigating the 
                 complexities of financial management and business operations. We aspire to be recognized for our unwavering dedication to 
                 client satisfaction, innovation, and excellence in everything we do.
               </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Our Team -->
-  <section class="section team-section">
-   <div class="container text-center">
-        <h2 class="mb-4">Our Team</h2>
-        <p class="lead mb-5 text-center">
-            Our strength lies in our people—qualified, experienced, and committed to your success.
-        </p>
-      <div class="row g-4">
-        <!-- Team Member 1 -->
-        <div class="col-md-6 col-lg-3">
-          <div class="team-card card h-100 shadow-sm">
-            <img src="images/team1.jpg" class="card-img-top" alt="Team Member 1">
-            <div class="card-body">
-              <h5 class="card-title">Employee</h5>
-              <p class="card-text text-muted">Designation</p>
-            </div>
-          </div>
-        </div>
-        <!-- Team Member 2 -->
-        <div class="col-md-6 col-lg-3">
-          <div class="team-card card h-100 shadow-sm">
-            <img src="images/team1.jpg" class="card-img-top" alt="Team Member 1">
-            <div class="card-body">
-              <h5 class="card-title">Employee</h5>
-              <p class="card-text text-muted">Designation</p>
-            </div>
-          </div>
-        </div>
-        <!-- Team Member 3 -->
-        <div class="col-md-6 col-lg-3">
-          <div class="team-card card h-100 shadow-sm">
-            <img src="images/team1.jpg" class="card-img-top" alt="Team Member 1">
-            <div class="card-body">
-              <h5 class="card-title">Employee</h5>
-              <p class="card-text text-muted">Designation</p>
-            </div>
-          </div>
-        </div>
-        <!-- Team Member 4 -->
-        <div class="col-md-6 col-lg-3">
-          <div class="team-card card h-100 shadow-sm">
-            <img src="images/team1.jpg" class="card-img-top" alt="Team Member 1">
-            <div class="card-body">
-              <h5 class="card-title">Employee</h5>
-              <p class="card-text text-muted">Designation</p>
             </div>
           </div>
         </div>
@@ -149,7 +97,7 @@ include 'includes/header-1.php'
               <i class="fas fa-balance-scale"></i>
             </span>
             <h5 class="fw-bold text-dark mb-2">Integrity</h5>
-            <p class="text-muted text-center">We uphold the highest standards of integrity, honesty, and ethical conduct. Trust and transparency are at our core.</p>
+            <p class="lead text-dark text-center">We uphold the highest standards of integrity, honesty, and ethical conduct. Trust and transparency are at our core.</p>
           </div>
         </div>
         <div class="col-md-4">
@@ -158,7 +106,7 @@ include 'includes/header-1.php'
               <i class="fas fa-star"></i>
             </span>
             <h5 class="fw-bold text-dark mb-2">Excellence</h5>
-            <p class="text-muted text-center">We strive for continuous improvement and consistently exceed client expectations with excellence in every service.</p>
+            <p class="lead text-dark text-center">We strive for continuous improvement and consistently exceed client expectations with excellence in every service.</p>
           </div>
         </div>
         <div class="col-md-4">
@@ -167,7 +115,7 @@ include 'includes/header-1.php'
               <i class="fas fa-users"></i>
             </span>
             <h5 class="fw-bold text-dark mb-2">Collaboration</h5>
-            <p class="text-muted text-center">We believe in teamwork and strong client partnerships to achieve greater success together.</p>
+            <p class="lead text-dark text-center">We believe in teamwork and strong client partnerships to achieve greater success together.</p>
           </div>
         </div>
         <div class="col-md-6">
@@ -176,7 +124,7 @@ include 'includes/header-1.php'
               <i class="fas fa-handshake"></i>
             </span>
             <h5 class="fw-bold text-dark mb-2">Client Centricity</h5>
-            <p class="text-muted text-center">Our clients are at the heart of everything we do, and we tailor our services to meet their unique needs with value-driven solutions.</p>
+            <p class="lead text-dark text-center">Our clients are at the heart of everything we do, and we tailor our services to meet their unique needs with value-driven solutions.</p>
           </div>
         </div>
         <div class="col-md-6">
@@ -185,70 +133,70 @@ include 'includes/header-1.php'
               <i class="fas fa-lightbulb"></i>
             </span>
             <h5 class="fw-bold text-dark mb-2">Innovation</h5>
-            <p class="text-muted text-center">We embrace creativity and innovation to help clients stay competitive in today’s evolving business landscape.</p>
+            <p class="lead text-dark text-center">We embrace creativity and innovation to help clients stay competitive in today’s evolving business landscape.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section bg-light">
+  <!-- <section class="section bg-light">
     <div class="container">
       <div class="row align-items-center g-5">
         
-        <!-- Left Content -->
+        <!-- Left Content 
         <div class="col-lg-6 text-start">
           <h2 class="fw-bold mb-3">The Benefits You’ll Get With OGMBC</h2>
-          <p class="text-start text-muted mb-4">
+          <p class="text-start lead mb-4">
             We go beyond the numbers offering reliable expertise and personalized support. 
             Our focus is to simplify your accounting process while ensuring accuracy.
           </p>
 
-          <!-- Benefit Item -->
+          <!-- Benefit Item 
           <div class="d-flex mb-4">
             <div class="icon-box flex-shrink-0 me-3">
               <i class="bi bi-check2-square"></i>
             </div>
             <div>
               <h5 class="fw-bold mb-1">Proven Accuracy</h5>
-              <p class="mb-0 text-start text-muted">
+              <p class="mb-0 text-start lead">
                 Every report we deliver goes through a meticulous review process to ensure it’s always spot on.
               </p>
             </div>
           </div>
 
-          <!-- Benefit Item -->
+          <!-- Benefit Item 
           <div class="d-flex mb-4">
             <div class="icon-box flex-shrink-0 me-3">
               <i class="bi bi-headset"></i>
             </div>
             <div>
               <h5 class="fw-bold mb-1">Reliable Support</h5>
-              <p class="mb-0 text-start text-muted">
+              <p class="mb-0 text-start lead">
                 Our responsive and friendly team is here when you need us—whether it’s a quick or complex question.
               </p>
             </div>
           </div>
 
-          <!-- Benefit Item -->
+          <!-- Benefit Item 
           <div class="d-flex">
             <div class="icon-box flex-shrink-0 me-3">
               <i class="bi bi-lightbulb"></i>
             </div>
             <div>
               <h5 class="fw-bold mb-1">Expert Insight</h5>
-              <p class="mb-0 text-start text-muted">
+              <p class="mb-0 text-start lead">
                 We don’t just handle the numbers; we help you understand them and use them to make smarter decisions.
               </p>
             </div>
           </div>
         </div>
 
-        <!-- Right Image -->
+        <!-- Right Image 
         <div class="col-lg-6 position-relative">
           <img src="resources/img/blog-2.jpg" alt="OGM Consultants" class="img-fluid rounded shadow">
           
-          <!-- Satisfaction Card -->
+          <!-- Satisfaction Card 
           <div class="satisfaction-card card shadow-sm position-absolute bottom-0 end-0 translate-middle-y m-3">
             <div class="card-body text-center">
               <p class="mb-1 fw-semibold text-warning">Satisfaction</p>
@@ -257,12 +205,12 @@ include 'includes/header-1.php'
                 <div id="satisfactionBar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
               </div>
             </div>
-          </div>
+          </div
         </div>
 
       </div>
     </div>
-  </section>
+  </section> -->
 
   <!-- Floating Action Buttons -->
   <div class="floating-buttons">

@@ -149,68 +149,12 @@ include 'includes/header-1.php'
     </div>
   </section>
 
-  <!-- Why Choose OGMBC Consultants -->
-  <section class="py-5">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2 class="fw-bold">Why Choose <span style="color:#d0aa4b;">OGMBC Consultants?</span></h2>
-        <p class="lead">Your partner for supply chain excellence.</p>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-md-3">
-          <div class="card h-100 shadow-sm border-0" style="background:#fff;">
-            <div class="card-body text-start">
-              <i class="fas fa-check-circle fa-2x mb-3" style="color:#d0aa4b;"></i>
-              <h5 class="fw-bold text-dark">Proven Track Record</h5>
-              <p class="text-muted">We’ve successfully helped businesses optimize supply chains and achieve sustainable growth.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card h-100 shadow-sm border-0" style="background:#fff;">
-            <div class="card-body text-start">
-              <i class="fas fa-users fa-2x mb-3" style="color:#d0aa4b;"></i>
-              <h5 class="fw-bold text-dark">Collaborative Approach</h5>
-              <p class="text-muted">We work hand-in-hand with clients, building strong partnerships to solve challenges together.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card h-100 shadow-sm border-0" style="background:#fff;">
-            <div class="card-body text-start">
-              <i class="fas fa-lightbulb fa-2x mb-3" style="color:#d0aa4b;"></i>
-              <h5 class="fw-bold text-dark">Innovation & Technology</h5>
-              <p class="text-muted">We adopt future-ready technologies and innovative strategies to future-proof your supply chain.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card h-100 shadow-sm border-0" style="background:#fff;">
-            <div class="card-body text-start">
-              <i class="fas fa-globe fa-2x mb-3" style="color:#d0aa4b;"></i>
-              <h5 class="fw-bold text-dark">Global Perspective</h5>
-              <p class="text-muted">We combine global expertise with local insights, tailoring our solutions for maximum impact.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="text-center mt-5">
-        <p class="lead">Ready to transform your supply chain with <span style="color:#d0aa4b;">OGMBC Consultants?</span></p>
-        <a href="#contact" class="btn px-4 py-2" style="background:#d0aa4b; color:#111827; font-weight:600; border:none;">
-          Contact Us Today
-        </a>
-      </div>
-    </div>
-  </section>
-
   <!-- Supply Chain FAQs -->
   <section class="py-5" style="background:#fff; color:#111827;">
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="fw-bold">Frequently Asked <span style="color:#d0aa4b;">Questions</span></h2>
-        <p class="text-muted">Your queries answered about our Supply Chain Consulting services.</p>
+        <p class="lead">Your queries answered about our Supply Chain Consulting services.</p>
       </div>
 
       <div class="accordion" id="supplyChainFaq">
@@ -295,7 +239,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

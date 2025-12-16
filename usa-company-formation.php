@@ -126,47 +126,6 @@ include 'includes/header-1.php'
     </div>
   </div>
 </section>
-<section class="section py-5">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold">Required Documents & Package Inclusions</h2>
-      <p class="lead text-center">Everything you need to get started with your company formation, simplified.</p>
-    </div>
-
-    <div class="row g-4 text-dark">
-      <!-- Required Documents -->
-      <div class="col-md-6">
-        <div class="doc-card p-4 h-100">
-          <h4 class="fw-bold mb-3"><i class="fas fa-file-alt me-2" style="color:#f1bf70;"></i> Required Documents for Non-US Residents</h4>
-          <ul>
-            <li>Copy of Passport</li>
-            <li>Proof of Address</li>
-            <li>Email ID</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Included in All Packages -->
-      <div class="col-md-6">
-        <div class="doc-card p-4 h-100">
-          <h4 class="fw-bold mb-3"><i class="fas fa-box-open me-2" style="color:#f1bf70;"></i> Included in All Packages</h4>
-          <ul class="check-list">
-            <li>Name Check & Clearance</li>
-            <li>Certificate of Incorporation/Formation</li>
-            <li>Preparation of Documents</li>
-            <li>All Delaware Filing Fees</li>
-            <li>Same Day Electronic Filing</li>
-            <li>Registered Agent Fee (12 Months)</li>
-            <li>Email of Approved Documents</li>
-            <li>Free Shipping & Handling</li>
-            <li>FREE Lifetime Customer Support</li>
-            <li>And much more</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
   <!-- CTA Section -->
   <section class="cta-section py-5">
@@ -186,7 +145,7 @@ include 'includes/header-1.php'
               <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
             </div>
           </div>
-          <p class="mb-4" style="color:#747576;">
+          <p class="lead mb-4" style="color:#747576;">
             We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
           </p>
           <div class="d-flex align-items-center gap-3 mt-2">

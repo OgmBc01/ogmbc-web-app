@@ -46,7 +46,7 @@ include 'includes/header-1.php'
       <!-- Section Header -->
       <div class="text-center mb-5">
         <h2 class="fw-bold">IFRS <span style="color:#d0aa4b;">Advisory & Financial Reporting Services</span></h2>
-        <p class="text-muted">
+        <p class="lead">
           At OGMBC Consultants, we offer comprehensive services to assist you in preparing and presenting 
           your financial statements in accordance with IFRSs. Our expert team ensures accuracy, compliance, 
           and transparency in financial reporting.
@@ -61,7 +61,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-project-diagram"></i></span>
               <h5 class="fw-bold">IFRS Implementation</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Guidance and support in implementing IFRSs within your organization, ensuring seamless 
                 integration and compliance with the latest standards.
               </p>
@@ -75,7 +75,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-file-invoice-dollar"></i></span>
               <h5 class="fw-bold">Financial Statement Preparation</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Preparation of financial statements in line with IFRSs, including balance sheet, income 
                 statement, statement of changes in equity, and cash flow statement.
               </p>
@@ -89,7 +89,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-lightbulb"></i></span>
               <h5 class="fw-bold">Technical Accounting Advice</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Expert guidance on complex IFRS issues, helping you navigate intricate reporting 
                 requirements and ensure accuracy in financial disclosures.
               </p>
@@ -103,7 +103,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-chalkboard-teacher"></i></span>
               <h5 class="fw-bold">Training & Workshops</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Customized training programs and workshops to equip your team with the knowledge and 
                 skills to understand and apply IFRSs effectively.
               </p>
@@ -117,7 +117,7 @@ include 'includes/header-1.php'
             <div class="card-body service-card-body">
               <span class="service-icon"><i class="fas fa-check-circle"></i></span>
               <h5 class="fw-bold">IFRS Compliance Review</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Comprehensive reviews of financial statements to ensure full compliance with IFRSs 
                 and identify opportunities for improvement.
               </p>
@@ -146,7 +146,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

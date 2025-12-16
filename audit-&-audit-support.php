@@ -44,7 +44,7 @@ include 'includes/header-1.php'
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">Audit Services</span></h2>
-        <p class="text-muted">
+        <p class="lead">
           At OGMBC Consultants, we provide a comprehensive suite of audit services to ensure transparency, 
           compliance, and operational excellence across your organization.
         </p>
@@ -57,7 +57,7 @@ include 'includes/header-1.php'
             <div class="card-body control-card-body">
               <span class="control-icon mb-3"><i class="fas fa-balance-scale"></i></span>
               <h5 class="fw-bold">Financial Audit</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Independent examination of financial records to ensure accuracy, compliance, and 
                 transparency in reporting.
               </p>
@@ -71,7 +71,7 @@ include 'includes/header-1.php'
             <div class="card-body control-card-body">
               <span class="control-icon mb-3"><i class="fas fa-laptop-code"></i></span>
               <h5 class="fw-bold">IT Audit</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Assessment of IT systems, controls, and security measures to safeguard digital 
                 assets and ensure compliance.
               </p>
@@ -85,7 +85,7 @@ include 'includes/header-1.php'
             <div class="card-body control-card-body">
               <span class="control-icon mb-3"><i class="fas fa-cogs"></i></span>
               <h5 class="fw-bold">Operational Audit</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Evaluation of business operations to identify inefficiencies, reduce risks, and 
                 enhance overall performance.
               </p>
@@ -99,7 +99,7 @@ include 'includes/header-1.php'
             <div class="card-body control-card-body">
               <span class="control-icon mb-3"><i class="fas fa-file-alt"></i></span>
               <h5 class="fw-bold">Preparation Assistance</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Support in preparing financial records, documentation, and systems ahead of audits 
                 to ensure readiness.
               </p>
@@ -113,7 +113,7 @@ include 'includes/header-1.php'
             <div class="card-body control-card-body">
               <span class="control-icon mb-3"><i class="fas fa-users"></i></span>
               <h5 class="fw-bold">Audit Representation</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Professional representation during external audits, ensuring compliance and 
                 protecting organizational interests.
               </p>
@@ -127,7 +127,7 @@ include 'includes/header-1.php'
             <div class="card-body control-card-body">
               <span class="control-icon mb-3"><i class="fas fa-clipboard-check"></i></span>
               <h5 class="fw-bold">Compliance Audit</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Verification that your organization adheres to industry regulations, legal 
                 requirements, and internal policies.
               </p>
@@ -141,7 +141,7 @@ include 'includes/header-1.php'
             <div class="card-body control-card-body">
               <span class="control-icon mb-3"><i class="fas fa-tools"></i></span>
               <h5 class="fw-bold">Remediation Support</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Assistance in addressing audit findings with corrective actions that 
                 strengthen compliance and governance.
               </p>
@@ -155,7 +155,7 @@ include 'includes/header-1.php'
             <div class="card-body control-card-body">
               <span class="control-icon mb-3"><i class="fas fa-search"></i></span>
               <h5 class="fw-bold">Internal Audit</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Independent reviews of internal processes and controls to provide assurance on 
                 risk management and efficiency.
               </p>
@@ -184,7 +184,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

@@ -28,9 +28,9 @@ include 'includes/header-1.php'
           <img src="resources/img/bookkeeping.jpg" class="img-fluid rounded shadow" alt="bookkeeping">
         </div>
         <div class="col-lg-6">
-          <h2 class="fw-bold" style="color:#d0aa4b;">Remote Bookkeeping</h2>
+          <h2 class="fw-bold" style="color:#d0aa4b;">In-House & Remote Bookkeeping</h2>
           <p class="text-start">
-            With our Remote Bookkeeping services, we ensure that distance is no barrier to efficient financial management. Experience the
+            With our In-House and Remote Bookkeeping services, we ensure that distance is no barrier to efficient financial management. Experience the
             convenience of accessing your financial records and reports from anywhere in the world, while our skilled professionals handl e
             the intricacies of your accounts.
           </p>
@@ -46,14 +46,14 @@ include 'includes/header-1.php'
         <!-- Left side: Illustration/Icon -->
         <div class="col-lg-5 text-center">
           <div class="p-4">
-            <i class="fas fa-book-open fa-4x mb-3" style="color:#d0aa4b;"></i>
-            <h4 class="fw-bold" style="color:#0b1224;">In-House Bookkeeping</h4>
+            <i class="fas fa-book fa-4x mb-3" style="color:#d0aa4b;"></i>
+            <h4 class="fw-bold" style="color:#0b1224;">In-House & Remote Bookkeeping</h4>
           </div>
         </div>
 
         <!-- Right side: Text -->
         <div class="col-lg-7">
-          <div class="card shadow-sm p-4 h-100">
+          <div class="card shadow-sm p-4 h-100" style="font-size: 1.1rem;">
             <p class="text-muted mb-3">
               For those who prefer a <strong>hands-on approach</strong>, our <strong>In-House Bookkeeping services</strong> provide a personalized touch to your financial management. 
               Our team can work directly from your premises, ensuring a direct and immediate understanding of your business dynamics.
@@ -99,7 +99,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

@@ -56,7 +56,7 @@ include 'includes/header-1.php'
             <div class="card-body text-center d-flex flex-column align-items-center">
               <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
               <h5 class="fw-bold mt-3">Setting AML Policy</h5>
-              <p class="text-muted">
+              <p class="lead">
                 AML policies outline guidelines and protocols for identifying and reporting suspicious activities, ensuring adherence to legal standards.
               </p>
             </div>
@@ -69,7 +69,7 @@ include 'includes/header-1.php'
             <div class="card-body text-center d-flex flex-column align-items-center">
               <div class="service-icon"><i class="fas fa-file-signature"></i></div>
               <h5 class="fw-bold mt-3">Effective AML Procedures</h5>
-              <p class="text-muted">
+              <p class="lead">
                 We help businesses establish effective AML procedures, including customer due diligence, identity verification, and monitoring of transactions.
               </p>
             </div>
@@ -77,17 +77,6 @@ include 'includes/header-1.php'
         </div>
 
         <!-- Card 3 -->
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100 shadow-sm border-0 service-card text-dark">
-            <div class="card-body text-center d-flex flex-column align-items-center">
-              <div class="service-icon"><i class="fas fa-search"></i></div>
-              <h5 class="fw-bold mt-3">Business Due Diligence</h5>
-              <p class="text-muted">
-                Investigate company backgrounds, identify potential legal issues, and assess operational efficiency to minimize risks.
-              </p>
-            </div>
-          </div>
-        </div>
 
         <!-- Card 4 -->
         <div class="col-md-6 col-lg-4">
@@ -95,7 +84,7 @@ include 'includes/header-1.php'
             <div class="card-body text-center d-flex flex-column align-items-center">
               <div class="service-icon"><i class="fas fa-users"></i></div>
               <h5 class="fw-bold mt-3">Training Staff</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Regular staff training on AML practices ensures vigilance, compliance, and adherence to established protocols.
               </p>
             </div>
@@ -108,7 +97,7 @@ include 'includes/header-1.php'
             <div class="card-body text-center d-flex flex-column align-items-center">
               <div class="service-icon"><i class="fas fa-sync-alt"></i></div>
               <h5 class="fw-bold mt-3">Review & Update Policies</h5>
-              <p class="text-muted">
+              <p class="lead">
                 Continuous review and updating of AML policies ensures adaptability to evolving regulatory landscapes and emerging threats.
               </p>
             </div>
@@ -136,7 +125,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

@@ -6,7 +6,7 @@ include 'includes/header-1.php'
     <!-- Hero Section -->
     <section class="about-hero d-flex align-items-center text-center text-white" style="height: 50vh;">
     <div class="container">
-        <h1 class="fw-bold">OGM Business Consultants Company Profile</h1>
+        <h1 class="fw-bold mt-5">OGM Business Consultants Company Profile</h1>
         <p class="lead">Navigate through our carefully crafted company profile, decorated with our amazing services & solutions, essential for your businesses.</p>
     </section>
 

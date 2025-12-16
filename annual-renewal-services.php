@@ -26,7 +26,7 @@ include 'includes/header-1.php'
       <!-- Header -->
       <div class="text-center mb-5">
         <h2 class="fw-bold text-dark">Trade License <span style="color:#d0aa4b;">Renewal</span></h2>
-        <p class="text-muted">
+        <p class="lead">
           Stay compliant and keep your business running smoothly with our efficient license and PRO renewal services.
         </p>
       </div>
@@ -45,7 +45,7 @@ include 'includes/header-1.php'
             <div class="card-body">
               <i class="fas fa-building mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
               <h5 class="fw-bold">UAE</h5>
-              <p class="text-muted">Annual business trade license renewal in the UAE.</p>
+              <p class="lead">Annual business trade license renewal in the UAE.</p>
             </div>
           </div>
         </div>
@@ -55,7 +55,7 @@ include 'includes/header-1.php'
             <div class="card-body">
               <i class="fas fa-flag-usa mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
               <h5 class="fw-bold">USA</h5>
-              <p class="text-muted">Annual business trade license renewal in the USA.</p>
+              <p class="lead">Annual business trade license renewal in the USA.</p>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ include 'includes/header-1.php'
             <div class="card-body">
               <i class="fas fa-flag mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
               <h5 class="fw-bold">UK</h5>
-              <p class="text-muted">Annual business trade license renewal in the UK.</p>
+              <p class="lead">Annual business trade license renewal in the UK.</p>
             </div>
           </div>
         </div>
@@ -85,7 +85,7 @@ include 'includes/header-1.php'
             <div class="card-body">
               <i class="fas fa-map-marker-alt mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
               <h5 class="fw-bold">UAE / Dubai</h5>
-              <p class="text-muted">Comprehensive PRO service renewal in the UAE and Dubai.</p>
+              <p class="lead">Comprehensive PRO service renewal in the UAE and Dubai.</p>
             </div>
           </div>
         </div>
@@ -95,7 +95,7 @@ include 'includes/header-1.php'
             <div class="card-body">
               <i class="fas fa-city mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
               <h5 class="fw-bold">USA / Delaware & New York</h5>
-              <p class="text-muted">PRO service renewal in Delaware and New York.</p>
+              <p class="lead">PRO service renewal in Delaware and New York.</p>
             </div>
           </div>
         </div>
@@ -105,7 +105,7 @@ include 'includes/header-1.php'
             <div class="card-body">
               <i class="fas fa-landmark mb-3" style="color:#d0aa4b; font-size:2rem;"></i>
               <h5 class="fw-bold">UK / England</h5>
-              <p class="text-muted">PRO service renewal in the UK (England).</p>
+              <p class="lead">PRO service renewal in the UK (England).</p>
             </div>
           </div>
         </div>
@@ -131,7 +131,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">

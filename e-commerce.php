@@ -29,7 +29,7 @@ include 'includes/header-1.php'
         </div>
         <div class="col-lg-6">
           <h2 class="fw-bold" style="color:#d0aa4b;">E-Commerce Business Formation</h2>
-          <p class="text-start">
+          <p class="lead text-start">
             Are you ready to embark on a thrilling journey into the world of online retail? Look no further than OGMBC, your trusted ally in E-Commerce
             business formation. Whether you're eyeing the vast marketplaces of Amazon or planning to set up shop on popular platforms lik e S hopify or dive
             into the lucrative realm of dropshipping , we've got you
@@ -44,7 +44,7 @@ include 'includes/header-1.php'
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="fw-bold" style="color:#d0aa4b;">E-Commerce Business Formation Services</h2>
-        <p class="lead text-muted">Helping you launch, expand, and optimize your online business worldwide.</p>
+        <p class="lead">Helping you launch, expand, and optimize your online business worldwide.</p>
       </div>
 
       <div class="row g-4">
@@ -53,7 +53,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm p-4">
             <i class="fab fa-amazon fa-2x mb-3" style="color:#d0aa4b;"></i>
             <h5 class="fw-bold">Amazon E-Commerce Business Registration</h5>
-            <p class="text-muted">
+            <p class="lead">
               Unlock the potential of the world's largest online marketplace with our comprehensive registration services. 
               From seller account setup to optimizing product listings, we empower you to maximize your presence and sales.
             </p>
@@ -65,7 +65,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm p-4">
             <i class="fas fa-globe fa-2x mb-3" style="color:#d0aa4b;"></i>
             <h5 class="fw-bold">Global Expansion Services</h5>
-            <p class="text-muted">
+            <p class="lead">
               Expand your footprint across the USA, Canada, Australia, UK, Europe, and the Middle East. 
               We help you navigate international regulations seamlessly, so your business thrives globally.
             </p>
@@ -89,7 +89,7 @@ include 'includes/header-1.php'
           <div class="card h-100 p-4 shadow-sm">
             <i class="fab fa-shopify fa-2x mb-3" style="color:#d0aa4b;"></i>
             <h5 class="fw-bold">Shopify Setup & Optimization</h5>
-            <p class="">
+            <p class="lead">
               From theme selection to payment gateway configuration, our experts guide you through creating a Shopify store 
               optimized for sales and growth.
             </p>
@@ -101,7 +101,7 @@ include 'includes/header-1.php'
           <div class="card h-100 p-4 shadow-sm">
             <i class="fas fa-truck-loading fa-2x mb-3" style="color:#d0aa4b;"></i>
             <h5 class="fw-bold">Dropshipping Business Guidance</h5>
-            <p class="">
+            <p class="lead">
               Explore the world of dropshipping with expert support. From choosing reliable suppliers to efficient order 
               fulfillment strategies, we set you up for long-term success.
             </p>
@@ -129,7 +129,7 @@ include 'includes/header-1.php'
                 <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
               </div>
             </div>
-            <p class="mb-4" style="color:#747576;">
+            <p class="lead mb-4" style="color:#747576;">
               We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
             </p>
           <div class="d-flex align-items-center gap-3 mt-2">
