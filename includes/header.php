@@ -1,5 +1,9 @@
-<!DOCTYPE html>
+<?php
+// This should be the VERY FIRST LINE in your index.php
+session_start();
+?>
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -121,6 +125,7 @@
   </script>
 
 </head>
+
 <body>
   <section class="hero position-relative">
   <!-- Background Media -->
@@ -253,9 +258,35 @@
               <a class="nav-link" href="contact.php">Contact</a>
           </li>
 
-          <!-- CTA -->
+          <?php
+          // Check for admin roles
+          $show_admin_link = false;
+          if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+              $admin_roles = ['admin', 'super_admin', 'moderator'];
+              $show_admin_link = in_array($_SESSION['user_role'], $admin_roles);
+          }
+
+          if ($show_admin_link): ?>
+              <!-- Admin Dashboard -->
+              <li class="nav-item">
+                  <a class="nav-link" href="admin/dashboard.php" target="_blank">
+                    Admin Dashboard
+                  </a>
+              </li>
+          <?php endif; ?>
+
+          <!-- Login / Sign up -->
           <li class="nav-item">
-              <a href="login.php" target="_blank" class="btn btn-ghost">Login</a>
+            <?php
+            
+            if (isset($_SESSION['user_id'])) {
+                // User is logged in - show Sign Out button
+                echo '<a href="logout.php" class="btn btn-ghost">Sign Out</a>';
+            } else {
+                // User is not logged in - show Login button
+                echo '<a href="login.php" target="_blank" class="btn btn-ghost">Login</a>';
+            }
+            ?>
           </li>
         </ul>
       </div>

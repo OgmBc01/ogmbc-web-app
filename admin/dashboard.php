@@ -1,7 +1,20 @@
 <?php
 include 'includes/header.php';
 include 'includes/nav.php';
-include 'includes/sidebar.php'
+include 'includes/sidebar.php';
+
+// admin/dashboard.php
+
+// Optional: Check if user has admin role
+// Uncomment if you want to restrict access to specific roles
+
+$admin_roles = ['admin', 'super_admin', 'moderator'];
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $admin_roles)) {
+    // Not authorized - redirect to home page
+    header("Location: ../index.php?error=access_denied");
+    exit();
+}
+
 ?>
 
     <!-- Main Content -->

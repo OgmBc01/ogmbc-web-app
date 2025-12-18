@@ -1,8 +1,6 @@
 <?php
-// logout.php
 session_start();
 
-// Check if logout is confirmed
 if (isset($_GET['confirm']) && $_GET['confirm'] == 'true') {
     // Unset all session variables
     $_SESSION = array();

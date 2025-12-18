@@ -1,68 +1,79 @@
 <?php
 session_start();
 
-// At the top of login.php, after session_start()
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
 if (isset($_GET['logout']) && $_GET['logout'] == 'success') {
     $logout_message = "You have been successfully logged out. Go to <a href='index.php' class='alert-link'>Home</a>";
 }
 
-include 'includes/database.php';
+// Check if already logged in
+if (isset($_SESSION['user_id'])) {
+    header("Location: admin/dashboard.php");
+    exit();
+}
+
+// Include database connection
+require_once 'includes/database.php';
 
 $error = '';
+$username = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
     
     if (!empty($username) && !empty($password)) {
-        // Include user_role in the SELECT query
-        $sql = "SELECT user_id, username, user_email, user_role, password FROM users WHERE username = ?";
+        // Check user status as well
+        $sql = "SELECT user_id, username, user_email, user_role, user_status, password FROM users WHERE username = ? OR user_email = ?";
         
         if ($stmt = $connection->prepare($sql)) {
-            $stmt->bind_param("s", $username);
+            $stmt->bind_param("ss", $username, $username);
             
             if ($stmt->execute()) {
                 $stmt->store_result();
                 
                 if ($stmt->num_rows == 1) {
-                    // Bind user_id, username, email, user_role, and password
-                    $stmt->bind_result($user_id, $db_username, $db_email, $db_role, $db_password);
+                    // Bind user_id, username, email, user_role, user_status, and password
+                    $stmt->bind_result($user_id, $db_username, $db_email, $db_role, $db_status, $db_password);
                     
                     if ($stmt->fetch()) {
+                        // Check if user is active
+                        if ($db_status != 'active') {
+                            $error = "Your account is not active. Please contact administrator.";
+                        }
                         // Use password_verify for hashed passwords
-                        if (password_verify($password, $db_password)) { 
+                        elseif (password_verify($password, $db_password)) { 
                             // Regenerate session ID for security
                             session_regenerate_id(true);
                             
-                            // Save into session (don't store password in session)
+                            // Save into session
                             $_SESSION['user_id'] = $user_id;
                             $_SESSION['username'] = $db_username;
                             $_SESSION['user_email'] = $db_email;
                             $_SESSION['user_role'] = $db_role;
-                            // Do NOT store password in session for security
                             
-                            // Update last login time (optional)
-                            $update_sql = "UPDATE users SET last_login = NOW() WHERE user_id = ?";
-                            if ($update_stmt = $connection->prepare($update_sql)) {
-                                $update_stmt->bind_param("i", $user_id);
-                                $update_stmt->execute();
-                                $update_stmt->close();
-                            }
+                            // REMOVED last_login update since column doesn't exist
                             
-                            header("Location: admin/dashboard.php");
+                            header("Location: index.php");
                             exit();
                         } else {
                             $error = "Invalid password.";
                         }
                     }
                 } else {
-                    $error = "No account found with that username.";
+                    $error = "No account found with that username/email.";
                 }
             } else {
                 $error = "Oops! Something went wrong. Please try again later.";
             }
             
             $stmt->close();
+        } else {
+            $error = "Database error. Please try again.";
         }
     } else {
         $error = "Please fill in all fields.";
@@ -72,13 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root {
             --dark-blue: #0f172a;
@@ -216,13 +227,68 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 1rem;
             border-left: 4px solid #4ade80;
         }
+        
+        .alert {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border-left: 4px solid #60a5fa;
+        }
+
+        /* Themed logout alert */
+        .logout-alert {
+            background: rgba(241, 191, 112, 0.06);
+            color: var(--text);
+            border-left: 4px solid var(--gold);
+            padding: 0.75rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .logout-alert .message {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .home-btn {
+            display: inline-block;
+            padding: 0.5rem 0.9rem;
+            background: var(--gold);
+            color: var(--dark-blue);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 6px 18px rgba(15,23,42,0.25);
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <div class="logo">
-                <i class="bi bi-shield-shaded"></i>
+                <img src="resources/img/logo.png" alt="OGMBC Logo" style="height:60px;">
                 <h1>Login</h1>
             </div>
             
@@ -235,16 +301,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <?php endif; ?>
             
             <?php if (isset($logout_message)): ?>
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                <i class="bi bi-info-circle me-2"></i> <?php echo $logout_message; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+                <div class="logout-alert">
+                    <div class="message"><i class="bi bi-check-circle-fill me-2" style="color:var(--gold);"></i> You have been successfully logged out.</div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <a href="index.php" class="home-btn">Home</a>
+                        <button type="button" class="btn-close" onclick="this.parentElement.parentElement.style.display='none'">&times;</button>
+                    </div>
+                </div>
+                <script>
+                (function(){
+                    if (window.history && history.replaceState) {
+                        try {
+                            const url = new URL(window.location.href);
+                            // Remove flash query params so the message doesn't reappear on refresh
+                            ['logout','registered','error','reason'].forEach(p => url.searchParams.delete(p));
+                            const newPath = url.pathname + (url.search ? ('?' + url.searchParams.toString()) : '');
+                            history.replaceState(null, document.title, newPath);
+                        } catch (e) {
+                            // fallback: try manual replace without search params
+                            const p = window.location.pathname;
+                            history.replaceState(null, document.title, p);
+                        }
+                    }
+                })();
+                </script>
             <?php endif; ?>
 
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" required>
+                    <label for="username">Username or Email</label>
+                    <input type="text" id="username" name="username" class="form-control" value="<?php echo htmlspecialchars($username ?? ''); ?>" required>
                 </div>
                 
                 <div class="form-group">

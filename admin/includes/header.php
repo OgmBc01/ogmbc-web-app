@@ -1,11 +1,30 @@
-<!DOCTYPE html>
-
 <?php
-session_start();
+// Start session and enforce admin-area authorization before any output
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Redirect to site root if user is not authenticated or not in allowed admin roles
+$allowed_roles = ['admin', 'super_admin', 'moderator'];
+
 include '../includes/database.php';
 include 'functions.php';
+// Enforce inactivity timeout (30 minutes) for logged-in admin users
+enforce_session_timeout();
+
+// Enforce session and role-based redirects
+$allowed_roles = ['admin', 'super_admin', 'moderator'];
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../index.php?error=session');
+    exit();
+}
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $allowed_roles)) {
+    header('Location: ../index.php?error=permission');
+    exit();
+}
 ?>
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
