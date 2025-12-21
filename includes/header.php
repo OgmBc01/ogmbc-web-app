@@ -1,5 +1,4 @@
 <?php
-// This should be the VERY FIRST LINE in your index.php
 session_start();
 ?>
 

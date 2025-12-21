@@ -14,7 +14,6 @@ if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $admin_r
     header("Location: ../index.php?error=access_denied");
     exit();
 }
-
 ?>
 
     <!-- Main Content -->

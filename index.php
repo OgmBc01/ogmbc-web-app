@@ -692,1018 +692,457 @@ document.addEventListener('DOMContentLoaded', function() {
 include 'includes/footer.php'
 ?>
 
+
+
 <script>
-// omni Chat Widget JavaScript
 class omniChat {
     constructor() {
         this.conversationHistory = [];
         this.usedPrompts = new Set();
         this.promptsCollapsed = false;
-        this.isThinking = false;
         this.isTypingResponse = false;
-        this.currentTypingInterval = null;
         this.isMaximized = false;
-        this.originalPosition = null;
-        
+
         this.availablePrompts = [
             "What business setup services do you offer?",
             "Tell me about UAE company formation",
-            "How can I set up a company in USA?",
+            "How can I set up a company in the USA?",
             "What accounting services do you provide?",
             "Do you offer tax consultancy services?",
-            "What is your corporate tax expertise?",
             "Can you help with bank account opening?",
-            "What audit services do you provide?",
-            "Tell me about your IFRS advisory services",
             "Do you offer Golden Visa assistance?",
-            "What are your office locations?",
-            "How long does company formation take?",
-            "What documents are needed for UAE setup?",
-            "Do you provide ongoing compliance support?",
+            "What audit services do you provide?",
             "What industries do you serve?",
-            "Can you help with business valuation?",
-            "What is transfer pricing?",
-            "Do you offer supply chain consulting?",
-            "What corporate governance services do you provide?",
-            "How can I contact OGMBC?",
-            "What makes OGMBC different from others?",
-            "Do you work with startups?",
-            "What are your fees for company formation?",
-            "Can you help with annual license renewal?",
-            "What AML support do you provide?",
-            "Do you offer bookkeeping services?",
-            "What accounting software do you support?",
-            "Can you help with due diligence?",
-            "What internal control services do you offer?",
-            "Do you provide management accounting?"
+            "How can I contact OGMBC?"
         ];
-        
-        this.initializeElements();
+
+        this.initElements();
         this.bindEvents();
-        this.setupAutoResize();
-        this.generatePrompts();
-        this.updateStatus();
+        this.renderPrompts();
         this.createDownloadOverlay();
+        this.injectClearButton(); // Fixed: Add clear button
     }
 
-    initializeElements() {
-        this.floatingBtn = document.getElementById('omni-floating-btn');
-        this.chatWidget = document.getElementById('omni-chat-widget');
-        this.messagesContainer = document.getElementById('omni-messages');
-        this.userInput = document.getElementById('omni-user-input');
+    /* ---------- INIT ---------- */
+
+    initElements() {
+        this.widget = document.getElementById('omni-chat-widget');
+        this.messages = document.getElementById('omni-messages');
+        this.input = document.getElementById('omni-user-input');
         this.sendBtn = document.getElementById('omni-send-btn');
+        this.floatBtn = document.getElementById('omni-floating-btn');
         this.closeBtn = document.getElementById('omni-close');
-        this.promptsContainer = document.getElementById('omni-prompts-container');
-        this.promptsSection = document.getElementById('omni-prompts');
-        this.refreshPromptsBtn = document.getElementById('omni-refresh-prompts');
+        this.status = document.getElementById('omni-status');
+
+        this.promptsBox = document.getElementById('omni-prompts-container');
         this.togglePromptsBtn = document.getElementById('omni-toggle-prompts');
+        this.refreshPromptsBtn = document.getElementById('omni-refresh-prompts');
         this.collapseIndicator = document.getElementById('omni-collapse-indicator');
-        this.charCount = document.querySelector('.omni-char-count');
-        this.statusElement = document.getElementById('omni-status');
+
         this.maximizeBtn = document.getElementById('omni-maximize-btn');
         this.downloadBtn = document.getElementById('omni-download-btn');
+        this.charCount = document.querySelector('.omni-char-count');
     }
 
     bindEvents() {
-        this.floatingBtn.addEventListener('click', () => this.toggleChat());
-        this.closeBtn.addEventListener('click', () => this.hideChat());
-        this.sendBtn.addEventListener('click', () => this.sendMessage());
-        
-        this.userInput.addEventListener('keydown', (e) => {
+        this.floatBtn.onclick = () => this.toggleChat();
+        this.closeBtn.onclick = () => this.hideChat();
+        this.sendBtn.onclick = () => this.sendMessage();
+
+        this.input.oninput = () => {
+            this.charCount.textContent = `${this.input.value.length}/500`;
+            this.input.style.height = 'auto';
+            this.input.style.height = Math.min(this.input.scrollHeight, 120) + 'px';
+        };
+
+        this.input.onkeydown = e => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 this.sendMessage();
             }
-        });
-        
-        this.userInput.addEventListener('input', () => {
-            this.updateCharCount();
-            this.autoResizeTextarea();
-        });
-        
-        this.refreshPromptsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.generatePrompts();
-        });
-        
-        this.togglePromptsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.togglePrompts();
-        });
-        
-        this.maximizeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.toggleMaximize();
-        });
-        
-        this.downloadBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.showDownloadModal();
-        });
-        
-        document.addEventListener('click', (e) => {
-            if (!this.chatWidget.contains(e.target) && !this.floatingBtn.contains(e.target)) {
-                this.hideChat();
-            }
-        });
-        
-        this.promptsSection.addEventListener('click', (e) => {
-            if (e.target.closest('.omni-prompts-header') && !e.target.closest('.omni-prompts-actions')) {
-                this.togglePrompts();
-            }
-        });
+        };
+
+        this.togglePromptsBtn.onclick = () => this.togglePrompts();
+        this.refreshPromptsBtn.onclick = () => this.renderPrompts(true);
+        this.maximizeBtn.onclick = () => this.toggleMaximize();
+        this.downloadBtn.onclick = () => this.showDownloadModal();
     }
 
-    createDownloadOverlay() {
-        this.downloadOverlay = document.createElement('div');
-        this.downloadOverlay.className = 'omni-download-overlay';
-        this.downloadOverlay.innerHTML = `
-            <div class="omni-download-modal">
-                <h3 class="omni-download-title">Download Conversation</h3>
-                <input type="text" class="omni-download-input" value="Omni-OGM_Conversation_${this.getFormattedDate()}" placeholder="Enter file name">
-                <div class="omni-download-actions">
-                    <button class="omni-cancel-btn">Cancel</button>
-                    <button class="omni-download-btn">Download PDF</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(this.downloadOverlay);
-        
-        this.downloadOverlay.querySelector('.omni-cancel-btn').addEventListener('click', () => {
-            this.hideDownloadModal();
-        });
-        
-        this.downloadOverlay.querySelector('.omni-download-btn').addEventListener('click', () => {
-            this.downloadPDF();
-        });
-        
-        this.downloadOverlay.addEventListener('click', (e) => {
-            if (e.target === this.downloadOverlay) {
-                this.hideDownloadModal();
-            }
-        });
-    }
-
-    getFormattedDate() {
-        const now = new Date();
-        const date = now.getDate().toString().padStart(2, '0');
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const year = now.getFullYear();
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        return `${date}-${month}-${year}_${hours}-${minutes}`;
-    }
-
-    showDownloadModal() {
-        this.downloadOverlay.classList.add('active');
-        const input = this.downloadOverlay.querySelector('.omni-download-input');
-        setTimeout(() => {
-            input.focus();
-            input.select();
-        }, 100);
-    }
-
-    hideDownloadModal() {
-        this.downloadOverlay.classList.remove('active');
-    }
-
-    async downloadPDF() {
-        const filename = this.downloadOverlay.querySelector('.omni-download-input').value || `Omni-OGM_Conversation_${this.getFormattedDate()}`;
-        
-        // Get all messages from the conversation history
-        let htmlContent = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>${filename}</title>
-                <style>
-                    body { 
-                        font-family: Arial, sans-serif; 
-                        margin: 40px; 
-                        color: #333; 
-                        line-height: 1.6;
-                    }
-                    .header { 
-                        text-align: center; 
-                        margin-bottom: 30px; 
-                        border-bottom: 2px solid #0d274d; 
-                        padding-bottom: 10px;
-                    }
-                    .logo { 
-                        color: #0d274d; 
-                        font-size: 24px; 
-                        font-weight: bold; 
-                        margin-bottom: 5px;
-                    }
-                    .subtitle { 
-                        color: #666; 
-                        font-size: 14px; 
-                        margin-bottom: 20px;
-                    }
-                    .meta { 
-                        font-size: 12px; 
-                        color: #888; 
-                        text-align: center; 
-                        margin-bottom: 30px;
-                    }
-                    .message { 
-                        margin-bottom: 15px; 
-                        padding: 10px; 
-                        border-radius: 8px; 
-                        display: flex;
-                    }
-                    .user-message { 
-                        background: #f5f5f5; 
-                        border-left: 4px solid #ffd260; 
-                        margin-left: 20%;
-                    }
-                    .bot-message { 
-                        background: #eef5ff; 
-                        border-left: 4px solid #0d274d; 
-                        margin-right: 20%;
-                    }
-                    .avatar { 
-                        width: 30px; 
-                        height: 30px; 
-                        border-radius: 50%; 
-                        display: flex; 
-                        align-items: center; 
-                        justify-content: center; 
-                        font-size: 12px; 
-                        font-weight: bold; 
-                        margin-right: 10px; 
-                        flex-shrink: 0;
-                    }
-                    .user-avatar { 
-                        background: #ffd260; 
-                        color: #333; 
-                    }
-                    .bot-avatar { 
-                        background: #0d274d; 
-                        color: white; 
-                    }
-                    .content { 
-                        flex: 1;
-                        font-size: 14px;
-                    }
-                    .time { 
-                        font-size: 11px; 
-                        color: #888; 
-                        margin-top: 5px; 
-                        text-align: right;
-                    }
-                    h2, h3, h4 { 
-                        color: #0d274d; 
-                        margin-top: 15px; 
-                        margin-bottom: 8px;
-                        font-weight: 600;
-                    }
-                    h2 { font-size: 18px; }
-                    h3 { font-size: 16px; }
-                    h4 { font-size: 14px; }
-                    ul, ol { 
-                        margin: 8px 0 8px 20px; 
-                        padding-left: 0;
-                    }
-                    li { 
-                        margin: 4px 0;
-                        line-height: 1.4;
-                    }
-                    ul { list-style-type: disc; }
-                    ol { list-style-type: decimal; }
-                    strong { font-weight: bold; }
-                    em { font-style: italic; }
-                    .footer { 
-                        margin-top: 40px; 
-                        padding-top: 20px; 
-                        border-top: 1px solid #ddd; 
-                        font-size: 12px; 
-                        color: #666; 
-                        text-align: center;
-                    }
-                    .separator {
-                        height: 1px;
-                        background: #eee;
-                        margin: 10px 0;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <div class="logo">OmniOGM Assistant</div>
-                    <div class="subtitle">OGM Business Consultants - Conversation History</div>
-                    <div class="meta">Downloaded on: ${new Date().toLocaleString()}</div>
-                </div>
-                <div class="conversation">
-        `;
-        
-        // Include welcome message
-        htmlContent += `
-            <div class="message bot-message">
-                <div class="avatar bot-avatar">AI</div>
-                <div class="content">
-                    <strong>Hello! I'm OmniOGM 👋</strong><br>
-                    OGMBC AI Assistant. I'm here to help you learn about OGMBC's services and answer any questions you might have.
-                </div>
-            </div>
-        `;
-        
-        // Add all conversation messages
-        this.conversationHistory.forEach((msg, index) => {
-            const isUser = msg.role === 'user';
-            const content = msg.content;
-            
-            htmlContent += `
-                <div class="message ${isUser ? 'user-message' : 'bot-message'}">
-                    <div class="avatar ${isUser ? 'user-avatar' : 'bot-avatar'}">
-                        ${isUser ? 'You' : 'AI'}
-                    </div>
-                    <div class="content">
-                        ${this.formatContentForPDF(content)}
-                        <div class="time">Message ${index + 1}</div>
-                    </div>
-                </div>
-            `;
-        });
-        
-        htmlContent += `
-                </div>
-                <div class="footer">
-                    © ${new Date().getFullYear()} OGM Business Consultants. All rights reserved.<br>
-                    This conversation was generated by the OmniOGM Assistant.
-                </div>
-            </body>
-            </html>
-        `;
-        
-        try {
-            if (typeof html2pdf !== 'undefined') {
-                const options = {
-                    margin: [10, 10, 10, 10],
-                    filename: `${filename}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { 
-                        scale: 2, 
-                        useCORS: true,
-                        logging: true
-                    },
-                    jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait' 
-                    }
-                };
-                
-                console.log('Generating PDF...');
-                const pdf = await html2pdf().set(options).from(htmlContent).save();
-                this.hideDownloadModal();
-            } else {
-                console.log('html2pdf not found, using print method');
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(htmlContent);
-                printWindow.document.close();
-                printWindow.print();
-                this.hideDownloadModal();
-            }
-        } catch (error) {
-            console.error('PDF generation error:', error);
-            alert('Failed to generate PDF. Please try printing the page instead.');
-        }
-    }
-
-    formatContentForPDF(text) {
-        if (!text) return '';
-        
-        // Apply basic formatting
-        let result = text;
-        
-        // Convert markdown-like formatting
-        result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        result = result.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        // Convert line breaks to <br>
-        result = result.replace(/\n/g, '<br>');
-        
-        // Process numbered lists
-        result = result.replace(/(\d+)\.\s+(.+?)(?=(\d+\.|$))/g, function(match, num, content) {
-            return '<br>' + num + '. ' + content.trim();
-        });
-        
-        // Process bulleted lists
-        result = result.replace(/([•\-*])\s+(.+?)(?=([•\-*]|$))/g, function(match, bullet, content) {
-            return '<br>' + bullet + ' ' + content.trim();
-        });
-        
-        return result;
-    }
-
-    toggleMaximize() {
-        this.isMaximized = !this.isMaximized;
-        
-        if (this.isMaximized) {
-            if (!this.originalPosition) {
-                const rect = this.chatWidget.getBoundingClientRect();
-                this.originalPosition = {
-                    bottom: this.chatWidget.style.bottom,
-                    right: this.chatWidget.style.right,
-                    width: this.chatWidget.style.width,
-                    height: this.chatWidget.style.height
-                };
-            }
-            
-            this.chatWidget.classList.add('omni-maximized');
-            this.maximizeBtn.innerHTML = `
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
-                </svg>
-            `;
-            this.maximizeBtn.title = 'Restore window';
-        } else {
-            this.chatWidget.classList.remove('omni-maximized');
-            this.maximizeBtn.innerHTML = `
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                </svg>
-            `;
-            this.maximizeBtn.title = 'Maximize window';
-            
-            if (this.originalPosition) {
-                this.chatWidget.style.bottom = this.originalPosition.bottom;
-                this.chatWidget.style.right = this.originalPosition.right;
-                this.chatWidget.style.width = this.originalPosition.width;
-                this.chatWidget.style.height = this.originalPosition.height;
-            }
-        }
-    }
-
-    setupAutoResize() {
-        this.userInput.style.height = 'auto';
-        this.userInput.style.height = (this.userInput.scrollHeight) + 'px';
-    }
-
-    autoResizeTextarea() {
-        this.userInput.style.height = 'auto';
-        const newHeight = Math.min(this.userInput.scrollHeight, 120);
-        this.userInput.style.height = newHeight + 'px';
-        this.userInput.style.overflowY = 'hidden';
-    }
+    /* ---------- CHAT ---------- */
 
     toggleChat() {
-        this.chatWidget.classList.toggle('omni-hidden');
-        if (!this.chatWidget.classList.contains('omni-hidden')) {
-            this.userInput.focus();
-            this.updateStatus('Online');
-        } else {
-            this.updateStatus('Offline');
-        }
+        this.widget.classList.toggle('omni-hidden');
+        this.status.textContent = this.widget.classList.contains('omni-hidden') ? 'Offline' : 'Online';
     }
 
     hideChat() {
-        this.chatWidget.classList.add('omni-hidden');
-        this.updateStatus('Offline');
+        this.widget.classList.add('omni-hidden');
+        this.status.textContent = 'Offline';
     }
 
-    updateStatus(status) {
-        if (this.statusElement) {
-            this.statusElement.textContent = status;
-            this.statusElement.style.opacity = '0.5';
-            setTimeout(() => {
-                this.statusElement.style.opacity = '1';
-            }, 300);
-        }
-    }
+    async sendMessage(text = null) {
+        const message = text || this.input.value.trim();
+        if (!message) return;
 
-    updateCharCount() {
-        const count = this.userInput.value.length;
-        this.charCount.textContent = `${count}/500`;
-        
-        if (count > 450) {
-            this.charCount.style.color = 'var(--secondary)';
-        } else if (count > 400) {
-            this.charCount.style.color = 'var(--primary)';
-        } else {
-            this.charCount.style.color = 'var(--muted)';
-        }
-    }
+        this.addMessage(message, true);
+        this.conversationHistory.push({ role: 'user', content: message });
 
-    togglePrompts() {
-        this.promptsCollapsed = !this.promptsCollapsed;
-        
-        if (this.promptsCollapsed) {
-            this.promptsContainer.classList.remove('omni-prompts-expanded');
-            this.promptsContainer.classList.add('omni-prompts-collapsed');
-            this.togglePromptsBtn.classList.add('collapsed');
-            this.promptsSection.classList.add('omni-compact');
-            this.collapseIndicator.textContent = '(click to expand)';
-        } else {
-            this.promptsContainer.classList.remove('omni-prompts-collapsed');
-            this.promptsContainer.classList.add('omni-prompts-expanded');
-            this.togglePromptsBtn.classList.remove('collapsed');
-            this.promptsSection.classList.remove('omni-compact');
-            this.collapseIndicator.textContent = '(click to collapse)';
-        }
-    }
+        this.input.value = '';
+        this.input.style.height = 'auto';
+        this.charCount.textContent = '0/500';
 
-    generatePrompts() {
-        this.promptsContainer.innerHTML = '';
-        
-        const unusedPrompts = this.availablePrompts.filter(prompt => !this.usedPrompts.has(prompt));
-        const randomPrompts = this.shuffleArray([...unusedPrompts]).slice(0, 3);
-        
-        if (randomPrompts.length < 3) {
-            const additional = this.shuffleArray([...this.usedPrompts]).slice(0, 3 - randomPrompts.length);
-            randomPrompts.push(...additional);
-        }
-
-        randomPrompts.forEach(prompt => {
-            const button = document.createElement('button');
-            button.className = `omni-prompt-btn ${this.usedPrompts.has(prompt) ? 'omni-prompt-used' : ''}`;
-            button.textContent = prompt;
-            button.addEventListener('click', () => {
-                if (!this.usedPrompts.has(prompt)) {
-                    this.usedPrompts.add(prompt);
-                    button.classList.add('omni-prompt-used');
-                    this.sendMessage(prompt);
-                }
-            });
-            this.promptsContainer.appendChild(button);
-        });
-    }
-
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    addMessage(content, isUser) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `omni-message ${isUser ? 'omni-message-user' : 'omni-message-bot'}`;
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'omni-message-avatar';
-        
-        if (isUser) {
-            avatar.textContent = 'You';
-            avatar.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-700))';
-        } else {
-            avatar.innerHTML = `<img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />`;
-        }
-        
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'omni-message-content';
-        
-        // Use the enhanced formatContent method
-        contentDiv.innerHTML = this.formatContent(content);
-        
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(contentDiv);
-        this.messagesContainer.appendChild(messageDiv);
-        
-        this.scrollToBottom();
-        return contentDiv;
-    }
-
-    // NEW: IMPROVED FORMAT CONTENT METHOD WITH BETTER SPACING FIX
-    formatContent(text) {
-        if (!text) return '';
-        
-        console.log('Original text:', text);
-        
-        // FIX 1: Add spaces between words that are stuck together
-        let cleanedText = this.fixSpacingIssues(text);
-        
-        // FIX 2: Ensure list items preserve their numbers/bullets
-        cleanedText = this.preserveListMarkers(cleanedText);
-        
-        // Split into lines
-        const lines = cleanedText.split('\n');
-        let result = '';
-        let inList = false;
-        let listType = '';
-        let listItems = [];
-        
-        for (let line of lines) {
-            line = line.trim();
-            
-            if (!line) {
-                // Empty line - close any open list
-                if (inList && listItems.length > 0) {
-                    result += this.createListHTML(listType, listItems);
-                    listItems = [];
-                    inList = false;
-                }
-                result += '<br>';
-                continue;
-            }
-            
-            // Check for numbered list (more robust matching)
-            const numberedMatch = line.match(/^(\d+)[\.\)]\s+(.+)$/);
-            // Check for bulleted list
-            const bulletedMatch = line.match(/^([•\-*])\s+(.+)$/);
-            
-            if (numberedMatch) {
-                const [, number, content] = numberedMatch;
-                if (!inList || listType !== 'numbered') {
-                    if (inList && listItems.length > 0) {
-                        result += this.createListHTML(listType, listItems);
-                        listItems = [];
-                    }
-                    inList = true;
-                    listType = 'numbered';
-                }
-                // Preserve the number in the content
-                listItems.push(this.applyInlineFormatting(content));
-            } 
-            else if (bulletedMatch) {
-                const [, bullet, content] = bulletedMatch;
-                if (!inList || listType !== 'bulleted') {
-                    if (inList && listItems.length > 0) {
-                        result += this.createListHTML(listType, listItems);
-                        listItems = [];
-                    }
-                    inList = true;
-                    listType = 'bulleted';
-                }
-                listItems.push(this.applyInlineFormatting(content));
-            } 
-            else {
-                // Not a list item - close any open list
-                if (inList && listItems.length > 0) {
-                    result += this.createListHTML(listType, listItems);
-                    listItems = [];
-                    inList = false;
-                }
-                
-                // Check for headers
-                if (line.startsWith('### ')) {
-                    result += `<h4>${this.applyInlineFormatting(line.substring(4))}</h4>`;
-                } else if (line.startsWith('## ')) {
-                    result += `<h3>${this.applyInlineFormatting(line.substring(3))}</h3>`;
-                } else if (line.startsWith('# ')) {
-                    result += `<h2>${this.applyInlineFormatting(line.substring(2))}</h2>`;
-                } else if (line.startsWith('**') && line.endsWith('**')) {
-                    result += `<strong>${this.applyInlineFormatting(line.substring(2, line.length - 2))}</strong><br>`;
-                } else {
-                    result += `<p>${this.applyInlineFormatting(line)}</p>`;
-                }
-            }
-        }
-        
-        // Close any remaining list
-        if (inList && listItems.length > 0) {
-            result += this.createListHTML(listType, listItems);
-        }
-        
-        console.log('Formatted result:', result);
-        return result;
-    }
-
-    // NEW METHOD: Fix spacing issues in text
-    fixSpacingIssues(text) {
-        let result = text;
-        
-        // Fix common spacing issues:
-        
-        // 1. Add space after period if missing (but not for decimals)
-        result = result.replace(/([a-zA-Z])\.([A-Z])/g, '$1. $2');
-        
-        // 2. Add space after colon if missing
-        result = result.replace(/:(?=[A-Za-z])/g, ': ');
-        
-        // 3. Fix "word1.word2" -> "word1. word2"
-        result = result.replace(/([a-z])\.([A-Z])/g, '$1. $2');
-        
-        // 4. Fix "word1,word2" -> "word1, word2"
-        result = result.replace(/([a-z]),([A-Za-z])/g, '$1, $2');
-        
-        // 5. Fix "Service:" becoming "Service:"
-        result = result.replace(/([A-Z][a-z]+):([A-Z])/g, '$1: $2');
-        
-        // 6. Fix specific pattern from your example: "Services:" at end of line
-        result = result.replace(/([A-Za-z]+):$/gm, '$1: ');
-        
-        return result;
-    }
-
-    // NEW METHOD: Preserve list markers
-    preserveListMarkers(text) {
-        let result = text;
-        
-        // Ensure list items have proper formatting
-        // Fix: "1.BoardFormation" -> "1. Board Formation"
-        result = result.replace(/(\d+)[\.\)]([A-Z][a-z]+)/g, '$1. $2');
-        
-        // Fix: "•Assistancewith" -> "• Assistance with"
-        result = result.replace(/([•\-*])([A-Z][a-z]+)/g, '$1 $2');
-        
-        // Fix the specific example from image: split long concatenated text
-        // This handles cases where the AI returns text without spaces
-        result = this.splitConcatenatedText(result);
-        
-        return result;
-    }
-
-    // NEW METHOD: Split concatenated text into proper words
-    splitConcatenatedText(text) {
-        // This is a simple word splitter - in production you might want a more sophisticated solution
-        // Common patterns from your example:
-        
-        // Fix "CorporateGovernanceServices:" -> "Corporate Governance Services:"
-        text = text.replace(/([a-z])([A-Z])/g, '$1 $2');
-        
-        // Fix "AI" at beginning (should stay as "AI")
-        text = text.replace(/^AI\s+/, '');
-        text = text.replace(/\s+AI\s+/, ' ');
-        
-        // Fix "OGMBC" (should stay together)
-        text = text.replace(/O G M B C/g, 'OGMBC');
-        text = text.replace(/O G M/g, 'OGM');
-        
-        // Fix specific known concatenations
-        const knownWords = {
-            'rangoot': 'a range of',
-            'compilance': 'compliance',
-            'sevices': 'services',
-            'recordstand': 'records and',
-            'iterinstitutions': 'international institutions',
-            'de': 'ae'
-        };
-        
-        Object.entries(knownWords).forEach(([wrong, correct]) => {
-            text = text.replace(new RegExp(wrong, 'gi'), correct);
-        });
-        
-        return text;
-    }
-
-    createListHTML(type, items) {
-        if (type === 'numbered') {
-            return `<ol class="omni-list">${items.map((item, index) => `<li>${item}</li>`).join('')}</ol>`;
-        } else {
-            return `<ul class="omni-list">${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
-        }
-    }
-
-    applyInlineFormatting(text) {
-        if (!text) return '';
-        
-        let result = text;
-        
-        // Apply bold formatting
-        result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        // Apply italic formatting
-        result = result.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        // Apply code formatting
-        result = result.replace(/`([^`]+)`/g, '<code class="omni-code">$1</code>');
-        
-        return result;
-    }
-
-    cleanupAIText(text) {
-        // Fix common formatting issues
-        let result = text;
-        
-        // Fix: "1. Item1. Item2" -> "1. Item\n2. Item"
-        result = result.replace(/(\d+)\.\s*([^.]+?)(?=\d+\.)/g, function(match, num, content) {
-            return num + '. ' + content.trim() + '\n';
-        });
-        
-        // Fix: "• Item• Item" -> "• Item\n• Item"
-        result = result.replace(/([•\-*])\s*([^•\-*\n]+?)(?=[•\-*])/g, function(match, bullet, content) {
-            return bullet + ' ' + content.trim() + '\n';
-        });
-        
-        // Add spaces after periods if missing
-        result = result.replace(/([a-z])\.([A-Z])/g, '$1. $2');
-        
-        // Add line breaks before lists
-        result = result.replace(/:\s*(\d+\.)/g, ':\n\n$1');
-        result = result.replace(/:\s*([•\-*])/g, ':\n\n$1');
-        
-        // Ensure proper spacing for list items
-        result = result.replace(/^(\d+)\.(\S)/gm, '$1. $2');
-        result = result.replace(/^([•\-*])(\S)/gm, '$1 $2');
-        
-        // Split into lines and clean up
-        const lines = result.split('\n');
-        const cleanedLines = [];
-        
-        for (const line of lines) {
-            const cleanedLine = line.trim();
-            if (cleanedLine) {
-                cleanedLines.push(cleanedLine);
-            }
-        }
-        
-        return cleanedLines.join('\n');
-    }
-
-    typeMessage(contentDiv, fullContent) {
-        return new Promise((resolve) => {
-            this.isTypingResponse = true;
-            this.updateStatus('Typing...');
-            
-            contentDiv.innerHTML = '';
-            
-            let index = 0;
-            const baseSpeed = 40;
-            let currentSpeed = baseSpeed;
-            
-            if (this.currentTypingInterval) {
-                clearInterval(this.currentTypingInterval);
-                this.currentTypingInterval = null;
-            }
-            
-            const typeNextChunk = () => {
-                if (index >= fullContent.length) {
-                    this.isTypingResponse = false;
-                    this.updateStatus('Online');
-                    resolve();
-                    return;
-                }
-                
-                let chunkSize = 1;
-                let nextChars = fullContent.substring(index, Math.min(index + 5, fullContent.length));
-                
-                if (nextChars.match(/^[.,!?;:]/)) {
-                    chunkSize = 1;
-                    currentSpeed = 80;
-                    
-                    if (/[.!?]/.test(nextChars[0])) {
-                        currentSpeed = 160;
-                    }
-                } else if (nextChars.match(/^\s\s+/)) {
-                    chunkSize = Math.min(2, nextChars.match(/^\s+/)[0].length);
-                    currentSpeed = 20;
-                } else if (nextChars.match(/^\s/)) {
-                    chunkSize = 1;
-                    currentSpeed = 30;
-                } else if (nextChars.match(/^[a-zA-Z]{3,}/)) {
-                    chunkSize = 3;
-                    currentSpeed = 25;
-                } else {
-                    chunkSize = 1;
-                    currentSpeed = baseSpeed;
-                }
-                
-                const chunk = fullContent.substring(index, index + chunkSize);
-                
-                // Get the current text
-                const currentText = contentDiv.textContent || '';
-                const newText = currentText + chunk;
-                
-                // Format the complete text so far
-                contentDiv.innerHTML = this.formatContent(newText);
-                
-                index += chunkSize;
-                this.scrollToBottom();
-                
-                let nextDelay = currentSpeed;
-                nextDelay += Math.random() * 20 - 10;
-                nextDelay = Math.max(20, nextDelay);
-                
-                if (chunk.match(/[.!?]/)) {
-                    nextDelay += 150;
-                } else if (chunk.match(/[,;:]/)) {
-                    nextDelay += 80;
-                } else if (index < fullContent.length && fullContent.charAt(index) === ' ') {
-                    nextDelay += 30;
-                }
-                
-                this.currentTypingInterval = setTimeout(typeNextChunk, nextDelay);
-            };
-            
-            typeNextChunk();
-        });
-    }
-
-    showThinkingIndicator() {
-        this.removeTypingIndicator();
-        this.isThinking = true;
-        
-        const thinkingDiv = document.createElement('div');
-        thinkingDiv.className = 'omni-thinking';
-        thinkingDiv.id = 'omni-thinking';
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'omni-message-avatar';
-        avatar.innerHTML = `<img src="resources/img/omni.svg" alt="omni Assistant" width="40" height="40" />`;
-        
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'omni-thinking-content';
-        
-        const dotsDiv = document.createElement('div');
-        dotsDiv.className = 'omni-thinking-dots';
-        dotsDiv.innerHTML = `
-            <div class="omni-thinking-dot"></div>
-            <div class="omni-thinking-dot"></div>
-            <div class="omni-thinking-dot"></div>
-        `;
-        
-        const textDiv = document.createElement('div');
-        textDiv.className = 'omni-thinking-text';
-        textDiv.textContent = 'Thinking...';
-        
-        contentDiv.appendChild(dotsDiv);
-        contentDiv.appendChild(textDiv);
-        
-        thinkingDiv.appendChild(avatar);
-        thinkingDiv.appendChild(contentDiv);
-        this.messagesContainer.appendChild(thinkingDiv);
-        
-        this.scrollToBottom();
-    }
-
-    removeTypingIndicator() {
-        const typing = document.getElementById('omni-typing');
-        if (typing) typing.remove();
-        
-        const thinking = document.getElementById('omni-thinking');
-        if (thinking) {
-            thinking.remove();
-            this.isThinking = false;
-        }
-        
-        if (this.currentTypingInterval) {
-            clearTimeout(this.currentTypingInterval);
-            this.currentTypingInterval = null;
-        }
-        this.isTypingResponse = false;
-    }
-
-    scrollToBottom() {
-        setTimeout(() => {
-            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
-        }, 50);
-    }
-
-    async sendMessage(prefilledMessage = null) {
-        const messageText = prefilledMessage || this.userInput.value.trim();
-        
-        if (!messageText) return;
-
-        this.addMessage(messageText, true);
-        this.conversationHistory.push({ role: 'user', content: messageText });
-
-        if (!prefilledMessage) {
-            this.userInput.value = '';
-            this.updateCharCount();
-            this.setupAutoResize();
-            this.usedPrompts.add(messageText);
-            this.generatePrompts();
-        }
-
-        this.userInput.disabled = true;
-        this.sendBtn.disabled = true;
-
-        this.showThinkingIndicator();
-        this.updateStatus('Thinking...');
+        this.showThinking();
 
         try {
-            const response = await fetch('chat_proxy.php', {
+            const res = await fetch('chat_proxy.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: messageText,
+                    message,
                     history: this.conversationHistory
                 })
             });
 
-            const data = await response.json();
-            this.removeTypingIndicator();
+            const data = await res.json();
+            this.removeThinking();
 
-            if (data.error) {
-                this.addMessage(`Error: ${data.error}`, false);
-                this.updateStatus('Online');
-            } else {
-                const messageContentDiv = this.addMessage('', false);
-                await this.typeMessage(messageContentDiv, data.reply);
-                this.conversationHistory.push({ role: 'assistant', content: data.reply });
-            }
-        } catch (error) {
-            this.removeTypingIndicator();
-            this.updateStatus('Online');
-            this.addMessage('Sorry, there was a connection error. Please try again.', false);
-            console.error('omni Error:', error);
+            const clean = this.cleanResponse(data.reply);
+            const el = this.addMessage('', false);
+            this.typeWriter(el, clean);
+            this.conversationHistory.push({ role: 'assistant', content: clean });
+
+        } catch {
+            this.removeThinking();
+            this.addMessage('Connection error. Please try again.', false);
+        }
+    }
+
+    /* ---------- RESPONSE CLEANUP ---------- */
+
+    cleanResponse(text) {
+        // Remove any truncation markers but keep the full response
+        let cleaned = text
+            .replace(/\.\.\.\s*\(truncated\)/gi, '')
+            .replace(/\(truncated\)/gi, '')
+            .trim();
+
+        // Remove any "..." at the end if it was added by truncation
+        if (cleaned.endsWith('...')) {
+            cleaned = cleaned.substring(0, cleaned.length - 3).trim();
         }
 
-        this.userInput.disabled = false;
-        this.sendBtn.disabled = false;
-        this.userInput.focus();
+        return cleaned;
+    }
+
+    /* ---------- MESSAGES ---------- */
+
+    addMessage(content, isUser) {
+        const msg = document.createElement('div');
+        msg.className = `omni-message ${isUser ? 'omni-message-user' : 'omni-message-bot'}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'omni-message-avatar';
+        avatar.innerHTML = isUser ? 'You' : `<img src="resources/img/omni.svg" width="32">`;
+
+        const body = document.createElement('div');
+        body.className = 'omni-message-content';
+        if (isUser) body.textContent = content;
+
+        msg.appendChild(avatar);
+        msg.appendChild(body);
+        this.messages.appendChild(msg);
+        this.scrollBottom();
+
+        return body;
+    }
+
+    typeWriter(el, text) {
+        el.innerHTML = '';
+        let i = 0;
+        const formatted = this.formatText(text);
+
+        const step = () => {
+            if (i <= formatted.length) {
+                el.innerHTML = formatted.slice(0, i++);
+                this.scrollBottom();
+                requestAnimationFrame(step);
+            }
+        };
+        step();
+    }
+
+    formatText(t) {
+        // Process text with proper spacing
+        let formatted = t
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/(\n|^)- (.*?)(?=\n|$)/gm, '<li>$2</li>')
+            .replace(/(\n|^)(\d+)\. (.*?)(?=\n|$)/gm, '<li>$3</li>')
+            .replace(/\n/g, '<br>');
+        
+        // Wrap consecutive list items in ul
+        formatted = formatted.replace(/(<li>.*?<\/li>(<br>)?)+/g, (match) => {
+            return '<ul class="omni-list">' + match.replace(/<br>/g, '') + '</ul>';
+        });
+        
+        return formatted;
+    }
+
+    /* ---------- THINKING ---------- */
+
+    showThinking() {
+        this.thinking = document.createElement('div');
+        this.thinking.className = 'omni-thinking';
+        this.thinking.innerHTML = `
+            <div class="omni-message-avatar"><img src="resources/img/omni.svg" width="32"></div>
+            <div class="omni-thinking-text">Thinking...</div>`;
+        this.messages.appendChild(this.thinking);
+        this.scrollBottom();
+    }
+
+    removeThinking() {
+        if (this.thinking) this.thinking.remove();
+    }
+
+    scrollBottom() {
+        this.messages.scrollTop = this.messages.scrollHeight;
+    }
+
+    /* ---------- PROMPTS (3 ONLY) ---------- */
+
+    renderPrompts(shuffle = false) {
+        this.promptsBox.innerHTML = '';
+        let prompts = [...this.availablePrompts];
+        if (shuffle) prompts.sort(() => Math.random() - 0.5);
+
+        // Filter out used prompts first
+        const available = prompts.filter(p => !this.usedPrompts.has(p));
+        
+        // Take up to 3 available prompts
+        const displayPrompts = available.slice(0, 3);
+        
+        // If we don't have enough available, add some used ones back
+        if (displayPrompts.length < 3) {
+            const used = prompts.filter(p => this.usedPrompts.has(p));
+            displayPrompts.push(...used.slice(0, 3 - displayPrompts.length));
+        }
+
+        displayPrompts.forEach(p => {
+            const btn = document.createElement('button');
+            btn.className = 'omni-prompt-btn';
+            btn.textContent = p;
+
+            if (this.usedPrompts.has(p)) {
+                btn.classList.add('omni-prompt-used');
+                btn.disabled = true;
+            }
+
+            btn.onclick = () => {
+                this.usedPrompts.add(p);
+                this.sendMessage(p);
+                btn.classList.add('omni-prompt-used');
+                btn.disabled = true;
+            };
+
+            this.promptsBox.appendChild(btn);
+        });
+    }
+
+    togglePrompts() {
+        this.promptsCollapsed = !this.promptsCollapsed;
+        this.promptsBox.classList.toggle('omni-prompts-collapsed', this.promptsCollapsed);
+        this.promptsBox.classList.toggle('omni-prompts-expanded', !this.promptsCollapsed);
+        this.togglePromptsBtn.classList.toggle('collapsed', this.promptsCollapsed);
+        this.collapseIndicator.textContent =
+            this.promptsCollapsed ? '(click to expand)' : '(click to collapse)';
+    }
+
+    /* ---------- MAXIMIZE ---------- */
+
+    toggleMaximize() {
+        this.isMaximized = !this.isMaximized;
+        this.widget.classList.toggle('omni-maximized', this.isMaximized);
+    }
+
+    /* ---------- CLEAR CHAT ---------- */
+
+    injectClearButton() {
+        // Check if button already exists
+        if (document.querySelector('.omni-clear-btn')) return;
+        
+        const btn = document.createElement('button');
+        btn.className = 'omni-action-btn omni-clear-btn';
+        btn.title = 'Clear chat';
+        btn.innerHTML = '🗑';
+        btn.onclick = () => this.clearChat();
+        
+        // Insert before maximize button
+        const headerActions = this.downloadBtn.parentNode;
+        headerActions.insertBefore(btn, this.maximizeBtn);
+    }
+
+    clearChat() {
+        // Store welcome message HTML
+        const welcomeMsg = this.messages.querySelector('.omni-welcome-message');
+        
+        // Clear all messages
+        this.messages.innerHTML = '';
+        
+        // Add welcome message back
+        if (welcomeMsg) {
+            this.messages.appendChild(welcomeMsg);
+        }
+        
+        // Reset conversation history
+        this.conversationHistory = [];
+        this.usedPrompts.clear();
+        
+        // Refresh prompts
+        this.renderPrompts(true);
+        this.scrollBottom();
+    }
+
+    /* ---------- DOWNLOAD (PDF) ---------- */
+
+    createDownloadOverlay() {
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'omni-download-overlay';
+        this.overlay.innerHTML = `
+            <div class="omni-download-modal">
+                <h3 class="omni-download-title">Download Chat</h3>
+                <div class="omni-download-actions">
+                    <button class="omni-cancel-btn">Cancel</button>
+                    <button class="omni-download-btn">Download PDF</button>
+                </div>
+            </div>`;
+        document.body.appendChild(this.overlay);
+
+        this.overlay.querySelector('.omni-cancel-btn').onclick = () =>
+            this.overlay.classList.remove('active');
+
+        this.overlay.querySelector('.omni-download-btn').onclick = () =>
+            this.downloadPDF();
+    }
+
+    showDownloadModal() {
+        // Check if there's content to download
+        if (this.conversationHistory.length === 0) {
+            alert('No conversation to download.');
+            return;
+        }
+        this.overlay.classList.add('active');
+    }
+
+    async downloadPDF() {
+        // Dynamically load jsPDF if not available
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            try {
+                // Try to load jsPDF from CDN
+                await this.loadJSPDF();
+            } catch (error) {
+                console.error('Failed to load PDF library:', error);
+                alert('PDF library not loaded. Please check internet connection.');
+                this.overlay.classList.remove('active');
+                return;
+            }
+        }
+
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 15;
+
+            // Title
+            doc.setFontSize(16);
+            doc.setTextColor(33, 33, 33);
+            doc.text('OGM Business Consultants - Chat Conversation', 105, y, { align: 'center' });
+            y += 10;
+
+            // Date
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            const now = new Date();
+            const dateStr = now.toLocaleString();
+            doc.text(`Generated: ${dateStr}`, 105, y, { align: 'center' });
+            y += 15;
+
+            // Conversation
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+
+            this.conversationHistory.forEach((m, index) => {
+                // Check for page break
+                if (y > 270) {
+                    doc.addPage();
+                    y = 15;
+                }
+
+                // Role header
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'bold');
+                doc.text(`${m.role === 'user' ? 'You' : 'OmniOGM'}:`, 10, y);
+                y += 7;
+
+                // Content
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                
+                // Clean content for PDF
+                const cleanContent = m.content
+                    .replace(/\*\*/g, '') // Remove bold markers
+                    .replace(/<br>/g, '\n')
+                    .replace(/<[^>]*>/g, ''); // Remove any HTML tags
+                
+                const lines = doc.splitTextToSize(cleanContent, 180);
+                doc.text(lines, 15, y);
+                y += lines.length * 5 + 8;
+            });
+
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('Powered by OGM Business Consultants - www.ogmbc.ae', 105, 285, { align: 'center' });
+
+            // Save
+            const fileName = `OGMBC_Chat_${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}.pdf`;
+            doc.save(fileName);
+
+            this.overlay.classList.remove('active');
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            alert('Error generating PDF. Please try again.');
+            this.overlay.classList.remove('active');
+        }
+    }
+
+    loadJSPDF() {
+        return new Promise((resolve, reject) => {
+            // Check if already loaded
+            if (window.jspdf && window.jspdf.jsPDF) {
+                resolve();
+                return;
+            }
+
+            // Load jsPDF from CDN
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            script.onload = () => {
+                if (window.jspdf && window.jspdf.jsPDF) {
+                    resolve();
+                } else {
+                    reject(new Error('jsPDF not loaded properly'));
+                }
+            };
+            script.onerror = () => reject(new Error('Failed to load jsPDF'));
+            document.head.appendChild(script);
+        });
     }
 }
 
-// Initialize omni when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    const omni = new omniChat();
-    window.omniChatInstance = omni;
+    window.omniChat = new omniChat();
 });
 </script>
+
+
+
 

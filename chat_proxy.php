@@ -12,6 +12,8 @@ $conversation_history = $input['history'] ?? [];
 // Build messages array
 $messages = [];
 
+$concise_guideline = "Keep responses concise: prefer headings, short paragraphs, numbered lists (max 6 items), and bullet points. Avoid long paragraphs; be brief and actionable.";
+
 // ENHANCED SYSTEM PROMPT WITH PROPER FORMATTING
 $messages[] = [
     "role" => "system", 
@@ -64,6 +66,7 @@ For more information on our corporate governance services, please contact us:
 - Use proper capitalization for headings
 - Keep sentences concise but complete
 - Ensure all contact information is accurate"
+    ."\n\n" . $concise_guideline
 ];
 
 // Add conversation history
@@ -110,8 +113,7 @@ function cleanupResponseFormatting($text) {
         if (!empty($trimmedLine)) {
             $formattedLines[] = $trimmedLine;
         }
-    }
-    
+    }  
     return implode("\n", $formattedLines);
 }
 
@@ -157,62 +159,50 @@ $response_data = json_decode($response, true);
 
 if (isset($response_data['choices'][0]['message']['content'])) {
     $ai_reply = trim($response_data['choices'][0]['message']['content']);
-    
+
     // Clean up the response to ensure proper formatting
     $ai_reply = cleanupResponseFormatting($ai_reply);
-    
+
+    // To this (or remove the truncation entirely):
+    $max_chars = 1500; // Increase limit to allow more content
+    if (mb_strlen($ai_reply) > $max_chars) {
+        // Instead of truncating, find a good breaking point
+        $truncated = mb_substr($ai_reply, 0, $max_chars);
+        // Try to end on a sentence
+        $lastPeriod = max(mb_strrpos($truncated, '.'), mb_strrpos($truncated, '!'), mb_strrpos($truncated, '?'));
+        if ($lastPeriod > ($max_chars - 200)) { // If we have a sentence end near the end
+            $ai_reply = mb_substr($ai_reply, 0, $lastPeriod + 1);
+        } else {
+            $ai_reply = $truncated;
+        }
+    }
+        
     // Ensure the response has proper formatting for corporate governance
     if (stripos($user_message, 'corporate governance') !== false || 
         stripos($user_message, 'governance services') !== false) {
-        $ai_reply = "**Corporate Governance Services:**
+          $ai_reply = "**Corporate Governance Services:**
 
 At OGM Business Consultants (OGMBC), we offer a range of corporate governance services to ensure your business operates efficiently and effectively.
 
 **Our services include:**
 
 1. **Board and Committee Formation:**
-   • Advisory on board composition and structure
-   • Guidance on committee setup and roles
+    • Advisory on board composition and structure
+    • Guidance on committee setup and roles
 
 2. **Shareholder and Director Services:**
-   • Assistance with shareholder agreements and resolutions
-   • Preparation of board meeting minutes and resolutions
+    • Assistance with shareholder agreements and resolutions
+    • Preparation of board meeting minutes and resolutions
 
 3. **Compliance and Regulatory Services:**
-   • Guidance on regulatory requirements and compliance
-   • Assistance with reporting and filing obligations
+    • Guidance on regulatory requirements and compliance
+    • Assistance with reporting and filing obligations
 
 4. **Governance Framework Development:**
-   • Creation of governance policies and procedures
-   • Development of compliance frameworks
-
-5. **Risk Management and Internal Controls:**
-   • Risk assessment and mitigation strategies
-   • Implementation of internal control systems
-
-6. **Compliance Programs and Training:**
-   • Design and implementation of compliance programs
-   • Training for directors and employees on governance and compliance
-
-7. **Board Effectiveness and Evaluation:**
-   • Board evaluation and effectiveness assessments
-   • Recommendations for improvement
-
-8. **Corporate Secretary Services:**
-   • Provision of corporate secretarial services
-   • Maintenance of statutory records and registers
-
-9. **Regulatory Change Management:**
-   • Monitoring of regulatory changes and updates
-   • Guidance on implementation and compliance
-
-**Team & Expertise:**
-
-Our team of experts has extensive experience in corporate governance, with qualifications from top international institutions. We understand the complexities of corporate governance and are committed to delivering tailored solutions for your business.
+    • Creation of governance policies and procedures
+    • Development of compliance frameworks
 
 **Contact Information:**
-
-For more information on our corporate governance services, please contact us:
 
 • Dubai: +971 50 986 0136
 • London: +44 7465 644424
