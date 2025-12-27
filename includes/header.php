@@ -15,6 +15,7 @@ session_start();
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="resources/css/style.css" />
+  <link rel="stylesheet" href="resources/css/omni-pdf-export.css" />
   <!-- Bootstrap CSS (load first so our style.css can override) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -241,15 +242,38 @@ session_start();
               </li>
             </ul>
           </li>
-
-          <!-- Ratios -->
-          <li class="nav-item">
-              <a class="nav-link" href="ratios.php">Ratios</a>
+          
+          <!-- Well of Love -->
+          <li class="nav-item position-relative">
+              <a class="nav-link well-of-love-link position-relative" href="our-well-of-love.php">
+                  <span class="well-of-love-text">Well Of Love</span>
+                  <span class="love-stars">
+                      <i class="bi bi-star-fill love-star star-1"></i>
+                      <i class="bi bi-star-fill love-star star-2"></i>
+                      <i class="bi bi-heart-fill love-heart"></i>
+                  </span>
+                  <span class="link-border"></span>
+              </a>
           </li>
 
-          <!-- Blog -->
-          <li class="nav-item">
-              <a class="nav-link" href="blog.php">Blog</a>
+          <!-- Plan your Business -->
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Business Planning
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                  <li class="dropdown-submenu">
+                      <a class="dropdown-item" href="check-business-health.php">Check your Company Health</a>
+                  </li>
+
+                  <li class="dropdown-submenu">
+                      <a class="dropdown-item" href="uae-business-setup-cost-calculator.php">UAE Business Setup Cost Calculator</a>
+                  </li>
+
+                  <li class="dropdown-submenu">
+                      <a class="dropdown-item" href="about.php">Explore Our Service</a>
+                  </li>
+              </ul>
           </li>
 
           <!-- Contact -->
@@ -269,7 +293,7 @@ session_start();
               <!-- Admin Dashboard -->
               <li class="nav-item">
                   <a class="nav-link" href="admin/dashboard.php" target="_blank">
-                    Admin Dashboard
+                    Admin
                   </a>
               </li>
           <?php endif; ?>

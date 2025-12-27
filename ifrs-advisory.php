@@ -30,7 +30,7 @@ include 'includes/header-1.php'
         <div class="col-lg-6">
           <h2 class="fw-bold" style="color:#d0aa4b;">IFRS Advisory</h2>
           <p class="text-start">
-            At OGMBC Consultants, we understand the complexities and challenges that businesses face in navigating the ever evolving lands cape of International
+            At OGMBC, we understand the complexities and challenges that businesses face in navigating the ever evolving lands cape of International
             Financial Reporting Standards (IFRSs). With our dedicated team of experts, we offer comprehensive IFRS advisory services tail ore d to meet the unique
             needs of your organization. Whether you're a multinational corporation or a growing enterprise, we're here to provide you wit h t he guidance and
             support necessary to ensure compliance and optimize financial reporting practices.
@@ -268,19 +268,6 @@ include 'includes/header-1.php'
       </div>
     </div>
   </section>
-
-  <!-- Floating Action Buttons -->
-  <div class="floating-buttons">
-      <!-- WhatsApp Button -->
-      <a href="https://wa.me/+971502923136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
-          <i class="bi bi-whatsapp"></i>
-      </a>
-      
-      <!-- Back to Top Button -->
-      <a href="#" class="floating-btn back-to-top">
-          <i class="bi bi-arrow-up"></i>
-      </a>
-  </div>
 
 <!-- Footer (same as home page) -->
 <?php

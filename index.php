@@ -17,16 +17,16 @@ $error_type = isset($_GET['error']) ? $_GET['error'] : null;
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const errorAlert = document.getElementById('errorAlert');
-    if (errorAlert) {
-        // Auto-dismiss after 4 seconds
-        setTimeout(function() {
-            const bsAlert = new bootstrap.Alert(errorAlert);
-            bsAlert.close();
-        }, 7000);
-    }
-});
+  document.addEventListener('DOMContentLoaded', function() {
+      const errorAlert = document.getElementById('errorAlert');
+      if (errorAlert) {
+          // Auto-dismiss after 4 seconds
+          setTimeout(function() {
+              const bsAlert = new bootstrap.Alert(errorAlert);
+              bsAlert.close();
+          }, 7000);
+      }
+  });
 </script>
 <?php endif; ?>
 
@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <h1 class="hero-title">Empowering growth through strategic advisory and financial transparency</h1>
             <p class="text-light">We providing IFRS-based reporting and strategic advisory that empower informed decisions and strengthen stakeholder trust</p>
             <div class="d-flex gap-3 flex-wrap">
-              <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
-              <a class="btn btn-ghost" href="#services">Explore services</a>
+              <a class="btn btn-primary" href="check-business-health.php">•	Check your Company’s Health</a>
+              <!-- <a class="btn btn-ghost" href="#services">Explore services</a> -->
             </div>
           </div>
           <div class="col-lg-5">
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <div class="d-flex flex-column gap-3 contact-info">
                 <div class="info-box d-flex align-items-center gap-2">
                   <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                  <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
+                  <span><a href="tel:+971509860136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 986 0136</a></span>
                 </div>
                 <div class="info-box d-flex align-items-center gap-2">
                   <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
@@ -575,19 +575,6 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </section>
 
-  <!-- Floating Action Buttons -->
-  <div class="floating-buttons">
-      <!-- WhatsApp Button -->
-      <a href="https://wa.me/+971502923136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
-          <i class="bi bi-whatsapp"></i>
-      </a>
-      
-      <!-- Back to Top Button -->
-      <a href="#" class="floating-btn back-to-top">
-          <i class="bi bi-arrow-up"></i>
-      </a>
-  </div>
-
 <!-- Floating Button (Should be outside the chat widget) -->
 <div id="omni-floating-btn" class="omni-floating-btn">
     <div class="omni-pulse"></div>
@@ -686,12 +673,9 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-
-
 <?php
 include 'includes/footer.php'
 ?>
-
 
 
 <script>
@@ -702,28 +686,64 @@ class omniChat {
         this.promptsCollapsed = false;
         this.isTypingResponse = false;
         this.isMaximized = false;
+        this.thinking = null;
 
         this.availablePrompts = [
             "What business setup services do you offer?",
             "Tell me about UAE company formation",
-            "How can I set up a company in the USA?",
+            "How can I set up a company in USA?",
             "What accounting services do you provide?",
             "Do you offer tax consultancy services?",
+            "What is your corporate tax expertise?",
             "Can you help with bank account opening?",
-            "Do you offer Golden Visa assistance?",
             "What audit services do you provide?",
+            "Tell me about your IFRS advisory services",
+            "Do you offer Golden Visa assistance?",
+            "What are your office locations?",
+            "How long does company formation take?",
+            "What documents are needed for UAE setup?",
+            "Do you provide ongoing compliance support?",
             "What industries do you serve?",
-            "How can I contact OGMBC?"
+            "Can you help with business valuation?",
+            "What is transfer pricing?",
+            "Do you offer supply chain consulting?",
+            "What corporate governance services do you provide?",
+            "How can I contact OGMBC?",
+            "What makes OGMBC different from others?",
+            "Do you work with startups?",
+            "What are your fees for company formation?",
+            "Can you help with annual license renewal?",
+            "What AML support do you provide?",
+            "Do you offer bookkeeping services?",
+            "What accounting software do you support?",
+            "Can you help with due diligence?",
+            "What internal control services do you offer?",
+            "Do you provide management accounting?"
         ];
 
+        // Initialize after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initialize());
+        } else {
+            this.initialize();
+        }
+    }
+
+    /* ---------- INIT ---------- */
+
+    initialize() {
         this.initElements();
         this.bindEvents();
         this.renderPrompts();
         this.createDownloadOverlay();
-        this.injectClearButton(); // Fixed: Add clear button
+        this.injectClearButton();
+        
+        // Check if elements exist
+        if (!this.widget) {
+            console.error('Chat widget element not found');
+            return;
+        }
     }
-
-    /* ---------- INIT ---------- */
 
     initElements() {
         this.widget = document.getElementById('omni-chat-widget');
@@ -745,51 +765,68 @@ class omniChat {
     }
 
     bindEvents() {
-        this.floatBtn.onclick = () => this.toggleChat();
-        this.closeBtn.onclick = () => this.hideChat();
-        this.sendBtn.onclick = () => this.sendMessage();
+        if (this.floatBtn) this.floatBtn.onclick = () => this.toggleChat();
+        if (this.closeBtn) this.closeBtn.onclick = () => this.hideChat();
+        if (this.sendBtn) this.sendBtn.onclick = () => this.sendMessage();
 
-        this.input.oninput = () => {
-            this.charCount.textContent = `${this.input.value.length}/500`;
-            this.input.style.height = 'auto';
-            this.input.style.height = Math.min(this.input.scrollHeight, 120) + 'px';
-        };
+        if (this.input) {
+            this.input.oninput = () => {
+                if (this.charCount) {
+                    this.charCount.textContent = `${this.input.value.length}/500`;
+                }
+                this.input.style.height = 'auto';
+                this.input.style.height = Math.min(this.input.scrollHeight, 120) + 'px';
+            };
 
-        this.input.onkeydown = e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.sendMessage();
-            }
-        };
+            this.input.onkeydown = e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            };
+        }
 
-        this.togglePromptsBtn.onclick = () => this.togglePrompts();
-        this.refreshPromptsBtn.onclick = () => this.renderPrompts(true);
-        this.maximizeBtn.onclick = () => this.toggleMaximize();
-        this.downloadBtn.onclick = () => this.showDownloadModal();
+        if (this.togglePromptsBtn) this.togglePromptsBtn.onclick = () => this.togglePrompts();
+        if (this.refreshPromptsBtn) this.refreshPromptsBtn.onclick = () => this.renderPrompts(true);
+        if (this.maximizeBtn) this.maximizeBtn.onclick = () => this.toggleMaximize();
+        if (this.downloadBtn) this.downloadBtn.onclick = () => this.showDownloadModal();
     }
 
     /* ---------- CHAT ---------- */
 
     toggleChat() {
+        if (!this.widget) return;
         this.widget.classList.toggle('omni-hidden');
-        this.status.textContent = this.widget.classList.contains('omni-hidden') ? 'Offline' : 'Online';
+        if (this.status) {
+            this.status.textContent = this.widget.classList.contains('omni-hidden') ? 'Offline' : 'Online';
+        }
     }
 
     hideChat() {
+        if (!this.widget) return;
         this.widget.classList.add('omni-hidden');
-        this.status.textContent = 'Offline';
+        if (this.status) this.status.textContent = 'Offline';
     }
 
     async sendMessage(text = null) {
-        const message = text || this.input.value.trim();
-        if (!message) return;
+        let message = text;
+        
+        if (!message && this.input) {
+            message = this.input.value.trim();
+        }
+        
+        if (!message || message.length === 0) return;
 
         this.addMessage(message, true);
         this.conversationHistory.push({ role: 'user', content: message });
 
-        this.input.value = '';
-        this.input.style.height = 'auto';
-        this.charCount.textContent = '0/500';
+        if (this.input) {
+            this.input.value = '';
+            this.input.style.height = 'auto';
+            if (this.charCount) {
+                this.charCount.textContent = '0/500';
+            }
+        }
 
         this.showThinking();
 
@@ -811,7 +848,8 @@ class omniChat {
             this.typeWriter(el, clean);
             this.conversationHistory.push({ role: 'assistant', content: clean });
 
-        } catch {
+        } catch (error) {
+            console.error('Chat error:', error);
             this.removeThinking();
             this.addMessage('Connection error. Please try again.', false);
         }
@@ -820,13 +858,11 @@ class omniChat {
     /* ---------- RESPONSE CLEANUP ---------- */
 
     cleanResponse(text) {
-        // Remove any truncation markers but keep the full response
         let cleaned = text
             .replace(/\.\.\.\s*\(truncated\)/gi, '')
             .replace(/\(truncated\)/gi, '')
             .trim();
 
-        // Remove any "..." at the end if it was added by truncation
         if (cleaned.endsWith('...')) {
             cleaned = cleaned.substring(0, cleaned.length - 3).trim();
         }
@@ -837,12 +873,17 @@ class omniChat {
     /* ---------- MESSAGES ---------- */
 
     addMessage(content, isUser) {
+        if (!this.messages) {
+            console.error('Messages container not found');
+            return null;
+        }
+
         const msg = document.createElement('div');
         msg.className = `omni-message ${isUser ? 'omni-message-user' : 'omni-message-bot'}`;
 
         const avatar = document.createElement('div');
         avatar.className = 'omni-message-avatar';
-        avatar.innerHTML = isUser ? 'You' : `<img src="resources/img/omni.svg" width="32">`;
+        avatar.innerHTML = isUser ? 'You' : `<img src="resources/img/omni.svg" width="32" alt="OmniOGM">`;
 
         const body = document.createElement('div');
         body.className = 'omni-message-content';
@@ -857,6 +898,8 @@ class omniChat {
     }
 
     typeWriter(el, text) {
+        if (!el) return;
+        
         el.innerHTML = '';
         let i = 0;
         const formatted = this.formatText(text);
@@ -872,55 +915,59 @@ class omniChat {
     }
 
     formatText(t) {
-        // Process text with proper spacing
+        if (!t) return '';
+        
         let formatted = t
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/(\n|^)- (.*?)(?=\n|$)/gm, '<li>$2</li>')
             .replace(/(\n|^)(\d+)\. (.*?)(?=\n|$)/gm, '<li>$3</li>')
             .replace(/\n/g, '<br>');
-        
-        // Wrap consecutive list items in ul
+
         formatted = formatted.replace(/(<li>.*?<\/li>(<br>)?)+/g, (match) => {
             return '<ul class="omni-list">' + match.replace(/<br>/g, '') + '</ul>';
         });
-        
+
         return formatted;
     }
 
     /* ---------- THINKING ---------- */
 
     showThinking() {
+        if (!this.messages) return;
+        
         this.thinking = document.createElement('div');
         this.thinking.className = 'omni-thinking';
         this.thinking.innerHTML = `
-            <div class="omni-message-avatar"><img src="resources/img/omni.svg" width="32"></div>
+            <div class="omni-message-avatar"><img src="resources/img/omni.svg" width="32" alt="OmniOGM"></div>
             <div class="omni-thinking-text">Thinking...</div>`;
         this.messages.appendChild(this.thinking);
         this.scrollBottom();
     }
 
     removeThinking() {
-        if (this.thinking) this.thinking.remove();
+        if (this.thinking && this.thinking.parentNode) {
+            this.thinking.remove();
+        }
     }
 
     scrollBottom() {
-        this.messages.scrollTop = this.messages.scrollHeight;
+        if (this.messages) {
+            this.messages.scrollTop = this.messages.scrollHeight;
+        }
     }
 
-    /* ---------- PROMPTS (3 ONLY) ---------- */
+    /* ---------- PROMPTS ---------- */
 
     renderPrompts(shuffle = false) {
+        if (!this.promptsBox) return;
+        
         this.promptsBox.innerHTML = '';
         let prompts = [...this.availablePrompts];
         if (shuffle) prompts.sort(() => Math.random() - 0.5);
 
-        // Filter out used prompts first
         const available = prompts.filter(p => !this.usedPrompts.has(p));
-        
-        // Take up to 3 available prompts
         const displayPrompts = available.slice(0, 3);
-        
-        // If we don't have enough available, add some used ones back
+
         if (displayPrompts.length < 3) {
             const used = prompts.filter(p => this.usedPrompts.has(p));
             displayPrompts.push(...used.slice(0, 3 - displayPrompts.length));
@@ -948,6 +995,8 @@ class omniChat {
     }
 
     togglePrompts() {
+        if (!this.promptsBox || !this.togglePromptsBtn || !this.collapseIndicator) return;
+        
         this.promptsCollapsed = !this.promptsCollapsed;
         this.promptsBox.classList.toggle('omni-prompts-collapsed', this.promptsCollapsed);
         this.promptsBox.classList.toggle('omni-prompts-expanded', !this.promptsCollapsed);
@@ -959,6 +1008,7 @@ class omniChat {
     /* ---------- MAXIMIZE ---------- */
 
     toggleMaximize() {
+        if (!this.widget) return;
         this.isMaximized = !this.isMaximized;
         this.widget.classList.toggle('omni-maximized', this.isMaximized);
     }
@@ -966,44 +1016,38 @@ class omniChat {
     /* ---------- CLEAR CHAT ---------- */
 
     injectClearButton() {
-        // Check if button already exists
-        if (document.querySelector('.omni-clear-btn')) return;
+        if (!this.downloadBtn || !this.downloadBtn.parentNode) return;
         
+        if (document.querySelector('.omni-clear-btn')) return;
+
         const btn = document.createElement('button');
         btn.className = 'omni-action-btn omni-clear-btn';
         btn.title = 'Clear chat';
         btn.innerHTML = '🗑';
         btn.onclick = () => this.clearChat();
-        
-        // Insert before maximize button
+
         const headerActions = this.downloadBtn.parentNode;
         headerActions.insertBefore(btn, this.maximizeBtn);
     }
 
     clearChat() {
-        // Store welcome message HTML
+        if (!this.messages) return;
+        
         const welcomeMsg = this.messages.querySelector('.omni-welcome-message');
-        
-        // Clear all messages
         this.messages.innerHTML = '';
-        
-        // Add welcome message back
-        if (welcomeMsg) {
-            this.messages.appendChild(welcomeMsg);
-        }
-        
-        // Reset conversation history
+        if (welcomeMsg) this.messages.appendChild(welcomeMsg);
+
         this.conversationHistory = [];
         this.usedPrompts.clear();
-        
-        // Refresh prompts
         this.renderPrompts(true);
         this.scrollBottom();
     }
 
-    /* ---------- DOWNLOAD (PDF) ---------- */
+    /* ---------- PDF DOWNLOAD ---------- */
 
     createDownloadOverlay() {
+        if (document.querySelector('.omni-download-overlay')) return;
+        
         this.overlay = document.createElement('div');
         this.overlay.className = 'omni-download-overlay';
         this.overlay.innerHTML = `
@@ -1024,7 +1068,8 @@ class omniChat {
     }
 
     showDownloadModal() {
-        // Check if there's content to download
+        if (!this.overlay) return;
+        
         if (this.conversationHistory.length === 0) {
             alert('No conversation to download.');
             return;
@@ -1033,116 +1078,191 @@ class omniChat {
     }
 
     async downloadPDF() {
-        // Dynamically load jsPDF if not available
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-            try {
-                // Try to load jsPDF from CDN
-                await this.loadJSPDF();
-            } catch (error) {
-                console.error('Failed to load PDF library:', error);
-                alert('PDF library not loaded. Please check internet connection.');
-                this.overlay.classList.remove('active');
-                return;
-            }
+        if (this.overlay) {
+            this.overlay.classList.remove('active');
         }
 
         try {
+            await this.loadJSPDF();
+            
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                throw new Error('jsPDF not loaded');
+            }
+
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            let y = 15;
+            const pdf = new jsPDF("p", "mm", "a4");
 
-            // Title
-            doc.setFontSize(16);
-            doc.setTextColor(33, 33, 33);
-            doc.text('OGM Business Consultants - Chat Conversation', 105, y, { align: 'center' });
-            y += 10;
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
 
-            // Date
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            const now = new Date();
-            const dateStr = now.toLocaleString();
-            doc.text(`Generated: ${dateStr}`, 105, y, { align: 'center' });
-            y += 15;
+            const marginX = 18;
+            let cursorY = 20;
 
-            // Conversation
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
+            /* -------------------------------------------------------
+              UTILITIES
+            ------------------------------------------------------- */
 
-            this.conversationHistory.forEach((m, index) => {
-                // Check for page break
-                if (y > 270) {
-                    doc.addPage();
-                    y = 15;
+            const addPageIfNeeded = (extraSpace = 10) => {
+                if (cursorY + extraSpace > pageHeight - 20) {
+                    pdf.addPage();
+                    cursorY = 20;
                 }
+            };
 
-                // Role header
-                doc.setFontSize(11);
-                doc.setFont(undefined, 'bold');
-                doc.text(`${m.role === 'user' ? 'You' : 'OmniOGM'}:`, 10, y);
-                y += 7;
+            const drawDivider = () => {
+                cursorY += 4;
+                pdf.setDrawColor(20, 45, 90);
+                pdf.setLineWidth(0.6);
+                pdf.line(marginX, cursorY, pageWidth - marginX, cursorY);
+                cursorY += 8;
+            };
 
-                // Content
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'normal');
-                
-                // Clean content for PDF
-                const cleanContent = m.content
-                    .replace(/\*\*/g, '') // Remove bold markers
-                    .replace(/<br>/g, '\n')
-                    .replace(/<[^>]*>/g, ''); // Remove any HTML tags
-                
-                const lines = doc.splitTextToSize(cleanContent, 180);
-                doc.text(lines, 15, y);
-                y += lines.length * 5 + 8;
+            /* -------------------------------------------------------
+              HEADER
+            ------------------------------------------------------- */
+
+            // Skip SVG if not available, use text logo instead
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(18);
+            pdf.setTextColor(15, 35, 70);
+            pdf.text("OmniOGM Assistant", pageWidth / 2, cursorY, { align: "center" });
+
+            cursorY += 20;
+
+            pdf.setFontSize(11);
+            pdf.setFont("helvetica", "normal");
+            pdf.setTextColor(90);
+            pdf.text(
+                "OGM Business Consultants – Conversation History",
+                pageWidth / 2,
+                cursorY,
+                { align: "center" }
+            );
+
+            cursorY += 8;
+
+            pdf.setFontSize(9);
+            pdf.setTextColor(130);
+            pdf.text(
+                `Downloaded on: ${new Date().toLocaleString()}`,
+                pageWidth / 2,
+                cursorY,
+                { align: "center" }
+            );
+
+            cursorY += 10;
+            drawDivider();
+
+            /* -------------------------------------------------------
+              CHAT CONTENT
+            ------------------------------------------------------- */
+
+            pdf.setFontSize(11);
+            pdf.setTextColor(40);
+
+            this.conversationHistory.forEach((msg, index) => {
+                addPageIfNeeded(25);
+
+                let role = msg.role === 'user' ? 'You' : 'OmniOGM';
+                let roleColor = msg.role === 'user' ? [170, 120, 0] : [20, 45, 90];
+
+                /* Role label */
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(...roleColor);
+                pdf.text(`${role}:`, marginX, cursorY);
+                cursorY += 6;
+
+                /* Message text */
+                pdf.setFont("helvetica", "normal");
+                pdf.setTextColor(60);
+
+                const rawText = this.cleanResponse(msg.content)
+                    .replace(/\n{3,}/g, "\n\n")
+                    .trim();
+
+                const lines = rawText.split("\n");
+
+                lines.forEach(line => {
+                    addPageIfNeeded(8);
+
+                    // Simple text wrapping
+                    const textLines = pdf.splitTextToSize(line, pageWidth - marginX * 2);
+                    pdf.text(textLines, marginX, cursorY);
+                    cursorY += textLines.length * 6;
+                });
+
+                cursorY += 8;
             });
 
-            // Footer
-            doc.setFontSize(8);
-            doc.setTextColor(150, 150, 150);
-            doc.text('Powered by OGM Business Consultants - www.ogmbc.ae', 105, 285, { align: 'center' });
+            /* -------------------------------------------------------
+              FOOTER
+            ------------------------------------------------------- */
 
-            // Save
-            const fileName = `OGMBC_Chat_${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}.pdf`;
-            doc.save(fileName);
+            addPageIfNeeded(20);
+            pdf.setDrawColor(220);
+            pdf.line(marginX, cursorY, pageWidth - marginX, cursorY);
+            cursorY += 8;
 
-            this.overlay.classList.remove('active');
+            pdf.setFontSize(9);
+            pdf.setTextColor(120);
+            pdf.text(
+                "© 2025 OGM Business Consultants. All rights reserved.",
+                pageWidth / 2,
+                cursorY,
+                { align: "center" }
+            );
+
+            cursorY += 5;
+            pdf.text(
+                "This conversation was generated by the OmniOGM Assistant.",
+                pageWidth / 2,
+                cursorY,
+                { align: "center" }
+            );
+
+            /* -------------------------------------------------------
+              SAVE FILE
+            ------------------------------------------------------- */
+
+            const timestamp = new Date()
+                .toISOString()
+                .replace(/[:.]/g, "-")
+                .slice(0, 19);
+
+            pdf.save(`OGMBC-Chat-${timestamp}.pdf`);
+
         } catch (error) {
             console.error('PDF generation error:', error);
             alert('Error generating PDF. Please try again.');
-            this.overlay.classList.remove('active');
         }
     }
 
     loadJSPDF() {
         return new Promise((resolve, reject) => {
-            // Check if already loaded
             if (window.jspdf && window.jspdf.jsPDF) {
                 resolve();
                 return;
             }
-
-            // Load jsPDF from CDN
+            
             const script = document.createElement('script');
             script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            
             script.onload = () => {
                 if (window.jspdf && window.jspdf.jsPDF) {
                     resolve();
                 } else {
-                    reject(new Error('jsPDF not loaded properly'));
+                    reject(new Error('jsPDF not loaded correctly'));
                 }
             };
-            script.onerror = () => reject(new Error('Failed to load jsPDF'));
+            
+            script.onerror = reject;
             document.head.appendChild(script);
         });
     }
 }
 
+// Initialize chat when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.omniChat = new omniChat();
 });
 </script>
-
-
-
-

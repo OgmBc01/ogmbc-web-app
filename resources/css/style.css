@@ -59,7 +59,6 @@ img { max-width: 100%; display: block; }
 /* Buttons */
 .btn { display:inline-flex; align-items:center; gap:.6rem; padding:.7rem 1.2rem; border-radius:999px; font-weight:600; border:1px solid transparent; cursor:pointer; transition:.2s ease; }
 .btn-primary { background: #d0aa4b; color:#000; box-shadow: var(--shadow); }
-.btn-primary { background: #d0aa4b; color:#000; box-shadow: var(--shadow); }
 .btn-primary:hover { filter:brightness(1.05); transform:translateY(-1px); }
 .btn-secondary { background: #091e3e; color:#fff; box-shadow: var(--shadow); }
 .btn-secondary:hover { filter:brightness(1.05); transform:translateY(-1px); }
@@ -381,6 +380,206 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
 .menu a,
 .dropdown-item {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Well of Love Link Styling */
+.well-of-love-link {
+    padding: 0.5rem 1.2rem !important;
+    border-radius: 30px !important;
+    overflow: hidden !important;
+    transition: all 0.4s ease !important;
+    background: linear-gradient(135deg, rgba(208, 170, 75, 0.1) 0%, rgba(208, 170, 75, 0.05) 100%) !important;
+    border: 1px solid rgba(208, 170, 75, 0.2) !important;
+    position: relative !important;
+    margin: 0 0.3rem !important;
+}
+
+.well-of-love-text {
+    color: var(--secondary) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    position: relative !important;
+    z-index: 2 !important;
+    transition: color 0.3s ease !important;
+    display: inline-block !important;
+    padding-right: 1.8rem !important;
+}
+
+/* Animated Border Effect */
+.link-border {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 30px !important;
+    border: 2px solid transparent !important;
+    background: linear-gradient(90deg, var(--secondary), #ff6b9d, var(--secondary)) border-box !important;
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) padding-box, 
+        linear-gradient(#fff 0 0) !important;
+    -webkit-mask-composite: xor !important;
+    mask-composite: exclude !important;
+    opacity: 0 !important;
+    transition: opacity 0.4s ease !important;
+    animation: borderRotate 3s linear infinite paused !important;
+}
+
+@keyframes borderRotate {
+    0% {
+        background: linear-gradient(90deg, var(--secondary), #ff6b9d, var(--secondary)) border-box !important;
+    }
+    25% {
+        background: linear-gradient(180deg, var(--secondary), #ff6b9d, var(--secondary)) border-box !important;
+    }
+    50% {
+        background: linear-gradient(270deg, var(--secondary), #ff6b9d, var(--secondary)) border-box !important;
+    }
+    75% {
+        background: linear-gradient(360deg, var(--secondary), #ff6b9d, var(--secondary)) border-box !important;
+    }
+    100% {
+        background: linear-gradient(450deg, var(--secondary), #ff6b9d, var(--secondary)) border-box !important;
+    }
+}
+
+/* Stars and Heart Styling */
+.love-stars {
+    position: absolute !important;
+    top: 50% !important;
+    right: 0.8rem !important;
+    transform: translateY(-50%) !important;
+    z-index: 3 !important;
+}
+
+.love-star {
+    position: absolute !important;
+    color: var(--secondary) !important;
+    font-size: 0.6rem !important;
+    opacity: 0 !important;
+    transition: all 0.5s ease !important;
+}
+
+.love-star.star-1 {
+    top: -8px !important;
+    right: 0 !important;
+    animation: starTwinkle 2s infinite !important;
+}
+
+.love-star.star-2 {
+    bottom: -8px !important;
+    right: -5px !important;
+    animation: starTwinkle 2s infinite 0.5s !important;
+}
+
+.love-heart {
+    color: #ff6b9d !important;
+    font-size: 0.7rem !important;
+    animation: heartbeat 1.5s ease-in-out infinite !important;
+}
+
+@keyframes starTwinkle {
+    0%, 100% {
+        opacity: 0.7 !important;
+        transform: scale(1) rotate(0deg) !important;
+    }
+    50% {
+        opacity: 1 !important;
+        transform: scale(1.2) rotate(180deg) !important;
+        color: #ffd166 !important;
+    }
+}
+
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1) !important;
+    }
+    25% {
+        transform: scale(1.1) !important;
+    }
+    50% {
+        transform: scale(1) !important;
+    }
+    75% {
+        transform: scale(1.05) !important;
+    }
+}
+
+/* Hover Effects */
+.well-of-love-link:hover {
+    background: linear-gradient(135deg, rgba(208, 170, 75, 0.15) 0%, rgba(208, 170, 75, 0.08) 100%) !important;
+    border-color: rgba(208, 170, 75, 0.4) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(208, 170, 75, 0.2) !important;
+}
+
+.well-of-love-link:hover .link-border {
+    opacity: 1 !important;
+    animation-play-state: running !important;
+}
+
+.well-of-love-link:hover .love-star {
+    opacity: 1 !important;
+}
+
+.well-of-love-link:hover .love-heart {
+    animation-duration: 1s !important;
+}
+
+.well-of-love-link:hover .well-of-love-text {
+    color: #ff6b9d !important;
+    text-shadow: 0 0 10px rgba(255, 107, 157, 0.3) !important;
+}
+
+/* Active/Current Page State */
+.well-of-love-link.active {
+    background: linear-gradient(135deg, var(--secondary) 0%, #e6b050 100%) !important;
+    border-color: var(--secondary) !important;
+}
+
+.well-of-love-link.active .well-of-love-text {
+    color: white !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+.well-of-love-link.active .link-border {
+    opacity: 0.7 !important;
+    animation-play-state: running !important;
+    background: linear-gradient(90deg, white, #ffd1dc, white) border-box !important;
+}
+
+.well-of-love-link.active .love-star {
+    color: white !important;
+    opacity: 1 !important;
+}
+
+.well-of-love-link.active .love-heart {
+    color: #ffd1dc !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .well-of-love-link {
+        padding: 0.4rem 1rem !important;
+        margin: 0.2rem 0 !important;
+    }
+    
+    .well-of-love-text {
+        padding-right: 1.5rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .love-stars {
+        right: 0.6rem !important;
+    }
+    
+    .love-star {
+        font-size: 0.5rem !important;
+    }
+    
+    .love-heart {
+        font-size: 0.6rem !important;
+    }
 }
 
 /* ================================
@@ -2155,181 +2354,482 @@ footer .brand { font-size:1.2rem; font-weight:700; }
 }
 
 
-    .card-app { background: #ffffff12; border:1px solid rgba(241, 192, 112, 0.21); margin-top: -70px; }
+    .card-app { background: #ffffff12; border:1px solid rgba(241, 192, 112, 0.21);}
     .stepper { counter-reset: step; }
     .step { position: relative; padding-left:3rem; margin-bottom:1.25rem; }
-    .step::before { counter-increment: step; content: counter(step); width:2rem; height:2rem; border-radius:50%; background:var(--gold); color:var(--primary); display:inline-grid; place-items:center; position:absolute; left:0; top:0; font-weight:700; }
     
-/* ================================
-   Ratio Calc
+    
+
+  /* ================================
+   Enhanced Ratio Calculator Styles
    ================================ */
+
+/* Category Tabs */
+.ratio-category-tabs {
+    margin-bottom: 1.5rem;
+}
+
+.nav-pills-category {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    border-radius: 8px; /* Match your button border radius */
+    padding-right: 10px; /* Add right padding for scrollbar space */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: var(--gold) rgba(11, 18, 36, 0.5); /* Firefox */
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.nav-pills-category::-webkit-scrollbar {
+    height: 6px; /* Make scrollbar thinner */
+}
+
+.nav-pills-category::-webkit-scrollbar-track {
+    background: rgba(11, 18, 36, 0.5);
+    border-radius: 3px;
+    margin: 0 10px; /* Add margin to contain within rounded corners */
+}
+
+.nav-pills-category::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 3px;
+}
+
+.nav-pills-category::-webkit-scrollbar-thumb:hover {
+    background: #e6a336;
+}
+
+/* Optional: Add a wrapper div with overflow hidden to fully contain scrollbar */
+.nav-pills-wrapper {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden; /* This will clip the scrollbar to rounded corners */
+}
+
+/* Or add to the existing .ratio-category-tabs class */
+.ratio-category-tabs {
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden; /* This will contain the scrollbar within rounded corners */
+    background: rgba(11, 18, 36, 0.8); /* Add background to match */
+}
+
+.nav-pills-category .nav-link {
+    color: #e2e8f0;
+    background: rgba(11, 18, 36, 0.8);
+    border: 1px solid rgba(241, 191, 112, 0.2);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.nav-pills-category .nav-link:hover {
+    background: rgba(241, 191, 112, 0.1);
+    border-color: var(--gold);
+}
+
+.nav-pills-category .nav-link.active {
+    background: var(--gold);
+    color: #0b1224;
+    border-color: var(--gold);
+    font-weight: 600;
+}
+
+/* Ratio Grids */
+.ratios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .ratios-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ratio-card {
+    background: linear-gradient(135deg, #0b1224 0%, #1a2238 100%);
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #e2e8f0;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ratio-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--gold);
+    box-shadow: 0 8px 25px rgba(241, 191, 112, 0.2);
+}
+
+.ratio-card.selected {
+    border-color: #10b981;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, #0b1224 0%, #064e3b 100%);
+    animation: pulse-selected 2s ease-in-out infinite;
+}
+
+@keyframes pulse-selected {
+    0%, 100% { 
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3); 
+    }
+    50% { 
+        box-shadow: 0 8px 35px rgba(16, 185, 129, 0.5); 
+    }
+}
+
+.selected-tick {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.ratio-card.selected .selected-tick {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.selected-tick i {
+    color: white;
+    font-size: 14px;
+}
+
+.ratio-abbr {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f1c070 0%, #e6a336 100%);
+    display: grid;
+    place-items: center;
+    color: #0b1224;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-right: 15px;
+}
+
+.ratio-name {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.3;
+    margin-bottom: 5px;
+}
+
+.ratio-description {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+/* Selected Ratios Summary */
+.selected-ratios-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.selected-ratios-list > div {
+    background: rgba(241, 191, 112, 0.1);
+    border-radius: 6px;
+    padding: 8px 12px;
+    border-left: 3px solid var(--gold);
+    color: #ffffff
+}
+
+/* Inputs Container */
+.inputs-container {
+    background: rgba(255, 252, 238, 0.5);
+    border: solid 1px rgba(241, 191, 112, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.input-category-section {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(241, 191, 112, 0.1);
+}
+
+.input-category-section h6 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.ratio-input {
+    background: #ffffff;
+    border: 1px solid rgba(241, 191, 112, 0.4); /* More visible border */
+    color: #000;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500; /* Slightly bolder text */
+}
+
+.ratio-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(241, 191, 112, 0.25);
+    color: #000000;
+    outline: none;
+}
+
+.ratio-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: normal;
+}
+
+.ratio-input:focus {
+    background: rgb(255, 255, 255);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(241, 191, 112, 0.1);
+    color: #000000;
+}
+
+.ratio-input::placeholder {
+    color: #94a3b8;
+}
+
+/* Results Modal Enhancements */
+.modal-content {
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.bg-paper {
+    background: #f7f6f2;
+    color: #0f172a;
+}
+
+.badge-good { 
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-warn { 
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-risk { 
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Saved Results Table */
+.saved-table {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.saved-table thead {
+    background: #0b1224;
+}
+
+.saved-table th {
+    color: var(--gold);
+    font-weight: 600;
+    border: none;
+    padding: 12px 16px;
+}
+
+.saved-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
+    border-color: #e2e8f0;
+}
+
+.saved-table tbody tr:hover {
+    background: rgba(241, 191, 112, 0.05);
+}
+
+/* Stepper Improvements */
+.stepper {
+    position: relative;
+}
+
+.stepper::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    border-radius: 3px;
+}
+
+.step-instruction {
+    background: rgba(241, 191, 112, 0.1);
+    border-left: 3px solid var(--gold);
+    padding: 12px 15px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 15px;
+}
+
+.step-instruction p {
+    margin-bottom: 0;
+    color: #e2e8f0;
+}
+
+.step-instruction .instruction-icon {
+    color: var(--gold);
+    margin-right: 8px;
+}
+
+/* Button Enhancements */
+.btn-primary {
+    background: var(--secondary);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(155, 131, 12, 0.3);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, var(--gold) 0%, #e6a336 100%);
+    color: #0b1224;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(241, 191, 112, 0.3);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .nav-pills-category {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+    }
+    
+    .nav-pills-category .nav-link {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.75rem;
+    }
+    
+    .ratios-grid {
+        grid-template-columns: 1fr;
+    }
+    
     .ratio-card {
-        background: #0b1224;
-        border-radius: 10px;
         padding: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: #e2e8f0;
-        border: 2px solid transparent;
-        flex: 1 1 calc(50% - 0.5rem);
-        min-width: 0; 
-        position: relative;
-        overflow: hidden;
     }
     
-    @media (min-width: 768px) {
-        .ratio-card {
-            flex: 0 0 auto;
-            min-width: 240px;
-        }
+    .inputs-container {
+        padding: 1rem;
     }
     
-    @media (max-width: 767.98px) {
-        .ratio-card {
-            flex: 1 1 calc(50% - 0.5rem);
-            min-width: 0;
-            padding: 0.75rem;
-        }
+    .input-category-section {
+        padding: 0.75rem;
     }
-  
-    @media (max-width: 575.98px) {
-        .ratio-card {
-            flex: 1 1 100%;
-        }
-    }
+}
 
-    .ratio-card:hover {
-        transform: translateY(-4px);
-        border-color: var(--gold);
-        box-shadow: 0 0 8px rgba(241,191,112,0.4);
-    }
-    
-    .ratio-card.selected {
-        border-color: var(--success);
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-        background: var(--success-light);
-        animation: pulse-selected 1.5s ease-in-out;
-    }
-    
-    @keyframes pulse-selected {
-        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-    
-    .selected-tick {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 20px;
-        height: 20px;
-        background: var(--success);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(11, 18, 36, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #e6a336;
+}
+
+/* Animation for ratio selection */
+@keyframes fadeIn {
+    from {
         opacity: 0;
-        transform: scale(0);
-        transition: all 0.3s ease;
+        transform: translateY(10px);
     }
-    
-    .ratio-card.selected .selected-tick {
+    to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0);
     }
-    
-    .selected-tick i {
-        color: white;
-        font-size: 12px;
-    }
+}
 
-    .ratio-abbr {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: #f1c070ff;
-        display: grid;
-        place-items: center;
-        color: #fff;
-        font-weight: 700;
-        font-size: 1rem;
-        flex-shrink: 0;
-    }
-    
-    @media (min-width: 768px) {
-        .ratio-abbr {
-            width: 48px;
-            height: 48px;
-            font-size: 1.1rem;
-        }
-    }
+.ratio-card {
+    animation: fadeIn 0.4s ease-out forwards;
+}
 
-    .ratio-name {
-        color: var(--gold);
-        font-weight: 600;
-        font-size: 0.95rem;
-        line-height: 1.3;
-    }
-    
-    @media (min-width: 768px) {
-        .ratio-name {
-            font-size: 1.05rem;
-        }
-    }
+/* Loading state for buttons */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
 
-    #ratiosGrid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-    
-    @media (max-width: 767.98px) {
-        #ratiosGrid {
-            gap: 0.5rem;
-        }
-    }
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spinner 0.6s linear infinite;
+}
 
-    .badge-good { background: #16a34a; color: #fff; }
-    .badge-warn { background: #f59e0b; color: #fff; }
-    .badge-risk { background: #dc2626; color: #fff; }
-    .small-muted { color: var(--muted); font-size:.95rem; }
-
-    .modal { z-index: 99999; }
-    .modal-backdrop.show { z-index: 99998; }
-
-    .saved-table td, .saved-table th { color: #0f172a; }
-    .bg-paper { background: #f7f6f2; color: #0f172a; }
-    
-    .step-instruction {
-        background: rgba(241, 191, 112, 0.1);
-        border-left: 3px solid var(--gold);
-        padding: 12px 15px;
-        border-radius: 0 8px 8px 0;
-        margin-bottom: 15px;
-    }
-    
-    .step-instruction p {
-        margin-bottom: 0;
-        color: #e2e8f0;
-    }
-    
-    .step-instruction .instruction-icon {
-        color: var(--gold);
-        margin-right: 8px;
-    }
-    
-    .selected-counter {
-        background: var(--success);
-        color: white;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        margin-left: 8px;
-    }
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
 
 
 /* ================================

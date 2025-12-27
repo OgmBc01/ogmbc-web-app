@@ -49,7 +49,7 @@ include 'includes/header-1.php'
           <div class="card h-100 shadow-sm border-0" style="background-color:#f7f0d9;">
             <div class="card-body p-0">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d19801.343354363723!2d-75.1449!3d38.7746!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b8ff5f1cb52f5d%3A0xf7d663f3e1a3bb6f!2sLewes%2C%20Delaware!5e0!3m2!1sen!2sus!4v1691764137000!5m2!1sen!2sus" 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14441.992555972345!2d55.242136353254054!3d25.18641825551446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f69d0bf460681%3A0xf852a2f5d28ca4d2!2sThe%20Regal%20Tower%20-%20Business%20Bay%20-%20Dubai!5e0!3m2!1sen!2sae!4v1766785134455!5m2!1sen!2sae"
                 width="100%" 
                 height="100%" 
                 style="border:0; min-height:400px;" 
@@ -79,7 +79,7 @@ include 'includes/header-1.php'
               <p class="lead mb-1">OGM Business Consultants FZCO</p>
               <p class="lead mb-1">Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai,</p>
               <p class="lead mb-1">United Arab Emirates. P.O. Box 33418</p>
-              <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmbc.ae" class="text-decoration-none">info@ogmbc.ae</a></p>
+              <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmbc.ae" class="text-dark">info@ogmbc.ae</a></p>
               <p class="mb-0"><strong>Tel:</strong> +971509860136</p>
             </div>
           </div>
@@ -92,8 +92,8 @@ include 'includes/header-1.php'
               <p class="lead mb-1">OGMBC Holding Co. Ltd</p>
               <p class="lead mb-1">16192 Coastal Highway, Lewes</p>
               <p class="lead mb-1">P.O. Box 19958, Delaware, United States</p>
-              <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmholding.com" class="text-decoration-none">info@ogmholding.com</a></p>
-              <p class="mb-0"><strong>Tel:</strong> +971509860136</p>
+              <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmauditing.com" class="text-dark">info@ogmauditing.com</a></p>
+              <!-- <p class="mb-0"><strong>Tel:</strong> +971509860136</p> -->
             </div>
           </div>
         </div>
@@ -106,8 +106,8 @@ include 'includes/header-1.php'
               <p class="lead mb-1">OGMBC UK Ltd</p>
               <p class="lead mb-1">128 City Road, EC1V 2NX</p>
               <p class="lead mb-1">London, United Kingdom</p>
-              <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmconsultants.com" class="text-decoration-none">info@ogmconsultants.com</a></p>
-              <p class="mb-0"><strong>Tel:</strong> +971509860136</p>
+              <p class="mb-1"><strong>Email:</strong> <a href="mailto:info@ogmauditing.com" class="text-dark">info@ogmauditing.com</a></p>
+              <!-- <p class="mb-0"><strong>Tel:</strong> +971509860136</p> -->
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ include 'includes/header-1.php'
             </div>
             <div>
               <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
-              <span class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971502923136</span>
+              <span class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 986 0136</span>
             </div>
           </div>
         </div>
@@ -177,19 +177,6 @@ include 'includes/header-1.php'
       </div>
     </div>
   </section>
-
-  <!-- Floating Action Buttons -->
-  <div class="floating-buttons">
-      <!-- WhatsApp Button -->
-      <a href="https://wa.me/+971502923136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
-          <i class="bi bi-whatsapp"></i>
-      </a>
-      
-      <!-- Back to Top Button -->
-      <a href="#" class="floating-btn back-to-top">
-          <i class="bi bi-arrow-up"></i>
-      </a>
-  </div>
 
 <!-- Footer (same as home page) -->
 <?php

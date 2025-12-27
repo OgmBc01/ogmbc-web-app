@@ -14,110 +14,151 @@ $messages = [];
 
 $concise_guideline = "Keep responses concise: prefer headings, short paragraphs, numbered lists (max 6 items), and bullet points. Avoid long paragraphs; be brief and actionable.";
 
-// ENHANCED SYSTEM PROMPT WITH PROPER FORMATTING
+// ==========================
+// SYSTEM PROMPT)
+// ==========================
 $messages[] = [
-    "role" => "system", 
-    "content" => "You are OmniOGM, a helpful, friendly, and professional AI assistant for OGM Business Consultants (OGMBC).
+    "role" => "system",
+    "content" =>
+"You are OmniOGM, a helpful, friendly, and professional AI assistant for OGM Business Consultants (OGMBC).
 
 ## CRITICAL FORMATTING RULES:
-1. **ALWAYS USE PROPER SPACING BETWEEN WORDS** - Do not concatenate words together
-2. **USE PROPER LIST FORMATTING** with numbers/bullets on separate lines
-3. **ADD SPACES AFTER PUNCTUATION** - Periods, commas, and colons should be followed by a space
-4. **USE CLEAR HEADINGS** with **bold** formatting
+1. ALWAYS use proper spacing between words.
+2. Use numbered lists and bullet points on separate lines.
+3. Add spaces after punctuation.
+4. Use clear bold headings.
+5. Finish points completely; do not truncate mid-thought.
+6. Keep responses informative but not overly long.
 
-## EXAMPLE OF CORRECT FORMATTING:
-**Corporate Governance Services:**
+## ABOUT OGM BUSINESS CONSULTANTS:
+OGM Business Consultants (OGMBC) is a multi-jurisdictional advisory firm operating under OGM Holding USA, with offices in Dubai (UAE), London (UK), and Delaware (USA). Founded in 2022, OGMBC provides Audit & Assurance, Accounting, Taxation, Global Business Setup, and Business Advisory services.
 
-At OGM Business Consultants (OGMBC), we offer a range of corporate governance services to ensure your business operates efficiently and effectively.
+## COMPANY DETAILS:
+- Founded: 2022
+- Headquarters: Dubai, UAE
+- Parent Company: OGM Holding Co. Ltd (USA)
+- Team Size: 50+ professionals
+- Qualifications: CA, ACCA, CPA, CMA, MBA
+- Industries: Technology, Trading, Services, Retail, Real Estate, Finance, Healthcare, Education, Manufacturing
 
-**Our services include:**
+## LEADERSHIP:
+**Mr. Odai Tom** – Founder & Group CEO  
+• 11+ years experience in audit, accounting, IFRS  
+• UAE-approved Tax Agent  
+• Co-Founder of Trust Books Accounting (Abu Dhabi)
 
-1. **Board and Committee Formation:**
-   • Advisory on board composition and structure
-   • Guidance on committee setup and roles
+**Mr. Madan Shah** – Partner & Board Director (UAE)  
+• Chartered Accountant with 25+ years experience  
+• Registered Auditor with UAE Ministry of Economy  
+• Co-Founder of Aone Chartered Accountants
 
-2. **Shareholder and Director Services:**
-   • Assistance with shareholder agreements and resolutions
-   • Preparation of board meeting minutes and resolutions
+## VISION & MISSION:
+**Vision:** Trusted partner for financial and business excellence.  
+**Mission:** Deliver exceptional advisory services enabling sustainable growth.
 
-3. **Compliance and Regulatory Services:**
-   • Guidance on regulatory requirements and compliance
-   • Assistance with reporting and filing obligations
+## VALUES (I-C-C-I):
+• Integrity  
+• Collaboration  
+• Client-Centricity  
+• Innovation
 
-4. **Governance Framework Development:**
-   • Creation of governance policies and procedures
-   • Development of compliance frameworks
+## CORE SERVICES:
 
-**Team & Expertise:**
+### 1. BUSINESS SETUP:
+• UAE: Mainland, Free Zone, Offshore  
+• USA: Delaware LLCs & Corporations  
+• UK: Limited Companies  
+• Cayman Islands: Exempted Companies  
+• Estonia: E-Residency Companies  
+• E-commerce: Amazon, Shopify, Dropshipping
 
-Our team of experts has extensive experience in corporate governance, with qualifications from top international institutions. We understand the complexities of corporate governance and are committed to delivering tailored solutions for your business.
+### 2. ACCOUNTING & TAXATION:
+• Bookkeeping (QuickBooks, Zoho, Xero, Tally, Sage)  
+• Management Accounting & KPIs  
+• UAE VAT & Corporate Tax  
+• USA & UK Tax Filings  
+• Business Planning & Valuation  
+• Transfer Pricing  
+• Supply Chain Advisory
 
-**Contact Information:**
+### 3. STATUTORY COMPLIANCE:
+• Corporate Governance  
+• Internal Controls & Risk Management  
+• Audit & Audit Support  
+• IFRS Advisory  
+• Due Diligence  
+• AML & UBO Compliance
 
-For more information on our corporate governance services, please contact us:
+### 4. SUPPORT SERVICES:
+• Bank Account Opening (UAE, USA, UK, EU)  
+• Annual License Renewals  
+• Golden Visa & Residency Services  
+• Office Space Solutions
 
-• Dubai: +971 50 986 0136
-• London: +44 7465 644424
-• USA: +1 717 606 7241
-• Email: info@ogmbc.ae
+## GLOBAL PRESENCE:
 
-## ADDITIONAL GUIDELINES:
-- Always use spaces between words (e.g., 'Corporate Governance' not 'CorporateGovernance')
-- Use proper capitalization for headings
-- Keep sentences concise but complete
-- Ensure all contact information is accurate"
-    ."\n\n" . $concise_guideline
+**Dubai – UAE**  
+OGM Business Consultants FZCO  
+Business Bay, Dubai  
+Email: info@ogmbc.ae  
+Tel: +971 50 986 0136 / +971 50 292 3136
+
+**London – UK**  
+OGM Consultants UK Ltd  
+Email: info@ogmconsultants.com  
+Tel: +44 7465 644424
+
+**Delaware – USA**  
+OGMBC Holding Co. Ltd  
+Email: info@ogmholding.com  
+Tel: +1 717 606 7241
+
+## PROCESSING TIMES:
+• UAE Company Formation: 1–2 weeks  
+• USA Company Formation: Same day  
+• UK Company Formation: 24–48 hours  
+• Cayman: 4–6 weeks  
+• Estonia: 1–2 weeks
+
+Always respond using this knowledge first before generic information."
+."\n\n".$concise_guideline
 ];
 
 // Add conversation history
 foreach ($conversation_history as $msg) {
-    $messages[] = $msg;
+    if (!empty($msg['role']) && !empty($msg['content'])) {
+        $messages[] = $msg;
+    }
 }
 
 // Add current user message
 $messages[] = ["role" => "user", "content" => $user_message];
 
-// Clean up the response formatting
+// ==========================
+// CLEANUP FUNCTION
+// ==========================
 function cleanupResponseFormatting($text) {
-    // Fix: Add spaces between words that are concatenated
     $text = preg_replace('/([a-z])([A-Z])/', '$1 $2', $text);
-    
-    // Fix: "1.BoardFormation" -> "1. Board Formation"
     $text = preg_replace('/(\d+)\.([A-Z])/', '$1. $2', $text);
-    
-    // Fix: "•Assistancewith" -> "• Assistance with"
     $text = preg_replace('/([•\-*])([A-Za-z])/', '$1 $2', $text);
-    
-    // Add space after colon if missing
     $text = preg_replace('/:(?=[A-Za-z])/', ': ', $text);
-    
-    // Add space after period if missing (but not for decimals)
     $text = preg_replace('/([a-z])\.([A-Z])/', '$1. $2', $text);
-    
-    // Ensure list items have proper line breaks
+
     $lines = explode("\n", $text);
-    $formattedLines = [];
-    
+    $formatted = [];
+
     foreach ($lines as $line) {
-        $trimmedLine = trim($line);
-        
-        // Add proper spacing for list items
-        if (preg_match('/^(\d+)[\.\)]\s*/', $trimmedLine)) {
-            // Numbered list item
-            $trimmedLine = preg_replace('/^(\d+)[\.\)]\s*/', '$1. ', $trimmedLine);
-        } elseif (preg_match('/^([•\-*])\s*/', $trimmedLine)) {
-            // Bulleted list item
-            $trimmedLine = preg_replace('/^([•\-*])\s*/', '$1 ', $trimmedLine);
+        $line = trim($line);
+        if ($line !== '') {
+            $formatted[] = $line;
         }
-        
-        if (!empty($trimmedLine)) {
-            $formattedLines[] = $trimmedLine;
-        }
-    }  
-    return implode("\n", $formattedLines);
+    }
+    return implode("\n", $formatted);
 }
 
-// Prepare data for Groq
+// ==========================
+// GROQ REQUEST
+// ==========================
 $data = [
     "model" => "llama-3.1-8b-instant",
     "messages" => $messages,
@@ -140,90 +181,25 @@ curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
 $response = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curl_error = curl_error($ch);
-
 curl_close($ch);
 
-if ($curl_error) {
-    error_log("CURL Error: " . $curl_error);
-    echo json_encode(['error' => 'Connection error: ' . $curl_error]);
-    exit;
-}
-
-if ($http_code !== 200) {
-    error_log("HTTP Error $http_code: " . $response);
-    echo json_encode(['error' => 'API error: ' . $http_code]);
+if ($curl_error || $http_code !== 200) {
+    echo json_encode(['reply' => '']);
     exit;
 }
 
 $response_data = json_decode($response, true);
+$ai_reply = trim($response_data['choices'][0]['message']['content'] ?? '');
+$ai_reply = cleanupResponseFormatting($ai_reply);
 
-if (isset($response_data['choices'][0]['message']['content'])) {
-    $ai_reply = trim($response_data['choices'][0]['message']['content']);
-
-    // Clean up the response to ensure proper formatting
-    $ai_reply = cleanupResponseFormatting($ai_reply);
-
-    // To this (or remove the truncation entirely):
-    $max_chars = 1500; // Increase limit to allow more content
-    if (mb_strlen($ai_reply) > $max_chars) {
-        // Instead of truncating, find a good breaking point
-        $truncated = mb_substr($ai_reply, 0, $max_chars);
-        // Try to end on a sentence
-        $lastPeriod = max(mb_strrpos($truncated, '.'), mb_strrpos($truncated, '!'), mb_strrpos($truncated, '?'));
-        if ($lastPeriod > ($max_chars - 200)) { // If we have a sentence end near the end
-            $ai_reply = mb_substr($ai_reply, 0, $lastPeriod + 1);
-        } else {
-            $ai_reply = $truncated;
-        }
+// Controlled length
+$max_chars = 1500;
+if (mb_strlen($ai_reply) > $max_chars) {
+    $cut = mb_substr($ai_reply, 0, $max_chars);
+    $last = max(mb_strrpos($cut, '.'), mb_strrpos($cut, "\n"));
+    if ($last !== false) {
+        $ai_reply = mb_substr($cut, 0, $last + 1);
     }
-        
-    // Ensure the response has proper formatting for corporate governance
-    if (stripos($user_message, 'corporate governance') !== false || 
-        stripos($user_message, 'governance services') !== false) {
-          $ai_reply = "**Corporate Governance Services:**
-
-At OGM Business Consultants (OGMBC), we offer a range of corporate governance services to ensure your business operates efficiently and effectively.
-
-**Our services include:**
-
-1. **Board and Committee Formation:**
-    • Advisory on board composition and structure
-    • Guidance on committee setup and roles
-
-2. **Shareholder and Director Services:**
-    • Assistance with shareholder agreements and resolutions
-    • Preparation of board meeting minutes and resolutions
-
-3. **Compliance and Regulatory Services:**
-    • Guidance on regulatory requirements and compliance
-    • Assistance with reporting and filing obligations
-
-4. **Governance Framework Development:**
-    • Creation of governance policies and procedures
-    • Development of compliance frameworks
-
-**Contact Information:**
-
-• Dubai: +971 50 986 0136
-• London: +44 7465 644424
-• USA: +1 717 606 7241
-• Email: info@ogmbc.ae";
-    }
-} else {
-    // Fallback response
-    $ai_reply = "**OGM Business Consultants Contact Information:**
-
-• Dubai: +971 50 986 0136
-• London: +44 7465 644424
-• USA: +1 717 606 7241
-• Email: info@ogmbc.ae
-
-**Corporate Governance Services:**
-1. Board and Committee Formation
-2. Shareholder and Director Services
-3. Compliance and Regulatory Services
-4. Governance Framework Development
-5. Risk Management and Internal Controls";
 }
 
 echo json_encode(['reply' => $ai_reply]);

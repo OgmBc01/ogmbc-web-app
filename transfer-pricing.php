@@ -7,7 +7,7 @@ include 'includes/header-1.php'
   <section class="about-hero d-flex align-items-center text-center text-white">
     <div class="container">
       <h1 class="display-4 fw-bold">Transfer Pricing</h1>
-      <p class="lead">Welcome to OGMBC Consultant. Your Trusted Partner in Transfer Pricing</p>
+      <p class="lead">Welcome to OGMBC. Your Trusted Partner in Transfer Pricing</p>
 
       <!-- Breadcrumb -->
       <nav aria-label="breadcrumb">
@@ -30,7 +30,7 @@ include 'includes/header-1.php'
         <div class="col-lg-6">
           <h2 class="fw-bold" style="color:#d0aa4b;">Transfer Pricing</h2>
           <p class="text-start">
-            At OGMBC . Consultants, we understand the complexities and challenges businesses face in the global marketplace. As companies expand their
+            At OGMBC, we understand the complexities and challenges businesses face in the global marketplace. As companies expand their
             operations across borders, the intricacies of transfer pricing become increasingly critical. Our dedicated team of experts is he re to guide you through the
             intricacies of transfer pricing, ensuring compliance with regulations and optimizing your global tax position.
           </p>
@@ -247,19 +247,6 @@ include 'includes/header-1.php'
       </div>
     </div>
   </section>
-
-  <!-- Floating Action Buttons -->
-  <div class="floating-buttons">
-      <!-- WhatsApp Button -->
-      <a href="https://wa.me/+971502923136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
-          <i class="bi bi-whatsapp"></i>
-      </a>
-      
-      <!-- Back to Top Button -->
-      <a href="#" class="floating-btn back-to-top">
-          <i class="bi bi-arrow-up"></i>
-      </a>
-  </div>
 
 <!-- Footer (same as home page) -->
 <?php

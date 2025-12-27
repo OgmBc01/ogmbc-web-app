@@ -43,12 +43,9 @@ include 'includes/header-1.php'
   <section class="py-5" style="background:#f9fafb;">
     <div class="container">
       <div class="row align-items-center g-4">
-        <!-- Left side: Illustration/Icon -->
-        <div class="col-lg-5 text-center">
-          <div class="p-4">
-            <i class="fas fa-book fa-4x mb-3" style="color:#d0aa4b;"></i>
-            <h4 class="fw-bold" style="color:#0b1224;">In-House & Remote Bookkeeping</h4>
-          </div>
+        <!-- Left side: Picture -->
+        <div class="col-lg-5">
+          <img src="resources/img/in-house-bookkeeping.jpg" class="img-fluid rounded shadow" alt="In-House & Remote Bookkeeping">
         </div>
 
         <!-- Right side: Text -->

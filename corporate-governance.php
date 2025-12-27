@@ -30,7 +30,7 @@ include 'includes/header-1.php'
         <div class="col-lg-6">
           <h2 class="fw-bold" style="color:#d0aa4b;">Corporate Governance</h2>
           <p class="text-start">
-            At OGMBC . Consultants, we recognize the critical importance of strong corporate governance practices in fostering transparency, accountability, and
+            At OGMB, we recognize the critical importance of strong corporate governance practices in fostering transparency, accountability, and
             sustainability within organizations. Our Corporate Governance Solutions are designed to help businesses of all sizes navigate co mplex regulatory
             landscapes, mitigate risks, and maximize long term value creation.
           </p>
@@ -244,19 +244,6 @@ include 'includes/header-1.php'
       </div>
     </div>
   </section>
-
-  <!-- Floating Action Buttons -->
-  <div class="floating-buttons">
-      <!-- WhatsApp Button -->
-      <a href="https://wa.me/+971502923136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
-          <i class="bi bi-whatsapp"></i>
-      </a>
-      
-      <!-- Back to Top Button -->
-      <a href="#" class="floating-btn back-to-top">
-          <i class="bi bi-arrow-up"></i>
-      </a>
-  </div>
 
 <!-- Footer (same as home page) -->
 <?php

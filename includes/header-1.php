@@ -29,7 +29,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="index.php">Home</a>
                 </li>
-
+                
                 <!-- About -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -111,15 +111,38 @@
                     </li>
                     </ul>
                 </li>
-
-                <!-- Ratios -->
-                <li class="nav-item">
-                    <a class="nav-link" href="ratios.php">Ratios</a>
-                </li>
                 
-                <!-- Blog -->
-                <li class="nav-item">
-                    <a class="nav-link" href="blog.php">Blog</a>
+                <!-- Well of Love -->
+                <li class="nav-item position-relative">
+                    <a class="nav-link well-of-love-link position-relative" href="our-well-of-love.php">
+                        <span class="well-of-love-text">Well Of Love</span>
+                        <span class="love-stars">
+                            <i class="bi bi-star-fill love-star star-1"></i>
+                            <i class="bi bi-star-fill love-star star-2"></i>
+                            <i class="bi bi-heart-fill love-heart"></i>
+                        </span>
+                        <span class="link-border"></span>
+                    </a>
+                </li>
+
+                <!-- Plan your Business -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Business Planning
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item" href="check-business-health.php">Check your Company Health</a>
+                        </li>
+
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item" href="uae-business-setup-cost-calculator.php">UAE Business Setup Cost Calculator</a>
+                        </li>
+
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item" href="about.php">Explore Our Service</a>
+                        </li>
+                    </ul>
                 </li>
 
                 <!-- Contact -->
@@ -127,9 +150,35 @@
                     <a class="nav-link" href="contact.php">Contact</a>
                 </li>
 
-            <!-- CTA -->
+                <?php
+                // Check for admin roles
+                $show_admin_link = false;
+                if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+                    $admin_roles = ['admin', 'super_admin', 'moderator'];
+                    $show_admin_link = in_array($_SESSION['user_role'], $admin_roles);
+                }
+
+                if ($show_admin_link): ?>
+                    <!-- Admin Dashboard -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin/dashboard.php" target="_blank">
+                            Admin
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Login / Sign up -->
                 <li class="nav-item">
-                    <a href="login.php" target="_blank" class="btn btn-ghost">Login</a>
+                    <?php
+                    
+                    if (isset($_SESSION['user_id'])) {
+                        // User is logged in - show Sign Out button
+                        echo '<a href="logout.php" class="btn btn-ghost">Sign Out</a>';
+                    } else {
+                        // User is not logged in - show Login button
+                        echo '<a href="login.php" target="_blank" class="btn btn-ghost">Login</a>';
+                    }
+                    ?>
                 </li>
                 </ul>
             </div>

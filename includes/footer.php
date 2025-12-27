@@ -1,7 +1,15 @@
-<!-- Back to Top Button -->
-<a href="#" class="back-to-top btn btn-primary rounded-circle">
-    <i class="bi bi-arrow-up"></i>
-</a>
+<!-- Floating Action Buttons -->
+<div class="floating-buttons">
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/+971509860136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+    
+    <!-- Back to Top Button -->
+    <a href="#" class="floating-btn back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+</div>
 
 <!-- Add to your HTML head section -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -38,17 +46,17 @@
 
       <!-- Social Media -->
       <div class="social-links mt-3">
-        <a href="https://facebook.com" target="_blank" aria-label="Facebook">
-          <i class="bi bi-facebook"></i>
-        </a>
-        <a href="https://twitter.com" target="_blank" aria-label="Twitter">
-          <i class="bi bi-twitter"></i>
-        </a>
-        <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn">
+        <a href="https://www.linkedin.com/company/o-g-m-holding-co-ltd/" target="_blank" aria-label="LinkedIn">
           <i class="bi bi-linkedin"></i>
         </a>
-        <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+        <a href="https://www.facebook.com/share/16iF6LSSwc/?mibextid=wwXIfr" target="_blank" aria-label="Facebook">
+          <i class="bi bi-facebook"></i>
+        </a>
+         <a href="https://www.instagram.com/ogmconsultants_?igsh=cDd2NDExbWp3eQ==" target="_blank" aria-label="Instagram">
           <i class="bi bi-instagram"></i>
+        </a>
+        <a href="#" target="_blank" aria-label="Twitter">
+          <i class="bi bi-twitter"></i>
         </a>
       </div>
     </div>
