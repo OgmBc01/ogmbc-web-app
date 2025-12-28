@@ -174,7 +174,7 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: -150px;/* you had margin-left hack earlier; keep layout natural unless needed */
+    margin-left: -150px;
   }
 
   .menu .navbar-nav {
@@ -260,7 +260,7 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
     top: 0;
     left: 0;
     width: 100%;
-    min-height: 100vh;                 /* expands as it grows */
+    min-height: 550px;                 /* expands as it grows */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
@@ -309,7 +309,7 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
   .menu .dropdown-menu {
     position: static;
     width: 100%;
-    background: transparent;
+    background: rgba(255, 242, 203, 0.05);
     border: none;
     box-shadow: none;
     padding-left: 0;
@@ -595,9 +595,22 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
 .hero {
   position: relative;
   overflow: hidden;
-  height: 100vh; /* full viewport height */
   width: 100%;   /* full width */
   padding: 0;
+}
+
+/* Responsive height: 100vh on large screens, auto on small screens */
+@media (min-width: 992px) { /* Large screens */
+  .hero {
+    height: 100vh;
+  }
+}
+
+@media (max-width: 991.98px) { /* Small/medium screens */
+  .hero {
+    height: auto;
+    min-height: 400px; /* Optional: set a minimum height for smaller screens */
+  }
 }
 
 .hero-bg-video {
@@ -625,7 +638,23 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
 .hero .carousel-item {
   position: relative;
   z-index: 2; /* content above video */
-  height: 100%; /* make carousel fill viewport */
+}
+
+/* Adjust carousel height based on screen size */
+@media (min-width: 992px) {
+  .hero .carousel,
+  .hero .carousel-inner,
+  .hero .carousel-item {
+    height: 100vh;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .hero .carousel,
+  .hero .carousel-inner,
+  .hero .carousel-item {
+    height: auto;
+  }
 }
 
 .hero .carousel-item > .container {
@@ -635,19 +664,29 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
   margin-top: -30px;
 }
 
-
-.hero .carousel-item > .container {
-  height: 100%; 
-  display: flex;
-  align-items: center; 
+/* Responsive adjustment for container height */
+@media (max-width: 991.98px) {
+  .hero .carousel-item > .container {
+    height: auto;
+    min-height: 400px; /* Match the hero min-height */
+    padding: 60px 0; /* Add vertical padding for better spacing */
+  }
 }
-
 
 .hero-inner {
   display: grid;
   gap: 2rem;
   grid-template-columns: 1.2fr 1fr;
   align-items: center;
+}
+
+/* Responsive adjustment for hero-inner layout */
+@media (max-width: 991.98px) {
+  .hero-inner {
+    grid-template-columns: 1fr; /* Stack content on smaller screens */
+    text-align: center;
+    gap: 1.5rem;
+  }
 }
 
 .hero h1 {

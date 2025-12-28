@@ -1,61 +1,27 @@
 <?php
 include 'includes/database.php';
 include 'includes/header.php';
-
-// Detect error type from URL parameter
-$error_type = isset($_GET['error']) ? $_GET['error'] : null;
 ?>
 
-<!-- Error Alert Container -->
-<?php if ($error_type): ?>
-<div id="errorAlert" class="alert alert-danger alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); max-width: 600px; z-index: 9999; margin: 0;">
-    <?php if ($error_type === 'session'): ?>
-        <strong>Session Expired!</strong> Your session has expired. Please <a href="login.php" class="alert-link">login again</a> to continue.
-    <?php elseif ($error_type === 'permission'): ?>
-        <strong>Access Denied!</strong> You do not have the required permissions to access the admin area. Please <a href="contact.php" class="alert-link">contact an administrator</a> for assistance.
-    <?php endif; ?>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-      const errorAlert = document.getElementById('errorAlert');
-      if (errorAlert) {
-          // Auto-dismiss after 4 seconds
-          setTimeout(function() {
-              const bsAlert = new bootstrap.Alert(errorAlert);
-              bsAlert.close();
-          }, 7000);
-      }
-  });
-</script>
-<?php endif; ?>
-
 <!-- Hero Section (Carousel) -->
-
   <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-  <!-- indicators (optional) -->
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-  </div>
 
   <div class="carousel-inner">
     <!-- Slide 1 -->
     <div class="carousel-item active" data-bs-interval="3000">
       <div class="container">
         <div class="row align-items-center gy-4">
-          <div class="col-lg-7 mb-5" style="margin-top: 5rem;">
+          <div class="col-lg-7 mb-5" style="margin-top: 3.5rem;">
             <span class="chip">Auditing • Accounting • Taxation • Advisory</span>
             <h1 class="hero-title">Empowering growth through strategic advisory and financial transparency</h1>
             <p class="text-light">We providing IFRS-based reporting and strategic advisory that empower informed decisions and strengthen stakeholder trust</p>
             <div class="d-flex gap-3 flex-wrap">
-              <a class="btn btn-primary" href="check-business-health.php">•	Check your Company’s Health</a>
+              <a class="btn btn-primary" href="check-business-health.php">Check your Company’s Health</a>
               <!-- <a class="btn btn-ghost" href="#services">Explore services</a> -->
             </div>
           </div>
           <div class="col-lg-5">
-            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white mx-3">
               <!-- Global presence row -->
               <div class="global-presence d-flex align-items-center justify-content-center py-2">
                 <span class="fw-bold" style="color:#d0aa4b; font-size:1.1rem;">Our global presence: UAE, UK, USA</span>
@@ -88,17 +54,16 @@ $error_type = isset($_GET['error']) ? $_GET['error'] : null;
     <div class="carousel-item" data-bs-interval="3000">
       <div class="container">
         <div class="row align-items-center gy-4">
-          <div class="col-lg-7 mb-5">
+          <div class="col-lg-7 mb-5"  style="margin-top: 3.5rem;">
             <span class="chip">Advisory & Compliance</span>
             <h1 class="hero-title">Strengthen governance & controls with OGMBC.</h1>
             <p class="text-light">Risk assessments, SOPs, internal audits, and tax compliance tailored to your sector.</p>
             <div class="d-flex gap-3 flex-wrap">
-              <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
-              <a class="btn btn-ghost" href="contact.php">Talk to an advisor</a>
+              <a class="btn btn-primary" href="check-business-health.php">Check your Company’s Health</a>
             </div>
           </div>
           <div class="col-lg-5">
-            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white mx-3">
               <!-- Global presence row -->
               <div class="global-presence d-flex align-items-center justify-content-center py-2">
                 <span class="fw-bold" style="color:#d0aa4b; font-size:1.1rem;">Our global presence: UAE, UK, USA</span>
@@ -130,17 +95,16 @@ $error_type = isset($_GET['error']) ? $_GET['error'] : null;
     <div class="carousel-item" data-bs-interval="3000">
       <div class="container">
         <div class="row align-items-center gy-4">
-          <div class="col-lg-7 mb-5">
+          <div class="col-lg-7 mb-5"  style="margin-top: 3.5rem;">
             <span class="chip">Global Business Formation</span>
             <h1 class="hero-title">Clear, compliant, and timely IFRS reporting.</h1>
             <p class="text-light">We make business setup simple, compliant, and stress-free so you can focus on growth.</p>
             <div class="d-flex gap-3 flex-wrap">
-              <a class="btn btn-primary" href="ratios.php">Ratio Calculator</a>
-              <a class="btn btn-ghost" href="ifrs.php">Get IFRS support</a>
+              <a class="btn btn-primary" href="check-business-health.php">Check your Company’s Health</a>
             </div>
           </div>
           <div class="col-lg-5">
-            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white">
+            <div class="contact-cta-inner d-flex flex-column gap-3 p-4 rounded-4 shadow-lg bg-blur text-white mx-3">
               <!-- Global presence row -->
               <div class="global-presence d-flex align-items-center justify-content-center py-2">
                 <span class="fw-bold" style="color:#d0aa4b; font-size:1.1rem;">Our global presence: UAE, UK, USA</span>
@@ -170,16 +134,16 @@ $error_type = isset($_GET['error']) ? $_GET['error'] : null;
     </div>
   </div>
 
-  <!-- Controls - Updated with higher z-index and wider positioning -->
-  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-  </div>
+    <!-- Controls - Updated with higher z-index and wider positioning -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+    </div>
   </section>
 
   <!-- Services -->

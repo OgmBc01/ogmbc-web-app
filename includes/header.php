@@ -1,6 +1,33 @@
 <?php
 session_start();
+
+// Detect error type from URL parameter
+$error_type = isset($_GET['error']) ? $_GET['error'] : null;
 ?>
+
+<!-- Error Alert Container -->
+<?php if ($error_type): ?>
+<div id="errorAlert" class="alert alert-danger alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); max-width: 600px; z-index: 9999; margin: 0;">
+    <?php if ($error_type === 'session'): ?>
+        <strong>Session Expired!</strong> Your session has expired. Please <a href="login.php" class="alert-link">login again</a> to continue.
+    <?php elseif ($error_type === 'permission'): ?>
+        <strong>Access Denied!</strong> You do not have the required permissions to access the admin area. Please <a href="contact.php" class="alert-link">contact an administrator</a> for assistance.
+    <?php endif; ?>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const errorAlert = document.getElementById('errorAlert');
+      if (errorAlert) {
+          // Auto-dismiss after 4 seconds
+          setTimeout(function() {
+              const bsAlert = new bootstrap.Alert(errorAlert);
+              bsAlert.close();
+          }, 7000);
+      }
+  });
+</script>
+<?php endif; ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -123,7 +150,6 @@ session_start();
   });
 
   </script>
-
 </head>
 
 <body>
