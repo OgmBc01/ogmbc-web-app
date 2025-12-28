@@ -516,24 +516,49 @@ include 'includes/header.php';
         </div>
         <!-- Right: Form -->
         <div class="col-lg-5 bg-cta-gold p-5 d-flex align-items-center">
-          <form action="send_mail.php" method="POST" class="w-100">
-            <div class="mb-3">
-                <input type="text" name="name" class="form-control cta-input" placeholder="Name" required>
-            </div>
-            <div class="mb-3">
-                <input type="email" name="email" class="form-control cta-input" placeholder="Email" required>
-            </div>
-            <div class="mb-3">
-                <input type="text" name="contact" class="form-control cta-input" placeholder="Contact" required>
-            </div>
-            <div class="mb-3">
-                <input type="text" name="subject" class="form-control cta-input" placeholder="Subject" required>
-            </div>
-            <div class="mb-3">
-                <textarea name="message" class="form-control cta-input" rows="3" placeholder="Message" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold" style="background:#091e3e;">Request A Quote</button>
-          </form>
+            <?php
+            // Call the function before displaying the form
+            handle_enquiry_form();
+            ?>
+            <form method="POST" class="w-100">
+                <div class="mb-3">
+                    <input type="text" name="name" class="form-control cta-input" placeholder="Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" name="email" class="form-control cta-input" placeholder="Email" required>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="contact" class="form-control cta-input" placeholder="Contact" required>
+                </div>
+                <div class="mb-3">
+                    <select name="service" class="form-control cta-input" required>
+                        <option value="" disabled selected>Choose service</option>
+                        <?php
+                        // Fetch all services from categories table
+                        $query = "SELECT cat_id, cat_title FROM categories ORDER BY cat_title ASC";
+                        $result = mysqli_query($connection, $query);
+                        
+                        if(mysqli_num_rows($result) > 0) {
+                            while($row = mysqli_fetch_assoc($result)) {
+                                echo '<option value="' . htmlspecialchars($row['cat_title']) . '">' 
+                                    . htmlspecialchars($row['cat_title']) . '</option>';
+                            }
+                        } else {
+                            echo '<option value="" disabled>No services available</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="sub_service" class="form-control cta-input" placeholder="Type sub service" required>
+                </div>
+                <div class="mb-3">
+                    <textarea name="message" class="form-control cta-input" rows="3" placeholder="Message" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold" style="background:#091e3e;">
+                    Request A Quote
+                </button>
+            </form>
         </div>
       </div>
     </div>
@@ -637,12 +662,58 @@ include 'includes/header.php';
     </div>
 </div>
 
+<!-- Success Modal -->
+<div class="modal fade" id="enquirySuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="modal-title mb-3">Thank You!</h4>
+                <p class="mb-4">Your enquiry has been submitted successfully. We'll contact you soon.</p>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="enquiryErrorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-exclamation-circle text-danger" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="modal-title mb-3">Oops!</h4>
+                <p class="mb-4 error-message"></p>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Try Again</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
 include 'includes/footer.php'
 ?>
 
-
 <script>
+// Add this script to show modals after form submission
+document.addEventListener('DOMContentLoaded', function() {
+    // Check URL for success parameter
+    if (window.location.search.includes('enquiry=success')) {
+        var successModal = new bootstrap.Modal(document.getElementById('enquirySuccessModal'));
+        successModal.show();
+    }
+    
+    // Check URL for error parameter
+    if (window.location.search.includes('enquiry=error')) {
+        var errorModal = new bootstrap.Modal(document.getElementById('enquiryErrorModal'));
+        errorModal.show();
+    }
+});
+
 class omniChat {
     constructor() {
         this.conversationHistory = [];
@@ -1230,3 +1301,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.omniChat = new omniChat();
 });
 </script>
+
