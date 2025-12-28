@@ -43,9 +43,27 @@ function sanitize_input($input) {
  * @param string $modalId Modal ID
  * @param string $message Message to display (optional)
  */
-function show_modal($modalId, $message = '') {
-    $_SESSION['modal_id'] = $modalId;
-    $_SESSION['modal_message'] = $message;
+
+// Alternative show_modal function (simpler)
+function show_modal($modal_id, $message = '') {
+    echo '<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var modalElement = document.getElementById("' . $modal_id . '");
+        if (modalElement) {
+            var modal = new bootstrap.Modal(modalElement);
+            ';
+            
+    if ($modal_id === 'enquiryErrorModal' && !empty($message)) {
+        echo 'var errorMessageElement = modalElement.querySelector(".error-message");
+              if (errorMessageElement) {
+                  errorMessageElement.textContent = "' . addslashes($message) . '";
+              }';
+    }
+    
+    echo 'modal.show();
+        }
+    });
+    </script>';
 }
 
 // Handle enquiry form
@@ -153,7 +171,7 @@ function handle_enquiry_form() {
 
                         <p style="color:#444;margin-top:20px;">If you need to update anything, simply reply to this email.</p>
 
-                        <p style="margin-top:30px;color:#222;font-weight:bold;">— Your Company Name Team</p>
+                        <p style="margin-top:30px;color:#222;font-weight:bold;">— OGMBC Team</p>
                     </td></tr>
 
                     <tr><td style="text-align:center;padding-top:20px;">
@@ -204,7 +222,7 @@ function handle_enquiry_form() {
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port = 587;
 
-                $mail->setFrom('otaksiconnect@gmail.com', 'Your Company Name'); // Change this
+                $mail->setFrom('otaksiconnect@gmail.com', 'OGM Business Consultants'); // Change this
                 $mail->addAddress($email, $name);
 
                 $mail->isHTML(true);

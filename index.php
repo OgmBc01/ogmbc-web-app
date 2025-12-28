@@ -16,8 +16,8 @@ include 'includes/header.php';
             <h1 class="hero-title">Empowering growth through strategic advisory and financial transparency</h1>
             <p class="text-light">We providing IFRS-based reporting and strategic advisory that empower informed decisions and strengthen stakeholder trust</p>
             <div class="d-flex gap-3 flex-wrap">
-              <a class="btn btn-primary" href="check-business-health.php">Check your Company’s Health</a>
-              <!-- <a class="btn btn-ghost" href="#services">Explore services</a> -->
+              <a class="btn btn-primary" href="check-business-health.php">Check Your Company Health</a>
+              <a class="btn btn-ghost" href="uae-business-setup-cost-calculator.php">UAE Company Setup Calculator</a>
             </div>
           </div>
           <div class="col-lg-5">
@@ -59,7 +59,8 @@ include 'includes/header.php';
             <h1 class="hero-title">Strengthen governance & controls with OGMBC.</h1>
             <p class="text-light">Risk assessments, SOPs, internal audits, and tax compliance tailored to your sector.</p>
             <div class="d-flex gap-3 flex-wrap">
-              <a class="btn btn-primary" href="check-business-health.php">Check your Company’s Health</a>
+              <a class="btn btn-primary" href="check-business-health.php">Check Your Company Health</a>
+              <a class="btn btn-ghost" href="uae-business-setup-cost-calculator.php">UAE Company Setup Calculator</a>
             </div>
           </div>
           <div class="col-lg-5">
@@ -71,7 +72,7 @@ include 'includes/header.php';
               <div class="d-flex flex-column gap-3 contact-info">
                 <div class="info-box d-flex align-items-center gap-2">
                   <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                  <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
+                  <span><a href="tel:+971509860136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 986 0136</a></span>
                 </div>
                 <div class="info-box d-flex align-items-center gap-2">
                   <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
@@ -100,7 +101,8 @@ include 'includes/header.php';
             <h1 class="hero-title">Clear, compliant, and timely IFRS reporting.</h1>
             <p class="text-light">We make business setup simple, compliant, and stress-free so you can focus on growth.</p>
             <div class="d-flex gap-3 flex-wrap">
-              <a class="btn btn-primary" href="check-business-health.php">Check your Company’s Health</a>
+              <a class="btn btn-primary" href="check-business-health.php">Check Your Company Health</a>
+              <a class="btn btn-ghost" href="uae-business-setup-cost-calculator.php">UAE Company Setup Calculator</a>
             </div>
           </div>
           <div class="col-lg-5">
@@ -113,7 +115,7 @@ include 'includes/header.php';
               <div class="d-flex flex-column gap-3 contact-info">
                 <div class="info-box d-flex align-items-center gap-2">
                   <div class="icon-circle"><i class="bi bi-telephone-fill"></i></div>
-                  <span><a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a></span>
+                  <span><a href="tel:+971509860136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 986 0136</a></span>
                 </div>
                 <div class="info-box d-flex align-items-center gap-2">
                   <div class="icon-circle"><i class="bi bi-envelope-fill"></i></div>
@@ -482,12 +484,12 @@ include 'includes/header.php';
     }
   ?>
 
-  <!-- CTA Section -->
+  <!-- CTA / Enquiry Section -->
   <section class="cta-section py-5">
     <div class="container">
       <div class="row align-items-stretch g-0">
         <!-- Left: Info -->
-        <div class="col-lg-7 bg-white p-5 d-flex flex-column justify-content-center cta-info">
+        <div class="col-lg-7 p-5 d-flex flex-column justify-content-center cta-info">
           <h5 class="fw-bold mb-2" style="color:#d0aa4b;">REQUEST A QUOTE</h5>
           <h2 class="fw-bold mb-3" style="color:#091e3e;">Need A Free Quote? Please Feel Free to Contact Us</h2>
           <div class="cta-divider mb-4" style="height:4px; width:120px; background:#d0aa4b; border-radius:2px;"></div>
@@ -662,58 +664,11 @@ include 'includes/header.php';
     </div>
 </div>
 
-<!-- Success Modal -->
-<div class="modal fade" id="enquirySuccessModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center p-5">
-                <div class="mb-4">
-                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
-                </div>
-                <h4 class="modal-title mb-3">Thank You!</h4>
-                <p class="mb-4">Your enquiry has been submitted successfully. We'll contact you soon.</p>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Error Modal -->
-<div class="modal fade" id="enquiryErrorModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center p-5">
-                <div class="mb-4">
-                    <i class="fas fa-exclamation-circle text-danger" style="font-size: 4rem;"></i>
-                </div>
-                <h4 class="modal-title mb-3">Oops!</h4>
-                <p class="mb-4 error-message"></p>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Try Again</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <?php
 include 'includes/footer.php'
 ?>
 
 <script>
-// Add this script to show modals after form submission
-document.addEventListener('DOMContentLoaded', function() {
-    // Check URL for success parameter
-    if (window.location.search.includes('enquiry=success')) {
-        var successModal = new bootstrap.Modal(document.getElementById('enquirySuccessModal'));
-        successModal.show();
-    }
-    
-    // Check URL for error parameter
-    if (window.location.search.includes('enquiry=error')) {
-        var errorModal = new bootstrap.Modal(document.getElementById('enquiryErrorModal'));
-        errorModal.show();
-    }
-});
-
 class omniChat {
     constructor() {
         this.conversationHistory = [];

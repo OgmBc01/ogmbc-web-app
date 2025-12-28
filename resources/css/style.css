@@ -62,7 +62,8 @@ img { max-width: 100%; display: block; }
 .btn-primary:hover { filter:brightness(1.05); transform:translateY(-1px); }
 .btn-secondary { background: #091e3e; color:#fff; box-shadow: var(--shadow); }
 .btn-secondary:hover { filter:brightness(1.05); transform:translateY(-1px); }
-.btn-ghost { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); color:var(--secondary); }
+.btn-ghost { background:rgba(255,255,255,.04); border:1px solid rgba(255, 255, 255, 0.614); color:var(--secondary); }
+.btn-ghost:hover { background:#091e3e; color:var(--secondary); transform:translateY(-1px); }
 
 .chip { 
   display:inline-flex; 
@@ -2099,7 +2100,7 @@ footer .brand { font-size:1.2rem; font-weight:700; }
   display: none;
 }
 
-        .cta-section {
+.cta-section {
   background: #fff;
 }
 
@@ -2110,8 +2111,11 @@ footer .brand { font-size:1.2rem; font-weight:700; }
 }
 
 .cta-info {
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
+  border: 1px solid rgba(9, 30, 62, 0.272); /* very light divider */
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  background: rgba(246, 236, 193, 0.5);
+  border-right: 1px solid rgba(9,30,62,0.06); /* very light divider */
 }
 
 .cta-input {

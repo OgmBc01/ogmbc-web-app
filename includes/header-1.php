@@ -1,4 +1,10 @@
 <?php
+require_once __DIR__ . '/../PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/../PHPMailer/src/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 session_start();
 
 // Detect error type from URL parameter
@@ -28,6 +34,10 @@ $error_type = isset($_GET['error']) ? $_GET['error'] : null;
   });
 </script>
 <?php endif; ?>
+
+<?php
+include 'functions.php'
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -168,10 +178,6 @@ $error_type = isset($_GET['error']) ? $_GET['error'] : null;
 
                         <li class="dropdown-submenu">
                             <a class="dropdown-item" href="uae-business-setup-cost-calculator.php">UAE Business Setup Cost Calculator</a>
-                        </li>
-
-                        <li class="dropdown-submenu">
-                            <a class="dropdown-item" href="about.php">Explore Our Service</a>
                         </li>
                     </ul>
                 </li>

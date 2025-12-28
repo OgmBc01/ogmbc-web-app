@@ -305,10 +305,6 @@ include 'functions.php'
                   <li class="dropdown-submenu">
                       <a class="dropdown-item" href="uae-business-setup-cost-calculator.php">UAE Business Setup Cost Calculator</a>
                   </li>
-
-                  <li class="dropdown-submenu">
-                      <a class="dropdown-item" href="about.php">Explore Our Service</a>
-                  </li>
               </ul>
           </li>
 

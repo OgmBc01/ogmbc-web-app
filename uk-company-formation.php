@@ -170,11 +170,12 @@ include 'includes/header-1.php'
     </div>
   </section>
 
-  <!-- CTA Section -->
+  <!-- CTA / Enquiry Section -->
   <section class="cta-section py-5">
     <div class="container">
       <div class="row align-items-stretch g-0">
-        <div class="col-lg-7 bg-white p-5 d-flex flex-column justify-content-center cta-info">
+        <!-- Left: Info -->
+        <div class="col-lg-7 p-5 d-flex flex-column justify-content-center cta-info">
           <h5 class="fw-bold mb-2" style="color:#d0aa4b;">REQUEST A QUOTE</h5>
           <h2 class="fw-bold mb-3" style="color:#091e3e;">Need A Free Quote? Please Feel Free to Contact Us</h2>
           <div class="cta-divider mb-4" style="height:4px; width:120px; background:#d0aa4b; border-radius:2px;"></div>
@@ -197,37 +198,55 @@ include 'includes/header-1.php'
             </div>
             <div>
               <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
-              <span class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971502923136</span>
+              <a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a>
             </div>
           </div>
         </div>
+        <!-- Right: Form -->
         <div class="col-lg-5 bg-cta-gold p-5 d-flex align-items-center">
-          <form class="w-100">
-            <div class="mb-3">
-              <input type="text" class="form-control cta-input" placeholder="Your Name">
-            </div>
-            <div class="mb-3">
-              <input type="email" class="form-control cta-input" placeholder="Your Email">
-            </div>
-            <div class="mb-3">
-              <select class="form-select cta-input">
-                <option selected>Select A Service</option>
-                <option value="audit">Audit & Assurance</option>
-                <option value="reporting">Financial Reporting</option>
-                <option value="advisory">Advisory</option>
-                <option value="tax">Tax Consulting</option>
-                <option value="outsourcing">Outsourced Finance</option>
-                <option value="training">Training</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <input type="text" class="form-control cta-input" placeholder="Sub-Service">
-            </div>
-            <div class="mb-3">
-              <textarea class="form-control cta-input" rows="3" placeholder="Message"></textarea>
-            </div>
-            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Request A Quote</button>
-          </form>
+            <?php
+            // Call the function before displaying the form
+            handle_enquiry_form();
+            ?>
+            <form method="POST" class="w-100">
+                <div class="mb-3">
+                    <input type="text" name="name" class="form-control cta-input" placeholder="Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" name="email" class="form-control cta-input" placeholder="Email" required>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="contact" class="form-control cta-input" placeholder="Contact" required>
+                </div>
+                <div class="mb-3">
+                    <select name="service" class="form-control cta-input" required>
+                        <option value="" disabled selected>Choose service</option>
+                        <?php
+                        // Fetch all services from categories table
+                        $query = "SELECT cat_id, cat_title FROM categories ORDER BY cat_title ASC";
+                        $result = mysqli_query($connection, $query);
+                        
+                        if(mysqli_num_rows($result) > 0) {
+                            while($row = mysqli_fetch_assoc($result)) {
+                                echo '<option value="' . htmlspecialchars($row['cat_title']) . '">' 
+                                    . htmlspecialchars($row['cat_title']) . '</option>';
+                            }
+                        } else {
+                            echo '<option value="" disabled>No services available</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="sub_service" class="form-control cta-input" placeholder="Type sub service" required>
+                </div>
+                <div class="mb-3">
+                    <textarea name="message" class="form-control cta-input" rows="3" placeholder="Message" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold" style="background:#091e3e;">
+                    Request A Quote
+                </button>
+            </form>
         </div>
       </div>
     </div>
