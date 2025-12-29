@@ -17,7 +17,7 @@ include 'includes/header.php';
             <p class="text-light">We providing IFRS-based reporting and strategic advisory that empower informed decisions and strengthen stakeholder trust</p>
             <div class="d-flex gap-3 flex-wrap">
               <a class="btn btn-primary" href="check-business-health.php">Check Your Company Health</a>
-              <a class="btn btn-ghost" href="uae-business-setup-cost-calculator.php">UAE Company Setup Calculator</a>
+              <a class="btn btn-secondary" href="uae-business-setup-cost-calculator.php">UAE Company Setup Cost Calculator</a>
             </div>
           </div>
           <div class="col-lg-5">
@@ -60,7 +60,7 @@ include 'includes/header.php';
             <p class="text-light">Risk assessments, SOPs, internal audits, and tax compliance tailored to your sector.</p>
             <div class="d-flex gap-3 flex-wrap">
               <a class="btn btn-primary" href="check-business-health.php">Check Your Company Health</a>
-              <a class="btn btn-ghost" href="uae-business-setup-cost-calculator.php">UAE Company Setup Calculator</a>
+              <a class="btn btn-secondary" href="uae-business-setup-cost-calculator.php">UAE Company Setup Cost Calculator</a>
             </div>
           </div>
           <div class="col-lg-5">
@@ -102,7 +102,7 @@ include 'includes/header.php';
             <p class="text-light">We make business setup simple, compliant, and stress-free so you can focus on growth.</p>
             <div class="d-flex gap-3 flex-wrap">
               <a class="btn btn-primary" href="check-business-health.php">Check Your Company Health</a>
-              <a class="btn btn-ghost" href="uae-business-setup-cost-calculator.php">UAE Company Setup Calculator</a>
+              <a class="btn btn-secondary" href="uae-business-setup-cost-calculator.php">UAE Company Setup Cost Calculator</a>
             </div>
           </div>
           <div class="col-lg-5">
@@ -1088,6 +1088,55 @@ class omniChat {
             const marginX = 18;
             let cursorY = 20;
 
+            // Load logo for watermark
+            let logoImg = null;
+            try {
+                logoImg = new Image();
+                logoImg.crossOrigin = "Anonymous";
+                logoImg.src = "resources/img/logo.png";
+                
+                await new Promise((resolve, reject) => {
+                    logoImg.onload = resolve;
+                    logoImg.onerror = () => reject(new Error("Failed to load logo"));
+                });
+            } catch (e) {
+                console.warn("Could not load logo for watermark:", e);
+                logoImg = null;
+            }
+
+            /**
+             * Add watermark logo to the current page
+             * Converts logo to semi-transparent canvas image for watermark effect
+             */
+            const addWatermark = () => {
+                if (!logoImg) return;
+                
+                try {
+                    const watermarkHeight = 160; // 4x larger for better visibility
+                    const aspectRatio = logoImg.naturalWidth / logoImg.naturalHeight;
+                    const watermarkWidth = watermarkHeight * aspectRatio;
+                    
+                    // Center watermark on page
+                    const watermarkX = (pageWidth - watermarkWidth) / 2;
+                    const watermarkY = (pageHeight - watermarkHeight) / 2;
+                    
+                    // Create canvas with semi-transparent image
+                    const canvas = document.createElement('canvas');
+                    canvas.width = logoImg.naturalWidth;
+                    canvas.height = logoImg.naturalHeight;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.globalAlpha = 0.15; // 15% opacity for better watermark visibility
+                    ctx.drawImage(logoImg, 0, 0);
+                    
+                    // Convert canvas to image data and add to PDF
+                    const watermarkImageData = canvas.toDataURL('image/png');
+                    pdf.addImage(watermarkImageData, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                } catch (e) {
+                    console.warn("Could not add watermark:", e);
+                }
+            };
+
             /* -------------------------------------------------------
               UTILITIES
             ------------------------------------------------------- */
@@ -1095,6 +1144,7 @@ class omniChat {
             const addPageIfNeeded = (extraSpace = 10) => {
                 if (cursorY + extraSpace > pageHeight - 20) {
                     pdf.addPage();
+                    addWatermark(); // Add watermark to new page
                     cursorY = 20;
                 }
             };
@@ -1107,41 +1157,70 @@ class omniChat {
                 cursorY += 8;
             };
 
-            /* -------------------------------------------------------
-              HEADER
-            ------------------------------------------------------- */
 
-            // Skip SVG if not available, use text logo instead
-            pdf.setFont("helvetica", "bold");
-            pdf.setFontSize(18);
-            pdf.setTextColor(15, 35, 70);
-            pdf.text("OmniOGM Assistant", pageWidth / 2, cursorY, { align: "center" });
+/* -------------------------------------------------------
+  HEADER
+------------------------------------------------------- */
 
-            cursorY += 20;
+// Add company logo centered at top with correct aspect ratio
+try {
+    const logoImg = new Image();
+    logoImg.crossOrigin = "Anonymous";
+    logoImg.src = "resources/img/logo.png";
+    
+    // Load image synchronously by waiting for it
+    await new Promise((resolve, reject) => {
+        logoImg.onload = resolve;
+        logoImg.onerror = () => reject(new Error("Failed to load logo"));
+    });
+    
+    // Calculate proportional dimensions based on actual image
+    const targetHeight = 15; // Fixed height for consistent layout
+    const aspectRatio = logoImg.naturalWidth / logoImg.naturalHeight;
+    const logoWidth = targetHeight * aspectRatio; // Maintain aspect ratio
+    const logoX = (pageWidth - logoWidth) / 2;
+    
+    pdf.addImage(logoImg, 'PNG', logoX, cursorY, logoWidth, targetHeight);
+    cursorY += targetHeight + 8; // Add space after logo
+} catch (e) {
+    console.warn("Could not load logo, using text header:", e);
+    // Continue with text-only header if logo fails
+}
 
-            pdf.setFontSize(11);
-            pdf.setFont("helvetica", "normal");
-            pdf.setTextColor(90);
-            pdf.text(
-                "OGM Business Consultants – Conversation History",
-                pageWidth / 2,
-                cursorY,
-                { align: "center" }
-            );
+// Header text
+pdf.setFont("helvetica", "bold");
+pdf.setFontSize(18);
+pdf.setTextColor(15, 35, 70);
+pdf.text("OmniOGM Assistant", pageWidth / 2, cursorY, { align: "center" });
 
-            cursorY += 8;
+cursorY += 8;
 
-            pdf.setFontSize(9);
-            pdf.setTextColor(130);
-            pdf.text(
-                `Downloaded on: ${new Date().toLocaleString()}`,
-                pageWidth / 2,
-                cursorY,
-                { align: "center" }
-            );
+pdf.setFontSize(11);
+pdf.setFont("helvetica", "normal");
+pdf.setTextColor(90);
+pdf.text(
+    "OGM Business Consultants – Conversation History",
+    pageWidth / 2,
+    cursorY,
+    { align: "center" }
+);
 
-            cursorY += 10;
-            drawDivider();
+cursorY += 8;
+
+// Add watermark to first page
+addWatermark();
+
+pdf.setFontSize(9);
+pdf.setTextColor(130);
+pdf.text(
+    `Downloaded on: ${new Date().toLocaleString()}`,
+    pageWidth / 2,
+    cursorY,
+    { align: "center" }
+);
+
+cursorY += 10;
+drawDivider();
 
             /* -------------------------------------------------------
               CHAT CONTENT
