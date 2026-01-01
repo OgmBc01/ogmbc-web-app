@@ -45,6 +45,7 @@
 
 <!-- Add to your HTML head section -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script type="text/javascript">document.addEventListener("DOMContentLoaded", function () {iFrameResize({log: false, checkOrigin: false}, "#wall-of-love-Zsr4bXU");});</script>
 
 <footer id="contact">
   <div class="container footer-grid lead">

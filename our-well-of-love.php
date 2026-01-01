@@ -7,7 +7,7 @@ include 'includes/header-1.php'
 <section class="about-hero d-flex align-items-center text-center text-white">
   <div class="container">
     <h1 class="display-4 fw-bold">Our Well of Love</h1>
-    <p class="lead">Page under construction, check back soon.</p>
+    <p class="lead"></p>
 
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
@@ -16,6 +16,13 @@ include 'includes/header-1.php'
         <li class="breadcrumb-item active text-white" aria-current="page">Well of Love</li>
       </ol>
     </nav>
+  </div>
+</section>
+
+<!-- Our Well of Love -->
+<section id="services" class="section">
+  <div class="container">
+    <iframe id="wall-of-love-Zsr4bXU" src="https://senja.io/p/ogm-business-consultants/Zsr4bXU?hideNavigation=true&embed=true" title="Wall of Love" frameborder="0" scrolling="no" height= "1300" width="100%"></iframe>
   </div>
 </section>
 

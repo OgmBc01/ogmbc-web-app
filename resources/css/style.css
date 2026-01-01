@@ -3602,6 +3602,7 @@ footer .brand { font-size:1.2rem; font-weight:700; }
 }
 
 .omni-download-btn, .omni-cancel-btn {
+    color: #d0aa4b;
     padding: 8px 16px;
     border-radius: 6px;
     font-size: 14px;

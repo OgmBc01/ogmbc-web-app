@@ -151,7 +151,7 @@ include 'includes/header.php';
   <!-- Services -->
   <section id="services" class="section">
     <div class="container">
-      <h2>Services</h2>
+      <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">Services</span></h2>
       <div class="d-flex justify-content-center">
         <p class="lead text-center">
           Whether it’s auditing, accounting, taxation, company setup, or strategic advisory, we customize our approach to fit your business vision, governance needs, and growth plans.
@@ -248,7 +248,7 @@ include 'includes/header.php';
   <!-- Why Choose US -->
   <section class="why-choose-us py-5" style="background:#fff;">
     <div class="container text-center">
-      <h2 class="mb-4" style="color:#d0aa4b;">Why Choose Us</h2>
+      <h2 class="fw-bold text-dark">Why <span style="color:#d0aa4b;">Choose Us</span></h2>
       <p class="lead mb-5">
         We are committed to making a positive impact on our clients' businesses and helping them 
         navigate the complexities of today's business environment with confidence and success.
@@ -336,64 +336,13 @@ include 'includes/header.php';
     </div>
   </section>
 
-  <!-- Testimonials 
-  <section class="section testimonials-section" style="padding: 0;">
-    <div class="testimonials-bg">
-      <div class="container py-5">
-        <h2 class="mb-5" style="color: #091e3e; font-weight: 700;">What Clients Say</h2>
-        <div class="row g-4 justify-content-center">
-          <!-- Testimonial 1 
-          <div class="col-md-4">
-            <div class="testimonial-card">
-              <div class="testimonial-quote">
-                <i class="bi bi-quote" style="font-size:4rem; color:#d0aa4b;"></i>
-              </div>
-              <p class="testimonial-text">
-                OGBC’s team delivered clear, actionable audit insights that helped us streamline our processes.
-              </p>
-              <div class="testimonial-avatar mx-auto mb-3">
-                <img src="assets/img/testimonial1.jpg" alt="Client 1" />
-              </div>
-              <div class="testimonial-author fw-bold">Sasha Grey</div>
-              <div class="testimonial-role">Business Owner</div>
-            </div>
-          </div>
-          <!-- Testimonial 2 
-          <div class="col-md-4">
-            <div class="testimonial-card">
-              <div class="testimonial-quote">
-                <i class="bi bi-quote" style="font-size:4rem; color:#d0aa4b;"></i>
-              </div>
-              <p class="testimonial-text">
-                Their financial reporting expertise gave us confidence in our numbers and compliance.
-              </p>
-              <div class="testimonial-avatar mx-auto mb-3">
-                <img src="assets/img/testimonial2.jpg" alt="Client 2" />
-              </div>
-              <div class="testimonial-author fw-bold">Nat Reynolds</div>
-              <div class="testimonial-role">Chief Accountant</div>
-            </div>
-          </div>
-          <!-- Testimonial 3 
-          <div class="col-md-4">
-            <div class="testimonial-card">
-              <div class="testimonial-quote">
-                <i class="bi bi-quote" style="font-size:4rem; color:#d0aa4b;"></i>
-              </div>
-              <p class="testimonial-text">
-                OGBC’s advisory and training helped our team grow and adapt to new standards.
-              </p>
-              <div class="testimonial-avatar mx-auto mb-3">
-                <img src="assets/img/testimonial3.jpg" alt="Client 3" />
-              </div>
-              <div class="testimonial-author fw-bold">Bob Roberts</div>
-              <div class="testimonial-role">Sales Manager</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Our Weel of Love -->
+  <section class="why-choose-us py-5" style="background:#fff;">
+    <div class="container text-center">
+      <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">Well of Love</span></h2>
+      <div class="senja-embed" data-id="a95d7d19-660c-4783-9a80-61b67e8d3b43" data-mode="shadow" data-lazyload="false" style="display: block; width: 100%;"></div> 
     </div>
-  </section -->
+  </section>
 
   <!-- Blog Section Posts Fetching Query -->
   <?php
@@ -412,7 +361,7 @@ include 'includes/header.php';
     <div class="container">
       <!-- Heading -->
       <div class="text-center mb-5">
-        <h2 class="section-title">Latest Insights</h2>
+        <h2 class="fw-bold text-dark">Latest <span style="color:#d0aa4b;">Insights</span></h2>
         <div class="d-flex justify-content-center">
           <p class="lead text-center">
             Stay updated with expert commentary on audits, IFRS, taxation, and governance trends.
