@@ -7,7 +7,7 @@ include 'includes/header-1.php'
 <section class="about-hero d-flex align-items-center text-center text-white">
   <div class="container">
     <h1 class="display-4 fw-bold">Our Well of Love</h1>
-    <p class="lead"></p>
+    <p class="lead">See what our customers are saying about us.</p>
 
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
@@ -22,11 +22,17 @@ include 'includes/header-1.php'
 <!-- Our Well of Love -->
 <section id="services" class="section">
   <div class="container">
-    <iframe id="wall-of-love-Zsr4bXU" src="https://senja.io/p/ogm-business-consultants/Zsr4bXU?hideNavigation=true&embed=true" title="Wall of Love" frameborder="0" scrolling="no" height= "1300" width="100%"></iframe>
+    <div class="responsive-iframe-wrapper">
+      <iframe id="wall-of-love-Zsr4bXU" 
+              src="https://senja.io/p/ogm-business-consultants/Zsr4bXU?hideNavigation=true&embed=true" 
+              title="Wall of Love" 
+              frameborder="0"
+              scrolling="yes">
+      </iframe>
+    </div>
   </div>
 </section>
 
-<!-- Footer (same as home page) -->
 <?php
 include 'includes/footer.php'
 ?>

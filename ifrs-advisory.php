@@ -47,7 +47,7 @@ include 'includes/header-1.php'
       <div class="text-center mb-5">
         <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">IFRS Advisory Services</span> Include</h2>
         <p class="lead">
-          At OGMBC Consultants, we provide end-to-end IFRS advisory services tailored to your business needs. 
+          At OGM Consultants, we provide end-to-end IFRS advisory services tailored to your business needs. 
           From implementation and training to compliance reviews and advisory support, our team ensures accuracy, 
           transparency, and global compliance in your financial reporting.
         </p>
@@ -234,7 +234,7 @@ include 'includes/header-1.php'
             </div>
             <div>
               <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
-              <a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a>
+              <a href="tel:+971509860136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a>
             </div>
           </div>
         </div>

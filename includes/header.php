@@ -284,7 +284,7 @@ include 'functions.php'
           <!-- Well of Love -->
           <li class="nav-item position-relative">
               <a class="nav-link well-of-love-link position-relative" href="our-well-of-love.php">
-                  <span class="well-of-love-text">Well Of Love</span>
+                  <span class="well-of-love-text">Our Well Of Love</span>
                   <span class="love-stars">
                       <i class="bi bi-star-fill love-star star-1"></i>
                       <i class="bi bi-star-fill love-star star-2"></i>

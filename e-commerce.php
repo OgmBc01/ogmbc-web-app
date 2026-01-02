@@ -139,7 +139,7 @@ include 'includes/header-1.php'
             </div>
             <div>
               <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
-              <a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a>
+              <a href="tel:+971509860136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 986 0136</a>
             </div>
           </div>
         </div>

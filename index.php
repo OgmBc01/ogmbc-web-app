@@ -299,6 +299,70 @@ include 'includes/header.php';
     </div>
   </section>
 
+  <!-- Our Approved Partners -->
+  <section class="cta-section py-5">
+    <div class="container text-center mb-5">
+      <h2 class="fw-bold">Our Trusted<span style="color:#d0aa4b;"> Partners</span></h2>
+      <p class="lead">Officially partnered with UAE's premier business authorities and global technology leaders to serve you better.</p>
+    </div>
+    
+    <div class="partners-slider-container">
+      <div class="partners-slider-track">
+        <!-- First set of logos -->
+        <div class="partner-logo">
+          <img src="resources/img/partners/dmcc.png" alt="DMCC" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/dwtc.jpg" alt="DWTC" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/fta.png" alt="FTA" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/ifza.png" alt="IFZA" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/jafza.png" alt="JAFZA" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/rakez.png" alt="RAKEZ" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/shams.png" alt="SHAMS" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/zoho.png" alt="ZOHO" class="img-fluid">
+        </div>
+        
+        <!-- Duplicate set for seamless loop -->
+        <div class="partner-logo">
+          <img src="resources/img/partners/dmcc.png" alt="DMCC" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/dwtc.jpg" alt="DWTC" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/fta.png" alt="FTA" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/ifza.png" alt="IFZA" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/jafza.png" alt="JAFZA" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/rakez.png" alt="RAKEZ" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/shams.png" alt="SHAMS" class="img-fluid">
+        </div>
+        <div class="partner-logo">
+          <img src="resources/img/partners/zoho.png" alt="ZOHO" class="img-fluid">
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Stats -->
   <section id="stats" class="section stats-modern">
     <div class="container">
@@ -340,6 +404,7 @@ include 'includes/header.php';
   <section class="why-choose-us py-5" style="background:#fff;">
     <div class="container text-center">
       <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">Well of Love</span></h2>
+      <p class="lead mb-5">See what our clients are saying about us.</p>
       <div class="senja-embed" data-id="a95d7d19-660c-4783-9a80-61b67e8d3b43" data-mode="shadow" data-lazyload="false" style="display: block; width: 100%;"></div> 
     </div>
   </section>
@@ -357,6 +422,7 @@ include 'includes/header.php';
     $result = $connection->query($sql);
   ?>
 
+<!-- Blog Section Posts Display -->
   <section id="blog" class="section blog-section bg-light">
     <div class="container">
       <!-- Heading -->
@@ -461,7 +527,7 @@ include 'includes/header.php';
             </div>
             <div>
               <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
-              <a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a>
+              <a href="tel:+971509860136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 986 0136</a>
             </div>
           </div>
         </div>

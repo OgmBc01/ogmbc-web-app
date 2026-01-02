@@ -45,7 +45,7 @@ include 'includes/header-1.php'
       <div class="text-center mb-5">
         <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">Audit Services</span></h2>
         <p class="lead">
-          At OGMBC Consultants, we provide a comprehensive suite of audit services to ensure transparency, 
+          At OGMB, we provide a comprehensive suite of audit services to ensure transparency, 
           compliance, and operational excellence across your organization.
         </p>
       </div>
@@ -194,7 +194,7 @@ include 'includes/header-1.php'
             </div>
             <div>
               <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
-              <a href="tel:+971502923136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a>
+              <a href="tel:+971509860136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 292 3136</a>
             </div>
           </div>
         </div>

@@ -1,14 +1,14 @@
 <!-- Floating Action Buttons -->
 <div class="floating-buttons">
-    <!-- WhatsApp Button -->
-    <a href="https://wa.me/+971509860136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
-        <i class="bi bi-whatsapp"></i>
-    </a>
-    
-    <!-- Back to Top Button -->
-    <a href="#" class="floating-btn back-to-top">
-        <i class="bi bi-arrow-up"></i>
-    </a>
+  <!-- WhatsApp Button -->
+  <a href="https://wa.me/+971509860136" class="floating-btn whatsapp-btn" target="_blank" rel="noopener">
+      <i class="bi bi-whatsapp"></i>
+  </a>
+  
+  <!-- Back to Top Button -->
+  <a href="#" class="floating-btn back-to-top">
+      <i class="bi bi-arrow-up"></i>
+  </a>
 </div>
 
 <!-- Success Modal -->
@@ -74,12 +74,12 @@
     <div>
       <h4>Contact</h4>
       <p>Email: info@ogmbc.ae</p>
-      <p>Phone: +971 50 292 3136</p>
+      <p>Phone: +971 50 986 0136</p>
       <p>Address: Office No. A07, 18th Floor, The Regal Tower, Business Bay, Dubai UAE. P.O. Box 33418</p>
 
       <!-- Social Media -->
       <div class="social-links mt-3">
-        <a href="https://www.linkedin.com/company/o-g-m-holding-co-ltd/" target="_blank" aria-label="LinkedIn">
+        <a href="https://www.linkedin.com/company/o-g-m-holding-co-ltd/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
           <i class="bi bi-linkedin"></i>
         </a>
         <a href="https://www.facebook.com/share/16iF6LSSwc/?mibextid=wwXIfr" target="_blank" aria-label="Facebook">
@@ -88,16 +88,21 @@
          <a href="https://www.instagram.com/ogmconsultants_?igsh=cDd2NDExbWp3eQ==" target="_blank" aria-label="Instagram">
           <i class="bi bi-instagram"></i>
         </a>
-        <a href="#" target="_blank" aria-label="Twitter">
+        <a href="https://x.com/odaitom22?s=21&t=DMEeU0ZBpS17Xh58lIagFA" target="_blank" aria-label="Twitter">
           <i class="bi bi-twitter"></i>
         </a>
       </div>
     </div>
   </div>
 
-  <p style="text-align:center; margin-top:2rem; color:var(--muted); font-size:.85rem;">
-    © 2025 OGMBC Consultants. All rights reserved.
-  </p>
+<p style="text-align:center; margin-top:2rem; color:var(--muted); font-size:.85rem;">
+    © <span id="current-year">2025</span> OGMBC Consultants. All rights reserved.
+</p>
+
+<script>
+  // Automatically update the year
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+</script>
 </footer>
 
 <!-- Bootstrap icons CDN -->

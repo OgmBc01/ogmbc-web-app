@@ -44,29 +44,33 @@ include 'includes/header-1.php'
 
                         <!-- Category Tabs -->
                         <div class="ratio-category-tabs mb-4">
-                            <div class="nav nav-pills nav-pills-category" id="categoryTabs" role="tablist">
-                                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#liquidity">
-                                    <i class="bi bi-cash-stack me-2"></i>Liquidity
-                                </button>
-                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#solvency">
-                                    <i class="bi bi-graph-up-arrow me-2"></i>Solvency & Leverage
-                                </button>
-                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#profitability">
-                                    <i class="bi bi-currency-dollar me-2"></i>Profitability
-                                </button>
-                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#efficiency">
-                                    <i class="bi bi-speedometer2 me-2"></i>Efficiency
-                                </button>
-                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#cashflow">
-                                    <i class="bi bi-arrow-repeat me-2"></i>Cash Flow
-                                </button>
-                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#cost">
-                                    <i class="bi bi-pie-chart me-2"></i>Cost Structure
-                                </button>
-                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#customer">
-                                    <i class="bi bi-people me-2"></i>Customer & Sales
-                                </button>
-                            </div>
+                          <div class="nav nav-pills nav-pills-category" id="categoryTabs" role="tablist">
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#liquidity">
+                                <i class="bi bi-cash-stack me-2"></i>Liquidity
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#solvency">
+                                <i class="bi bi-graph-up-arrow me-2"></i>Solvency & Leverage
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#profitability">
+                                <i class="bi bi-currency-dollar me-2"></i>Profitability
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#efficiency">
+                                <i class="bi bi-speedometer2 me-2"></i>Efficiency
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#cashflow">
+                                <i class="bi bi-arrow-repeat me-2"></i>Cash Flow
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#cost">
+                                <i class="bi bi-pie-chart me-2"></i>Cost Structure
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#customer">
+                                <i class="bi bi-people me-2"></i>Customer & Sales
+                            </button>
+                          </div>
+                        </div>
+                        <!-- Add this right after the category tabs div -->
+                        <div class="mobile-scroll-hint d-block d-md-none text-center mb-5" style="font-size: 0.75rem; color: var(--muted); margin-top: -20px;">
+                            <i class="bi bi-arrow-left-right me-1"></i> Scroll horizontally to view more categories
                         </div>
 
                         <!-- Tab Content -->
@@ -146,8 +150,8 @@ include 'includes/header-1.php'
 
                 <hr class="border-light">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="mb-0"><i class="bi bi-save me-2"></i>Saved Results</h6>
-                    <div><a id="clearSaved" class="btn btn-sm btn-secondary">Clear All Saved</a></div>
+                  <h6 class="mb-0"><i class="bi bi-save me-2"></i>Saved Results</h6>
+                  <div><a id="clearSaved" class="btn btn-sm btn-secondary clear-saved-btn">Clear All Saved</a></div>
                 </div>
                 <div id="savedArea" class="mb-3"><div class="small-muted">No saved results yet.</div></div>
             </div>
