@@ -24,7 +24,7 @@ include 'includes/header-1.php'
       <p class="lead">OGM Business Consultants provides a complimentary ratio analysis snapshot that highlights key strengths, 
           red flags, and trend indicators using standard financial ratios across 7 comprehensive categories.
         </p>
-        <div class="card card-app shadow-sm">
+        <div class="card card-app-1 shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="mb-0">Financial Ratio Calculator</h3>
@@ -137,10 +137,12 @@ include 'includes/header-1.php'
                             <div id="inputsContainer" class="inputs-container"></div>
 
                             <div class="mt-3 d-flex justify-content-between align-items-center">
-                                <button id="backToStep1" type="button" class="btn btn-secondary">← Back to Ratio Selection</button>
+                                <button id="backToStep1" type="button" class="btn btn-secondary btn-sm">
+                                    <i class="bi bi-arrow-left me-1"></i>Back to Selection
+                                </button>
                                 <div>
-                                    <button id="calcBtn" type="button" class="btn btn-gold btn-lg" style="background:var(--gold); color:var(--primary);">
-                                        <i class="bi bi-calculator me-2"></i>Calculate Ratios
+                                    <button id="calcBtn" type="button" class="btn btn-gold btn-primary btn-sm">
+                                        <i class="bi bi-calculator me-1"></i>Calculate Ratios
                                     </button>
                                 </div>
                             </div>

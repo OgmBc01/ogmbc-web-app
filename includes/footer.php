@@ -128,7 +128,7 @@
           <i class="bi bi-clock me-1"></i>
           Business Hours: Sun-Thu 9:00 AM - 6:00 PM
         </p>
-        <a href="https://goo.gl/maps/6pYKmYCdYQL7FumYA" target="_blank" class="btn btn-sm btn-outline-light mt-2">
+        <a href="" target="_blank" class="btn btn-sm btn-outline-light mt-2">
           <i class="bi bi-arrow-up-right-square me-1"></i>Open in Google Maps
         </a>
       </div>
