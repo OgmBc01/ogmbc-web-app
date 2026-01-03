@@ -3,7 +3,7 @@
    Version: 2.0
    Author: OGM Business Consultants
    Description: Comprehensive financial ratio analysis tool
-   Usage: Include in ratio.php and initialize with initRatioCalculator()
+   Usage: Include in check-company-health.php and initialize with initRatioCalculator()
    =========================================== */
 
 // Ratio definitions and calculator logic

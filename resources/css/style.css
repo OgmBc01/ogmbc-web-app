@@ -385,8 +385,8 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Well of Love Link Styling */
-.well-of-love-link {
+/* Wall of Love Link Styling */
+.Wall-of-love-link {
     padding: 0.5rem 1.2rem !important;
     border-radius: 30px !important;
     overflow: hidden !important;
@@ -397,7 +397,7 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
     margin: 0 0.3rem !important;
 }
 
-.well-of-love-text {
+.Wall-of-love-text {
     color: var(--secondary) !important;
     font-weight: 600 !important;
     letter-spacing: 0.5px !important;
@@ -509,65 +509,65 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
 }
 
 /* Hover Effects */
-.well-of-love-link:hover {
+.Wall-of-love-link:hover {
     background: linear-gradient(135deg, rgba(208, 170, 75, 0.15) 0%, rgba(208, 170, 75, 0.08) 100%) !important;
     border-color: rgba(208, 170, 75, 0.4) !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 5px 15px rgba(208, 170, 75, 0.2) !important;
 }
 
-.well-of-love-link:hover .link-border {
+.Wall-of-love-link:hover .link-border {
     opacity: 1 !important;
     animation-play-state: running !important;
 }
 
-.well-of-love-link:hover .love-star {
+.Wall-of-love-link:hover .love-star {
     opacity: 1 !important;
 }
 
-.well-of-love-link:hover .love-heart {
+.Wall-of-love-link:hover .love-heart {
     animation-duration: 1s !important;
 }
 
-.well-of-love-link:hover .well-of-love-text {
+.Wall-of-love-link:hover .Wall-of-love-text {
     color: #ff6b9d !important;
     text-shadow: 0 0 10px rgba(255, 107, 157, 0.3) !important;
 }
 
 /* Active/Current Page State */
-.well-of-love-link.active {
+.Wall-of-love-link.active {
     background: linear-gradient(135deg, var(--secondary) 0%, #e6b050 100%) !important;
     border-color: var(--secondary) !important;
 }
 
-.well-of-love-link.active .well-of-love-text {
+.Wall-of-love-link.active .Wall-of-love-text {
     color: white !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
 }
 
-.well-of-love-link.active .link-border {
+.Wall-of-love-link.active .link-border {
     opacity: 0.7 !important;
     animation-play-state: running !important;
     background: linear-gradient(90deg, white, #ffd1dc, white) border-box !important;
 }
 
-.well-of-love-link.active .love-star {
+.Wall-of-love-link.active .love-star {
     color: white !important;
     opacity: 1 !important;
 }
 
-.well-of-love-link.active .love-heart {
+.Wall-of-love-link.active .love-heart {
     color: #ffd1dc !important;
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-    .well-of-love-link {
+    .Wall-of-love-link {
         padding: 0.4rem 1rem !important;
         margin: 0.2rem 0 !important;
     }
     
-    .well-of-love-text {
+    .Wall-of-love-text {
         padding-right: 1.5rem !important;
         font-size: 0.9rem !important;
     }
@@ -935,7 +935,7 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
 }
 
 /* ================================
-   Well of love
+   Wall of love
    ================================ */
 .responsive-iframe-wrapper {
   width: 100%;
@@ -1757,10 +1757,94 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
    ================================ */
 footer { background: var(--surface); padding:3rem 1rem; margin-top:4rem; }
 footer .footer-grid { display:grid; gap:2rem; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); }
-footer h4 { color:var(--heading); margin-bottom:1rem; }
-footer p, footer a { color:var(--muted); font-size:.95rem; }
+footer h4 { color:var(--secondary); margin-bottom:1rem; }
+footer p, footer a { color: #ffffff; font-size:.95rem; }
 footer a:hover { color:var(--secondary); }
 footer .brand { font-size:1.2rem; font-weight:700; }
+
+.map-column .map-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.map-container iframe {
+  display: block;
+}
+
+.map-info {
+  color: #ccc;
+}
+
+.map-info .small {
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+
+.map-info .btn {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.75rem;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.map-info .btn:hover {
+  background: var(--gold);
+  color: #0b1224;
+  border-color: var(--gold);
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-links a {
+  color: #e0e0e0;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 0.2rem 0;
+}
+
+.footer-links a:hover {
+  color: var(--gold);
+  transform: translateX(5px);
+}
+
+.footer-bottom {
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .footer-column {
+    margin-bottom: 1rem;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+  
+  .map-container iframe {
+    height: 180px;
+  }
+}
 
 .social-links {
   margin-top: 1.5rem;
@@ -1784,6 +1868,12 @@ footer .brand { font-size:1.2rem; font-weight:700; }
   color: var(--secondary);
   border-color: var(--secondary);
   transform: translateY(-3px); /* subtle lift effect */
+}
+
+/* Animation for current year update */
+#current-year {
+  color: var(--gold);
+  font-weight: 600;
 }
 
 

@@ -5,17 +5,17 @@ include 'includes/header-1.php'
 
 <!-- Hero Section -->
 <section class="about-hero d-flex align-items-center text-center text-white">
-    <div class="container">
-        <h1 class="display-4 fw-bold">Financial Ratios</h1>
-        <h3>Numbers tell stories — and we help you read them.</h3>
-        <nav aria-label="breadcrumb">
-            <!-- <ol class="breadcrumb justify-content-center">
-                <li class="breadcrumb-item"><a href="#" class="text-white text-decoration-none"></a></li>
-                <li class="breadcrumb-item"><a href="#" class="text-white text-decoration-none"></a></li>
-                <li class="breadcrumb-item active text-white" aria-current="page"></li>
-            </ol> -->
-        </nav>
-    </div>
+  <div class="container">
+    <h1 class="display-4 fw-bold">Financial Ratios</h1>
+    <h3>Numbers tell stories — and we help you read them.</h3>
+    <nav aria-label="breadcrumb">
+        <!-- <ol class="breadcrumb justify-content-center">
+            <li class="breadcrumb-item"><a href="#" class="text-white text-decoration-none"></a></li>
+            <li class="breadcrumb-item"><a href="#" class="text-white text-decoration-none"></a></li>
+            <li class="breadcrumb-item active text-white" aria-current="page"></li>
+        </ol> -->
+    </nav>
+  </div>
 </section>
 
 <!-- Ratios Calculator Section -->
@@ -211,4 +211,3 @@ include 'includes/header-1.php'
 </section>
 
 <?php include 'includes/footer.php' ?>
-

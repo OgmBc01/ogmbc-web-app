@@ -13,13 +13,13 @@ $error_type = isset($_GET['error']) ? $_GET['error'] : null;
 
 <!-- Error Alert Container -->
 <?php if ($error_type): ?>
-<div id="errorAlert" class="alert alert-danger alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); max-width: 600px; z-index: 9999; margin: 0;">
-    <?php if ($error_type === 'session'): ?>
-        <strong>Session Expired!</strong> Your session has expired. Please <a href="login.php" class="alert-link">login again</a> to continue.
-    <?php elseif ($error_type === 'permission'): ?>
-        <strong>Access Denied!</strong> You do not have the required permissions to access the admin area. Please <a href="contact.php" class="alert-link">contact an administrator</a> for assistance.
-    <?php endif; ?>
-</div>
+    <div id="errorAlert" class="alert alert-danger alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); max-width: 600px; z-index: 9999; margin: 0;">
+        <?php if ($error_type === 'session'): ?>
+            <strong>Session Expired!</strong> Your session has expired. Please <a href="login.php" class="alert-link">login again</a> to continue.
+        <?php elseif ($error_type === 'permission'): ?>
+            <strong>Access Denied!</strong> You do not have the required permissions to access the admin area. Please <a href="contact.php" class="alert-link">contact an administrator</a> for assistance.
+        <?php endif; ?>
+    </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -153,10 +153,10 @@ include 'functions.php'
                     </ul>
                 </li>
                 
-                <!-- Well of Love -->
+                <!-- Wall of Love -->
                 <li class="nav-item position-relative">
-                    <a class="nav-link well-of-love-link position-relative" href="our-well-of-love.php">
-                        <span class="well-of-love-text">Our Well Of Love</span>
+                    <a class="nav-link Wall-of-love-link position-relative" href="our-Wall-of-love.php">
+                        <span class="Wall-of-love-text">Our Wall Of Love</span>
                         <span class="love-stars">
                             <i class="bi bi-star-fill love-star star-1"></i>
                             <i class="bi bi-star-fill love-star star-2"></i>
