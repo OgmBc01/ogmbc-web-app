@@ -110,6 +110,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="resources/js/main.js" defer></script>
+<script src="resources/js/ratio-calculator.js"></script>
 <script>
   // Back to top button functionality
   document.addEventListener('DOMContentLoaded', function() {
