@@ -3,13 +3,13 @@ include 'includes/database.php';
 include 'includes/header-1.php'
 ?>
 
-<!-- Hero Section -->
+<!-- Hero Section --
 <section class="about-hero d-flex align-items-center text-center text-white">
   <div class="container">
     <h1 class="display-4 fw-bold">Our Wall of Love</h1>
     <p class="lead">See what our customers are saying about us.</p>
 
-    <!-- Breadcrumb -->
+    <!-- Breadcrumb >
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb justify-content-center">
         <li class="breadcrumb-item"><a href="index.php" class="text-white text-decoration-none">Home</a></li>
@@ -17,7 +17,7 @@ include 'includes/header-1.php'
       </ol>
     </nav>
   </div>
-</section>
+</section-->
 
 <!-- Our Wall of Love -->
 <section id="services" class="section">

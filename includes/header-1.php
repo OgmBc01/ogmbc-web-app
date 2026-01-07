@@ -155,7 +155,7 @@ include 'functions.php'
                 
                 <!-- Wall of Love -->
                 <li class="nav-item position-relative">
-                    <a class="nav-link Wall-of-love-link position-relative" href="our-Wall-of-love.php">
+                    <a class="nav-link Wall-of-love-link position-relative" href="our-wall-of-love.php">
                         <span class="Wall-of-love-text">Our Wall Of Love</span>
                         <span class="love-stars">
                             <i class="bi bi-star-fill love-star star-1"></i>

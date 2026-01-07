@@ -51,8 +51,6 @@ include 'functions.php'
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="resources/css/style.css" />
-  <link rel="stylesheet" href="resources/css/omni-pdf-export.css" />
   <!-- Bootstrap CSS (load first so our style.css can override) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -181,7 +179,7 @@ include 'functions.php'
               
               <!-- Wall of Love -->
               <li class="nav-item position-relative">
-                  <a class="nav-link Wall-of-love-link position-relative" href="our-Wall-of-love.php">
+                  <a class="nav-link Wall-of-love-link position-relative" href="our-wall-of-love.php">
                       <span class="Wall-of-love-text">Our Wall Of Love</span>
                       <span class="love-stars">
                           <i class="bi bi-star-fill love-star star-1"></i>
