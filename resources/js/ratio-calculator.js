@@ -1830,7 +1830,7 @@ const LeadCapture = (function() {
         // Essential only
         full_name: '',
         email: '',
-        phone_number: '',
+        phone: '',
         company_name: '',
         industry: '',
         
@@ -1853,7 +1853,7 @@ const LeadCapture = (function() {
         <div class="modal fade" id="leadCaptureModal" tabindex="-1" aria-labelledby="leadCaptureModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
+                    <div class="modal-header" style=" background: var(--card); color: var(--secondary);">
                         <h5 class="modal-title" id="leadCaptureModalLabel">
                             <i class="bi bi-download me-2"></i>Get Your Report
                         </h5>
@@ -1864,7 +1864,7 @@ const LeadCapture = (function() {
                                 <div class="alert alert-info mb-0">
                                     <i class="bi bi-info-circle me-2"></i>
                                     <strong>Enter your details to download the report</strong>
-                                    <p class="mb-0 mt-1 small">We'll also email you a copy for future reference.</p>
+                                    <p class="mb-0 mt-1 small"></p>
                                 </div>
                             </div>
                         </div>
@@ -1883,7 +1883,7 @@ const LeadCapture = (function() {
                                     <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                                     <input type="email" class="form-control" id="email" name="email" placeholder="your.email@example.com" required>
                                     <div class="invalid-feedback">Please enter a valid email address.</div>
-                                    <div class="form-text">We'll send the report to this email</div>
+                                    <div class="form-text"></div>
                                 </div>
                                 
                                 <!-- New Phone Field -->
@@ -2017,18 +2017,6 @@ const LeadCapture = (function() {
             
             processLeadForm();
         });
-        
-        // Quick fill for testing (remove in production)
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            setTimeout(() => {
-                document.getElementById('full_name').value = 'Test User';
-                document.getElementById('email').value = 'test@example.com';
-                document.getElementById('phone_number').value = '+971501234567';
-                document.getElementById('company_name').value = 'Test Company';
-                document.getElementById('industry').value = 'technology';
-                document.getElementById('consent_given').checked = true;
-            }, 500);
-        }
     }
     
     /* ===== PROCESS LEAD FORM ===== */
@@ -2056,7 +2044,7 @@ const LeadCapture = (function() {
                 
                 // New fields
                 full_name: formData.get('full_name') || '',
-                phone_number: formData.get('phone_number') || '',
+                phone: formData.get('phone') || '',
                 
                 // Existing fields
                 email: formData.get('email'),

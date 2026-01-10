@@ -276,13 +276,16 @@ function save_lead_to_crm(): int|false {
     // Extract data (use null coalescing for safety)
     $full_name = mysqli_real_escape_string($connection, $lead_data['full_name'] ?? '');
     $email = mysqli_real_escape_string($connection, $lead_data['email'] ?? '');
-    $phone_number = mysqli_real_escape_string($connection, $lead_data['phone_number'] ?? '');
+    $phone = mysqli_real_escape_string($connection, $lead_data['phone'] ?? '');
     $company_name = mysqli_real_escape_string($connection, $lead_data['company_name'] ?? '');
     $industry = mysqli_real_escape_string($connection, $lead_data['industry'] ?? '');
     $consent_given = isset($lead_data['consent_given']) ? 1 : 0;
     $ratios_calculated = isset($lead_data['ratios_calculated']) ? 
         mysqli_real_escape_string($connection, json_encode($lead_data['ratios_calculated'])) : '[]';
     $timestamp = date('Y-m-d H:i:s');
+    
+    // Debug log - remove after testing if not needed
+    error_log('Lead data received: full_name=' . $full_name . ', email=' . $email . ', phone=' . $phone);
     
     // Validate required fields
     if (empty($email) || empty($company_name) || empty($industry)) {
@@ -306,7 +309,7 @@ function save_lead_to_crm(): int|false {
         // Update existing lead
         $query = "UPDATE leads SET 
             full_name = '{$full_name}',
-            phone = '{$phone_number}',
+            phone = '{$phone}',
             company_name = '{$company_name}',
             industry = '{$industry}',
             consent_given = {$consent_given},
@@ -331,7 +334,7 @@ function save_lead_to_crm(): int|false {
         ) VALUES (
             '{$full_name}',
             '{$email}',
-            '{$phone_number}',
+            '{$phone}',
             '{$company_name}',
             '{$industry}',
             {$consent_given},
@@ -362,9 +365,6 @@ function save_lead_to_crm(): int|false {
     
     return $lead_id;
 }
-
-// Call this function at the top of your check-business-health.php
-// Right after including functions.php, add: save_lead_to_crm();
 
 
 ?>

@@ -13,6 +13,10 @@ try {
         throw new Exception('Invalid request method');
     }
 
+    // Debug: Log incoming request
+    $raw_input = file_get_contents('php://input');
+    error_log('Incoming request body: ' . $raw_input);
+
     $lead_id = save_lead_to_crm();
 
     if ($lead_id === false) {
