@@ -970,7 +970,7 @@ header { position:sticky; top:0; z-index:100; padding: .5rem 0; }
 /* Small screens */
 @media (max-width: 767px) {
   .responsive-iframe-wrapper iframe {
-    height: 600px;
+    height: 700px;
   }
 }
 

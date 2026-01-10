@@ -2,7 +2,7 @@
    OGMBC Financial Ratio Calculator
    Version: 2.0
    Author: OGM Business Consultants
-   Description: Comprehensive financial ratio analysis tool
+   Description: Comprehensive financial ratio analysis tool with lead capture
    Usage: Include in check-company-health.php and initialize with initRatioCalculator()
    =========================================== */
 
@@ -989,7 +989,7 @@ const RatioCalculator = (function() {
         }
     }
 
-    /* Generate PDF */
+    /* ===== UPDATED PDF FUNCTION WITHOUT ACTION TRUNCATION ===== */
     async function downloadPdf(resultsByCategory, inputs, selectedKeys) {
         try {
             const { jsPDF } = window.jspdf;
@@ -999,11 +999,15 @@ const RatioCalculator = (function() {
                 format: 'a4'
             });
 
+            // Set up for multi-line text
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const margin = 20;
+            
             // Letterhead background
             pdf.setFillColor(15, 40, 75);
             pdf.rect(0, 0, 210, 40, 'F');
 
-            // Try loading the logo image for header
+            // Try loading the logo
             let headerLogoData = null;
             try {
                 headerLogoData = await new Promise((resolve, reject) => {
@@ -1021,21 +1025,19 @@ const RatioCalculator = (function() {
                     img.src = 'resources/img/logo.png';
                 });
             } catch (e) {
-                console.warn('Header logo not loaded for PDF:', e);
-                headerLogoData = null;
+                console.warn('Header logo not loaded:', e);
             }
 
-            // Add header logo (if available) centered; always render the firm name below it
+            // Header with logo
             if (headerLogoData) {
-                const headerTargetH = 14; // mm (slightly larger)
+                const headerTargetH = 14;
                 const aspect = headerLogoData.w / headerLogoData.h;
                 const headerTargetW = headerTargetH * aspect;
                 const x = (210 - headerTargetW) / 2;
                 const logoY = 6;
                 pdf.addImage(headerLogoData.dataUrl, 'PNG', x, logoY, headerTargetW, headerTargetH);
-
-                // Compute company name Y position with a small margin below the logo
-                const companyNameY = logoY + headerTargetH + 6; // 6mm gap
+                
+                const companyNameY = logoY + headerTargetH + 6;
                 pdf.setTextColor(255, 255, 255);
                 pdf.setFontSize(18);
                 pdf.setFont('helvetica', 'bold');
@@ -1047,7 +1049,7 @@ const RatioCalculator = (function() {
                 pdf.text('OGM BUSINESS CONSULTANTS', 105, 22, { align: 'center' });
             }
 
-            // Letterhead subtitle / contact
+            // Subtitle
             pdf.setFontSize(10);
             pdf.setFont('helvetica', 'normal');
             pdf.text('Financial Advisory & Business Consulting', 105, 30, { align: 'center' });
@@ -1093,13 +1095,18 @@ const RatioCalculator = (function() {
                 });
             });
             
-            pdf.text(`Total Ratios Analyzed: ${totalRatios} across ${Object.keys(resultsByCategory).length} categories`, 25, yPos);
-            yPos += 6;
-            pdf.text(`• ${goodCount} ratios indicate healthy financial position`, 25, yPos);
-            yPos += 6;
-            pdf.text(`• ${warnCount} ratios require monitoring and improvement`, 25, yPos);
-            yPos += 6;
-            pdf.text(`• ${riskCount} ratios need immediate attention`, 25, yPos);
+            const summaryText = [
+                `Total Ratios Analyzed: ${totalRatios} across ${Object.keys(resultsByCategory).length} categories`,
+                `• ${goodCount} ratios indicate healthy financial position`,
+                `• ${warnCount} ratios require monitoring and improvement`,
+                `• ${riskCount} ratios need immediate attention`
+            ];
+            
+            summaryText.forEach(line => {
+                pdf.text(line, 25, yPos);
+                yPos += 6;
+            });
+            
             yPos += 10;
 
             // Category-wise results
@@ -1125,14 +1132,16 @@ const RatioCalculator = (function() {
                 pdf.text('RATIO', 25, yPos + 4);
                 pdf.text('VALUE', 90, yPos + 4);
                 pdf.text('STATUS', 130, yPos + 4);
-                pdf.text('ACTION', 150, yPos + 4);
                 
                 yPos += 8;
                 
                 resultsByCategory[category].forEach((result, index) => {
+                    // Check if we need a new page
                     if (yPos > 270) {
                         pdf.addPage();
                         yPos = 40;
+                        
+                        // Add headers on new page
                         pdf.setFillColor(241, 191, 112);
                         pdf.rect(20, yPos - 8, 170, 6, 'F');
                         pdf.setTextColor(0, 0, 0);
@@ -1141,7 +1150,6 @@ const RatioCalculator = (function() {
                         pdf.text('RATIO', 25, yPos - 4);
                         pdf.text('VALUE', 90, yPos - 4);
                         pdf.text('STATUS', 130, yPos - 4);
-                        pdf.text('ACTION', 150, yPos - 4);
                     }
                     
                     // Alternate row background
@@ -1151,32 +1159,117 @@ const RatioCalculator = (function() {
                     }
                     
                     pdf.setTextColor(0, 0, 0);
-                    pdf.setFontSize(7);
+                    pdf.setFontSize(8);
                     pdf.setFont('helvetica', 'normal');
                     
                     // Ratio name
-                    const ratioName = result.label.length > 25 ? result.label.substring(0, 25) + '...' : result.label;
+                    const ratioName = result.label.length > 35 ? result.label.substring(0, 35) + '...' : result.label;
                     pdf.text(ratioName, 25, yPos + 2);
                     
                     // Value
                     pdf.text(result.formatted, 90, yPos + 2);
                     
-                    // Status
+                    // Status with color
                     if (result.status === 'good') pdf.setTextColor(0, 128, 0);
                     else if (result.status === 'warn') pdf.setTextColor(255, 165, 0);
                     else if (result.status === 'risk') pdf.setTextColor(255, 0, 0);
                     
                     pdf.text(result.status.toUpperCase(), 130, yPos + 2);
-                    
-                    // Reset color
                     pdf.setTextColor(0, 0, 0);
-                    const action = result.actions[0].length > 30 ? result.actions[0].substring(0, 30) + '...' : result.actions[0];
-                    pdf.text(action, 150, yPos + 2);
                     
                     yPos += 8;
+                    
+                    // ACTION SECTION - FULL TEXT, NO TRUNCATION
+                    pdf.setFillColor(255, 255, 255);
+                    pdf.rect(20, yPos - 2, 170, 10, 'F');
+                    
+                    pdf.setFontSize(7);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Action:', 25, yPos + 2);
+                    
+                    pdf.setFont('helvetica', 'normal');
+                    const actionText = result.actions[0];
+                    
+                    // Check if action text fits in one line
+                    const actionWidth = pdf.getTextWidth(actionText);
+                    if (actionWidth < 120) {
+                        pdf.text(actionText, 40, yPos + 2);
+                        yPos += 6;
+                    } else {
+                        // Split into multiple lines
+                        const actionLines = pdf.splitTextToSize(actionText, 120);
+                        pdf.text(actionLines, 40, yPos + 2);
+                        yPos += (actionLines.length * 4) + 2;
+                    }
+                    
+                    yPos += 4; // Extra space between ratios
                 });
                 
                 yPos += 10;
+            });
+
+            // Overall Recommendations Page
+            if (yPos > 200) {
+                pdf.addPage();
+                yPos = 40;
+            }
+            
+            pdf.setFontSize(14);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('OVERALL RECOMMENDATIONS', 20, yPos);
+            yPos += 10;
+            
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'normal');
+            
+            // Collect priority actions
+            let priorityActions = [];
+            Object.keys(resultsByCategory).forEach(category => {
+                resultsByCategory[category].forEach(r => {
+                    if (r.status === 'risk') {
+                        priorityActions = priorityActions.concat(r.actions);
+                    }
+                });
+            });
+            
+            // If no risk actions, include warnings
+            if (priorityActions.length === 0) {
+                Object.keys(resultsByCategory).forEach(category => {
+                    resultsByCategory[category].forEach(r => {
+                        if (r.status === 'warn') {
+                            priorityActions = priorityActions.concat(r.actions.slice(0, 1));
+                        }
+                    });
+                });
+            }
+            
+            // If still empty, provide general advice
+            if (priorityActions.length === 0) {
+                priorityActions = [
+                    "Maintain current financial practices and monitor ratios regularly.",
+                    "Continue efficient working capital management.",
+                    "Consider strategic investments to fuel growth.",
+                    "Regularly review pricing strategy to maintain healthy margins.",
+                    "Maintain strong relationships with lenders and investors."
+                ];
+            }
+            
+            // Add unique recommendations
+            const uniqueActions = [...new Set(priorityActions)];
+            uniqueActions.forEach((action, index) => {
+                if (yPos > 270) {
+                    pdf.addPage();
+                    yPos = 40;
+                }
+                
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text(`${index + 1}.`, 25, yPos);
+                
+                pdf.setFont('helvetica', 'normal');
+                const lines = pdf.splitTextToSize(action, 150);
+                pdf.text(lines, 35, yPos);
+                yPos += (lines.length * 5) + 4;
             });
 
             // Footer
@@ -1186,10 +1279,8 @@ const RatioCalculator = (function() {
             pdf.text('This report was generated by OGMBC Financial Analysis System', 105, 290, { align: 'center' });
             pdf.text('Contact: info@ogmbc.ae | Tel: +971509860136', 105, 295, { align: 'center' });
 
-            // Create watermark using the logo (no tilt) if available, otherwise use text
+            // Watermark
             let watermarkDataUrl = null;
-            let watermarkCanvasW = 1600;
-            let watermarkCanvasH = 600;
             try {
                 if (headerLogoData && headerLogoData.dataUrl) {
                     const img = new Image();
@@ -1199,52 +1290,30 @@ const RatioCalculator = (function() {
                         img.onerror = () => reject(new Error('Logo data image failed'));
                     });
 
-                    // Larger canvas for a big watermark (4x larger visual impact)
                     const canvas = document.createElement('canvas');
-                    canvas.width = 3200; // increased size
+                    canvas.width = 3200;
                     canvas.height = 1200;
-                    watermarkCanvasW = canvas.width;
-                    watermarkCanvasH = canvas.height;
                     const ctx = canvas.getContext('2d');
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalAlpha = 0.18; // slightly more visible
+                    ctx.globalAlpha = 0.18;
 
-                    // Draw the logo centered and scaled to occupy most of canvas height
                     const targetH = canvas.height * 0.85;
                     const aspect = img.naturalWidth / img.naturalHeight;
                     const targetW = targetH * aspect;
                     ctx.drawImage(img, (canvas.width - targetW) / 2, (canvas.height - targetH) / 2, targetW, targetH);
 
                     watermarkDataUrl = canvas.toDataURL('image/png');
-                } else {
-                    // Fallback: plain centered text watermark (no rotation)
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 2400;
-                    canvas.height = 600;
-                    watermarkCanvasW = canvas.width;
-                    watermarkCanvasH = canvas.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.globalAlpha = 0.18;
-                    ctx.fillStyle = '#111';
-                    ctx.font = 'bold 80px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText('FINANCIAL RATIOS ANALYSIS REPORT', canvas.width / 2, canvas.height / 2);
-                    watermarkDataUrl = canvas.toDataURL('image/png');
                 }
             } catch (e) {
-                console.warn('Could not create watermark image:', e);
-                watermarkDataUrl = null;
+                console.warn('Watermark creation failed:', e);
             }
 
-            // Apply watermark to every page (centered) using actual image aspect ratio
+            // Apply watermark
             try {
                 const pageCount = pdf.getNumberOfPages();
                 for (let p = 1; p <= pageCount; p++) {
                     pdf.setPage(p);
                     if (watermarkDataUrl) {
-                        // load watermark image to get real aspect
                         const wmImg = new Image();
                         await new Promise((resolve, reject) => {
                             wmImg.onload = resolve;
@@ -1255,14 +1324,12 @@ const RatioCalculator = (function() {
                         const pageW = pdf.internal.pageSize.getWidth();
                         const pageH = pdf.internal.pageSize.getHeight();
 
-                        // Make watermark up to 4x bigger than the previous base size, capped to page dimensions
-                        const baseW = pageW * 0.95; // previous base width
-                        const desiredW = Math.min(pageW * 0.99, baseW * 4); // 4x but not exceed page width
+                        const baseW = pageW * 0.95;
+                        const desiredW = Math.min(pageW * 0.99, baseW * 4);
                         const aspect = wmImg.naturalWidth / wmImg.naturalHeight;
                         let wmWidth = desiredW;
                         let wmHeight = wmWidth / aspect;
 
-                        // If height exceeds page, downscale to fit within page height
                         if (wmHeight > pageH * 0.98) {
                             const scale = (pageH * 0.98) / wmHeight;
                             wmWidth = wmWidth * scale;
@@ -1276,7 +1343,7 @@ const RatioCalculator = (function() {
                     }
                 }
             } catch (e) {
-                console.warn('Could not apply watermark to pages:', e);
+                console.warn('Watermark application failed:', e);
             }
 
             // Save the PDF
@@ -1543,7 +1610,16 @@ const RatioCalculator = (function() {
         const saveResultBtn = document.getElementById('saveResultBtn');
         
         if (downloadPdfBtn) {
-            downloadPdfBtn.onclick = () => downloadPdf(resultsByCategory, inputValues, selectedKeys);
+            // Replace the direct download with lead capture flow
+            downloadPdfBtn.onclick = () => {
+                // Trigger sequential modal flow
+                if (typeof LeadCapture !== 'undefined' && LeadCapture.showModalSequentially) {
+                    LeadCapture.showModalSequentially();
+                } else {
+                    // Fallback to direct download if lead capture not available
+                    downloadPdf(resultsByCategory, inputValues, selectedKeys);
+                }
+            };
         }
         
         if (saveResultBtn) {
@@ -1742,14 +1818,465 @@ const RatioCalculator = (function() {
     };
 })();
 
-/* Initialize when DOM is ready */
+/* ===========================================
+   LEAD CAPTURE SYSTEM
+   =========================================== */
+const LeadCapture = (function() {
+    const STORAGE_KEY = 'ogmbc_user_info';
+    const CRM_ENDPOINT = 'includes/save_lead.php';
+    
+    // Simplified user data structure
+    const userData = {
+        // Essential only
+        full_name: '',
+        email: '',
+        phone_number: '',
+        company_name: '',
+        industry: '',
+        
+        // Consent
+        consent_given: false,
+        
+        // Metadata
+        first_interaction: null,
+        last_interaction: null,
+        ratios_calculated: []
+    };
+    
+    /* ===== CREATE SIMPLIFIED MODAL ===== */
+    function createLeadModal() {
+        // Remove existing modal if any
+        const existingModal = document.getElementById('leadCaptureModal');
+        if (existingModal) existingModal.remove();
+        
+        const modalHTML = `
+        <div class="modal fade" id="leadCaptureModal" tabindex="-1" aria-labelledby="leadCaptureModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="leadCaptureModalLabel">
+                            <i class="bi bi-download me-2"></i>Get Your Report
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="alert alert-info mb-0">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Enter your details to download the report</strong>
+                                    <p class="mb-0 mt-1 small">We'll also email you a copy for future reference.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form id="leadCaptureForm" class="needs-validation" novalidate>
+                            <div class="row">
+                                <!-- New Full Name Field -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="full_name" name="full_name" placeholder="John Smith" required>
+                                    <div class="invalid-feedback">Please enter your full name.</div>
+                                </div>
+                                
+                                <!-- Email Address -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="your.email@example.com" required>
+                                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                                    <div class="form-text">We'll send the report to this email</div>
+                                </div>
+                                
+                                <!-- New Phone Field -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="+971 50 123 4567">
+                                    <div class="form-text">Optional - for follow-up if needed</div>
+                                </div>
+                                
+                                <!-- Company Name -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="company_name" class="form-label">Company/Business Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Your Company Name" required>
+                                    <div class="invalid-feedback">Please enter your company name.</div>
+                                </div>
+                                
+                                <!-- Industry -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="industry" class="form-label">Industry/Sector <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="industry" name="industry" required>
+                                        <option value="" selected disabled>Select your industry...</option>
+                                        <option value="manufacturing">Manufacturing</option>
+                                        <option value="retail">Retail & E-commerce</option>
+                                        <option value="services">Professional Services</option>
+                                        <option value="technology">Technology & IT</option>
+                                        <option value="healthcare">Healthcare</option>
+                                        <option value="hospitality">Hospitality & Tourism</option>
+                                        <option value="construction">Construction & Real Estate</option>
+                                        <option value="finance">Finance & Insurance</option>
+                                        <option value="education">Education</option>
+                                        <option value="transportation">Transportation & Logistics</option>
+                                        <option value="agriculture">Agriculture</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select your industry.</div>
+                                </div>
+                                
+                                <!-- Privacy & Consent -->
+                                <div class="col-12 mb-3 mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="consent_given" name="consent_given" required>
+                                        <label class="form-check-label small" for="consent_given">
+                                            I agree to receive my financial analysis report and related communications from OGM Business Consultants.
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#privacyPolicyModal">Privacy Policy</a>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="invalid-feedback">You must agree to continue.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="submitLeadForm">
+                            <i class="bi bi-download me-2"></i>Download Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Simplified Privacy Policy Modal -->
+        <div class="modal fade" id="privacyPolicyModal" tabindex="-1" aria-labelledby="privacyPolicyModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="privacyPolicyModalLabel">Privacy Notice</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                        <h6>OGM Business Consultants Privacy Notice</h6>
+                        <p><strong>Last Updated:</strong> ${new Date().toLocaleDateString()}</p>
+                        
+                        <h6 class="mt-4">Information We Collect</h6>
+                        <p>When you download our financial analysis report, we collect your email address, company name, and industry to:</p>
+                        <ul>
+                            <li>Send you the requested financial analysis report</li>
+                            <li>Provide relevant business insights</li>
+                            <li>Improve our financial analysis tools</li>
+                        </ul>
+                        
+                        <h6 class="mt-4">Your Data Rights</h6>
+                        <p>You can request to view, update, or delete your information at any time by contacting us.</p>
+                        
+                        <h6 class="mt-4">Contact Information</h6>
+                        <p>
+                            OGM Business Consultants<br>
+                            Office No. A07, 18th Floor, The Regal Tower<br>
+                            Business Bay, Dubai, UAE<br>
+                            Email: privacy@ogmbc.ae<br>
+                            Tel: +971509860136
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        setupLeadFormHandlers();
+    }
+    
+    /* ===== SETUP FORM HANDLERS ===== */
+    function setupLeadFormHandlers() {
+        const form = document.getElementById('leadCaptureForm');
+        const submitBtn = document.getElementById('submitLeadForm');
+        
+        if (!form || !submitBtn) return;
+        
+        // Form validation
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            processLeadForm();
+        });
+        
+        // Submit button handler
+        submitBtn.addEventListener('click', function() {
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            processLeadForm();
+        });
+        
+        // Quick fill for testing (remove in production)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            setTimeout(() => {
+                document.getElementById('full_name').value = 'Test User';
+                document.getElementById('email').value = 'test@example.com';
+                document.getElementById('phone_number').value = '+971501234567';
+                document.getElementById('company_name').value = 'Test Company';
+                document.getElementById('industry').value = 'technology';
+                document.getElementById('consent_given').checked = true;
+            }, 500);
+        }
+    }
+    
+    /* ===== PROCESS LEAD FORM ===== */
+    async function processLeadForm() {
+        const form = document.getElementById('leadCaptureForm');
+        const submitBtn = document.getElementById('submitLeadForm');
+        const modalEl = document.getElementById('leadCaptureModal');
+        
+        if (!form || !submitBtn) {
+            console.error('Form or button not found');
+            return;
+        }
+        
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        
+        try {
+            // Collect form data
+            const formData = new FormData(form);
+            
+            // ======== UPDATED LEAD DATA STRUCTURE ========
+            const leadData = {
+                action: 'save_lead',
+                
+                // New fields
+                full_name: formData.get('full_name') || '',
+                phone_number: formData.get('phone_number') || '',
+                
+                // Existing fields
+                email: formData.get('email'),
+                company_name: formData.get('company_name'),
+                industry: formData.get('industry'),
+                
+                // Consent
+                consent_given: formData.get('consent_given') === 'on',
+                
+                // Metadata
+                timestamp: new Date().toISOString(),
+                source: 'financial_ratio_calculator',
+                ratios_calculated: window.lastResults?.selectedKeys || [],
+                report_generated: window.lastResults?.timestamp || null
+            };
+            // ======== END UPDATED SECTION ========
+            
+            console.log('Lead data prepared:', leadData);
+            
+            // Store in localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(leadData));
+            
+            // Save to CRM (fire and forget - don't block download)
+            const crmResponse = await saveToCRM(leadData);
+            console.log('CRM response:', crmResponse);
+            
+            // Close lead capture modal
+            const leadModal = bootstrap.Modal.getInstance(modalEl);
+            if (leadModal) leadModal.hide();
+            
+            // Proceed with PDF download using the updated function
+            // FIX: Use RatioCalculator.downloadPdf instead of downloadPdf
+            if (window.lastResults && RatioCalculator && RatioCalculator.downloadPdf) {
+                console.log('Downloading PDF...');
+                await RatioCalculator.downloadPdf(
+                    window.lastResults.resultsByCategory,
+                    window.lastResults.inputs,
+                    window.lastResults.selectedKeys
+                );
+            } else {
+                console.error('Cannot download PDF:', {
+                    hasLastResults: !!window.lastResults,
+                    hasRatioCalculator: !!RatioCalculator,
+                    hasDownloadFunction: RatioCalculator ? !!RatioCalculator.downloadPdf : false
+                });
+                
+                // Show alternative download option
+                alert('Report saved! Click the Download PDF button in the results modal to download your report.');
+            }
+            
+            // Show success message
+            showSuccessNotification();
+            
+        } catch (error) {
+            console.error('Error processing lead form:', error);
+            
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-download me-2"></i>Download Report';
+            
+            // Show error with more details
+            alert('There was an error processing your request. Please try again.\n\nError: ' + error.message);
+        }
+    }
+    
+    /* ===== SAVE TO CRM ===== */
+    async function saveToCRM(leadData) {
+        try {
+            console.log('Sending lead data to CRM:', leadData);
+            
+            // Send to PHP endpoint as JSON
+            const response = await fetch(CRM_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(leadData)
+            });
+            
+            console.log('CRM Response status:', response.status);
+            
+            const result = await response.json();
+            
+            console.log('CRM Response:', result);
+            
+            if (response.ok && result.success) {
+                console.log('Lead saved successfully:', result);
+                return result;
+            } else {
+                console.error('Lead save failed:', result.message);
+                throw new Error(result.message || 'Failed to save lead');
+            }
+            
+        } catch (error) {
+            console.error('CRM save error:', error);
+            throw error;
+        }
+    }
+    
+    /* ===== CHECK IF INFO EXISTS ===== */
+    function hasUserInfo() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return false;
+        
+        try {
+            const data = JSON.parse(stored);
+            return data.consent_given && data.email;
+        } catch (e) {
+            return false;
+        }
+    }
+    
+    /* ===== SHOW MODAL SEQUENTIALLY ===== */
+    function showModalSequentially() {
+        // First close the results modal
+        const resultsModal = bootstrap.Modal.getInstance(document.getElementById('resultsModal'));
+        if (resultsModal) {
+            resultsModal.hide();
+            
+            // Show lead capture modal after results modal is fully hidden
+            document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
+                if (hasUserInfo()) {
+                    // User already provided info - download immediately
+                    if (window.lastResults) {
+                        RatioCalculator.downloadPdf(
+                            window.lastResults.resultsByCategory,
+                            window.lastResults.inputs,
+                            window.lastResults.selectedKeys
+                        );
+                    }
+                } else {
+                    // Show lead capture modal
+                    createLeadModal();
+                    const modalEl = document.getElementById('leadCaptureModal');
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                }
+            }, { once: true }); // Run only once
+        } else {
+            // If results modal isn't open, just show lead capture
+            if (hasUserInfo()) {
+                if (window.lastResults) {
+                    RatioCalculator.downloadPdf(
+                        window.lastResults.resultsByCategory,
+                        window.lastResults.inputs,
+                        window.lastResults.selectedKeys
+                    );
+                }
+            } else {
+                createLeadModal();
+                const modalEl = document.getElementById('leadCaptureModal');
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        }
+    }
+    
+    /* ===== SHOW SUCCESS NOTIFICATION ===== */
+    function showSuccessNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-success alert-dismissible fade show position-fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '10000';
+        notification.style.maxWidth = '350px';
+        notification.innerHTML = `
+            <div class="d-flex align-items-start">
+                <div class="me-3">
+                    <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+                </div>
+                <div>
+                    <h6 class="alert-heading mb-1">Report Downloaded!</h6>
+                    <p class="mb-1 small">Your financial analysis report has been downloaded. Check your downloads for a copy.</p>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+    
+    /* ===== PUBLIC API ===== */
+    return {
+        init: function() {
+            // Initialize if needed
+        },
+        
+        showModalSequentially: showModalSequentially,
+        hasUserInfo: hasUserInfo,
+        getUserInfo: function() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : null;
+        },
+        
+        clearUserInfo: function() {
+            localStorage.removeItem(STORAGE_KEY);
+        }
+    };
+})();
+
+/* =========================
+   INITIALIZATION
+   ========================= */
+
+// Initialize when DOM is ready
 if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', function() {
         RatioCalculator.init();
+        LeadCapture.init();
     });
 }
 
 /* Export for module systems */
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = RatioCalculator;
+    module.exports = { RatioCalculator, LeadCapture };
 }

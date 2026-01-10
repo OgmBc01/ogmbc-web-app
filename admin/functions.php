@@ -149,7 +149,6 @@ function deleteCategory() {
 //////////////////
 
 function checkBankAccountsSession() {
-    // Don't call session_start() here if it's already called in your pages
     if(!isset($_SESSION['bank_accounts_access']) || !$_SESSION['bank_accounts_access']) {
         header('Location: dashboard.php?session_expired=true');
         exit;

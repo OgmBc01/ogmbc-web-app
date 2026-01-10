@@ -17,17 +17,17 @@ class omniChat {
         this.overlay = null;
 
         this.availablePrompts = [
-            "What business setup services do you offer?",
-            "Tell me about UAE company formation",
-            "How can I set up a company in USA?",
-            "What accounting services do you provide?",
-            "Do you offer tax consultancy services?",
             "What is your corporate tax expertise?",
             "Can you help with bank account opening?",
             "What audit services do you provide?",
             "Tell me about your IFRS advisory services",
             "Do you offer Golden Visa assistance?",
             "What are your office locations?",
+            "What business setup services do you offer?",
+            "Tell me about UAE company formation",
+            "How can I set up a company in USA?",
+            "What accounting services do you provide?",
+            "Do you offer tax consultancy services?",
             "How long does company formation take?",
             "What documents are needed for UAE setup?",
             "Do you provide ongoing compliance support?",

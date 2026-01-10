@@ -1,6 +1,6 @@
 <?php
 include 'includes/database.php';
-include 'includes/header-1.php'
+include 'includes/header-1.php';
 ?> 
 
 <!-- Hero Section -->

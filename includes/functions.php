@@ -250,4 +250,121 @@ function handle_enquiry_form() {
     }
 }
 
+
+// Add to your existing functions.php file
+function save_lead_to_crm(): int|false {
+    global $connection;
+    
+    // Get the JSON data from the request body
+    $json_data = file_get_contents('php://input');
+    $lead_data = json_decode($json_data, true);
+    
+    // If no JSON body, try form data
+    if (!$lead_data) {
+        $lead_data = $_POST;
+    }
+    
+    if (!$lead_data) {
+        return false;
+    }
+    
+    // Check if action is 'save_lead'
+    if (!isset($lead_data['action']) || $lead_data['action'] !== 'save_lead') {
+        return false;
+    }
+    
+    // Extract data (use null coalescing for safety)
+    $full_name = mysqli_real_escape_string($connection, $lead_data['full_name'] ?? '');
+    $email = mysqli_real_escape_string($connection, $lead_data['email'] ?? '');
+    $phone_number = mysqli_real_escape_string($connection, $lead_data['phone_number'] ?? '');
+    $company_name = mysqli_real_escape_string($connection, $lead_data['company_name'] ?? '');
+    $industry = mysqli_real_escape_string($connection, $lead_data['industry'] ?? '');
+    $consent_given = isset($lead_data['consent_given']) ? 1 : 0;
+    $ratios_calculated = isset($lead_data['ratios_calculated']) ? 
+        mysqli_real_escape_string($connection, json_encode($lead_data['ratios_calculated'])) : '[]';
+    $timestamp = date('Y-m-d H:i:s');
+    
+    // Validate required fields
+    if (empty($email) || empty($company_name) || empty($industry)) {
+        return false;
+    }
+    
+    // Validate email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+    
+    // Check if lead exists
+    $check_query = "SELECT id FROM leads WHERE email = '{$email}'";
+    $check_result = mysqli_query($connection, $check_query);
+    
+    if (!$check_result) {
+        return false;
+    }
+    
+    if (mysqli_num_rows($check_result) > 0) {
+        // Update existing lead
+        $query = "UPDATE leads SET 
+            full_name = '{$full_name}',
+            phone = '{$phone_number}',
+            company_name = '{$company_name}',
+            industry = '{$industry}',
+            consent_given = {$consent_given},
+            ratios_calculated = '{$ratios_calculated}',
+            last_interaction = '{$timestamp}',
+            status = 'active'
+            WHERE email = '{$email}'";
+    } else {
+        // Insert new lead
+        $query = "INSERT INTO leads (
+            full_name,
+            email, 
+            phone,
+            company_name, 
+            industry, 
+            consent_given, 
+            ratios_calculated, 
+            first_interaction, 
+            last_interaction, 
+            status,
+            source
+        ) VALUES (
+            '{$full_name}',
+            '{$email}',
+            '{$phone_number}',
+            '{$company_name}',
+            '{$industry}',
+            {$consent_given},
+            '{$ratios_calculated}',
+            '{$timestamp}',
+            '{$timestamp}',
+            'new',
+            'financial_ratio_calculator'
+        )";
+    }
+    
+    $result = mysqli_query($connection, $query);
+    
+    if (!$result) {
+        return false;
+    }
+    
+    // Return the lead_id
+    $lead_id = mysqli_insert_id($connection);
+    if ($lead_id == 0 && mysqli_num_rows($check_result) > 0) {
+        // For updates, get the existing ID
+        $id_result = mysqli_query($connection, "SELECT id FROM leads WHERE email = '{$email}'");
+        if ($id_result && mysqli_num_rows($id_result) > 0) {
+            $row = mysqli_fetch_assoc($id_result);
+            return $row['id'];
+        }
+    }
+    
+    return $lead_id;
+}
+
+// Call this function at the top of your check-business-health.php
+// Right after including functions.php, add: save_lead_to_crm();
+
+
 ?>
