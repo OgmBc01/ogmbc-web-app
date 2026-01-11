@@ -8,27 +8,27 @@ include 'includes/sidebar.php';
     <div class="col-md-12">
       <?php
         if (isset($_GET['source'])) {
-            $source = $_GET['source'];
+          $source = $_GET['source'];
         } else {
-            $source = '';
+          $source = '';
         }
 
         switch ($source) {
-            case 'add_post':
-                include "includes/add_post.php";
-                break;
+          case 'ratio-calc-leads':
+            include "includes/ratio-calc-leads.php";
+            break;
 
-            case 'edit_post':
-                include "includes/edit_post.php";
-                break;
+          case 'newsletter-subs':
+            include "includes/newsletter-subs.php";
+            break;
 
-            case 'delete_post':
-                include "includes/delete_post.php";
-                break;
+          case 'service-enquiries':
+            include "includes/service-enquiries.php";
+            break;
 
-            default:
-                include "includes/view_all_posts.php";
-                break;
+          default:
+            include "ratio-calc-leads.php";
+            break;
         }
       ?>
     </div>

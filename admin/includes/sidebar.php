@@ -12,7 +12,7 @@
         </div>
         
         <ul class="nav flex-column">
-            <!-- Category Menu -->
+            <!-- Dashboard -->
             <li class="nav-item">
                 <a class="nav-link" href="dashboard.php" data-menu="services">
                     <i class="bi bi-speedometer nav-icon"></i>
@@ -20,29 +20,7 @@
                 </a>
             </li>
 
-            <!-- Sales/CRM Menu
-            <li class="nav-item">
-                <a class="nav-link menu-toggle-btn" href="#" data-menu="sales">
-                    <i class="bi bi-graph-up nav-icon"></i>
-                    <span class="nav-text">Sales/CRM</span>
-                    <i class="bi bi-chevron-right menu-toggle"></i>
-                </a>
-                <ul class="sub-menu" id="sales-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="clients.php?source=add_client">
-                            <i class="bi bi-plus-circle nav-icon"></i>
-                            <span class="nav-text">Add Client</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./clients.php">
-                            <i class="bi bi-card-checklist nav-icon"></i>
-                            <span class="nav-text">View All Clients</span>
-                        </a>
-                    </li>
-                </ul>
-            </li> -->
-
+            <!-- Operations Menu -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn" href="#" data-menu="sales">
                     <i class="bi bi-graph-up nav-icon"></i>
@@ -63,22 +41,6 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-
-             <!-- Category Menu -->
-            <li class="nav-item">
-                <a class="nav-link" href="categories.php" data-menu="services">
-                    <i class="bi bi-gear nav-icon"></i>
-                    <span class="nav-text">Services</span>
-                </a>
-            </li>
-
-            <!-- Bank Accounts Menu -->
-            <li class="nav-item">
-                <a class="nav-link" href="bank_accounts.php" data-menu="bank-accounts">
-                    <i class="bi bi-bank nav-icon"></i>
-                    <span class="nav-text">Bank Accounts</span>
-                </a>
             </li>
 
             <!-- Posts Menu -->
@@ -104,7 +66,30 @@
                 </ul>
             </li>
             
-            <!-- Users Menu -->
+            <!-- Submissions -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn" href="#" data-menu="users">
+                    <i class="bi bi-file nav-icon"></i>
+                    <span class="nav-text">Submissions</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="users-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="leads.php?source=ratio-calc-leads">
+                            <i class="bi bi-calculator nav-icon"></i>
+                            <span class="nav-text">Ratio Calculator Leads</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="lead.php">
+                            <i class="bi bi-envelope nav-icon"></i>
+                            <span class="nav-text">Newsletter Subs</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Users/Employees Menu -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn" href="#" data-menu="users">
                     <i class="bi bi-people nav-icon"></i>
@@ -126,5 +111,44 @@
                     </li>
                 </ul>
             </li>
+            
+            <!-- Services Menu -->
+            <li class="nav-item">
+                <a class="nav-link" href="categories.php" data-menu="services">
+                    <i class="bi bi-gear nav-icon"></i>
+                    <span class="nav-text">Services</span>
+                </a>
+            </li>
+
+            <!-- Bank Accounts Menu -->
+            <li class="nav-item">
+                <a class="nav-link" href="bank_accounts.php" data-menu="bank-accounts">
+                    <i class="bi bi-bank nav-icon"></i>
+                    <span class="nav-text">Bank Accounts</span>
+                </a>
+            </li>
+            
+            <!-- Sales/CRM Menu
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn" href="#" data-menu="sales">
+                    <i class="bi bi-graph-up nav-icon"></i>
+                    <span class="nav-text">Sales/CRM</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="sales-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="clients.php?source=add_client">
+                            <i class="bi bi-plus-circle nav-icon"></i>
+                            <span class="nav-text">Add Client</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./clients.php">
+                            <i class="bi bi-card-checklist nav-icon"></i>
+                            <span class="nav-text">View All Clients</span>
+                        </a>
+                    </li>
+                </ul>
+            </li> -->
         </ul>
     </div>
