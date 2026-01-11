@@ -69,7 +69,7 @@
             <!-- Submissions -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn" href="#" data-menu="users">
-                    <i class="bi bi-file nav-icon"></i>
+                    <i class="bi bi-file-earmark-text nav-icon"></i> <!-- Recommended -->
                     <span class="nav-text">Submissions</span>
                     <i class="bi bi-chevron-right menu-toggle"></i>
                 </a>
@@ -81,11 +81,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="lead.php">
-                            <i class="bi bi-envelope nav-icon"></i>
-                            <span class="nav-text">Newsletter Subs</span>
+                        <a class="nav-link" href="leads.php?source=service-enquiries">
+                            <i class="bi bi-chat-left-text nav-icon"></i> <!-- Changed from calculator to chat -->
+                            <span class="nav-text">Service Enquiries</span>
                         </a>
                     </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="lead.php">
+                            <i class="bi bi-envelope-paper nav-icon"></i> <!-- Changed from envelope to envelope-paper>
+                            <span class="nav-text">Newsletter Subs</span>
+                        </a>
+                    </li> -->
                 </ul>
             </li>
 
