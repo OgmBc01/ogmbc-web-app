@@ -1,0 +1,12 @@
+{
+  "name": "ogmbc-web-app",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build/build.js",
+    "build:watch": "nodemon --watch resources/js --ext js --exec npm run build",
+    "test": "echo \"Open test-bundle.html in browser\""
+  },
+  "devDependencies": {
+    "terser": "^5.0.0"
+  }
+}

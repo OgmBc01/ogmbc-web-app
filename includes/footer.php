@@ -148,8 +148,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script type="text/javascript">document.addEventListener("DOMContentLoaded", function () {iFrameResize({log: false, checkOrigin: false}, "#wall-of-love-Zsr4bXU");});</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="resources/js/main.js" defer></script>
-<script src="resources/js/ratio-calculator.js"></script>
-<script src="resources/js/omni-chat.js"></script>
+<?php
+// Add version based on file modification time
+$jsVersion = file_exists('public/js/bundle.min.js') 
+    ? filemtime('public/js/bundle.min.js') 
+    : time();
+?>
+<script src="public/js/bundle.min.js?v=<?php echo $jsVersion; ?>" defer></script>
 </body>
 </html>
