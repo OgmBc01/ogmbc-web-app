@@ -1,0 +1,131 @@
+/* ================================
+   OmniOGM PDF Export Styling
+   ================================ */
+
+.omni-pdf {
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    color: #1f2937;
+    background: #ffffff;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 24mm 20mm;
+    box-sizing: border-box;
+}
+
+/* Header */
+.omni-pdf-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 2px solid #d0aa4b;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+}
+
+.omni-pdf-logo {
+    height: 48px;
+    object-fit: contain;
+}
+
+.omni-pdf-header-text h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0d274d;
+}
+
+.omni-pdf-header-text p {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Messages Container */
+.omni-pdf-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Individual Message */
+.omni-pdf-message {
+    max-width: 85%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.55;
+    page-break-inside: avoid;
+}
+
+/* Bot Messages */
+.omni-pdf-message.bot {
+    background: #f3f4f6;
+    border-left: 4px solid #0d274d;
+    align-self: flex-start;
+}
+
+/* User Messages */
+.omni-pdf-message.user {
+    background: #fff7e1;
+    border-right: 4px solid #d0aa4b;
+    align-self: flex-end;
+}
+
+/* Headings inside messages */
+.omni-pdf-message h2,
+.omni-pdf-message h3,
+.omni-pdf-message h4 {
+    margin: 10px 0 6px;
+    color: #0d274d;
+}
+
+.omni-pdf-message h2 {
+    font-size: 15px;
+}
+
+.omni-pdf-message h3 {
+    font-size: 14px;
+}
+
+.omni-pdf-message h4 {
+    font-size: 13px;
+}
+
+/* Lists */
+.omni-pdf-message ul,
+.omni-pdf-message ol {
+    margin: 8px 0 8px 18px;
+    padding: 0;
+}
+
+.omni-pdf-message li {
+    margin-bottom: 4px;
+}
+
+/* Strong / emphasis */
+.omni-pdf-message strong {
+    color: #0d274d;
+    font-weight: 600;
+}
+
+/* Footer */
+.omni-pdf-footer {
+    margin-top: 32px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* Print behavior */
+@page {
+    size: A4;
+    margin: 20mm;
+}
+
+@media print {
+    body {
+        background: none !important;
+    }
+}

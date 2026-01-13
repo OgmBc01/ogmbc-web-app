@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     
     $enquiry_id = intval($_POST['enquiry_id'] ?? 0);
     $new_status = mysqli_real_escape_string($connection, $_POST['status'] ?? '');
+    $notes = mysqli_real_escape_string($connection, $_POST['notes'] ?? '');
     
     $allowed_statuses = ['new', 'contacted', 'dropped', 'qualified'];
     
@@ -36,7 +37,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit;
 }
 
-// Fetch all enquiries - ONLY USE COLUMNS THAT EXIST
+// Handle AJAX actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action']) && $_POST['action'] === 'get_enquiry_details') {
+        $enquiry_id = intval($_POST['enquiry_id'] ?? 0);
+        
+        if ($enquiry_id > 0) {
+            $query = "SELECT * FROM enquiries WHERE enquiry_id = $enquiry_id";
+            $result = mysqli_query($connection, $query);
+            
+            if ($result && mysqli_num_rows($result) > 0) {
+                $enquiry = mysqli_fetch_assoc($result);
+                echo json_encode([
+                    'success' => true,
+                    'enquiry' => $enquiry
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Enquiry not found']);
+            }
+            exit;
+        }
+    }
+    
+    if (isset($_POST['action']) && $_POST['action'] === 'mark_as_read') {
+        $enquiry_id = intval($_POST['enquiry_id'] ?? 0);
+        
+        if ($enquiry_id > 0) {
+            $query = "UPDATE enquiries SET is_read = 1 WHERE enquiry_id = $enquiry_id";
+            $result = mysqli_query($connection, $query);
+            
+            if ($result) {
+                echo json_encode(['success' => true, 'message' => 'Marked as read']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Database error']);
+            }
+            exit;
+        }
+    }
+    
+    if (isset($_POST['action']) && $_POST['action'] === 'delete_enquiry') {
+        $enquiry_id = intval($_POST['enquiry_id'] ?? 0);
+        
+        if ($enquiry_id > 0) {
+            $query = "DELETE FROM enquiries WHERE enquiry_id = $enquiry_id";
+            $result = mysqli_query($connection, $query);
+            
+            if ($result) {
+                echo json_encode(['success' => true, 'message' => 'Enquiry deleted successfully']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($connection)]);
+            }
+            exit;
+        }
+    }
+}
+
+// Fetch all enquiries
 $query = "SELECT 
             enquiry_id,
             name,
@@ -69,7 +125,7 @@ if (!$result) {
         .status-qualified { background-color: #fff3e0; color: #ef6c00; }
         .enquiry-unread { background-color: #f8f9fa; font-weight: 500; }
         .enquiry-read { background-color: #ffffff; }
-        .action-dropdown .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; }
+        .actions-dropdown .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; }
         .table-hover tbody tr:hover { background-color: rgba(0, 0, 0, 0.02); }
         .message-preview {
             max-width: 300px;
@@ -86,6 +142,9 @@ if (!$result) {
             border-radius: 5px;
             border-left: 4px solid #0d6efd;
         }
+        .actions-dropdown .dropdown-menu {
+            min-width: 200px;
+        }
     </style>
 </head>
 <body>
@@ -93,9 +152,12 @@ if (!$result) {
     <div class="main-content" id="mainContent">
         <div class="container-fluid py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="page-title">Enquiries Management</h1>
+                <h1 class="page-title">Service Enquiries Management</h1>
                 <div>
-                    <button class="btn btn-outline-secondary" onclick="refreshEnquiries()">
+                    <button class="btn btn-outline-secondary" onclick="exportToCSV()">
+                        <i class="bi bi-download me-2"></i>Export CSV
+                    </button>
+                    <button class="btn btn-primary" onclick="refreshEnquiries()">
                         <i class="bi bi-arrow-clockwise me-2"></i>Refresh
                     </button>
                 </div>
@@ -114,6 +176,7 @@ if (!$result) {
                                     <th>#</th>
                                     <th>ID</th>
                                     <th>Name</th>
+                                    <th>Email</th>
                                     <th>Contact</th>
                                     <th>Service</th>
                                     <th>Message</th>
@@ -130,9 +193,12 @@ if (!$result) {
                                             <td class="fw-bold"><?php echo $serial++; ?></td>
                                             <td class="text-muted"><?php echo $enquiry['enquiry_id']; ?></td>
                                             <td>
-                                                <strong><?php echo htmlspecialchars($enquiry['name']); ?></strong>
-                                                <br>
-                                                <small class="text-muted"><?php echo htmlspecialchars($enquiry['email']); ?></small>
+                                                <strong><?php echo htmlspecialchars($enquiry['name'] ?: 'N/A'); ?></strong>
+                                            </td>
+                                            <td>
+                                                <a href="mailto:<?php echo htmlspecialchars($enquiry['email']); ?>" class="text-primary">
+                                                    <?php echo htmlspecialchars($enquiry['email']); ?>
+                                                </a>
                                             </td>
                                             <td>
                                                 <?php if (!empty($enquiry['contact'])): ?>
@@ -173,12 +239,10 @@ if (!$result) {
                                                 </span>
                                             </td>
                                             <td>
-                                                <div class="dropdown action-dropdown">
+                                                <div class="dropdown actions-dropdown">
                                                     <button class="btn btn-sm btn-outline-primary dropdown-toggle" 
                                                             type="button" 
-                                                            data-bs-toggle="dropdown"
-                                                            data-enquiry-id="<?php echo $enquiry['enquiry_id']; ?>"
-                                                            data-current-status="<?php echo $enquiry['status']; ?>">
+                                                            data-bs-toggle="dropdown">
                                                         <i class="bi bi-gear"></i> Actions
                                                     </button>
                                                     <ul class="dropdown-menu">
@@ -201,6 +265,13 @@ if (!$result) {
                                                                 <i class="bi bi-envelope me-2"></i>Send Email
                                                             </a>
                                                         </li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li>
+                                                            <a class="dropdown-item text-danger delete-enquiry" href="#" 
+                                                               data-id="<?php echo $enquiry['enquiry_id']; ?>">
+                                                                <i class="bi bi-trash me-2"></i>Delete Enquiry
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </td>
@@ -208,7 +279,7 @@ if (!$result) {
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="9" class="text-center py-5">
+                                        <td colspan="10" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="bi bi-envelope display-4 d-block mb-3"></i>
                                                 <h5>No enquiries found</h5>
@@ -265,6 +336,12 @@ if (!$result) {
                             </select>
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="statusNotes" class="form-label">Notes (Optional)</label>
+                            <textarea class="form-control" id="statusNotes" name="notes" rows="3" 
+                                      placeholder="Add any notes about this enquiry..."></textarea>
+                        </div>
+                        
                         <div class="d-flex justify-content-between">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">
@@ -293,6 +370,7 @@ if (!$result) {
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
         // Initialize DataTable
@@ -327,7 +405,6 @@ if (!$result) {
                 e.preventDefault();
                 const enquiryId = this.dataset.id;
                 
-                // Direct database query for details
                 const formData = new FormData();
                 formData.append('action', 'get_enquiry_details');
                 formData.append('enquiry_id', enquiryId);
@@ -409,6 +486,7 @@ if (!$result) {
                 
                 document.getElementById('updateEnquiryId').value = enquiryId;
                 document.getElementById('statusSelect').value = currentStatus;
+                document.getElementById('statusNotes').value = '';
                 
                 const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
                 modal.show();
@@ -454,12 +532,7 @@ if (!$result) {
                         statusCell.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
                         
                         // Update button data attributes
-                        const dropdownBtn = row.querySelector('.dropdown-toggle');
                         const updateBtn = row.querySelector('.update-status-btn');
-                        
-                        if (dropdownBtn) {
-                            dropdownBtn.dataset.currentStatus = newStatus;
-                        }
                         if (updateBtn) {
                             updateBtn.dataset.currentStatus = newStatus;
                         }
@@ -484,17 +557,48 @@ if (!$result) {
             });
         });
 
-        // Add AJAX handlers for get_enquiry_details and mark_as_read
-        // This replaces the separate include files
-        document.addEventListener('DOMContentLoaded', function() {
-            // Intercept form submissions for get_enquiry_details
-            document.querySelectorAll('.view-enquiry').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    // The main logic is already handled above
-                });
+        // Delete enquiry
+        document.querySelectorAll('.delete-enquiry').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const enquiryId = this.dataset.id;
+                
+                if (confirm('Are you sure you want to delete this enquiry? This action cannot be undone.')) {
+                    const formData = new FormData();
+                    formData.append('action', 'delete_enquiry');
+                    formData.append('enquiry_id', enquiryId);
+                    
+                    fetch('service-enquiries.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove row from table
+                            const row = document.querySelector(`tr[data-id="${enquiryId}"]`);
+                            if (row) {
+                                row.remove();
+                                // Show success message
+                                const toast = new bootstrap.Toast(document.getElementById('successToast'));
+                                document.getElementById('toastMessage').textContent = 'Enquiry deleted successfully';
+                                toast.show();
+                            }
+                        } else {
+                            alert('Error deleting enquiry: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error deleting enquiry: ' + error.message);
+                    });
+                }
             });
         });
+
+        // Export to CSV (simplified version like leads module)
+        function exportToCSV() {
+            window.location.href = 'includes/export_enquiries.php';
+        }
 
         // Refresh enquiries
         function refreshEnquiries() {
@@ -516,44 +620,3 @@ if (!$result) {
     </script>
 </body>
 </html>
-
-<?php
-// Handle additional AJAX actions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && $_POST['action'] === 'get_enquiry_details') {
-        $enquiry_id = intval($_POST['enquiry_id'] ?? 0);
-        
-        if ($enquiry_id > 0) {
-            $query = "SELECT * FROM enquiries WHERE enquiry_id = $enquiry_id";
-            $result = mysqli_query($connection, $query);
-            
-            if ($result && mysqli_num_rows($result) > 0) {
-                $enquiry = mysqli_fetch_assoc($result);
-                echo json_encode([
-                    'success' => true,
-                    'enquiry' => $enquiry
-                ]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Enquiry not found']);
-            }
-            exit;
-        }
-    }
-    
-    if (isset($_POST['action']) && $_POST['action'] === 'mark_as_read') {
-        $enquiry_id = intval($_POST['enquiry_id'] ?? 0);
-        
-        if ($enquiry_id > 0) {
-            $query = "UPDATE enquiries SET is_read = 1 WHERE enquiry_id = $enquiry_id";
-            $result = mysqli_query($connection, $query);
-            
-            if ($result) {
-                echo json_encode(['success' => true, 'message' => 'Marked as read']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Database error']);
-            }
-            exit;
-        }
-    }
-}
-?>

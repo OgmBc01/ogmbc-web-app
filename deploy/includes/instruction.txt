@@ -1,0 +1,39 @@
+⚙️ Steps to Make It Work
+
+Install PHPMailer via Composer
+In your project root, run:
+
+composer require phpmailer/phpmailer
+
+
+For Local (XAMPP + Gmail)
+
+Enable “Less secure apps” is no longer possible → instead, create a Gmail App Password:
+
+Go to Google Account Security
+
+Enable 2-Step Verification
+
+Generate an App Password (choose "Mail" and "Other")
+
+Use that password in $mail->Password
+
+For Hostinger
+
+Create a Hostinger email (e.g. info@yourdomain.com)
+
+Use SMTP settings:
+
+Host: smtp.hostinger.com
+
+Port: 587
+
+Username: your full email
+
+Password: your email password
+
+Switch environment
+
+On localhost → set $environment = "local";
+
+On Hostinger → set $environment = "production";

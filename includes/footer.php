@@ -49,7 +49,7 @@
 <footer id="contact">
   <div class="container footer-grid text-light">
     <div class="footer-column">
-      <a class="brand" href="#">OGMBC Consultants</a>
+      <a class="brand" href="#">OGM Business Consultants</a>
       <p class="font-lg">
         This company was founded with the mission to provide clarity, compliance, and confidence 
         to businesses navigating today's financial and regulatory landscapes. With years of 

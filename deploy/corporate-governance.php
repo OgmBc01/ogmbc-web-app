@@ -1,0 +1,270 @@
+<?php
+include 'includes/database.php';
+include 'includes/header-1.php'
+?> 
+
+  <!-- Hero Section -->
+  <section class="about-hero d-flex align-items-center text-center text-white">
+    <div class="container">
+      <h1 class="display-4 fw-bold">Corporate Governance</h1>
+      <p class="lead"></p>
+
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb justify-content-center">
+          <li class="breadcrumb-item"><a href="#" class="text-white text-decoration-none">Services</a></li>
+          <li class="breadcrumb-item"><a href="#" class="text-white text-decoration-none">AStatutory Compliance</a></li>
+          <li class="breadcrumb-item active text-white" aria-current="page">Corporate Governance</li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <!-- About Story -->
+  <section class="section bg-light text-dark">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <img src="resources/img/corporate-governance.jpg" class="img-fluid rounded shadow" alt="corporate governance">
+        </div>
+        <div class="col-lg-6">
+          <h2 class="fw-bold" style="color:#d0aa4b;">Corporate Governance</h2>
+          <p class="text-start">
+            At OGMB, we recognize the critical importance of strong corporate governance practices in fostering transparency, accountability, and
+            sustainability within organizations. Our Corporate Governance Solutions are designed to help businesses of all sizes navigate co mplex regulatory
+            landscapes, mitigate risks, and maximize long term value creation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Corporate Governance Section -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark">Our <span style="color:#d0aa4b;">Approach</span></h2>
+        <p class="lead">
+          We believe that effective corporate governance is more than just compliance—it's about creating 
+          a culture of integrity and ethical behavior throughout an organization. Our holistic approach is 
+          tailored to meet the unique needs of each client. We work closely with boards, executives, and 
+          stakeholders to implement best practices and enhance governance structures.
+        </p>
+      </div>
+
+      <!-- Services We Offer -->
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="fw-bold"><i class="fas fa-balance-scale me-2" style="color:#d0aa4b;"></i> Governance Framework Development</h5>
+              <p class="lead">
+                Establish robust governance frameworks, including policies, board structures, and committees, 
+                tailored to your industry and organizational complexity.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="fw-bold"><i class="fas fa-users me-2" style="color:#d0aa4b;"></i> Board Effectiveness Evaluation</h5>
+              <p class="lead">
+                Conduct thorough assessments of board performance through surveys, interviews, and benchmarking, 
+                with actionable strategies for improvement.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="fw-bold"><i class="fas fa-shield-alt me-2" style="color:#d0aa4b;"></i> Risk Management & Compliance</h5>
+              <p class="lead">
+                Identify, assess, and mitigate risks with tailored frameworks, internal controls, and ongoing 
+                monitoring to ensure compliance and protect reputation.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="fw-bold"><i class="fas fa-hand-holding-heart me-2" style="color:#d0aa4b;"></i> Ethics & Corporate Responsibility</h5>
+              <p class="lead">
+                Develop ethical codes of conduct, whistleblower policies, and sustainability initiatives to 
+                promote responsible business practices.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="fw-bold"><i class="fas fa-handshake me-2" style="color:#d0aa4b;"></i> Stakeholder Engagement</h5>
+              <p class="lead">
+                Facilitate meaningful dialogues with shareholders, employees, and communities to build trust, 
+                enhance communication, and align interests.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Corporate Governance FAQs -->
+  <section class="py-5 bg-light" style="color:#fff;">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold" style="color:#0b1224;">Frequently Asked Questions</h2>
+        <p class="lead text-dark">Get answers to the most common corporate governance queries.</p>
+      </div>
+
+      <div class="accordion" id="govFaq">
+        <!-- FAQ 1 -->
+        <div class="accordion-item border-0 mb-3 shadow-sm">
+          <h2 class="accordion-header" id="faq1Heading">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#govFaq1" aria-expanded="false" aria-controls="govFaq1" style="color:#111827;">
+              <i class="fas fa-question-circle me-2" style="color:#d0aa4b;"></i> What is corporate governance, and why is it important?
+            </button>
+          </h2>
+          <div id="govFaq1" class="accordion-collapse collapse" aria-labelledby="faq1Heading" data-bs-parent="#govFaq">
+            <div class="accordion-body text-muted">
+              Corporate governance is the system of rules, practices, and processes by which a company is directed and controlled. 
+              It ensures transparency, accountability, and fairness—key for stakeholder trust and long-term success.
+            </div>
+          </div>
+        </div>
+        <!-- FAQ 2 -->
+        <div class="accordion-item border-0 mb-3 shadow-sm">
+          <h2 class="accordion-header" id="faq2Heading">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#govFaq2" aria-expanded="false" aria-controls="govFaq2" style="color:#111827;">
+              <i class="fas fa-users-cog me-2" style="color:#d0aa4b;"></i> How can OGMBC Consultants help improve our governance?
+            </button>
+          </h2>
+          <div id="govFaq2" class="accordion-collapse collapse" aria-labelledby="faq2Heading" data-bs-parent="#govFaq">
+            <div class="accordion-body text-muted">
+              We provide governance framework development, board effectiveness evaluation, risk management, ethics programs, 
+              and stakeholder engagement, all tailored to your organization’s needs.
+            </div>
+          </div>
+        </div>
+        <!-- FAQ 3 -->
+        <div class="accordion-item border-0 mb-3 shadow-sm">
+          <h2 class="accordion-header" id="faq3Heading">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#govFaq3" aria-expanded="false" aria-controls="govFaq3" style="color:#111827;">
+              <i class="fas fa-check-circle me-2" style="color:#d0aa4b;"></i> What are the benefits of strong corporate governance?
+            </button>
+          </h2>
+          <div id="govFaq3" class="accordion-collapse collapse" aria-labelledby="faq3Heading" data-bs-parent="#govFaq">
+            <div class="accordion-body text-muted">
+              Strong governance leads to better decision-making, risk management, financial performance, investor confidence, 
+              and stakeholder trust, while mitigating legal and reputational risks.
+            </div>
+          </div>
+        </div>
+        <!-- FAQ 4 -->
+        <div class="accordion-item border-0 shadow-sm">
+          <h2 class="accordion-header" id="faq4Heading">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#govFaq4" aria-expanded="false" aria-controls="govFaq4" style="color:#111827;">
+              <i class="fas fa-clipboard-list me-2" style="color:#d0aa4b;"></i> How often should board effectiveness evaluations be conducted?
+            </button>
+          </h2>
+          <div id="govFaq4" class="accordion-collapse collapse" aria-labelledby="faq4Heading" data-bs-parent="#govFaq">
+            <div class="accordion-body text-muted">
+              Evaluations should be conducted regularly—typically annually or biennially—depending on your size, industry, 
+              and regulatory requirements, to ensure the board fulfills its responsibilities effectively.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / Enquiry Section -->
+  <section class="cta-section py-5">
+    <div class="container">
+      <div class="row align-items-stretch g-0">
+        <!-- Left: Info -->
+        <div class="col-lg-7 p-5 d-flex flex-column justify-content-center cta-info">
+          <h5 class="fw-bold mb-2" style="color:#d0aa4b;">REQUEST A QUOTE</h5>
+          <h2 class="fw-bold mb-3" style="color:#091e3e;">Need A Free Quote? Please Feel Free to Contact Us</h2>
+          <div class="cta-divider mb-4" style="height:4px; width:120px; background:#d0aa4b; border-radius:2px;"></div>
+          <div class="d-flex gap-4 mb-3 flex-wrap">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-arrow-return-left" style="color:#d0aa4b; font-size:1.5rem;"></i>
+              <span class="fw-semibold" style="color:#091e3e;">Reply within 24 hours</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-telephone" style="color:#d0aa4b; font-size:1.5rem;"></i>
+              <span class="fw-semibold" style="color:#091e3e;">24 hrs telephone support</span>
+            </div>
+          </div>
+          <p class="lead mb-4" style="color:#747576;">
+            We promptly respond to customer inquiries for quotations, providing a free and transparent request process. Our commitment is to deliver accurate and detailed information, ensuring clients receive the best insights and options tailored to their needs. Your satisfaction is our priority, and we strive to make the quotation process seamless, informative, and cost-free for a hassle-free experience.
+          </p>
+          <div class="d-flex align-items-center gap-3 mt-2">
+            <div class="cta-phone-icon d-flex align-items-center justify-content-center" style="background:#d0aa4b; width:48px; height:48px; border-radius:8px;">
+              <i class="bi bi-telephone-fill" style="color:#fff; font-size:1.5rem;"></i>
+            </div>
+            <div>
+              <span class="fw-semibold" style="color:#091e3e;">Call to ask any question</span><br>
+              <a href="tel:+971509860136" class="fw-bold" style="color:#d0aa4b; font-size:1.25rem;">+971 50 986 0136</a>
+            </div>
+          </div>
+        </div>
+        <!-- Right: Form -->
+        <div class="col-lg-5 bg-cta-gold p-5 d-flex align-items-center">
+            <?php
+            // Call the function before displaying the form
+            handle_enquiry_form();
+            ?>
+            <form method="POST" class="w-100">
+                <div class="mb-3">
+                    <input type="text" name="name" class="form-control cta-input" placeholder="Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="email" name="email" class="form-control cta-input" placeholder="Email" required>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="contact" class="form-control cta-input" placeholder="Contact" required>
+                </div>
+                <div class="mb-3">
+                    <select name="service" class="form-control cta-input" required>
+                        <option value="" disabled selected>Choose service</option>
+                        <?php
+                        // Fetch all services from categories table
+                        $query = "SELECT cat_id, cat_title FROM categories ORDER BY cat_title ASC";
+                        $result = mysqli_query($connection, $query);
+                        
+                        if(mysqli_num_rows($result) > 0) {
+                            while($row = mysqli_fetch_assoc($result)) {
+                                echo '<option value="' . htmlspecialchars($row['cat_title']) . '">' 
+                                    . htmlspecialchars($row['cat_title']) . '</option>';
+                            }
+                        } else {
+                            echo '<option value="" disabled>No services available</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="sub_service" class="form-control cta-input" placeholder="Type sub service" required>
+                </div>
+                <div class="mb-3">
+                    <textarea name="message" class="form-control cta-input" rows="3" placeholder="Message" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-dark w-100 py-2 fw-bold" style="background:#091e3e;">
+                    Request A Quote
+                </button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- Footer (same as home page) -->
+<?php
+include 'includes/footer.php'
+?>

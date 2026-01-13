@@ -1,0 +1,64 @@
+# OGMBC Web App
+
+Brief: PHP + Bootstrap site for OGMBC consultants (audit, IFRS, advisory).  
+Open the site via a local PHP server (XAMPP / WAMP / MAMP) and use the admin pages for CMS tasks.
+
+Quick links
+- Main entry: [index.php](index.php)
+- Ratios tool: [ratios.php](ratios.php) (see `RATIOS` constant and [`downloadPdf`](ratios.php))
+- DB config: [includes/database.php](includes/database.php) (uses `$connection`)
+- Mail & helpers: [includes/functions.php](includes/functions.php) (contains `insert_categories` usage)
+- Header(s): [includes/header.php](includes/header.php), [includes/header-1.php](includes/header-1.php)
+- Footer: [includes/footer.php](includes/footer.php)
+- CSS: [resources/css/style.css](resources/css/style.css)
+- JS: [resources/js/main.js](resources/js/main.js)
+- Admin example: [admin/categories.php](admin/categories.php)
+
+Prerequisites
+1. PHP 8+ and MySQL (XAMPP/WAMP/MAMP recommended).  
+2. Composer (for PHPMailer).  
+3. Modern browser for client-side features (html2canvas/jsPDF used in [ratios.php](ratios.php)).
+
+Setup (local)
+1. Copy the repository into your web server document root, for example:
+   - Windows XAMPP: C:\xampp\htdocs\ogmbc\ogmbc-web-app
+2. Start Apache and MySQL (XAMPP Control Panel).
+
+Database
+1. Create a database named `ogmbc` (matches [includes/database.php](includes/database.php)):
+   - Using phpMyAdmin or CLI:
+     - CREATE DATABASE ogmbc;
+2. Create required tables (posts, users, etc.) or import a provided SQL dump if available. The app expects `posts` and `users` for the blog features used in [index.php](index.php) and [post_detail.php](post_detail.php).
+
+Composer / PHPMailer
+1. From project root run:
+   ```sh
+   composer require phpmailer/phpmailer
+
+2. Edit includes/functions.php:
+Set $environment to production when ready.
+Configure SMTP credentials (Host, Username, Password) as commented in file.
+Configuration notes
+
+DB connection uses includes/database.php -> variable $connection.
+Email sending logic and environment selection live in includes/functions.php.
+Floating WhatsApp buttons use the number +971502923136 across the site (see index.php and other pages).
+Ratio calculator: client-side only, stores saved reports in browser localStorage; exports via html2canvas + jsPDF (loaded in includes/header-1.php).
+Run / View
+
+Open in browser:
+http://localhost/ogmbc-web-app/index.php
+Admin
+
+Admin area files are in admin/ (e.g. admin/categories.php). Ensure proper authentication before exposing to public.
+Troubleshooting
+
+Blank page / errors: enable PHP error display in php.ini or check Apache error log.
+SMTP issues: ensure credentials and port are correct; for Gmail use App Password and TLS (see comments in includes/functions.php).
+JS features (PDF download) require html2canvas and jsPDF — included in headers.
+Maintenance
+
+Centralize repeated contact info if desired: search for phone/email occurrences (e.g., index.php and includes/footer.php) and update accordingly.
+License / Credits
+
+Project assets and content are project-owned. Third-party libraries used: Bootstrap icons, FontAwesome, jsPDF, html2canvas, PHPMailer.
