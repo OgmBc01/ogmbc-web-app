@@ -49,7 +49,7 @@ if ($post_id > 0) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $post_id = intval($_POST['post_id']);
     $post_title = trim($_POST['post_title']);
-    $post_content = trim($_POST['post_content']);
+    $post_content = trim($_POST['post_content']);  // Don't sanitize - store raw HTML from TinyMCE
     $post_excerpt = trim($_POST['post_excerpt'] ?? '');
     $post_status = trim($_POST['post_status']);
     $post_author = trim($_POST['post_author']);
@@ -165,8 +165,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                     <div class="mb-3">
                                         <label for="post_content" class="form-label">Content *</label>
-                                        <textarea id="post_content" name="post_content" class="form-control" 
-                                                  rows="12" required><?php echo htmlspecialchars($post_content); ?></textarea>
+                                        <textarea id="post_content" name="post_content" class="form-control" rows="12" required>
+                                        <?php echo $post_content; ?>
+                                        </textarea>
                                     </div>
 
                                     <div class="mb-3">

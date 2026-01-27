@@ -6,6 +6,38 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+////// Handle TinyMCE image upload //////
+if (isset($_GET['action']) && $_GET['action'] === 'tinymce_upload') {
+    if (!empty($_FILES['file'])) {
+
+        $upload_dir = "../uploads/editor/";
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+
+        $file = $_FILES['file'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (!in_array($ext, $allowed)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid file type']);
+            exit;
+        }
+
+        $filename = "editor_" . time() . "_" . rand(1000,9999) . "." . $ext;
+        $path = $upload_dir . $filename;
+
+        if (move_uploaded_file($file['tmp_name'], $path)) {
+            echo json_encode([
+                'location' => "/uploads/editor/" . $filename
+            ]);
+            exit;
+        }
+    }
+}
+
+
 // Initialize all variables with empty values
 $post_title = $post_content = $post_excerpt = $meta_title = $meta_description = $meta_keywords = '';
 $post_status = 'published'; // Set default value
@@ -23,7 +55,7 @@ function generateSlug($title) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $post_title = trim($_POST['post_title']);
-    $post_content = trim($_POST['post_content']);
+    $post_content = trim($_POST['post_content']);  // Don't sanitize - store raw HTML from TinyMCE
     $post_excerpt = trim($_POST['post_excerpt'] ?? '');
     $post_status = trim($_POST['post_status']);
     $meta_title = trim($_POST['meta_title'] ?? '');
@@ -126,8 +158,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                     <div class="mb-3">
                                         <label for="post_content" class="form-label">Content *</label>
-                                        <textarea id="post_content" name="post_content" class="form-control" 
-                                                  rows="12" required><?php echo htmlspecialchars($post_content); ?></textarea>
+                                        <textarea id="post_content" name="post_content" class="form-control" rows="12" required>
+                                        <?php echo $post_content; ?>
+                                        </textarea>
+                                        <div class="form-text">Drag and drop image to insert</div>
                                     </div>
 
                                     <div class="mb-3">

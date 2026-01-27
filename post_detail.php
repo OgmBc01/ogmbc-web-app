@@ -92,7 +92,7 @@ if (!$post) {
 
                     <!-- Post Content -->
                     <article class="post-content">
-                        <?php echo $post['post_content']; ?>
+                        <?php echo html_entity_decode($post['post_content']); ?>
                     </article>
 
                     <!-- Social Sharing -->
@@ -150,7 +150,7 @@ if (!$post) {
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($related_post['post_title']); ?></h5>
                             <p class="card-text text-muted"><?php echo date('F j, Y', strtotime($related_post['created_at'])); ?></p>
-                            <p class="card-text"><?php echo htmlspecialchars(substr($related_post['post_excerpt'], 0, 100)); ?>...</p>
+                            <p class="card-text"><?php echo htmlspecialchars(strip_tags(substr($related_post['post_excerpt'], 0, 100))); ?>...</p>
                         </div>
                         <div class="card-footer bg-transparent">
                             <a href="post_detail.php?slug=<?php echo urlencode($related_post['post_slug']); ?>" class="btn btn-sm btn-primary">Read More</a>

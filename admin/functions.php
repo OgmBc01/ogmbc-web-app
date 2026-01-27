@@ -26,6 +26,12 @@ function enforce_session_timeout($timeout_seconds = 1800, $redirect = '../index.
     $_SESSION['last_activity'] = $now;
 }
 
+// Function to sanitize HTML content //
+function sanitizeHTML($html) {
+    // Use built-in PHP filter for basic sanitization
+    return htmlspecialchars($html, ENT_QUOTES, 'UTF-8');
+}
+
 // Function to insert/update categories
 function insert_categories() {
     global $connection;
