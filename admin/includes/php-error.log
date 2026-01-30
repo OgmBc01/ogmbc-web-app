@@ -1,0 +1,5 @@
+[30-Jan-2026 19:15:39 Europe/Berlin] PHP Warning:  require_once(D:\xampp\htdocs\ogmbc\ogmbc-web-app\admin\includes/../header.php): Failed to open stream: No such file or directory in D:\xampp\htdocs\ogmbc\ogmbc-web-app\admin\includes\delete_lead.php on line 14
+[30-Jan-2026 19:15:39 Europe/Berlin] PHP Fatal error:  Uncaught Error: Failed opening required 'D:\xampp\htdocs\ogmbc\ogmbc-web-app\admin\includes/../header.php' (include_path='D:\xampp\php\PEAR') in D:\xampp\htdocs\ogmbc\ogmbc-web-app\admin\includes\delete_lead.php:14
+Stack trace:
+#0 {main}
+  thrown in D:\xampp\htdocs\ogmbc\ogmbc-web-app\admin\includes\delete_lead.php on line 14

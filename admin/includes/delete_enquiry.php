@@ -1,4 +1,5 @@
 <?php
+// Robust error handling for AJAX: always return JSON, catch fatal errors
 ob_start();
 error_reporting(0);
 ini_set('display_errors', 0);
@@ -42,27 +43,22 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $enquiry_id = (int)$_GET['id'];
 
-$query = "SELECT * FROM enquiries WHERE enquiry_id = $enquiry_id";
+$query = "DELETE FROM enquiries WHERE enquiry_id = $enquiry_id";
 $result = mysqli_query($connection, $query);
 
-if ($result && mysqli_num_rows($result) > 0) {
-    $enquiry = mysqli_fetch_assoc($result);
-    // Ensure all fields exist
-    $enquiry = array_map(function($value) {
-        return $value === null ? '' : $value;
-    }, $enquiry);
-    echo json_encode([
-        'success' => true,
-        'enquiry' => $enquiry
-    ]);
+if ($result && mysqli_affected_rows($connection) > 0) {
+    echo json_encode(['success' => true, 'message' => 'Enquiry deleted successfully']);
 } else {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Enquiry not found'
-    ]);
-}
-if ($result) {
-    mysqli_free_result($result);
+    $check_query = "SELECT enquiry_id FROM enquiries WHERE enquiry_id = $enquiry_id";
+    $check_result = mysqli_query($connection, $check_query);
+    if ($check_result && mysqli_num_rows($check_result) === 0) {
+        echo json_encode(['success' => false, 'message' => 'Enquiry not found']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to delete enquiry. Please try again.']);
+    }
+    if ($check_result) {
+        mysqli_free_result($check_result);
+    }
 }
 ob_end_flush();
 ?>

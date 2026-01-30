@@ -1,9 +1,33 @@
 <?php
-// admin/includes/get_lead_details.php
+ob_start();
+error_reporting(0);
+ini_set('display_errors', 0);
+
+set_exception_handler(function($e) {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
+    exit;
+});
+set_error_handler(function($errno, $errstr) {
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Server error: ' . $errstr]);
+    exit;
+});
+
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Fatal error: ' . $error['message']]);
+        exit;
+    }
+});
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once __DIR__ . '/../../includes/database.php';
-session_start();
-
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
@@ -11,22 +35,34 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-if (!isset($_GET['id'])) {
-    echo json_encode(['success' => false, 'message' => 'No ID provided']);
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid lead ID']);
     exit;
 }
 
-$lead_id = intval($_GET['id']);
+$lead_id = (int)$_GET['id'];
+
 $query = "SELECT * FROM leads WHERE id = $lead_id";
 $result = mysqli_query($connection, $query);
 
-if (!$result || mysqli_num_rows($result) === 0) {
-    echo json_encode(['success' => false, 'message' => 'Lead not found']);
-    exit;
+if ($result && mysqli_num_rows($result) > 0) {
+    $lead = mysqli_fetch_assoc($result);
+    // Ensure all fields exist
+    $lead = array_map(function($value) {
+        return $value === null ? '' : $value;
+    }, $lead);
+    echo json_encode([
+        'success' => true,
+        'lead' => $lead
+    ]);
+} else {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Lead not found'
+    ]);
 }
-
-$lead = mysqli_fetch_assoc($result);
-echo json_encode(['success' => true, 'lead' => $lead]);
-
-mysqli_close($connection);
+if ($result) {
+    mysqli_free_result($result);
+}
+ob_end_flush();
 ?>
