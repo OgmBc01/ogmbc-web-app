@@ -201,11 +201,6 @@ if (!$result) {
                                                         title="Update Status">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </button>
-                                                <a href="mailto:<?php echo htmlspecialchars($enquiry['email']); ?>?subject=Re: Your enquiry about <?php echo htmlspecialchars($enquiry['service']); ?>" 
-                                                   class="btn btn-outline-info"
-                                                   title="Send Email">
-                                                    <i class="bi bi-envelope"></i>
-                                                </a>
                                                 <button type="button" class="btn btn-outline-danger delete-enquiry-btn" 
                                                         onclick="showDeleteConfirmation(<?php echo $enquiry['enquiry_id']; ?>, '<?php echo htmlspecialchars(addslashes($enquiry['name'])); ?>')"
                                                         title="Delete Enquiry">

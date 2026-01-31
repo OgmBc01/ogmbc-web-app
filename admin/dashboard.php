@@ -3,11 +3,7 @@ include 'includes/header.php';
 include 'includes/nav.php';
 include 'includes/sidebar.php';
 
-// admin/dashboard.php
-
-// Optional: Check if user has admin role
-// Uncomment if you want to restrict access to specific roles
-
+// Check if user is admin
 $admin_roles = ['admin', 'super_admin', 'moderator'];
 if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $admin_roles)) {
     // Not authorized - redirect to home page
@@ -146,9 +142,6 @@ if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $admin_r
                                 <a class="btn btn-success mb-2" href="employees.php?source=add_employee">
                                     <i class="bi bi-person-plus me-2"></i> Add New Employee
                                 </a>
-                                <button class="btn btn-warning mb-2">
-                                    <i class="bi bi-gear me-2"></i> Settings
-                                </button>
                                 <button class="btn btn-info">
                                     <i class="bi bi-graph-up me-2"></i> View Reports
                                 </button>

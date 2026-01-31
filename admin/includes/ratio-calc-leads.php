@@ -198,11 +198,6 @@ if (!$result) {
                                                         title="Update Status">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </button>
-                                                <a href="mailto:<?php echo htmlspecialchars($lead['email']); ?>?subject=Follow-up%20from%20OGMBC%20Financial%20Analysis" 
-                                                   class="btn btn-outline-info"
-                                                   title="Send Email">
-                                                    <i class="bi bi-envelope"></i>
-                                                </a>
                                                 <button type="button" class="btn btn-outline-danger delete-lead-btn" 
                                                         onclick="showDeleteConfirmation(<?php echo $lead['id']; ?>, '<?php echo htmlspecialchars(addslashes($lead['full_name'])); ?>')"
                                                         title="Delete Lead">

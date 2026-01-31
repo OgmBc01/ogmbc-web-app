@@ -66,14 +66,15 @@
                 </ul>
             </li>
             
+
             <!-- Submissions -->
             <li class="nav-item">
-                <a class="nav-link menu-toggle-btn" href="#" data-menu="users">
+                <a class="nav-link menu-toggle-btn" href="#" data-menu="submissions">
                     <i class="bi bi-file-earmark-text nav-icon"></i> <!-- Recommended -->
                     <span class="nav-text">Submissions</span>
                     <i class="bi bi-chevron-right menu-toggle"></i>
                 </a>
-                <ul class="sub-menu" id="users-menu">
+                <ul class="sub-menu" id="submissions-menu">
                     <li class="nav-item">
                         <a class="nav-link" href="leads.php?source=ratio-calc-leads">
                             <i class="bi bi-calculator nav-icon"></i>
@@ -97,12 +98,12 @@
 
             <!-- Users/Employees Menu -->
             <li class="nav-item">
-                <a class="nav-link menu-toggle-btn" href="#" data-menu="users">
+                <a class="nav-link menu-toggle-btn" href="#" data-menu="employees">
                     <i class="bi bi-people nav-icon"></i>
                     <span class="nav-text">Employees</span>
                     <i class="bi bi-chevron-right menu-toggle"></i>
                 </a>
-                <ul class="sub-menu" id="users-menu">
+                <ul class="sub-menu" id="employees-menu">
                     <li class="nav-item">
                         <a class="nav-link" href="employees.php?source=add_employee">
                             <i class="bi bi-person-plus nav-icon"></i>
