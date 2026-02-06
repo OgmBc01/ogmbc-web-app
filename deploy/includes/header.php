@@ -55,7 +55,7 @@ include 'functions.php'
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom CSS abd Scripts-->
-  <link rel="stylesheet" href="resources/css/style.css" />
+  <link rel="stylesheet" href="resources/css/style.css?v=<?php echo time(); ?>" />
   <script src="https://widget.senja.io/widget/a95d7d19-660c-4783-9a80-61b67e8d3b43/platform.js" type="text/javascript" async></script>
   <script type="text/javascript" src="https://widget.senja.io/js/iframeResizer.min.js"></script>
 </head>

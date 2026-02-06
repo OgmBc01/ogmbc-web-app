@@ -1,5 +1,5 @@
     <!-- Bootstrap JS -->
-    <script src="resources/js/main.js"></script>
+    <script src="resources/js/main.js?v=<?php echo time(); ?>"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.tiny.cloud/1/oii13cxduct5af15nee77fercq0vsw9lsib6z8iswjjw9otp/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
