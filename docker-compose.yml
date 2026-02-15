@@ -1,0 +1,41 @@
+services:
+  second_mysql:
+    image: mysql:8.0
+    container_name: ogmbc_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ogmbc
+    volumes:
+      - ogmbc_data:/var/lib/mysql
+
+  second_phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ogmbc_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: second_mysql
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - second_mysql
+
+  second_web:
+    build: .
+    container_name: ogmbc_web
+    restart: always
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8010:80"
+    depends_on:
+      - second_mysql
+    environment:
+      DB_HOST: second_mysql
+      DB_NAME: ogmbc
+      DB_USER: root
+      DB_PASS: rootpassword
+
+volumes:
+  ogmbc_data:
