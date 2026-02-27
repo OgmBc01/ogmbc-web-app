@@ -4,7 +4,7 @@ insert_clients();
 
 // Check if user is logged in and has permission
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
               
@@ -36,12 +36,28 @@ $message_type = '';
                         <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Client Information</h5>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($message)): ?>
-                        <div class="alert alert-<?php echo $message_type == 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
-                            <?php echo $message; ?>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        <?php endif; ?>
+                                                <?php if (!empty($message)): ?>
+                                                <div class="alert alert-<?php echo $message_type == 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
+                                                        <?php echo $message; ?>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                </div>
+                                                <?php endif; ?>
+
+                                                <!-- Success Modal -->
+                                                <div class="modal fade" id="clientSuccessModal" tabindex="-1" aria-labelledby="clientSuccessModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-success text-white">
+                                                                <h5 class="modal-title" id="clientSuccessModalLabel"><i class="bi bi-check-circle me-2"></i>Client Added Successfully</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body text-center">
+                                                                <p class="mb-3">The new client has been added to the database.</p>
+                                                                <a href="./clients.php" class="btn btn-success"><i class="bi bi-people me-1"></i> View All Clients</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                         <form method="POST" action="" id="clientForm">
                             <input type="hidden" name="submit_client" value="1">
@@ -332,4 +348,14 @@ document.getElementById('clientForm').addEventListener('submit', function(e) {
         return;
     }
 });
+
+// Show success modal if redirected after add
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('added') === 'true') {
+        const modal = new bootstrap.Modal(document.getElementById('clientSuccessModal'));
+        modal.show();
+    }
+});
+</script>
 </script>

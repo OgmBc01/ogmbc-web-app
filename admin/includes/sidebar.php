@@ -20,10 +20,33 @@
                 </a>
             </li>
 
-            <!-- Operations Menu -->
+            <!-- Sales/CRM Menu -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn" href="#" data-menu="sales">
                     <i class="bi bi-graph-up nav-icon"></i>
+                    <span class="nav-text">Sales/CRM</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="sales-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="clients.php?source=add_client">
+                            <i class="bi bi-plus-circle nav-icon"></i>
+                            <span class="nav-text">Add Client</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./clients.php">
+                            <i class="bi bi-card-checklist nav-icon"></i>
+                            <span class="nav-text">View All Clients</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Operations Menu -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn" href="#" data-menu="operations">
+                    <i class="bi bi-tools nav-icon"></i>
                     <span class="nav-text">Operations</span>
                     <i class="bi bi-chevron-right menu-toggle"></i>
                 </a>
@@ -134,28 +157,5 @@
                     <span class="nav-text">Bank Accounts</span>
                 </a>
             </li>
-            
-            <!-- Sales/CRM Menu
-            <li class="nav-item">
-                <a class="nav-link menu-toggle-btn" href="#" data-menu="sales">
-                    <i class="bi bi-graph-up nav-icon"></i>
-                    <span class="nav-text">Sales/CRM</span>
-                    <i class="bi bi-chevron-right menu-toggle"></i>
-                </a>
-                <ul class="sub-menu" id="sales-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="clients.php?source=add_client">
-                            <i class="bi bi-plus-circle nav-icon"></i>
-                            <span class="nav-text">Add Client</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./clients.php">
-                            <i class="bi bi-card-checklist nav-icon"></i>
-                            <span class="nav-text">View All Clients</span>
-                        </a>
-                    </li>
-                </ul>
-            </li> -->
         </ul>
     </div>

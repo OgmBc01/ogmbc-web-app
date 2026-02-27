@@ -2,7 +2,7 @@
 
 // Check if user is logged in and has permission to create posts
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 

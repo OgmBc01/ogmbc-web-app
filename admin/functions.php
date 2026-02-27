@@ -389,12 +389,23 @@ function insert_clients() {
 
             $success_message = "Client updated successfully!";
             $redirect_param = "updated=true";
+            $client_query = mysqli_query($connection, $query);
         } else {
-            echo "<script>showAlert('Invalid client ID', 'error');</script>";
-            return;
-        }
+            // Insert new client
+            $query = "INSERT INTO clients (
+                        company_name, trade_license_no, country, emirate_zone, business_activity, address,
+                        contact_name, contact_designation, contact_mobile, contact_email, service_id, service_description,
+                        expected_start_date, payment_currency, payment_term, service_total_fee, lead_source, client_status
+                    ) VALUES (
+                        '{$company_name}', '{$trade_license_no}', '{$country}', '{$emirate_zone}', '{$business_activity}', '{$address}',
+                        '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', {$service_id}, '{$service_description}',
+                        " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
+                    )";
 
-        $client_query = mysqli_query($connection, $query);
+            $success_message = "Client added successfully!";
+            $redirect_param = "added=true";
+            $client_query = mysqli_query($connection, $query);
+        }
 
         if (!$client_query) {
             die('Query Failed: ' . mysqli_error($connection));
