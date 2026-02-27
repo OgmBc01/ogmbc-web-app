@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_id'])) {
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header table-dark text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>User Roles</h5>
                     <a href="user_roles.php?source=add_role" class="btn btn-light btn-sm">
                         <i class="bi bi-plus-circle"></i> Add New Role
@@ -25,7 +25,7 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
                             <thead>
-                                <tr>
+                                <tr class="table-dark">
                                     <th>ID</th>
                                     <th>Role Name</th>
                                     <th>Description</th>
@@ -83,7 +83,7 @@ if (!isset($_SESSION['user_id'])) {
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <div class="card-header table-dark text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-tags me-2"></i>User Types</h5>
                     <a href="user_roles.php?source=add_type" class="btn btn-light btn-sm">
                         <i class="bi bi-plus-circle"></i> Add New Type
@@ -93,7 +93,7 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
                             <thead>
-                                <tr>
+                                <tr class="table-dark">
                                     <th>ID</th>
                                     <th>Type Name</th>
                                     <th>Description</th>

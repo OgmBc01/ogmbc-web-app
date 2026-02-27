@@ -9,24 +9,87 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Fetch all employees from the database
-$sql = "SELECT * FROM employees ORDER BY first_name, last_name";
+// Fetch all employees from both users and employees tables
+// Show employees where either:
+// - users.type_id = 1 (employee type)
+// - employees.user_type = 'employee'
+$sql = "SELECT 
+            e.*, 
+            u.username,
+            u.user_status,
+            u.created_at as user_created_at,
+            r.role_name,
+            r.role_level,
+            t.type_name
+        FROM employees e
+        INNER JOIN users u ON e.user_id = u.user_id
+        LEFT JOIN user_roles r ON u.role_id = r.role_id
+        LEFT JOIN user_types t ON u.type_id = t.type_id
+        WHERE u.type_id = 1 OR e.user_type = 'employee'
+        ORDER BY e.first_name, e.last_name";
+
 $result = $connection->query($sql);
 
 // Check for errors
 if (!$result) {
     die("Query failed: " . $connection->error);
 }
+
+// Get statistics
+$stats_sql = "SELECT 
+                COUNT(*) as total_employees,
+                SUM(CASE WHEN u.user_status = 'active' THEN 1 ELSE 0 END) as active_employees,
+                COUNT(DISTINCT r.role_name) as role_count
+              FROM employees e
+              INNER JOIN users u ON e.user_id = u.user_id
+              LEFT JOIN user_roles r ON u.role_id = r.role_id
+              WHERE u.type_id = 1 OR e.user_type = 'employee'";
+$stats_result = $connection->query($stats_sql);
+$stats = $stats_result->fetch_assoc();
 ?>
 <!-- Main Content -->
 <div class="main-content" id="mainContent">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="page-title">Employee Management</h1>
-            <a href="employees.php?source=add_employee" class="btn btn-primary">
-                <i class="bi bi-person-plus"></i> Add New Employee
-            </a>
+            <div>
+                <a href="user_roles.php" class="btn btn-info me-2">
+                    <i class="bi bi-shield-lock"></i> Roles & Types
+                </a>
+                <a href="employees.php?source=add_employee" class="btn btn-primary">
+                    <i class="bi bi-person-plus"></i> Add New Employee
+                </a>
+            </div>
         </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Employees</h5>
+                        <h2><?php echo $stats['total_employees'] ?? 0; ?></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Active Employees</h5>
+                        <h2><?php echo $stats['active_employees'] ?? 0; ?></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Roles Used</h5>
+                        <h2><?php echo $stats['role_count'] ?? 0; ?></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Employees Table -->
         <div class="card shadow-sm">
             <div class="card-header">
@@ -42,18 +105,30 @@ if (!$result) {
                                 <th width="70">Image</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Status</th>
                                 <th>Field of Study</th>
                                 <th>Qualification</th>
-                                <th>Highest Graduation</th>
-                                <th width="80">Year</th>
                                 <th width="180">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if ($result->num_rows > 0): ?>
+                            <?php if ($result && $result->num_rows > 0): ?>
                                 <?php 
                                 $serial = 1;
                                 while ($employee = $result->fetch_assoc()): 
+                                    // Set badge color based on role level
+                                    $role_class = 'secondary';
+                                    if ($employee['role_level'] >= 90) {
+                                        $role_class = 'danger';
+                                    } elseif ($employee['role_level'] >= 70) {
+                                        $role_class = 'warning';
+                                    } elseif ($employee['role_level'] >= 50) {
+                                        $role_class = 'info';
+                                    }
+                                    
+                                    $status_class = $employee['user_status'] == 'active' ? 'success' : 'warning';
                                 ?>
                                     <tr id="employee-row-<?php echo $employee['employee_id']; ?>">
                                         <td class="fw-bold"><?php echo $serial++; ?></td>
@@ -77,10 +152,23 @@ if (!$result) {
                                             <?php echo htmlspecialchars($employee['first_name'] . ' ' . $employee['last_name']); ?>
                                         </td>
                                         <td><?php echo htmlspecialchars($employee['user_email']); ?></td>
+                                        <td><code><?php echo htmlspecialchars($employee['username']); ?></code></td>
+                                        <td>
+                                            <?php if ($employee['type_name']): ?>
+                                                <span class="badge bg-success">
+                                                    <?php echo htmlspecialchars($employee['type_name']); ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary">Not Assigned</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-<?php echo $status_class; ?>">
+                                                <?php echo $employee['user_status']; ?>
+                                            </span>
+                                        </td>
                                         <td><?php echo !empty($employee['field_of_study']) ? htmlspecialchars($employee['field_of_study']) : '<span class="text-muted">N/A</span>'; ?></td>
                                         <td><?php echo !empty($employee['qualification']) ? htmlspecialchars($employee['qualification']) : '<span class="text-muted">N/A</span>'; ?></td>
-                                        <td><?php echo !empty($employee['highest_graduation']) ? htmlspecialchars($employee['highest_graduation']) : '<span class="text-muted">N/A</span>'; ?></td>
-                                        <td><?php echo !empty($employee['year_of_graduation']) ? htmlspecialchars($employee['year_of_graduation']) : '<span class="text-muted">N/A</span>'; ?></td>
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group">
                                                 <button type="button" class="btn btn-outline-primary view-employee-btn" 
@@ -106,7 +194,7 @@ if (!$result) {
                                 <?php endwhile; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="10" class="text-center py-4">
+                                    <td colspan="11" class="text-center py-4">
                                         <div class="text-muted">
                                             <i class="bi bi-people display-4 d-block mb-2"></i>
                                             <h5>No employees found</h5>
@@ -227,6 +315,15 @@ if (!$result) {
         object-fit: cover;
         border: 3px solid #f1bf70;
     }
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+    code {
+        background: #f8f9fa;
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
 </style>
 
 <script>
@@ -270,6 +367,14 @@ function viewEmployee(employeeId) {
                     imageUrl = 'https://ui-avatars.com/api/?name=' + name + '&background=f1bf70&color=0f172a&size=120';
                 }
                 
+                const roleBadge = employee.role_name ? 
+                    `<span class="badge bg-info">${escapeHtml(employee.role_name)}</span>` : 
+                    '<span class="badge bg-secondary">Not Assigned</span>';
+                
+                const statusBadge = employee.user_status == 'active' ? 
+                    '<span class="badge bg-success">Active</span>' : 
+                    '<span class="badge bg-warning">Inactive</span>';
+                
                 const detailsHtml = `
                     <div class="row">
                         <div class="col-md-4 text-center mb-4 mb-md-0">
@@ -279,6 +384,7 @@ function viewEmployee(employeeId) {
                                  onerror="this.src='https://ui-avatars.com/api/?name=Employee&background=f1bf70&color=0f172a&size=120'">
                             <h4 class="mb-1">${escapeHtml(employee.first_name + ' ' + employee.last_name)}</h4>
                             <p class="text-muted">Employee ID: ${employee.employee_id}</p>
+                            <p>${roleBadge} ${statusBadge}</p>
                         </div>
                         <div class="col-md-8">
                             <div class="row">
@@ -286,39 +392,29 @@ function viewEmployee(employeeId) {
                                     <p><strong>Email:</strong><br>
                                     <a href="mailto:${escapeHtml(employee.user_email)}">${escapeHtml(employee.user_email)}</a></p>
                                     
-                                    <p><strong>Phone:</strong><br>
-                                    ${employee.contact_number ? escapeHtml(employee.contact_number) : '<span class="text-muted">N/A</span>'}</p>
+                                    <p><strong>Username:</strong><br>
+                                    <code>${escapeHtml(employee.username)}</code></p>
                                     
-                                    <p><strong>Address:</strong><br>
-                                    ${employee.address ? escapeHtml(employee.address) : '<span class="text-muted">N/A</span>'}</p>
-                                    
-                                    <p><strong>Gender:</strong><br>
-                                    ${employee.gender ? escapeHtml(employee.gender) : '<span class="text-muted">N/A</span>'}</p>
-                                </div>
-                                <div class="col-md-6">
                                     <p><strong>Field of Study:</strong><br>
                                     ${employee.field_of_study ? escapeHtml(employee.field_of_study) : '<span class="text-muted">N/A</span>'}</p>
                                     
                                     <p><strong>Qualification:</strong><br>
                                     ${employee.qualification ? escapeHtml(employee.qualification) : '<span class="text-muted">N/A</span>'}</p>
-                                    
+                                </div>
+                                <div class="col-md-6">
                                     <p><strong>Highest Graduation:</strong><br>
                                     ${employee.highest_graduation ? escapeHtml(employee.highest_graduation) : '<span class="text-muted">N/A</span>'}</p>
                                     
                                     <p><strong>Year of Graduation:</strong><br>
                                     ${employee.year_of_graduation ? escapeHtml(employee.year_of_graduation) : '<span class="text-muted">N/A</span>'}</p>
+                                    
+                                    <p><strong>User Type:</strong><br>
+                                    <span class="badge bg-secondary">${escapeHtml(employee.user_type)}</span></p>
+                                    
+                                    <p><strong>Created:</strong><br>
+                                    ${new Date(employee.created_at).toLocaleDateString()}</p>
                                 </div>
                             </div>
-                            ${employee.bio ? `
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <h6>Bio/Description:</h6>
-                                    <div class="bg-light p-3 rounded">
-                                        ${escapeHtml(employee.bio).replace(/\n/g, '<br>')}
-                                    </div>
-                                </div>
-                            </div>` : ''}
                         </div>
                     </div>`;
                 
