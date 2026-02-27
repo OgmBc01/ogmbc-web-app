@@ -66,6 +66,39 @@
                 </ul>
             </li>
 
+            <!-- Users Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'users.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                href="#" data-menu="users">
+                    <i class="bi bi-people nav-icon"></i>
+                    <span class="nav-text">Users</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="users-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'add_user') ? 'active' : ''; ?>" 
+                        href="users.php?source=add_user">
+                            <i class="bi bi-person-plus nav-icon"></i>
+                            <span class="nav-text">Add User</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (!isset($_GET['source']) || $_GET['source'] == 'view_all') ? 'active' : ''; ?>" 
+                        href="./users.php">
+                            <i class="bi bi-person-lines-fill nav-icon"></i>
+                            <span class="nav-text">View All</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'user_roles.php') ? 'active' : ''; ?>" 
+                        href="user_roles.php">
+                            <i class="bi bi-shield-lock nav-icon"></i>
+                            <span class="nav-text">Roles & Types</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Posts Menu -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn" href="#" data-menu="posts">
