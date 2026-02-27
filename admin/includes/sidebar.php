@@ -150,6 +150,32 @@
                 </a>
             </li>
 
+            <!-- Departments Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'departments.php' && !isset($_GET['source'])) ? 'active-sub' : ''; ?>" 
+                href="#" data-menu="departments">
+                    <i class="bi bi-building nav-icon"></i>
+                    <span class="nav-text">Departments</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="departments-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'add_department') ? 'active-sub' : ''; ?>" 
+                        href="departments.php?source=add_department">
+                            <i class="bi bi-plus-circle nav-icon"></i>
+                            <span class="nav-text">Add Department</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (!isset($_GET['source']) || $_GET['source'] == 'view_all_departments') ? 'active-sub' : ''; ?>" 
+                        href="./departments.php">
+                            <i class="bi bi-list-ul nav-icon"></i>
+                            <span class="nav-text">View All</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Bank Accounts Menu -->
             <li class="nav-item">
                 <a class="nav-link" href="bank_accounts.php" data-menu="bank-accounts">

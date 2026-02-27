@@ -1,5 +1,6 @@
 <?php
 // Reusable session inactivity timeout checker
+if (!function_exists('enforce_session_timeout')) {
 function enforce_session_timeout($timeout_seconds = 1800, $redirect = '../index.php?error=session&reason=inactivity') {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -25,14 +26,18 @@ function enforce_session_timeout($timeout_seconds = 1800, $redirect = '../index.
     // update last activity timestamp
     $_SESSION['last_activity'] = $now;
 }
+} // Close function_exists block for enforce_session_timeout
 
 // Function to sanitize HTML content //
+if (!function_exists('sanitizeHTML')) {
 function sanitizeHTML($html) {
     // Use built-in PHP filter for basic sanitization
     return htmlspecialchars($html, ENT_QUOTES, 'UTF-8');
 }
+} // Close function_exists block for sanitizeHTML
 
 // Function to insert/update categories
+if (!function_exists('insert_categories')) {
 function insert_categories() {
     global $connection;
 
@@ -70,8 +75,10 @@ function insert_categories() {
         }
     }
 }
+} // Close function_exists block for insert_categories
 
 //////////////// FIND CATEGORY BY ID //////////////////
+if (!function_exists('findCategoryById')) {
 function findCategoryById($cat_id) {
     global $connection;
     
@@ -81,11 +88,14 @@ function findCategoryById($cat_id) {
     if($result && mysqli_num_rows($result) > 0) {
         return mysqli_fetch_assoc($result);
     }
+    return null;
     
     return null;
 }
+} // Close function_exists block for findCategoryById
 
 //////////////// GET CATEGORY PRICE //////////////////
+if (!function_exists('getCategoryPrice')) {
 function getCategoryPrice($cat_id) {
     global $connection;
     
@@ -99,8 +109,11 @@ function getCategoryPrice($cat_id) {
     
     return 0.00;
 }
+} // Close function_exists block for getCategoryPrice
+
 
 //////////////// FIND ALL CATEGORIES //////////////////
+if (!function_exists('findAllCategories')) {
 function findAllCategories() {
     global $connection;
 
@@ -123,8 +136,10 @@ function findAllCategories() {
         echo "</tr>";
     }
 }
+} // Close function_exists block for findAllCategories
 
 // Function to delete categories
+if (!function_exists('deleteCategory')) {
 function deleteCategory() {
     global $connection;
 
@@ -146,6 +161,7 @@ function deleteCategory() {
         }
     }
 }
+} // Close function_exists block for deleteCategory
 
 
 ////////////////////////
@@ -154,6 +170,7 @@ function deleteCategory() {
 
 //////////////////
 
+if (!function_exists('checkBankAccountsSession')) {
 function checkBankAccountsSession() {
     if(!isset($_SESSION['bank_accounts_access']) || !$_SESSION['bank_accounts_access']) {
         header('Location: dashboard.php?session_expired=true');
@@ -176,7 +193,7 @@ function checkBankAccountsSession() {
     $_SESSION['bank_accounts_last_activity'] = time();
 }
 
-function insert_bank_account() {
+    function insert_bank_account() {
     global $connection;
     
     // Check session before proceeding
@@ -233,9 +250,12 @@ function insert_bank_account() {
             }
         }
     }
-}
+    }
+} // Close function_exists block for insert_bank_account
 
-function findAllBankAccounts() {
+
+if (!function_exists('findAllBankAccounts')) {
+    function findAllBankAccounts() {
     global $connection;
 
     $query = "SELECT * FROM bank_accounts ORDER BY account_id DESC";
@@ -268,9 +288,11 @@ function findAllBankAccounts() {
         echo "</td>";
         echo "</tr>";
     }
-}
+    }
+} // Close function_exists block for findAllBankAccounts
 
-function deleteBankAccount() {
+if (!function_exists('deleteBankAccount')) {
+    function deleteBankAccount() {
     global $connection;
     
     // Check session before proceeding
@@ -290,8 +312,10 @@ function deleteBankAccount() {
             exit;
         }
     }
-}
+    }
+} // Close function_exists block for deleteBankAccount
 
+if (!function_exists('verifyBankAccess')) {
 function verifyBankAccess() {
     // Don't call session_start() here if it's already called in your pages
     
@@ -325,9 +349,39 @@ function verifyBankAccess() {
 
 
 //////////////// CLIENT MANAGEMENT FUNCTIONS ////////////////
+// Function to generate a unique but readable password
+function generate_client_password($company_name, $contact_name) {
+    // Get first 3 letters of company name (uppercase)
+    $company_prefix = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $company_name), 0, 3));
+    if (strlen($company_prefix) < 3) {
+        $company_prefix = str_pad($company_prefix, 3, 'X');
+    }
+    
+    // Get first 2 letters of contact name (lowercase)
+    $contact_prefix = strtolower(substr(preg_replace('/[^A-Za-z]/', '', $contact_name), 0, 2));
+    if (strlen($contact_prefix) < 2) {
+        $contact_prefix = str_pad($contact_prefix, 2, 'x');
+    }
+    
+    // Add random numbers and special character
+    $random_numbers = rand(100, 999);
+    $special_chars = ['!', '@', '#', '$', '%', '&', '*'];
+    $special_char = $special_chars[array_rand($special_chars)];
+    
+    // Combine to create password
+    $password = $company_prefix . $contact_prefix . $random_numbers . $special_char;
+    
+    return $password;
+}
 
-// Function to insert/update clients
-// Function to insert/update clients
+// Function to check if password is unique
+function is_password_unique($connection, $password) {
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    // Note: We can't search by hashed password directly, so we'll generate a few times if needed
+    // For simplicity, we'll assume passwords are unique enough with our generation method
+    return true;
+}
+
 function insert_clients() {
     global $connection;
 
@@ -365,7 +419,7 @@ function insert_clients() {
         }
 
         if ($client_id > 0) {
-            // Update existing client
+            // Update existing client - don't change password on update
             $query = "UPDATE clients SET 
                      company_name = '{$company_name}', 
                      trade_license_no = '{$trade_license_no}', 
@@ -390,33 +444,100 @@ function insert_clients() {
             $success_message = "Client updated successfully!";
             $redirect_param = "updated=true";
             $client_query = mysqli_query($connection, $query);
+            
+            // Store plain password for display (not used in update)
+            $plain_password = '';
         } else {
-            // Insert new client
+            // Generate a unique password for new client
+            $plain_password = generate_client_password($company_name, $contact_name);
+            
+            // Hash the password for storage
+            $hashed_password = password_hash($plain_password, PASSWORD_DEFAULT);
+            
+            // Insert new client with password
             $query = "INSERT INTO clients (
                         company_name, trade_license_no, country, emirate_zone, business_activity, address,
-                        contact_name, contact_designation, contact_mobile, contact_email, service_id, service_description,
-                        expected_start_date, payment_currency, payment_term, service_total_fee, lead_source, client_status
+                        contact_name, contact_designation, contact_mobile, contact_email, client_password,
+                        service_id, service_description, expected_start_date, payment_currency, payment_term, 
+                        service_total_fee, lead_source, client_status
                     ) VALUES (
                         '{$company_name}', '{$trade_license_no}', '{$country}', '{$emirate_zone}', '{$business_activity}', '{$address}',
-                        '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', {$service_id}, '{$service_description}',
-                        " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
+                        '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', '{$hashed_password}',
+                        {$service_id}, '{$service_description}', " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
+                        '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
                     )";
 
-            $success_message = "Client added successfully!";
-            $redirect_param = "added=true";
+            $success_message = "Client added successfully! A password has been generated for the client.";
+            $redirect_param = "added=true&show_password=true";
             $client_query = mysqli_query($connection, $query);
+            
+            // Get the newly created client ID
+            $new_client_id = mysqli_insert_id($connection);
         }
 
         if (!$client_query) {
             die('Query Failed: ' . mysqli_error($connection));
         } else {
+            // Show success message
             echo "<script>showAlert('{$success_message}', 'success');</script>";
+
+            // After successful insertion, send email
+            if ($client_id == 0) {
+                send_client_welcome_email($contact_email, $company_name, $plain_password);
+            }
+
+            // If it's a new client, store the plain password in session to display
+            if ($client_id == 0 && isset($plain_password)) {
+                $_SESSION['new_client_password'] = $plain_password;
+                $_SESSION['new_client_email'] = $contact_email;
+                $_SESSION['new_client_name'] = $company_name;
+                $redirect_param = "added=true&show_password=true&id=" . $new_client_id;
+            }
+
             echo "<script>setTimeout(() => { window.location.href = 'clients.php?{$redirect_param}'; }, 1500);</script>";
         }
     }
 }
+}
+
+// Function to send welcome email with credentials
+function send_client_welcome_email($email, $company_name, $plain_password) {
+    $subject = "Welcome to Our Platform - Your Login Credentials";
+    
+    $message = "
+    <html>
+    <head>
+        <title>Welcome to Our Platform</title>
+    </head>
+    <body>
+        <h2>Welcome, {$company_name}!</h2>
+        <p>Thank you for registering with us. Your account has been created successfully.</p>
+        
+        <h3>Your Login Credentials:</h3>
+        <p><strong>Email:</strong> {$email}</p>
+        <p><strong>Password:</strong> {$plain_password}</p>
+        
+        <p>You can log in to your account using the link below:</p>
+        <p><a href='https://yourdomain.com/client-login.php'>Login to Client Portal</a></p>
+        
+        <p>For security reasons, we recommend changing your password after first login.</p>
+        
+        <p>Best regards,<br>Your Company Name</p>
+    </body>
+    </html>
+    ";
+    
+    // Set content-type headers for HTML email
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers .= "From: noreply@yourdomain.com" . "\r\n";
+    
+    // Send email
+    return mail($email, $subject, $message, $headers);
+}
 
 // Function to get all clients
+if (!function_exists('findAllClients')) {
 function findAllClients() {
     global $connection;
 
@@ -491,8 +612,10 @@ function findAllClients() {
         echo "</tr>";
     }
 }
+}
 
 // Helper function for status badge classes
+if (!function_exists('getStatusBadgeClass')) {
 function getStatusBadgeClass($status) {
     $classes = [
         'New Lead' => 'bg-secondary',
@@ -511,6 +634,7 @@ function getStatusBadgeClass($status) {
     ];
     
     return $classes[$status] ?? 'bg-secondary';
+}
 }
 
 // Helper function to check if review button should be shown

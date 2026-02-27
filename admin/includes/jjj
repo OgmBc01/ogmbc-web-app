@@ -1,0 +1,26 @@
+Now I want to create a new module (Users), where I can perform all the 4 CRUD operations for users, and any other features for handling and managing users (in general) employees, clients
+
+Users can be from any department, so aside from users module, also create a department module where we can manage the departments.
+
+I need to also be dynamically managing user roles, so create another module for user roles
+
+The departments and user roles modules be under the settings, where admin can assign a department to an employee or set their roles for access permissions.
+
+But now don't work on the settings page, just focus on creating the modules.
+
+For the users module I need it to follow this structure;
+
+
+
+
+
+
+Users can be from any department, so aside from users module, also create a department module where we can manage the departments.
+
+I need to also be dynamically managing user roles, so create another module for user roles
+
+The departments and user roles modules be under the settings, where admin can assign a department to an employee or set their roles for access permissions.
+
+But now don't work on the settings page, just focus on creating the modules.
+
+ if its better for me to create a sepeate employees table, then let me know, bcos I think that would be better. And if so, when creating a new 

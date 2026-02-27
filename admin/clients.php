@@ -85,6 +85,94 @@ include "includes/sidebar.php";
     </div>
 </div>
 
+
+<!-- Success Modal for Client Addition (with credentials) -->
+<div class="modal fade" id="clientPasswordModal" tabindex="-1" aria-labelledby="clientPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="clientPasswordModalLabel">
+                    <i class="bi bi-check-circle me-2"></i>Client Added Successfully
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success">
+                    <i class="bi bi-info-circle me-2"></i>
+                    The client has been added. Please save these credentials. The password cannot be retrieved again.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Company Name:</label>
+                    <div class="p-2 bg-light rounded" id="displayCompanyName"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Email:</label>
+                    <div class="p-2 bg-light rounded" id="displayEmail"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Password:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-light" id="displayPassword" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyPassword()">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Note:</strong> The client can use this email and password to log in to the client portal.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="copyPasswordAndClose()">
+                    <i class="bi bi-check-all"></i> Copy & Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show success modal with credentials after client addition
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('show_password') === 'true') {
+        <?php if (isset($_SESSION['new_client_password'])): ?>
+        document.getElementById('displayCompanyName').textContent = '<?php echo addslashes($_SESSION['new_client_name']); ?>';
+        document.getElementById('displayEmail').textContent = '<?php echo addslashes($_SESSION['new_client_email']); ?>';
+        document.getElementById('displayPassword').value = '<?php echo addslashes($_SESSION['new_client_password']); ?>';
+        // Clear session data
+        <?php 
+        unset($_SESSION['new_client_password']);
+        unset($_SESSION['new_client_email']);
+        unset($_SESSION['new_client_name']);
+        ?>
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('clientPasswordModal'));
+        modal.show();
+        <?php endif; ?>
+    }
+});
+
+// Copy password to clipboard
+function copyPassword() {
+    const passwordInput = document.getElementById('displayPassword');
+    passwordInput.select();
+    passwordInput.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    
+    // Show tooltip or alert
+    alert('Password copied to clipboard!');
+}
+
+// Copy password and close modal
+function copyPasswordAndClose() {
+    copyPassword();
+    bootstrap.Modal.getInstance(document.getElementById('clientPasswordModal')).hide();
+}
+</script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 // Load client details for modal

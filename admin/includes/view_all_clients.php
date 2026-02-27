@@ -307,24 +307,43 @@ document.addEventListener('click', function(e) {
 </script>
 
 <!-- Client Details Modal -->
+<style>
+    /* Make modal wider and responsive */
+    #clientDetailsModal .modal-dialog {
+        max-width: 90vw;
+        width: 100%;
+    }
+    #clientDetailsModal .modal-content {
+        min-height: 60vh;
+        overflow-x: auto;
+    }
+    @media (max-width: 768px) {
+        #clientDetailsModal .modal-dialog {
+            max-width: 98vw;
+        }
+        #clientDetailsModal .modal-content {
+            min-height: 40vh;
+        }
+    }
+</style>
 <div class="modal fade" id="clientDetailsModal" tabindex="-1" aria-labelledby="clientDetailsLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header card-header">
-        <h5 class="modal-title" id="clientDetailsLabel"><i class="bi bi-person-lines-fill me-2"></i>Client Details</h5>
-         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="clientDetailsModalBody">
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header card-header">
+                <h5 class="modal-title" id="clientDetailsLabel"><i class="bi bi-person-lines-fill me-2"></i>Client Details</h5>
+                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <p class="mt-2">Loading client details...</p>
+            <div class="modal-body" id="clientDetailsModalBody">
+                <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading client details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
     </div>
-  </div>
 </div>
