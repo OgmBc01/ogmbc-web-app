@@ -9,10 +9,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Fetch all employees from both users and employees tables
-// Show employees where either:
-// - users.type_id = 1 (employee type)
-// - employees.user_type = 'employee'
+// Fetch all employees from both users and employees tables with department info
+// Show employees where user_type = 'employee' (as per schema)
 $sql = "SELECT 
             e.*, 
             u.username,
@@ -20,12 +18,15 @@ $sql = "SELECT
             u.created_at as user_created_at,
             r.role_name,
             r.role_level,
-            t.type_name
+            t.type_name,
+            d.dept_name as department_name,
+            d.dept_code as department_code
         FROM employees e
         INNER JOIN users u ON e.user_id = u.user_id
         LEFT JOIN user_roles r ON u.role_id = r.role_id
         LEFT JOIN user_types t ON u.type_id = t.type_id
-        WHERE u.type_id = 1 OR e.user_type = 'employee'
+        LEFT JOIN departments d ON e.department_id = d.id
+        WHERE e.user_type = 'employee'
         ORDER BY e.first_name, e.last_name";
 
 $result = $connection->query($sql);
@@ -39,11 +40,12 @@ if (!$result) {
 $stats_sql = "SELECT 
                 COUNT(*) as total_employees,
                 SUM(CASE WHEN u.user_status = 'active' THEN 1 ELSE 0 END) as active_employees,
-                COUNT(DISTINCT r.role_name) as role_count
+                COUNT(DISTINCT r.role_name) as role_count,
+                COUNT(DISTINCT e.department_id) as department_count
               FROM employees e
               INNER JOIN users u ON e.user_id = u.user_id
               LEFT JOIN user_roles r ON u.role_id = r.role_id
-              WHERE u.type_id = 1 OR e.user_type = 'employee'";
+              WHERE e.user_type = 'employee'";
 $stats_result = $connection->query($stats_sql);
 $stats = $stats_result->fetch_assoc();
 ?>
@@ -64,7 +66,7 @@ $stats = $stats_result->fetch_assoc();
 
         <!-- Statistics Cards -->
         <div class="row mb-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
                         <h5 class="card-title">Total Employees</h5>
@@ -72,7 +74,7 @@ $stats = $stats_result->fetch_assoc();
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card bg-success text-white">
                     <div class="card-body">
                         <h5 class="card-title">Active Employees</h5>
@@ -80,11 +82,19 @@ $stats = $stats_result->fetch_assoc();
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card bg-info text-white">
                     <div class="card-body">
                         <h5 class="card-title">Roles Used</h5>
                         <h2><?php echo $stats['role_count'] ?? 0; ?></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Departments</h5>
+                        <h2><?php echo $stats['department_count'] ?? 0; ?></h2>
                     </div>
                 </div>
             </div>
@@ -106,10 +116,10 @@ $stats = $stats_result->fetch_assoc();
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Username</th>
+                                <th>Department</th>
                                 <th>Role</th>
                                 <th>Status</th>
-                                <th>Field of Study</th>
-                                <th>Qualification</th>
+                                <th>Salary</th>
                                 <th width="180">Actions</th>
                             </tr>
                         </thead>
@@ -154,9 +164,21 @@ $stats = $stats_result->fetch_assoc();
                                         <td><?php echo htmlspecialchars($employee['user_email']); ?></td>
                                         <td><code><?php echo htmlspecialchars($employee['username']); ?></code></td>
                                         <td>
-                                            <?php if ($employee['type_name']): ?>
-                                                <span class="badge bg-success">
-                                                    <?php echo htmlspecialchars($employee['type_name']); ?>
+                                            <?php if ($employee['department_name']): ?>
+                                                <span class="badge bg-secondary">
+                                                    <?php echo htmlspecialchars($employee['department_name']); ?>
+                                                    <?php if ($employee['department_code']): ?>
+                                                        <small>(<?php echo $employee['department_code']; ?>)</small>
+                                                    <?php endif; ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary">Not Assigned</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($employee['role_name']): ?>
+                                                <span class="badge bg-<?php echo $role_class; ?>">
+                                                    <?php echo htmlspecialchars($employee['role_name']); ?>
                                                 </span>
                                             <?php else: ?>
                                                 <span class="badge bg-secondary">Not Assigned</span>
@@ -167,8 +189,7 @@ $stats = $stats_result->fetch_assoc();
                                                 <?php echo $employee['user_status']; ?>
                                             </span>
                                         </td>
-                                        <td><?php echo !empty($employee['field_of_study']) ? htmlspecialchars($employee['field_of_study']) : '<span class="text-muted">N/A</span>'; ?></td>
-                                        <td><?php echo !empty($employee['qualification']) ? htmlspecialchars($employee['qualification']) : '<span class="text-muted">N/A</span>'; ?></td>
+                                        <td>$<?php echo number_format($employee['salary'] ?? 0, 2); ?></td>
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group">
                                                 <button type="button" class="btn btn-outline-primary view-employee-btn" 
@@ -375,6 +396,10 @@ function viewEmployee(employeeId) {
                     '<span class="badge bg-success">Active</span>' : 
                     '<span class="badge bg-warning">Inactive</span>';
                 
+                const departmentBadge = employee.department_name ? 
+                    `<span class="badge bg-secondary">${escapeHtml(employee.department_name)}</span>` : 
+                    '<span class="badge bg-secondary">Not Assigned</span>';
+                
                 const detailsHtml = `
                     <div class="row">
                         <div class="col-md-4 text-center mb-4 mb-md-0">
@@ -395,21 +420,24 @@ function viewEmployee(employeeId) {
                                     <p><strong>Username:</strong><br>
                                     <code>${escapeHtml(employee.username)}</code></p>
                                     
+                                    <p><strong>Department:</strong><br>
+                                    ${departmentBadge}</p>
+                                    
+                                    <p><strong>Salary:</strong><br>
+                                    $${employee.salary ? parseFloat(employee.salary).toFixed(2) : '0.00'}</p>
+                                </div>
+                                <div class="col-md-6">
                                     <p><strong>Field of Study:</strong><br>
                                     ${employee.field_of_study ? escapeHtml(employee.field_of_study) : '<span class="text-muted">N/A</span>'}</p>
                                     
                                     <p><strong>Qualification:</strong><br>
                                     ${employee.qualification ? escapeHtml(employee.qualification) : '<span class="text-muted">N/A</span>'}</p>
-                                </div>
-                                <div class="col-md-6">
+                                    
                                     <p><strong>Highest Graduation:</strong><br>
                                     ${employee.highest_graduation ? escapeHtml(employee.highest_graduation) : '<span class="text-muted">N/A</span>'}</p>
                                     
                                     <p><strong>Year of Graduation:</strong><br>
                                     ${employee.year_of_graduation ? escapeHtml(employee.year_of_graduation) : '<span class="text-muted">N/A</span>'}</p>
-                                    
-                                    <p><strong>User Type:</strong><br>
-                                    <span class="badge bg-secondary">${escapeHtml(employee.user_type)}</span></p>
                                     
                                     <p><strong>Created:</strong><br>
                                     ${new Date(employee.created_at).toLocaleDateString()}</p>
