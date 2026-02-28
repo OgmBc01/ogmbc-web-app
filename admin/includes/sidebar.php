@@ -206,6 +206,52 @@
                     </li>
                 </ul>
             </li>
+
+            <!-- Points Ledger Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'points_ledger.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                href="#" data-menu="points-ledger">
+                    <i class="bi bi-cash-coin nav-icon"></i>
+                    <span class="nav-text">Points Ledger</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="points-ledger-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'view_ledger') ? 'active' : ''; ?>" 
+                        href="points_ledger.php?source=view_ledger">
+                            <i class="bi bi-journal-bookmark-fill nav-icon"></i>
+                            <span class="nav-text">Transaction Ledger</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'monthly_summary') ? 'active' : ''; ?>" 
+                        href="points_ledger.php?source=monthly_summary">
+                            <i class="bi bi-calendar-month nav-icon"></i>
+                            <span class="nav-text">Monthly Summary</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'quarterly_payout') ? 'active' : ''; ?>" 
+                        href="points_ledger.php?source=quarterly_payout">
+                            <i class="bi bi-cash-stack nav-icon"></i>
+                            <span class="nav-text">Quarterly Payout</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'manual_adjustment') ? 'active' : ''; ?>" 
+                        href="points_ledger.php?source=manual_adjustment">
+                            <i class="bi bi-pencil-square nav-icon"></i>
+                            <span class="nav-text">Manual Adjustment</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'employee_wallet') ? 'active' : ''; ?>" href="points_ledger.php?source=employee_wallet">
+                            <i class="bi bi-wallet2 nav-icon"></i>
+                            <span class="nav-text">My Wallet</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             
             <!-- Services Menu -->
             <li class="nav-item">
