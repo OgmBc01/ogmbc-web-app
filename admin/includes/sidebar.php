@@ -183,6 +183,32 @@
                 </a>
             </li>
 
+            <!-- Services Config Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'services.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                href="#" data-menu="services-config">
+                    <i class="bi bi-gear-wide-connected nav-icon"></i>
+                    <span class="nav-text">Services Config</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="services-config-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'add_service') ? 'active' : ''; ?>" 
+                        href="services.php?source=add_service">
+                            <i class="bi bi-plus-circle nav-icon"></i>
+                            <span class="nav-text">Add Service</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (!isset($_GET['source']) || $_GET['source'] == 'view_all') ? 'active' : ''; ?>" 
+                        href="./services.php">
+                            <i class="bi bi-list-ul nav-icon"></i>
+                            <span class="nav-text">View All</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Departments Menu with Dropdown -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'departments.php' && !isset($_GET['source'])) ? 'active-sub' : ''; ?>" 
