@@ -163,6 +163,38 @@
                 </ul>
             </li>
 
+            <!-- Client Feedback Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'client_feedback.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                href="#" data-menu="client-feedback">
+                    <i class="bi bi-chat-quote nav-icon"></i>
+                    <span class="nav-text">Client Feedback</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="client-feedback-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'add_feedback') ? 'active' : ''; ?>" 
+                        href="client_feedback.php?source=add_feedback">
+                            <i class="bi bi-plus-circle nav-icon"></i>
+                            <span class="nav-text">Log Feedback</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (!isset($_GET['source']) || $_GET['source'] == 'view_all') ? 'active' : ''; ?>" 
+                        href="./client_feedback.php">
+                            <i class="bi bi-list-ul nav-icon"></i>
+                            <span class="nav-text">View All</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="client_feedback.php?filter=pending">
+                            <i class="bi bi-clock-history nav-icon"></i>
+                            <span class="nav-text">Pending Validation</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Posts Menu -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn" href="#" data-menu="posts">
