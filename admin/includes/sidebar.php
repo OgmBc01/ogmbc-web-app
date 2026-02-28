@@ -66,6 +66,38 @@
                 </ul>
             </li>
 
+            <!-- Engagements Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'engagements.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                href="#" data-menu="engagements">
+                    <i class="bi bi-briefcase nav-icon"></i>
+                    <span class="nav-text">Engagements</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="engagements-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'add_engagement') ? 'active' : ''; ?>" 
+                        href="engagements.php?source=add_engagement">
+                            <i class="bi bi-plus-circle nav-icon"></i>
+                            <span class="nav-text">Create Engagement</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (!isset($_GET['source']) || $_GET['source'] == 'view_all') ? 'active' : ''; ?>" 
+                        href="./engagements.php">
+                            <i class="bi bi-list-ul nav-icon"></i>
+                            <span class="nav-text">View All</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="engagements.php?filter=overdue">
+                            <i class="bi bi-exclamation-triangle nav-icon"></i>
+                            <span class="nav-text">Overdue</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Users Menu with Dropdown -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'users.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
