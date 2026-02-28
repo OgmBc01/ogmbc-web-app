@@ -131,6 +131,38 @@
                 </ul>
             </li>
 
+            <!-- Sales Targets Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'sales_targets.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                href="#" data-menu="sales-targets">
+                    <i class="bi bi-graph-up nav-icon"></i>
+                    <span class="nav-text">Sales Targets</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="sales-targets-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'set_target') ? 'active' : ''; ?>" 
+                        href="sales_targets.php?source=set_target">
+                            <i class="bi bi-plus-circle nav-icon"></i>
+                            <span class="nav-text">Set Target</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (!isset($_GET['source']) || $_GET['source'] == 'view_all') ? 'active' : ''; ?>" 
+                        href="./sales_targets.php">
+                            <i class="bi bi-list-ul nav-icon"></i>
+                            <span class="nav-text">View All</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sales_targets.php?month=<?php echo date('m'); ?>&year=<?php echo date('Y'); ?>">
+                            <i class="bi bi-calendar-check nav-icon"></i>
+                            <span class="nav-text">Current Month</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Posts Menu -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn" href="#" data-menu="posts">
