@@ -10,9 +10,14 @@ ob_start();
 $client_id = $_SESSION['client_id'];
 
 // Fetch current client data
-$query = "SELECT * FROM clients WHERE client_id = $client_id";
+$query = "SELECT * FROM clients WHERE client_id = " . intval($client_id);
 $result = mysqli_query($connection, $query);
 $client = mysqli_fetch_assoc($result);
+
+if (!$client) {
+    echo '<div class="alert alert-danger">Client not found</div>';
+    return;
+}
 
 // Initialize variables
 $company_name = $client['company_name'];
@@ -64,20 +69,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                         contact_designation = '$contact_designation',
                         contact_mobile = '$contact_mobile',
                         contact_email = '$contact_email'
-                        WHERE client_id = $client_id";
+                        WHERE client_id = " . intval($client_id);
         
         if (mysqli_query($connection, $update_query)) {
             // Log activity
-            $log_query = "INSERT INTO client_activity_log 
-                         (client_id, activity_type, description, ip_address)
-                         VALUES 
-                         ($client_id, 'profile_update', 'Updated company profile information', '{$_SERVER['REMOTE_ADDR']}')";
-            mysqli_query($connection, $log_query);
+            $log_check = mysqli_query($connection, "SHOW TABLES LIKE 'client_activity_log'");
+            if ($log_check && mysqli_num_rows($log_check) > 0) {
+                $log_query = "INSERT INTO client_activity_log 
+                             (client_id, activity_type, description, ip_address)
+                             VALUES 
+                             (" . intval($client_id) . ", 'profile_update', 'Updated company profile information', '{$_SERVER['REMOTE_ADDR']}')";
+                mysqli_query($connection, $log_query);
+            }
+            
+            // Update session name
+            $_SESSION['client_name'] = $company_name;
             
             $showSuccessModal = true;
-            
-            // Refresh session data
-            $_SESSION['client_name'] = $company_name;
         } else {
             $message = "Error updating profile: " . mysqli_error($connection);
             $message_type = "danger";
@@ -195,7 +203,7 @@ ob_end_flush();
                         </div>
 
                         <div class="text-center mt-4">
-                            <button type="submit" name="update_profile" class="btn btn-primary btn-lg">
+                            <button type="submit" name="update_profile" class="btn btn-primary btn-lg px-5">
                                 <i class="bi bi-check-circle me-2"></i>Save Changes
                             </button>
                         </div>
