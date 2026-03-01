@@ -1,29 +1,46 @@
 <?php
-// Get all engagements for this client
-$query = "SELECT e.*, 
-          s.service_name,
-          CONCAT(u.first_name, ' ', u.last_name) as assigned_to_name,
-          r.role_name as assigned_role,
-          DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining,
-          (SELECT COUNT(*) FROM client_files WHERE engagement_id = e.engagement_id AND uploaded_by = 'client') as my_files,
-          (SELECT COUNT(*) FROM client_files WHERE engagement_id = e.engagement_id AND uploaded_by = 'staff') as staff_files
-          FROM engagements e
-          JOIN service_types s ON e.service_id = s.service_id
-          LEFT JOIN users u ON e.assigned_to = u.user_id
-          LEFT JOIN user_roles r ON u.role_id = r.role_id
-          WHERE e.client_id = $client_id
-          ORDER BY 
-            CASE e.status 
-                WHEN 'IN_PROGRESS' THEN 1
-                WHEN 'AWAITING_REVIEW' THEN 2
-                WHEN 'ASSIGNED' THEN 3
-                WHEN 'SUBMITTED' THEN 4
-                WHEN 'CLOSED' THEN 5
-                ELSE 6
-            END,
-            e.created_at DESC";
+// Ensure client_id is defined
+if (!isset($client_id)) {
+    $client_id = $_SESSION['client_id'] ?? 0;
+}
 
-$result = mysqli_query($connection, $query);
+// Initialize result variable
+$result = null;
+
+// Check if engagements table exists
+$table_check = mysqli_query($connection, "SHOW TABLES LIKE 'engagements'");
+if (mysqli_num_rows($table_check) > 0) {
+    // Get all engagements for this client - FIXED ORDER BY CASE SYNTAX
+    $query = "SELECT e.*, 
+              s.service_name,
+              CONCAT(u.first_name, ' ', u.last_name) as assigned_to_name,
+              r.role_name as assigned_role,
+              DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining,
+              (SELECT COUNT(*) FROM client_files WHERE engagement_id = e.engagement_id AND uploaded_by = 'client') as my_files,
+              (SELECT COUNT(*) FROM client_files WHERE engagement_id = e.engagement_id AND uploaded_by = 'staff') as staff_files
+              FROM engagements e
+              JOIN service_types s ON e.service_id = s.service_id
+              LEFT JOIN users u ON e.assigned_to = u.user_id
+              LEFT JOIN user_roles r ON u.role_id = r.role_id
+              WHERE e.client_id = " . intval($client_id) . "
+              ORDER BY 
+                CASE 
+                    WHEN e.status = 'IN_PROGRESS' THEN 1
+                    WHEN e.status = 'AWAITING_REVIEW' THEN 2
+                    WHEN e.status = 'ASSIGNED' THEN 3
+                    WHEN e.status = 'SUBMITTED' THEN 4
+                    WHEN e.status = 'CLOSED' THEN 5
+                    ELSE 6
+                END,
+                e.created_at DESC";
+
+    $result = mysqli_query($connection, $query);
+    
+    if (!$result) {
+        error_log("Engagements query failed: " . mysqli_error($connection));
+        $result = null;
+    }
+}
 ?>
 
 <div class="container-fluid">
@@ -55,11 +72,30 @@ $result = mysqli_query($connection, $query);
                 if ($eng['status'] == 'SUBMITTED') $status_class = 'info';
                 if ($eng['status'] == 'CLOSED') $status_class = 'success';
                 
-                $deadline_class = $eng['days_remaining'] < 0 ? 'danger' : ($eng['days_remaining'] < 7 ? 'warning' : 'success');
-                $deadline_text = $eng['days_remaining'] < 0 ? abs($eng['days_remaining']) . ' days overdue' : $eng['days_remaining'] . ' days left';
+                $deadline_class = 'success';
+                $deadline_text = 'No deadline';
+                
+                if (isset($eng['days_remaining'])) {
+                    if ($eng['days_remaining'] < 0) {
+                        $deadline_class = 'danger';
+                        $deadline_text = abs($eng['days_remaining']) . ' days overdue';
+                    } elseif ($eng['days_remaining'] < 7) {
+                        $deadline_class = 'warning';
+                        $deadline_text = $eng['days_remaining'] . ' days left';
+                    } else {
+                        $deadline_class = 'success';
+                        $deadline_text = $eng['days_remaining'] . ' days left';
+                    }
+                }
                 
                 // Determine if engagement is active (not closed)
                 $is_active = ($eng['status'] != 'CLOSED' && $eng['status'] != 'SUBMITTED');
+                
+                // Safely get file counts
+                $my_files = $eng['my_files'] ?? 0;
+                $staff_files = $eng['staff_files'] ?? 0;
+                $total_files = $my_files + $staff_files;
+                $progress_width = $total_files > 0 ? min(100, $total_files * 10) : 0;
             ?>
             <div class="col-md-6 col-lg-4 mb-4 engagement-card" data-status="<?php echo $is_active ? 'active' : 'closed'; ?>">
                 <div class="card h-100 shadow-sm">
@@ -68,12 +104,12 @@ $result = mysqli_query($connection, $query);
                         <small class="text-muted">#<?php echo $eng['engagement_id']; ?></small>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($eng['title']); ?></h5>
-                        <p class="card-text small text-muted"><?php echo htmlspecialchars($eng['service_name']); ?></p>
+                        <h5 class="card-title"><?php echo htmlspecialchars($eng['title'] ?? 'Untitled'); ?></h5>
+                        <p class="card-text small text-muted"><?php echo htmlspecialchars($eng['service_name'] ?? 'N/A'); ?></p>
                         
                         <div class="mb-2">
                             <strong>Assigned to:</strong><br>
-                            <?php echo htmlspecialchars($eng['assigned_to_name']); ?>
+                            <?php echo htmlspecialchars($eng['assigned_to_name'] ?? 'Unassigned'); ?>
                             <small class="text-muted">(<?php echo ucfirst($eng['assigned_role'] ?? 'Staff'); ?>)</small>
                         </div>
                         
@@ -83,13 +119,13 @@ $result = mysqli_query($connection, $query);
                         </div>
                         
                         <div class="progress mb-2" style="height: 5px;">
-                            <div class="progress-bar bg-<?php echo $eng['staff_files'] > 0 ? 'success' : 'secondary'; ?>" 
-                                 style="width: <?php echo min(100, ($eng['staff_files'] + $eng['my_files']) * 10); ?>%"></div>
+                            <div class="progress-bar bg-<?php echo $staff_files > 0 ? 'success' : 'secondary'; ?>" 
+                                 style="width: <?php echo $progress_width; ?>%"></div>
                         </div>
                         
                         <div class="d-flex justify-content-between small">
-                            <span><i class="bi bi-cloud-upload"></i> You: <?php echo $eng['my_files']; ?></span>
-                            <span><i class="bi bi-cloud-download"></i> Staff: <?php echo $eng['staff_files']; ?></span>
+                            <span><i class="bi bi-cloud-upload"></i> You: <?php echo $my_files; ?></span>
+                            <span><i class="bi bi-cloud-download"></i> Staff: <?php echo $staff_files; ?></span>
                         </div>
                     </div>
                     <div class="card-footer bg-transparent">
@@ -153,8 +189,6 @@ document.querySelectorAll('#engagementTabs .nav-link').forEach(tab => {
 
 // Contact staff function
 function contactStaff(staffId, method, engagementId) {
-    // This would typically fetch staff contact details via AJAX
-    // For now, we'll use a placeholder
     if (method === 'whatsapp') {
         window.open(`https://wa.me/?text=Hi%2C%20I%20have%20a%20question%20about%20engagement%20%23${engagementId}`, '_blank');
     } else if (method === 'email') {
