@@ -1138,3 +1138,81 @@ Client Feedback Module (record feedback)
 CDP & Annual Performance Module (certificates, annual reviews)
 
 Audit Log (implement last)
+
+
+
+
+==================================================================================
+ogmbc-web-app/
+├── admin/ (your existing admin panel)
+├── client/
+│   ├── dashboard.php
+│   ├── engagements.php (master)
+│   ├── files.php
+│   ├── feedback.php
+│   ├── invoices.php
+│   ├── profile.php
+│   ├── support.php
+│   ├── includes/
+│   │   ├── client_header.php
+│   │   ├── client_nav.php
+│   │   ├── client_sidebar.php
+│   │   ├── client_footer.php
+│   │   ├── view_engagements.php
+│   │   ├── view_engagement_details.php
+│   │   ├── upload_file.php
+│   │   ├── submit_feedback.php
+│   │   ├── view_invoices.php
+│   │   ├── edit_profile.php
+│   │   ├── view_support_tickets.php
+│   │   ├── create_ticket.php
+│   │   └── ajax/
+│   │       ├── get_engagement_details.php
+│   │       ├── download_file.php
+│   │       ├── send_message.php
+│   │       └── submit_ticket_reply.php
+│   └── assets/ (copied from admin)
+│
+├── employee/ (for operations/sales staff)
+│   ├── dashboard.php
+│   ├── engagements.php
+│   ├── tasks.php
+│   ├── cdp.php
+│   ├── sales_targets.php (sales only)
+│   ├── wallet.php
+│   ├── profile.php
+│   ├── includes/
+│   │   ├── employee_header.php
+│   │   ├── employee_nav.php
+│   │   ├── employee_sidebar.php
+│   │   ├── employee_footer.php
+│   │   ├── view_my_engagements.php
+│   │   ├── update_engagement_status.php
+│   │   ├── upload_evidence.php
+│   │   ├── request_deadline_change.php
+│   │   ├── view_cdp_records.php
+│   │   ├── add_cdp_record.php
+│   │   ├── view_sales_targets.php
+│   │   ├── submit_achievement.php
+│   │   ├── view_wallet.php
+│   │   ├── edit_profile.php
+│   │   └── ajax/
+│   │       ├── get_task_details.php
+│   │       ├── update_status.php
+│   │       ├── submit_request.php
+│   │       └── load_notifications.php
+│   └── assets/ (copied from admin)
+│
+└── user/ (for internal staff)
+    ├── dashboard.php
+    ├── tasks.php
+    ├── cdp.php
+    ├── wallet.php
+    ├── profile.php
+    ├── includes/
+    │   ├── user_header.php
+    │   ├── user_nav.php
+    │   ├── user_sidebar.php
+    │   ├── user_footer.php
+    │   └── [similar structure to employee but simplified]
+    └── assets/ (copied from admin)
