@@ -14,7 +14,7 @@
         <ul class="nav flex-column">
             <!-- Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="dashboard.php" data-menu="services">
+                <a class="nav-link" href="client_dashboard.php" data-menu="services">
                     <i class="bi bi-speedometer nav-icon"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
