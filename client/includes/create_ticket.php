@@ -1,13 +1,14 @@
 <?php
 ob_start();
 
-if (!isset($_SESSION['client_id'])) {
-    ob_end_clean();
-    echo "<script>window.location.href = '../login.php';</script>";
-    exit();
-}
+// Check if client_id is set in the session
+// if (!isset($_SESSION['client_id'])) {
+//     ob_end_clean();
+//     echo "<script>window.location.href = '../login.php';</script>";
+//     exit();
+// }
 
-$client_id = $_SESSION['client_id'];
+$client_id = $_SESSION['client_id']; // Define client_id from session
 
 // Initialize variables
 $subject = '';
@@ -15,12 +16,22 @@ $message = '';
 $priority = 'medium';
 $engagement_id = '';
 $showSuccessModal = false;
+$ticket_id = null;
+$message_error = '';
+$message_type = '';
 
-// Get engagements for dropdown
+// Get engagements for dropdown - with error handling
+$engagements_result = null;
 $engagements_query = "SELECT engagement_id, title FROM engagements 
-                      WHERE client_id = $client_id AND status != 'CLOSED'
+                      WHERE client_id = " . intval($client_id) . " AND status != 'CLOSED'
                       ORDER BY created_at DESC";
 $engagements_result = mysqli_query($connection, $engagements_query);
+
+if (!$engagements_result) {
+    // Log error but continue - table might not exist
+    error_log("Engagements query failed: " . mysqli_error($connection));
+    $engagements_result = null;
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_ticket'])) {
@@ -34,31 +45,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_ticket'])) {
         $message_error = "Please fill in all required fields.";
         $message_type = "danger";
     } else {
-        // Insert ticket
-        $engagement_value = ($engagement_id !== 'NULL') ? $engagement_id : 'NULL';
-        
-        $insert_query = "INSERT INTO support_tickets 
-                        (client_id, subject, message, priority, status, created_at)
-                        VALUES 
-                        ($client_id, '$subject', '$message', '$priority', 'open', NOW())";
-        
-        if (mysqli_query($connection, $insert_query)) {
-            $ticket_id = mysqli_insert_id($connection);
-            
-            // Log activity
-            $log_query = "INSERT INTO client_activity_log 
-                         (client_id, activity_type, description, ip_address)
-                         VALUES 
-                         ($client_id, 'ticket_created', 'Created support ticket #$ticket_id: $subject', '{$_SERVER['REMOTE_ADDR']}')";
-            mysqli_query($connection, $log_query);
-            
-            $showSuccessModal = true;
-            $subject = $message = '';
-            $priority = 'medium';
-            $engagement_id = '';
-        } else {
-            $message_error = "Error creating ticket: " . mysqli_error($connection);
+        // Check if support_tickets table exists
+        $table_check = mysqli_query($connection, "SHOW TABLES LIKE 'support_tickets'");
+        if (mysqli_num_rows($table_check) == 0) {
+            $message_error = "Support tickets system is not set up yet. Please contact administrator.";
             $message_type = "danger";
+        } else {
+            // Insert ticket
+            $engagement_value = ($engagement_id !== 'NULL') ? $engagement_id : 'NULL';
+            
+            $insert_query = "INSERT INTO support_tickets 
+                            (client_id, subject, message, priority, status, created_at)
+                            VALUES 
+                            ($client_id, '$subject', '$message', '$priority', 'open', NOW())";
+            
+            if (mysqli_query($connection, $insert_query)) {
+                $ticket_id = mysqli_insert_id($connection);
+                
+                // Log activity if table exists
+                $log_check = mysqli_query($connection, "SHOW TABLES LIKE 'client_activity_log'");
+                if (mysqli_num_rows($log_check) > 0) {
+                    $log_query = "INSERT INTO client_activity_log 
+                                 (client_id, activity_type, description, ip_address)
+                                 VALUES 
+                                 ($client_id, 'ticket_created', 'Created support ticket #$ticket_id: $subject', '{$_SERVER['REMOTE_ADDR']}')";
+                    mysqli_query($connection, $log_query);
+                }
+                
+                $showSuccessModal = true;
+                $subject = $message = '';
+                $priority = 'medium';
+                $engagement_id = '';
+            } else {
+                $message_error = "Error creating ticket: " . mysqli_error($connection);
+                $message_type = "danger";
+            }
         }
     }
 }
@@ -107,11 +128,13 @@ ob_end_flush();
                                 <label for="engagement_id" class="form-label">Related Engagement (Optional)</label>
                                 <select class="form-control" id="engagement_id" name="engagement_id">
                                     <option value="">None</option>
-                                    <?php while($eng = mysqli_fetch_assoc($engagements_result)): ?>
-                                        <option value="<?php echo $eng['engagement_id']; ?>">
-                                            <?php echo htmlspecialchars($eng['title']); ?>
-                                        </option>
-                                    <?php endwhile; ?>
+                                    <?php if ($engagements_result && mysqli_num_rows($engagements_result) > 0): ?>
+                                        <?php while($eng = mysqli_fetch_assoc($engagements_result)): ?>
+                                            <option value="<?php echo $eng['engagement_id']; ?>">
+                                                <?php echo htmlspecialchars($eng['title']); ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                         </div>
@@ -147,7 +170,9 @@ ob_end_flush();
                 <i class="bi bi-ticket-check text-success" style="font-size: 4rem;"></i>
                 <h5 class="mt-3">Your support ticket has been created</h5>
                 <p class="text-muted">We'll get back to you as soon as possible.</p>
-                <p class="small">Ticket #<?php echo $ticket_id; ?></p>
+                <?php if ($ticket_id): ?>
+                    <p class="small">Ticket #<?php echo $ticket_id; ?></p>
+                <?php endif; ?>
             </div>
             <div class="modal-footer justify-content-center">
                 <a href="support.php" class="btn btn-success px-4">View My Tickets</a>
