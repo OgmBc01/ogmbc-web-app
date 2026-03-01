@@ -416,6 +416,15 @@
                 </ul>
             </li>
 
+            <!-- Audit Log Menu -->
+            <li class="nav-item">
+                <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'audit_log.php') ? 'active' : ''; ?>" 
+                href="audit_log.php">
+                    <i class="bi bi-journal-text nav-icon"></i>
+                    <span class="nav-text">Audit Log</span>
+                </a>
+            </li>
+
             <!-- Bank Accounts Menu -->
             <li class="nav-item">
                 <a class="nav-link" href="bank_accounts.php" data-menu="bank-accounts">
