@@ -316,6 +316,45 @@
                     </li>
                 </ul>
             </li>
+
+            <!-- CDP & Annual Performance Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'cdp_annual.php' && !isset($_GET['tab'])) ? 'active' : ''; ?>" 
+                href="#" data-menu="cdp-annual">
+                    <i class="bi bi-bar-chart-steps nav-icon"></i>
+                    <span class="nav-text">CDP & Annual</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="cdp-annual-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['tab']) && $_GET['tab'] == 'cdp' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                        href="cdp_annual.php?tab=cdp">
+                            <i class="bi bi-mortarboard nav-icon"></i>
+                            <span class="nav-text">CDP Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['tab']) && $_GET['tab'] == 'annual') ? 'active' : ''; ?>" 
+                        href="cdp_annual.php?tab=annual">
+                            <i class="bi bi-graph-up nav-icon"></i>
+                            <span class="nav-text">Annual Performance</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['tab']) && $_GET['tab'] == 'bands') ? 'active' : ''; ?>" 
+                        href="cdp_annual.php?tab=bands">
+                            <i class="bi bi-bar-chart nav-icon"></i>
+                            <span class="nav-text">Salary Bands</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cdp_annual.php?source=add_cdp">
+                            <i class="bi bi-plus-circle nav-icon"></i>
+                            <span class="nav-text">Add CDP Record</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             
             <!-- Services Menu -->
             <li class="nav-item">
