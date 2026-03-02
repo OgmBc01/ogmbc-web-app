@@ -134,7 +134,7 @@ if (mysqli_num_rows($notif_check) > 0) {
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-header">
-                        <i class="bi bi-people me-2"></i>Your Team
+                        <i class="bi bi-people me-2"></i>Your Expert Team
                     </div>
                     <div class="card-body">
                         <?php if ($staff_result && mysqli_num_rows($staff_result) > 0): ?>

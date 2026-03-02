@@ -37,14 +37,42 @@ $version_result = mysqli_query($connection, $version_query);
 $version_row = mysqli_fetch_assoc($version_result);
 $next_version = ($version_row['max_version'] ?? 0) + 1;
 
-// Initialize variables
+// Initialize variables based on service type defaults
 $base_points = 100;
-$penalty_type = 'linear';
-$penalty_value = 25;
-$penalty_unit = '10days';
-$threshold_days = '';
-$threshold_award = '';
-$floor_points = 0;
+$points_within_deadline = 100;
+$points_tier_1 = 75;      // 5-15 days (75% of base)
+$points_tier_2 = 50;      // 16-25 days (50% of base)
+$points_tier_3 = 25;      // >25 days (25% of base)
+
+// Service-specific defaults based on your table
+$service_defaults = [
+    'Monthly Bookkeeping' => ['base' => 100, 't1' => 75, 't2' => 50, 't3' => 25],
+    'Backlog accounting' => ['base' => 150, 't1' => 113, 't2' => 75, 't3' => 38],
+    'Monthly Internal Audit' => ['base' => 100, 't1' => 75, 't2' => 50, 't3' => 25],
+    'Quarterly Internal audit' => ['base' => 350, 't1' => 263, 't2' => 175, 't3' => 88],
+    'External Audit' => ['base' => 30, 't1' => 23, 't2' => 15, 't3' => 8],
+    'Monthly CFO services' => ['base' => 100, 't1' => 75, 't2' => 50, 't3' => 25],
+    'VAT & CT Return Filing' => ['base' => 25, 't1' => 19, 't2' => 13, 't3' => 6],
+    'VAT & CT Registration' => ['base' => 30, 't1' => 23, 't2' => 15, 't3' => 8],
+    'VAT & CT De-registration' => ['base' => 40, 't1' => 30, 't2' => 20, 't3' => 10],
+    'gAML Registration' => ['base' => 25, 't1' => 19, 't2' => 13, 't3' => 6],
+    'gAMl report' => ['base' => 75, 't1' => 56, 't2' => 38, 't3' => 19],
+    'Free Zone Company Setup' => ['base' => 110, 't1' => 83, 't2' => 55, 't3' => 28],
+    'Mainland Company Setup' => ['base' => 80, 't1' => 60, 't2' => 40, 't3' => 20],
+    'Bank account opening' => ['base' => 80, 't1' => 60, 't2' => 40, 't3' => 20],
+    'PRO Services' => ['base' => 30, 't1' => 23, 't2' => 15, 't3' => 8]
+];
+
+// Check if this service has predefined defaults
+if (isset($service_defaults[$service['service_name']])) {
+    $default = $service_defaults[$service['service_name']];
+    $base_points = $default['base'];
+    $points_within_deadline = $default['base'];
+    $points_tier_1 = $default['t1'];
+    $points_tier_2 = $default['t2'];
+    $points_tier_3 = $default['t3'];
+}
+
 $is_active = 1;
 $message = '';
 $message_type = '';
@@ -55,12 +83,10 @@ $new_rule_id = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_rule'])) {
     
     $base_points = (int)$_POST['base_points'];
-    $penalty_type = mysqli_real_escape_string($connection, $_POST['penalty_type']);
-    $penalty_value = !empty($_POST['penalty_value']) ? (int)$_POST['penalty_value'] : null;
-    $penalty_unit = mysqli_real_escape_string($connection, $_POST['penalty_unit'] ?? 'day');
-    $threshold_days = !empty($_POST['threshold_days']) ? (int)$_POST['threshold_days'] : null;
-    $threshold_award = !empty($_POST['threshold_award']) ? (int)$_POST['threshold_award'] : null;
-    $floor_points = (int)$_POST['floor_points'];
+    $points_within_deadline = (int)$_POST['points_within_deadline'];
+    $points_tier_1 = (int)$_POST['points_tier_1'];
+    $points_tier_2 = (int)$_POST['points_tier_2'];
+    $points_tier_3 = (int)$_POST['points_tier_3'];
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $effective_date = mysqli_real_escape_string($connection, $_POST['effective_date']);
     $created_by = $_SESSION['user_id'];
@@ -76,29 +102,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_rule'])) {
         
         // Insert rule
         $insert_query = "INSERT INTO service_point_rules 
-                        (service_id, rule_version, base_points, penalty_type, penalty_value, 
-                         penalty_unit, threshold_days, threshold_award, floor_points, 
+                        (service_id, rule_version, base_points, points_within_deadline,
+                         points_tier_1, points_tier_2, points_tier_3,
                          is_active, created_by, effective_date) 
-                        VALUES ($service_id, $next_version, $base_points, '$penalty_type', 
-                                " . ($penalty_value ? $penalty_value : 'NULL') . ", 
-                                '$penalty_unit', 
-                                " . ($threshold_days ? $threshold_days : 'NULL') . ", 
-                                " . ($threshold_award ? $threshold_award : 'NULL') . ", 
-                                $floor_points, $is_active, $created_by, '$effective_date')";
+                        VALUES ($service_id, $next_version, $base_points, $points_within_deadline,
+                                $points_tier_1, $points_tier_2, $points_tier_3,
+                                $is_active, $created_by, '$effective_date')";
         
         if (mysqli_query($connection, $insert_query)) {
             $new_rule_id = mysqli_insert_id($connection);
             $showSuccessModal = true;
-            
-            // Clear form data
-            $base_points = 100;
-            $penalty_type = 'linear';
-            $penalty_value = 25;
-            $penalty_unit = '10days';
-            $threshold_days = '';
-            $threshold_award = '';
-            $floor_points = 0;
-            $is_active = 1;
             
             // Update next version
             $next_version++;
@@ -114,7 +127,7 @@ ob_end_flush();
 
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Add Point Rule for: <?php echo htmlspecialchars($service['service_name']); ?></h5>
@@ -137,59 +150,43 @@ ob_end_flush();
                     </div>
 
                     <form method="POST" action="" id="ruleForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
                                 <label for="base_points" class="form-label">Base Points *</label>
                                 <input type="number" id="base_points" name="base_points" class="form-control" 
                                        value="<?php echo $base_points; ?>" min="1" required>
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="floor_points" class="form-label">Floor Points</label>
-                                <input type="number" id="floor_points" name="floor_points" class="form-control" 
-                                       value="<?php echo $floor_points; ?>" min="0">
-                                <div class="form-text">Minimum points that can be awarded</div>
+                            <div class="col-md-8">
+                                <small class="text-muted d-block mt-4">Base points are the maximum possible points for this service.</small>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="penalty_type" class="form-label">Penalty Type *</label>
-                                <select id="penalty_type" name="penalty_type" class="form-control" required>
-                                    <option value="linear" <?php echo ($penalty_type == 'linear') ? 'selected' : ''; ?>>Linear</option>
-                                    <option value="threshold" <?php echo ($penalty_type == 'threshold') ? 'selected' : ''; ?>>Threshold</option>
-                                    <option value="fixed" <?php echo ($penalty_type == 'fixed') ? 'selected' : ''; ?>>Fixed</option>
-                                </select>
+                        <h6 class="border-bottom pb-2 mb-3">Points by Completion Time</h6>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="points_within_deadline" class="form-label">Within Deadline</label>
+                                <input type="number" id="points_within_deadline" name="points_within_deadline" class="form-control" 
+                                       value="<?php echo $points_within_deadline; ?>" min="0" required>
+                                <small class="text-muted">0 days late</small>
                             </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <label for="penalty_value" class="form-label">Penalty Value</label>
-                                <input type="number" id="penalty_value" name="penalty_value" class="form-control" 
-                                       value="<?php echo $penalty_value; ?>">
+                            <div class="col-md-3">
+                                <label for="points_tier_1" class="form-label">5-15 Days Late</label>
+                                <input type="number" id="points_tier_1" name="points_tier_1" class="form-control" 
+                                       value="<?php echo $points_tier_1; ?>" min="0" required>
+                                <small class="text-muted">Tier 1</small>
                             </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <label for="penalty_unit" class="form-label">Penalty Unit</label>
-                                <select id="penalty_unit" name="penalty_unit" class="form-control">
-                                    <option value="day" <?php echo ($penalty_unit == 'day') ? 'selected' : ''; ?>>Per Day</option>
-                                    <option value="5days" <?php echo ($penalty_unit == '5days') ? 'selected' : ''; ?>>Per 5 Days</option>
-                                    <option value="10days" <?php echo ($penalty_unit == '10days') ? 'selected' : ''; ?>>Per 10 Days</option>
-                                </select>
+                            <div class="col-md-3">
+                                <label for="points_tier_2" class="form-label">16-25 Days Late</label>
+                                <input type="number" id="points_tier_2" name="points_tier_2" class="form-control" 
+                                       value="<?php echo $points_tier_2; ?>" min="0" required>
+                                <small class="text-muted">Tier 2</small>
                             </div>
-                        </div>
-
-                        <div class="row threshold-fields" style="<?php echo ($penalty_type != 'threshold') ? 'display: none;' : ''; ?>">
-                            <div class="col-md-6 mb-3">
-                                <label for="threshold_days" class="form-label">Threshold Days</label>
-                                <input type="number" id="threshold_days" name="threshold_days" class="form-control" 
-                                       value="<?php echo $threshold_days; ?>" min="1">
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="threshold_award" class="form-label">Threshold Award Points</label>
-                                <input type="number" id="threshold_award" name="threshold_award" class="form-control" 
-                                       value="<?php echo $threshold_award; ?>" min="0">
-                                <div class="form-text">Points awarded after threshold</div>
+                            <div class="col-md-3">
+                                <label for="points_tier_3" class="form-label">>25 Days Late</label>
+                                <input type="number" id="points_tier_3" name="points_tier_3" class="form-control" 
+                                       value="<?php echo $points_tier_3; ?>" min="0" required>
+                                <small class="text-muted">Tier 3</small>
                             </div>
                         </div>
 
@@ -205,6 +202,39 @@ ob_end_flush();
                                 <div class="form-check form-switch mt-4">
                                     <input class="form-check-input" type="checkbox" id="is_active" name="is_active" <?php echo $is_active ? 'checked' : ''; ?>>
                                     <label class="form-check-label" for="is_active">Active</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview Section -->
+                        <div class="card bg-light mt-4">
+                            <div class="card-body">
+                                <h6 class="mb-3">Points Preview</h6>
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <div class="p-2 bg-white rounded">
+                                            <strong>Within Deadline</strong>
+                                            <div class="h4 mt-2"><?php echo $points_within_deadline; ?> pts</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="p-2 bg-white rounded">
+                                            <strong>5-15 Days</strong>
+                                            <div class="h4 mt-2"><?php echo $points_tier_1; ?> pts</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="p-2 bg-white rounded">
+                                            <strong>16-25 Days</strong>
+                                            <div class="h4 mt-2"><?php echo $points_tier_2; ?> pts</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="p-2 bg-white rounded">
+                                            <strong>>25 Days</strong>
+                                            <div class="h4 mt-2"><?php echo $points_tier_3; ?> pts</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -268,12 +298,15 @@ ob_end_flush();
 <?php endif; ?>
 
 <script>
-document.getElementById('penalty_type')?.addEventListener('change', function() {
-    const thresholdFields = document.querySelector('.threshold-fields');
-    if (this.value === 'threshold') {
-        thresholdFields.style.display = 'flex';
-    } else {
-        thresholdFields.style.display = 'none';
-    }
-});
+// Live preview update
+document.getElementById('base_points').addEventListener('input', updatePreview);
+document.getElementById('points_within_deadline').addEventListener('input', updatePreview);
+document.getElementById('points_tier_1').addEventListener('input', updatePreview);
+document.getElementById('points_tier_2').addEventListener('input', updatePreview);
+document.getElementById('points_tier_3').addEventListener('input', updatePreview);
+
+function updatePreview() {
+    // Preview is updated automatically as fields change
+    // The values will be submitted with the form
+}
 </script>

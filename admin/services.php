@@ -136,23 +136,33 @@ if (isset($_GET['delete_rule'])) {
 
 <!-- Service Details Modal -->
 <div class="modal fade" id="serviceDetailsModal" tabindex="-1" aria-labelledby="serviceDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="serviceDetailsModalLabel">Service Details</h5>
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="serviceDetailsModalLabel">
+                    <i class="bi bi-info-circle me-2"></i>Service Details
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="serviceDetailsContent">
                 <!-- Content will be loaded via AJAX -->
-                <div class="text-center py-4">
+                <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mt-2">Loading service details...</p>
+                    <p class="mt-3 text-muted">Loading service details...</p>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>Close
+                </button>
+                <a href="#" id="editServiceBtn" class="btn btn-warning">
+                    <i class="bi bi-pencil me-1"></i>Edit Service
+                </a>
+                <a href="#" id="addRuleBtn" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i>Add Rule
+                </a>
             </div>
         </div>
     </div>
@@ -257,60 +267,45 @@ function showAlert(message, type) {
 function viewService(id) {
     const modal = new bootstrap.Modal(document.getElementById('serviceDetailsModal'));
     const contentDiv = document.getElementById('serviceDetailsContent');
+    const editBtn = document.getElementById('editServiceBtn');
+    const addRuleBtn = document.getElementById('addRuleBtn');
     
+    // Show loading state
     contentDiv.innerHTML = `
-        <div class="text-center py-4">
+        <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Loading service details...</p>
+            <p class="mt-3 text-muted">Loading service details...</p>
         </div>
     `;
     
     modal.show();
     
+    // Fetch service details
     fetch('includes/ajax/get_service_details.php?id=' + id)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const service = data.service;
-                const rules = data.rules || [];
-                
-                let rulesHtml = '';
-                if (rules.length > 0) {
-                    rulesHtml = '<h6 class="mt-4 mb-3">Point Rules</h6><div class="table-responsive"><table class="table table-sm table-striped"><thead><tr><th>Version</th><th>Base Points</th><th>Penalty Type</th><th>Penalty</th><th>Floor</th><th>Active</th></tr></thead><tbody>';
-                    
-                    rules.forEach(rule => {
-                        rulesHtml += `<tr>
-                            <td>v${rule.rule_version}</td>
-                            <td>${rule.base_points}</td>
-                            <td>${rule.penalty_type}</td>
-                            <td>${rule.penalty_value || 0} per ${rule.penalty_unit || 'day'}</td>
-                            <td>${rule.floor_points}</td>
-                            <td><span class="badge bg-${rule.is_active ? 'success' : 'secondary'}">${rule.is_active ? 'Yes' : 'No'}</span></td>
-                        </tr>`;
-                    });
-                    
-                    rulesHtml += '</tbody></table></div>';
-                }
-                
+                contentDiv.innerHTML = data.html;
+                editBtn.href = 'services.php?source=edit_service&id=' + id;
+                addRuleBtn.href = 'services.php?source=add_rule&service_id=' + id;
+            } else {
                 contentDiv.innerHTML = `
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h5>${escapeHtml(service.service_name)}</h5>
-                            <p class="text-muted">Category: ${escapeHtml(service.service_category)}</p>
-                            <p><strong>Status:</strong> <span class="badge bg-${service.is_active ? 'success' : 'secondary'}">${service.is_active ? 'Active' : 'Inactive'}</span></p>
-                            <p><strong>Created:</strong> ${new Date(service.created_at).toLocaleDateString()}</p>
-                            ${rulesHtml}
-                        </div>
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        ${data.message || 'Error loading service details'}
                     </div>
                 `;
-            } else {
-                contentDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
             }
         })
         .catch(error => {
-            contentDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            contentDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Error loading service details: ${error.message}
+                </div>
+            `;
         });
 }
 

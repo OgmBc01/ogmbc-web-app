@@ -42,11 +42,10 @@ $service_id = $rule['service_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_rule'])) {
     
     $base_points = (int)$_POST['base_points'];
-    $penalty_type = mysqli_real_escape_string($connection, $_POST['penalty_type']);
-    $penalty_value = !empty($_POST['penalty_value']) ? (int)$_POST['penalty_value'] : null;
-    $penalty_unit = mysqli_real_escape_string($connection, $_POST['penalty_unit'] ?? 'day');
-    $threshold_days = !empty($_POST['threshold_days']) ? (int)$_POST['threshold_days'] : null;
-    $threshold_award = !empty($_POST['threshold_award']) ? (int)$_POST['threshold_award'] : null;
+    $points_within_deadline = (float)$_POST['points_within_deadline'];
+    $points_tier_1 = (float)$_POST['points_tier_1'];
+    $points_tier_2 = (float)$_POST['points_tier_2'];
+    $points_tier_3 = (float)$_POST['points_tier_3'];
     $floor_points = (int)$_POST['floor_points'];
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $effective_date = mysqli_real_escape_string($connection, $_POST['effective_date']);
@@ -59,23 +58,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_rule'])) {
         $message = "Effective date is required.";
         $message_type = "danger";
     } else {
-        
         // Update rule
         $update_query = "UPDATE service_point_rules SET 
                          base_points = $base_points,
-                         penalty_type = '$penalty_type',
-                         penalty_value = " . ($penalty_value ? $penalty_value : 'NULL') . ",
-                         penalty_unit = '$penalty_unit',
-                         threshold_days = " . ($threshold_days ? $threshold_days : 'NULL') . ",
-                         threshold_award = " . ($threshold_award ? $threshold_award : 'NULL') . ",
+                         points_within_deadline = $points_within_deadline,
+                         points_tier_1 = $points_tier_1,
+                         points_tier_2 = $points_tier_2,
+                         points_tier_3 = $points_tier_3,
                          floor_points = $floor_points,
                          is_active = $is_active,
                          effective_date = '$effective_date'
                          WHERE rule_id = $rule_id";
-        
         if (mysqli_query($connection, $update_query)) {
             $showSuccessModal = true;
-            
             // Refresh rule data
             $refresh_query = "SELECT r.*, s.service_name 
                               FROM service_point_rules r
@@ -83,8 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_rule'])) {
                               WHERE r.rule_id = $rule_id";
             $refresh_result = mysqli_query($connection, $refresh_query);
             $rule = mysqli_fetch_assoc($refresh_result);
-            
-            // Clear message
             $message = '';
             $message_type = '';
         } else {
@@ -120,58 +113,38 @@ ob_end_flush();
                         <input type="hidden" name="rule_id" value="<?php echo $rule_id; ?>">
                         
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="base_points" class="form-label">Base Points *</label>
                                 <input type="number" id="base_points" name="base_points" class="form-control" 
                                        value="<?php echo $rule['base_points']; ?>" min="1" required>
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label for="points_within_deadline" class="form-label">Points Within Deadline *</label>
+                                <input type="number" step="0.01" id="points_within_deadline" name="points_within_deadline" class="form-control" 
+                                       value="<?php echo $rule['points_within_deadline']; ?>" min="0" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label for="floor_points" class="form-label">Floor Points</label>
                                 <input type="number" id="floor_points" name="floor_points" class="form-control" 
                                        value="<?php echo $rule['floor_points']; ?>" min="0">
                                 <div class="form-text">Minimum points that can be awarded</div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label for="penalty_type" class="form-label">Penalty Type *</label>
-                                <select id="penalty_type" name="penalty_type" class="form-control" required>
-                                    <option value="linear" <?php echo ($rule['penalty_type'] == 'linear') ? 'selected' : ''; ?>>Linear</option>
-                                    <option value="threshold" <?php echo ($rule['penalty_type'] == 'threshold') ? 'selected' : ''; ?>>Threshold</option>
-                                    <option value="fixed" <?php echo ($rule['penalty_type'] == 'fixed') ? 'selected' : ''; ?>>Fixed</option>
-                                </select>
+                                <label for="points_tier_1" class="form-label">Points (5-15 Days Late) *</label>
+                                <input type="number" step="0.01" id="points_tier_1" name="points_tier_1" class="form-control" 
+                                       value="<?php echo $rule['points_tier_1']; ?>" min="0" required>
                             </div>
-                            
                             <div class="col-md-4 mb-3">
-                                <label for="penalty_value" class="form-label">Penalty Value</label>
-                                <input type="number" id="penalty_value" name="penalty_value" class="form-control" 
-                                       value="<?php echo $rule['penalty_value']; ?>">
+                                <label for="points_tier_2" class="form-label">Points (16-25 Days Late) *</label>
+                                <input type="number" step="0.01" id="points_tier_2" name="points_tier_2" class="form-control" 
+                                       value="<?php echo $rule['points_tier_2']; ?>" min="0" required>
                             </div>
-                            
                             <div class="col-md-4 mb-3">
-                                <label for="penalty_unit" class="form-label">Penalty Unit</label>
-                                <select id="penalty_unit" name="penalty_unit" class="form-control">
-                                    <option value="day" <?php echo ($rule['penalty_unit'] == 'day') ? 'selected' : ''; ?>>Per Day</option>
-                                    <option value="5days" <?php echo ($rule['penalty_unit'] == '5days') ? 'selected' : ''; ?>>Per 5 Days</option>
-                                    <option value="10days" <?php echo ($rule['penalty_unit'] == '10days') ? 'selected' : ''; ?>>Per 10 Days</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row threshold-fields" style="<?php echo ($rule['penalty_type'] != 'threshold') ? 'display: none;' : ''; ?>">
-                            <div class="col-md-6 mb-3">
-                                <label for="threshold_days" class="form-label">Threshold Days</label>
-                                <input type="number" id="threshold_days" name="threshold_days" class="form-control" 
-                                       value="<?php echo $rule['threshold_days']; ?>" min="1">
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="threshold_award" class="form-label">Threshold Award Points</label>
-                                <input type="number" id="threshold_award" name="threshold_award" class="form-control" 
-                                       value="<?php echo $rule['threshold_award']; ?>" min="0">
-                                <div class="form-text">Points awarded after threshold</div>
+                                <label for="points_tier_3" class="form-label">Points (>25 Days Late) *</label>
+                                <input type="number" step="0.01" id="points_tier_3" name="points_tier_3" class="form-control" 
+                                       value="<?php echo $rule['points_tier_3']; ?>" min="0" required>
                             </div>
                         </div>
 
@@ -249,13 +222,4 @@ ob_end_flush();
 </script>
 <?php endif; ?>
 
-<script>
-document.getElementById('penalty_type')?.addEventListener('change', function() {
-    const thresholdFields = document.querySelector('.threshold-fields');
-    if (this.value === 'threshold') {
-        thresholdFields.style.display = 'flex';
-    } else {
-        thresholdFields.style.display = 'none';
-    }
-});
-</script>
+<!-- No penalty type logic needed for new structure -->
