@@ -15,7 +15,7 @@
         <!-- Dashboard -->
         <li class="nav-item">
             <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'dashboard.php') ? 'active' : ''; ?>" 
-               href="dashboard.php">
+               href="operations_dashboard.php">
                 <i class="bi bi-speedometer2 nav-icon"></i>
                 <span class="nav-text">Dashboard</span>
             </a>
