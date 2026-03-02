@@ -104,7 +104,7 @@ if (isset($_POST['submit_department'])) {
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="budget" class="form-label">Annual Budget ($) *</label>
+                                    <label for="budget" class="form-label">Annual Budget (AED) *</label>
                                     <input type="number" step="0.01" id="budget" name="budget" class="form-control" 
                                            value="<?php echo htmlspecialchars($budget); ?>" required>
                                 </div>

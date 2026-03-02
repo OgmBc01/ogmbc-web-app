@@ -48,6 +48,12 @@ while ($row = mysqli_fetch_assoc($chart_result)) {
 <div class="container-fluid">
     <!-- Analytics Dashboard -->
     <div class="analytics-dashboard">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="page-title mb-0">Departments Analytics</h1>
+            <a href="departments.php?source=add_department" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Department
+            </a>
+        </div>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">
@@ -75,7 +81,7 @@ while ($row = mysqli_fetch_assoc($chart_result)) {
                 </div>
                 <div class="stat-details">
                     <h3>Avg Salary</h3>
-                    <p class="stat-number">$<?php echo number_format($avg_salary, 2); ?></p>
+                    <p class="stat-number">AED <?php echo number_format($avg_salary, 2); ?></p>
                 </div>
             </div>
             
@@ -156,7 +162,7 @@ while ($row = mysqli_fetch_assoc($chart_result)) {
                                     <td><span class="badge bg-info"><?php echo htmlspecialchars($dept_code); ?></span></td>
                                     <td><?php echo htmlspecialchars($dept_name); ?></td>
                                     <td><?php echo htmlspecialchars($manager_name); ?></td>
-                                    <td>$<?php echo $budget; ?></td>
+                                    <td>AED <?php echo $budget; ?></td>
                                     <td><?php echo htmlspecialchars($location); ?></td>
                                     <td>
                                         <span class="badge bg-primary"><?php echo $employee_count; ?></span>
@@ -207,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 yAxisID: 'y-employees'
             },
             {
-                label: 'Average Salary ($)',
+                label: 'Average Salary (AED)',
                 data: chartSalaries,
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
                 borderColor: 'rgba(255, 99, 132, 1)',
@@ -241,11 +247,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     title: {
                         display: true,
-                        text: 'Average Salary ($)'
+                        text: 'Average Salary (AED)'
                     },
                     ticks: {
                         callback: function(value) {
-                            return '$' + value;
+                            return 'AED ' + value;
                         }
                     }
                 }
@@ -263,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 label += ': ';
                             }
                             if (context.dataset.label.includes('Salary')) {
-                                label += '$' + context.raw.toFixed(2);
+                                label += 'AED ' + context.raw.toFixed(2);
                             } else {
                                 label += context.raw;
                             }

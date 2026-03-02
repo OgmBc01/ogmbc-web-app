@@ -40,7 +40,7 @@ $category_colors = [
     font-size: 0.9rem;
     padding: 0.3rem 0.6rem;
     border-radius: 12px;
-    background: #f8f9fa;
+    background: #eaf5ff;
     color: #2c3e50;
     border-left: 3px solid;
 }

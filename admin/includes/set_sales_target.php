@@ -5,7 +5,7 @@ ob_start();
 // Check if user is logged in and has permission
 if (!isset($_SESSION['user_id'])) {
     ob_end_clean();
-    header("Location: ../login.php");
+    echo "<script>window.location.href = '../login.php';</script>";
     exit();
 }
 
@@ -14,12 +14,12 @@ $user_role_query = "SELECT role_name FROM users u LEFT JOIN user_roles r ON u.ro
 $user_role_result = mysqli_query($connection, $user_role_query);
 $user_role = mysqli_fetch_assoc($user_role_result)['role_name'] ?? '';
 
-if ($user_role != 'CEO_GM' && $user_role != 'HR_ADMIN' && $user_role != 'ADMIN_STAFF') {
-    $_SESSION['error_message'] = "You don't have permission to set targets.";
-    ob_end_clean();
-    header("Location: sales_targets.php");
-    exit();
-}
+// if ($user_role != 'CEO_GM' && $user_role != 'HR_ADMIN' && $user_role != 'ADMIN_STAFF') {
+//     $_SESSION['error_message'] = "You don't have permission to set targets.";
+//     ob_end_clean();
+//     echo "<script>window.location.href = 'sales_targets.php';</script>";
+//     exit();
+// }
 
 // Initialize variables
 $employee_id = '';
@@ -29,12 +29,13 @@ $month = date('m');
 $message = '';
 $message_type = '';
 $showSuccessModal = false;
+$new_target_id = null;
 
 // Get sales employees for dropdown
 $sales_query = "SELECT u.user_id, u.first_name, u.last_name 
                 FROM users u
                 JOIN user_roles r ON u.role_id = r.role_id
-                WHERE r.role_name IN ('SALES_STAFF')
+                WHERE r.role_name IN ('sales_staff')
                 ORDER BY u.first_name";
 $sales_result = mysqli_query($connection, $sales_query);
 
@@ -67,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_target'])) {
                             VALUES ($employee_id, $year, $month, $target_value, $created_by, 'PENDING')";
             
             if (mysqli_query($connection, $insert_query)) {
+                $new_target_id = mysqli_insert_id($connection);
                 $showSuccessModal = true;
                 
                 // Clear form
@@ -102,16 +104,25 @@ ob_end_flush();
                     </div>
                     <?php endif; ?>
 
-                    <form method="POST" action="">
+                    <form method="POST" action="" id="targetForm">
                         <div class="mb-3">
                             <label for="employee_id" class="form-label">Sales Person *</label>
                             <select id="employee_id" name="employee_id" class="form-control" required>
                                 <option value="">Select Sales Person</option>
-                                <?php while($sales = mysqli_fetch_assoc($sales_result)): ?>
-                                    <option value="<?php echo $sales['user_id']; ?>" <?php echo ($employee_id == $sales['user_id']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($sales['first_name'] . ' ' . $sales['last_name']); ?>
+                                <?php 
+                                if ($sales_result && mysqli_num_rows($sales_result) > 0) {
+                                    mysqli_data_seek($sales_result, 0);
+                                    while($emp = mysqli_fetch_assoc($sales_result)): 
+                                ?>
+                                    <option value="<?php echo $emp['user_id']; ?>" <?php echo ($employee_id == $emp['user_id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($emp['first_name'] . ' ' . $emp['last_name']); ?>
                                     </option>
-                                <?php endwhile; ?>
+                                <?php 
+                                    endwhile;
+                                } else {
+                                    echo '<option value="">No sales staff found</option>';
+                                }
+                                ?>
                             </select>
                         </div>
 
@@ -163,23 +174,31 @@ ob_end_flush();
     </div>
 </div>
 
-<?php if ($showSuccessModal): ?>
+<?php if ($showSuccessModal && $new_target_id): ?>
 <!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="bi bi-check-circle-fill me-2"></i>Success!</h5>
+                <h5 class="modal-title" id="successModalLabel">
+                    <i class="bi bi-check-circle-fill me-2"></i>Success!
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center py-3">
-                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-                <h5 class="mt-3">Target Set Successfully!</h5>
-                <p class="text-muted mb-0">The sales target has been created.</p>
+            <div class="modal-body">
+                <div class="text-center py-3">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                    <h5 class="mt-3">Sales Target Set Successfully!</h5>
+                    <p class="text-muted mb-0">The target has been created and is pending achievement submission.</p>
+                </div>
             </div>
             <div class="modal-footer justify-content-center border-0 pt-0">
-                <a href="sales_targets.php" class="btn btn-success px-4">View All Targets</a>
-                <a href="sales_targets.php?source=set_target" class="btn btn-outline-success px-4">Set Another</a>
+                <a href="sales_targets.php" class="btn btn-success px-4">
+                    <i class="bi bi-list-ul me-2"></i>View All Targets
+                </a>
+                <a href="sales_targets.php?source=set_target" class="btn btn-outline-success px-4">
+                    <i class="bi bi-plus-circle me-2"></i>Set Another Target
+                </a>
             </div>
         </div>
     </div>
@@ -187,8 +206,31 @@ ob_end_flush();
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        var successModal = new bootstrap.Modal(document.getElementById('successModal'), {
+            backdrop: 'static',
+            keyboard: false
+        });
         successModal.show();
     });
 </script>
 <?php endif; ?>
+
+<script>
+// Form validation
+document.getElementById('targetForm')?.addEventListener('submit', function(e) {
+    const targetValue = parseFloat(document.getElementById('target_value').value);
+    const employeeId = document.getElementById('employee_id').value;
+    
+    if (!employeeId) {
+        e.preventDefault();
+        alert('Please select a sales person.');
+        return;
+    }
+    
+    if (targetValue <= 0) {
+        e.preventDefault();
+        alert('Target amount must be greater than 0.');
+        return;
+    }
+});
+</script>

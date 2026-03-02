@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: second_mysql
--- Generation Time: Mar 02, 2026 at 04:16 AM
+-- Generation Time: Feb 28, 2026 at 04:39 AM
 -- Server version: 8.0.45
 -- PHP Version: 8.3.26
 
@@ -56,17 +56,13 @@ CREATE TABLE `annual_performance` (
 CREATE TABLE `audit_log` (
   `log_id` int NOT NULL,
   `user_id` int NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `action` varchar(50) NOT NULL,
-  `table_name` varchar(50) NOT NULL,
-  `record_id` int DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `entity_type` varchar(50) NOT NULL,
+  `entity_id` int NOT NULL,
   `old_data` json DEFAULT NULL,
   `new_data` json DEFAULT NULL,
-  `changes` json DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `user_agent` text,
-  `request_url` varchar(255) DEFAULT NULL,
-  `description` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -130,24 +126,16 @@ CREATE TABLE `cdp_records` (
   `cdp_type` enum('CERTIFICATE','COURSE','LOYALTY','BEHAVIOR') NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text,
-  `document_file` varchar(255) DEFAULT NULL,
+  `document_file` varchar(255) NOT NULL,
   `uplift_percentage` decimal(5,2) DEFAULT NULL,
   `effective_date` date NOT NULL,
   `status` enum('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
   `approved_by` int DEFAULT NULL,
   `approved_at` timestamp NULL DEFAULT NULL,
   `approval_notes` text,
-  `created_by` int NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `cdp_records`
---
-
-INSERT INTO `cdp_records` (`cdp_id`, `employee_id`, `cdp_type`, `title`, `description`, `document_file`, `uplift_percentage`, `effective_date`, `status`, `approved_by`, `approved_at`, `approval_notes`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 9, 'CERTIFICATE', 'Accounting Online Course', 'Hello Test', 'cdp_1772324696_7784.png', 15.00, '2026-03-01', 'PENDING', NULL, NULL, NULL, 9, '2026-03-01 00:24:56', '2026-03-01 00:24:56');
 
 -- --------------------------------------------------------
 
@@ -199,39 +187,6 @@ INSERT INTO `clients` (`client_id`, `company_name`, `trade_license_no`, `country
 -- --------------------------------------------------------
 
 --
--- Table structure for table `client_activity_log`
---
-
-CREATE TABLE `client_activity_log` (
-  `log_id` int NOT NULL,
-  `client_id` int NOT NULL,
-  `activity_type` varchar(50) NOT NULL,
-  `description` text NOT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `client_communications`
---
-
-CREATE TABLE `client_communications` (
-  `comm_id` int NOT NULL,
-  `client_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `comm_type` enum('email','whatsapp','call','meeting','note') NOT NULL,
-  `direction` enum('outgoing','incoming') NOT NULL,
-  `subject` varchar(255) DEFAULT NULL,
-  `message` text,
-  `engagement_id` int DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `client_documents`
 --
 
@@ -268,9 +223,8 @@ CREATE TABLE `client_feedback` (
   `feedback_id` int NOT NULL,
   `client_id` int NOT NULL,
   `engagement_id` int DEFAULT NULL,
-  `employee_id` int NOT NULL,
-  `feedback_text` text NOT NULL,
-  `rating` int DEFAULT '5',
+  `feedback_date` date NOT NULL,
+  `feedback_text` text,
   `is_positive` tinyint(1) DEFAULT '1',
   `points_awarded` int DEFAULT '50',
   `evidence_file` varchar(255) DEFAULT NULL,
@@ -279,54 +233,6 @@ CREATE TABLE `client_feedback` (
   `validated_at` timestamp NULL DEFAULT NULL,
   `created_by` int NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `client_feedback`
---
-
-INSERT INTO `client_feedback` (`feedback_id`, `client_id`, `engagement_id`, `employee_id`, `feedback_text`, `rating`, `is_positive`, `points_awarded`, `evidence_file`, `is_validated`, `validated_by`, `validated_at`, `created_by`, `created_at`) VALUES
-(1, 2, NULL, 9, 'They said I work fast.', 5, 1, 50, 'feedback_1772257636_9010.png', 0, NULL, NULL, 9, '2026-02-28 05:47:16');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `client_files`
---
-
-CREATE TABLE `client_files` (
-  `file_id` int NOT NULL,
-  `client_id` int NOT NULL,
-  `engagement_id` int DEFAULT NULL,
-  `uploaded_by` enum('client','staff') NOT NULL,
-  `file_name` varchar(255) NOT NULL,
-  `file_path` varchar(500) NOT NULL,
-  `file_size` int DEFAULT NULL,
-  `file_type` varchar(50) DEFAULT NULL,
-  `description` text,
-  `uploaded_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `client_invoices`
---
-
-CREATE TABLE `client_invoices` (
-  `invoice_id` int NOT NULL,
-  `client_id` int NOT NULL,
-  `engagement_id` int DEFAULT NULL,
-  `invoice_number` varchar(50) NOT NULL,
-  `amount` decimal(10,2) NOT NULL,
-  `currency` varchar(10) DEFAULT 'AED',
-  `status` enum('draft','sent','paid','overdue','cancelled') DEFAULT 'draft',
-  `due_date` date DEFAULT NULL,
-  `paid_date` date DEFAULT NULL,
-  `pdf_path` varchar(255) DEFAULT NULL,
-  `notes` text,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -348,23 +254,6 @@ CREATE TABLE `client_notes` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `client_notifications`
---
-
-CREATE TABLE `client_notifications` (
-  `notif_id` int NOT NULL,
-  `client_id` int NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `type` enum('info','success','warning','urgent') DEFAULT 'info',
-  `is_read` tinyint(1) DEFAULT '0',
-  `link` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `deadline_change_requests`
 --
 
@@ -381,6 +270,13 @@ CREATE TABLE `deadline_change_requests` (
   `review_notes` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `deadline_change_requests`
+--
+
+INSERT INTO `deadline_change_requests` (`request_id`, `engagement_id`, `requested_by`, `requested_date`, `reason_code`, `reason_notes`, `status`, `reviewed_by`, `reviewed_at`, `review_notes`, `created_at`) VALUES
+(1, 1, 9, '2026-04-02', 'client_delay', 'Please change', 'PENDING', NULL, NULL, NULL, '2026-02-28 04:22:29');
 
 -- --------------------------------------------------------
 
@@ -406,8 +302,7 @@ CREATE TABLE `departments` (
 
 INSERT INTO `departments` (`id`, `dept_name`, `dept_code`, `manager`, `budget`, `location`, `description`, `created_at`, `updated_at`) VALUES
 (3, 'Operations', 'OPS', '2', 30000.00, 'OGMBC', 'Our operations department', '2026-02-27 23:17:33', '2026-02-27 23:17:33'),
-(4, 'Sales', 'SLS', '1', 6000.00, 'OGMBC', 'Our sales department', '2026-02-28 00:23:03', '2026-02-28 00:23:03'),
-(5, 'Accounts', 'ACC', '1', 20000.00, 'OGMBC', 'Our internal Accounts department', '2026-03-01 00:55:44', '2026-03-01 00:55:44');
+(4, 'Sales', 'SLS', '1', 6000.00, 'OGMBC', 'Our sales department', '2026-02-28 00:23:03', '2026-02-28 00:23:03');
 
 -- --------------------------------------------------------
 
@@ -492,6 +387,36 @@ CREATE TABLE `engagements` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `engagements`
+--
+
+INSERT INTO `engagements` (`engagement_id`, `client_id`, `service_id`, `rule_version_id`, `title`, `description`, `assigned_to`, `assigned_by`, `reviewer_id`, `assigned_at`, `start_date`, `original_deadline`, `approved_deadline`, `completion_date`, `status`, `evidence_required`, `submitted_at`, `submitted_by`, `delay_days`, `points_awarded`, `calculation_explanation`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 2, 1, 1, 'Financial Audit', 'He need finance audit', 4, 9, 2, '2026-02-28 04:19:56', '2026-02-28', '2026-03-30', NULL, NULL, 'ASSIGNED', 1, NULL, NULL, 0, NULL, NULL, 9, '2026-02-28 04:19:56', '2026-02-28 04:19:56');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `engagement_status_history`
+--
+
+CREATE TABLE `engagement_status_history` (
+  `history_id` int NOT NULL,
+  `engagement_id` int NOT NULL,
+  `old_status` varchar(50) DEFAULT NULL,
+  `new_status` varchar(50) NOT NULL,
+  `changed_by` int NOT NULL,
+  `changed_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `notes` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `engagement_status_history`
+--
+
+INSERT INTO `engagement_status_history` (`history_id`, `engagement_id`, `old_status`, `new_status`, `changed_by`, `changed_at`, `notes`) VALUES
+(1, 1, NULL, 'ASSIGNED', 9, '2026-02-28 04:19:56', 'Engagement created');
+
 -- --------------------------------------------------------
 
 --
@@ -528,6 +453,27 @@ INSERT INTO `enquiries` (`enquiry_id`, `name`, `email`, `contact`, `service`, `s
 (11, 'Abdull55', 'abdaullahbalam@gmail.com', '+123456789', 'Accounting &amp; Taxation', 'Another Random Test22', 'Just testing this stuff.', '2025-12-28 14:43:26', 0, 'new'),
 (12, 'New Comer', 'madakisoft@gmail.com', '80808080', 'Accounting &amp; Taxation', 'Taxation services', 'Hello this is new live test.', '2026-01-02 18:19:00', 0, 'new'),
 (13, 'Odai', 'tom@ohmbc.ae', '0509860136', 'Accounting &amp; Taxation', 'Hdhd', 'Hi', '2026-01-09 05:15:10', 0, 'new');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `evidence`
+--
+
+CREATE TABLE `evidence` (
+  `evidence_id` int NOT NULL,
+  `engagement_id` int NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `file_path` varchar(500) NOT NULL,
+  `file_size` int DEFAULT NULL,
+  `mime_type` varchar(100) DEFAULT NULL,
+  `uploaded_by` int NOT NULL,
+  `uploaded_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_validated` tinyint(1) DEFAULT '0',
+  `validated_by` int DEFAULT NULL,
+  `validated_at` timestamp NULL DEFAULT NULL,
+  `validation_notes` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -616,13 +562,6 @@ CREATE TABLE `points_ledger` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `created_by` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `points_ledger`
---
-
-INSERT INTO `points_ledger` (`ledger_id`, `employee_id`, `source_type`, `source_id`, `points`, `points_type`, `description`, `calculation_data`, `requires_approval`, `approved_by`, `approved_at`, `created_at`, `created_by`) VALUES
-(1, 4, 'MANUAL_ADJUSTMENT', NULL, 400, 'EARNED', 'Nice points', NULL, 0, NULL, NULL, '2026-02-28 05:07:33', 9);
 
 -- --------------------------------------------------------
 
@@ -903,23 +842,14 @@ CREATE TABLE `service_point_rules` (
   `service_id` int NOT NULL,
   `rule_version` int NOT NULL,
   `base_points` int NOT NULL,
-  `points_within_deadline` int NOT NULL,
-  `points_tier_1` int NOT NULL,
-  `tier_1_min_days` int DEFAULT '5',
-  `tier_1_max_days` int DEFAULT '15',
-  `points_tier_2` int NOT NULL,
-  `tier_2_min_days` int DEFAULT '16',
-  `tier_2_max_days` int DEFAULT '25',
-  `points_tier_3` int NOT NULL,
-  `tier_3_min_days` int DEFAULT '26',
-  `penalty_type` varchar(20) DEFAULT NULL,
+  `penalty_type` enum('linear','threshold','fixed') NOT NULL,
   `penalty_value` int DEFAULT NULL,
-  `penalty_unit` varchar(10) DEFAULT NULL,
+  `penalty_unit` enum('day','5days','10days') NOT NULL,
   `threshold_days` int DEFAULT NULL,
   `threshold_award` int DEFAULT NULL,
   `floor_points` int DEFAULT '0',
   `is_active` tinyint(1) DEFAULT '1',
-  `created_by` int NOT NULL,
+  `created_by` int DEFAULT NULL,
   `effective_date` date NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -928,22 +858,8 @@ CREATE TABLE `service_point_rules` (
 -- Dumping data for table `service_point_rules`
 --
 
-INSERT INTO `service_point_rules` (`rule_id`, `service_id`, `rule_version`, `base_points`, `points_within_deadline`, `points_tier_1`, `tier_1_min_days`, `tier_1_max_days`, `points_tier_2`, `tier_2_min_days`, `tier_2_max_days`, `points_tier_3`, `tier_3_min_days`, `penalty_type`, `penalty_value`, `penalty_unit`, `threshold_days`, `threshold_award`, `floor_points`, `is_active`, `created_by`, `effective_date`, `created_at`) VALUES
-(1, 63, 1, 100, 100, 75, 5, 15, 50, 16, 25, 25, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(2, 64, 1, 150, 150, 113, 5, 15, 75, 16, 25, 38, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(3, 65, 1, 100, 100, 75, 5, 15, 50, 16, 25, 25, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(4, 66, 1, 350, 350, 263, 5, 15, 175, 16, 25, 88, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(5, 67, 1, 30, 30, 23, 5, 15, 15, 16, 25, 8, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(6, 68, 1, 100, 100, 75, 5, 15, 50, 16, 25, 25, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(7, 69, 1, 25, 25, 19, 5, 15, 13, 16, 25, 6, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(8, 70, 1, 30, 30, 23, 5, 15, 15, 16, 25, 8, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(9, 71, 1, 40, 40, 30, 5, 15, 20, 16, 25, 10, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(10, 72, 1, 25, 25, 19, 5, 15, 13, 16, 25, 6, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(11, 73, 1, 75, 75, 56, 5, 15, 38, 16, 25, 19, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(12, 74, 1, 110, 110, 83, 5, 15, 55, 16, 25, 28, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(13, 75, 1, 80, 80, 60, 5, 15, 40, 16, 25, 20, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(14, 76, 1, 80, 80, 60, 5, 15, 40, 16, 25, 20, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27'),
-(15, 77, 1, 30, 30, 23, 5, 15, 15, 16, 25, 8, 26, NULL, NULL, NULL, NULL, NULL, 0, 1, 2, '2026-03-02', '2026-03-02 00:18:27');
+INSERT INTO `service_point_rules` (`rule_id`, `service_id`, `rule_version`, `base_points`, `penalty_type`, `penalty_value`, `penalty_unit`, `threshold_days`, `threshold_award`, `floor_points`, `is_active`, `created_by`, `effective_date`, `created_at`) VALUES
+(1, 1, 1, 100, 'linear', 25, '10days', NULL, NULL, 0, 1, 9, '2026-02-28', '2026-02-28 04:04:55');
 
 -- --------------------------------------------------------
 
@@ -966,36 +882,7 @@ CREATE TABLE `service_types` (
 --
 
 INSERT INTO `service_types` (`service_id`, `service_name`, `service_category`, `is_active`, `created_by`, `created_at`, `updated_at`) VALUES
-(63, 'Monthly Bookkeeping', 'bookkeeping', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(64, 'Backlog accounting', 'bookkeeping', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(65, 'Monthly Internal Audit', 'audit', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(66, 'Quarterly Internal audit', 'audit', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(67, 'External Audit', 'audit', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(68, 'Monthly CFO services', 'other', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(69, 'VAT & CT Return Filing', 'tax', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(70, 'VAT & CT Registration', 'tax', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(71, 'VAT & CT De-registration', 'tax', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(72, 'gAML Registration', 'registration', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(73, 'gAMl report', 'tax', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(74, 'Free Zone Company Setup', 'setup', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(75, 'Mainland Company Setup', 'setup', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(76, 'Bank account opening', 'other', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(77, 'PRO Services', 'other', 1, 2, '2026-03-01 23:07:43', '2026-03-01 23:07:43'),
-(78, 'Monthly Bookkeeping', 'bookkeeping', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(79, 'Backlog accounting', 'bookkeeping', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(80, 'Monthly Internal Audit', 'audit', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(81, 'Quarterly Internal audit', 'audit', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(82, 'External Audit', 'audit', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(83, 'Monthly CFO services', 'other', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(84, 'VAT & CT Return Filing', 'tax', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(85, 'VAT & CT Registration', 'tax', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(86, 'VAT & CT De-registration', 'tax', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(87, 'gAML Registration', 'registration', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(88, 'gAMl report', 'tax', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(89, 'Free Zone Company Setup', 'setup', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(90, 'Mainland Company Setup', 'setup', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(91, 'Bank account opening', 'other', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45'),
-(92, 'PRO Services', 'other', 1, 2, '2026-03-01 23:24:45', '2026-03-01 23:24:45');
+(1, 'Vat Return Filing', 'bookkeeping', 1, 9, '2026-02-28 04:03:38', '2026-02-28 04:04:07');
 
 -- --------------------------------------------------------
 
@@ -1027,53 +914,6 @@ CREATE TABLE `stamps` (
   `uploaded_by` int DEFAULT NULL,
   `uploaded_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `support_tickets`
---
-
-CREATE TABLE `support_tickets` (
-  `ticket_id` int NOT NULL,
-  `client_id` int NOT NULL,
-  `subject` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `status` enum('open','in_progress','resolved','closed') DEFAULT 'open',
-  `priority` enum('low','medium','high','urgent') DEFAULT 'medium',
-  `assigned_to` int DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `task_comments`
---
-
-CREATE TABLE `task_comments` (
-  `comment_id` int NOT NULL,
-  `engagement_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `comment` text NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ticket_replies`
---
-
-CREATE TABLE `ticket_replies` (
-  `reply_id` int NOT NULL,
-  `ticket_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `message` text NOT NULL,
-  `is_staff` tinyint(1) DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1137,38 +977,6 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_activity_log`
---
-
-CREATE TABLE `user_activity_log` (
-  `log_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `activity_type` varchar(50) NOT NULL,
-  `description` text NOT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `user_notifications`
---
-
-CREATE TABLE `user_notifications` (
-  `notif_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `type` enum('info','success','warning','danger') DEFAULT 'info',
-  `link` varchar(255) DEFAULT NULL,
-  `is_read` tinyint(1) DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `user_roles`
 --
 
@@ -1190,8 +998,7 @@ INSERT INTO `user_roles` (`role_id`, `role_name`, `role_description`, `role_leve
 (2, 'manager', 'Can manage users and view reports', 75, '2026-02-27 20:59:01', '2026-02-27 20:59:01'),
 (3, 'supervisor', 'Can supervise daily operations', 50, '2026-02-27 20:59:01', '2026-02-27 20:59:01'),
 (4, 'editor', 'Can edit content but not manage users', 30, '2026-02-27 20:59:01', '2026-02-27 20:59:01'),
-(7, 'viewer', '', 10, '2026-02-27 21:56:39', '2026-02-27 21:56:39'),
-(14, 'REVIEWER', 'Reviewer - Performs internal review/approval for submissions where configured.', 70, '2026-02-28 05:28:57', '2026-02-28 05:28:57');
+(7, 'viewer', '', 10, '2026-02-27 21:56:39', '2026-02-27 21:56:39');
 
 -- --------------------------------------------------------
 
@@ -1235,11 +1042,8 @@ ALTER TABLE `annual_performance`
 --
 ALTER TABLE `audit_log`
   ADD PRIMARY KEY (`log_id`),
-  ADD KEY `idx_user` (`user_id`),
-  ADD KEY `idx_table` (`table_name`),
-  ADD KEY `idx_action` (`action`),
-  ADD KEY `idx_created` (`created_at`),
-  ADD KEY `idx_record` (`table_name`,`record_id`);
+  ADD KEY `idx_entity` (`entity_type`,`entity_id`),
+  ADD KEY `idx_user_date` (`user_id`,`created_at`);
 
 --
 -- Indexes for table `bank_accounts`
@@ -1258,11 +1062,8 @@ ALTER TABLE `categories`
 --
 ALTER TABLE `cdp_records`
   ADD PRIMARY KEY (`cdp_id`),
-  ADD KEY `approved_by` (`approved_by`),
-  ADD KEY `created_by` (`created_by`),
-  ADD KEY `idx_employee` (`employee_id`),
-  ADD KEY `idx_status` (`status`),
-  ADD KEY `idx_effective_date` (`effective_date`);
+  ADD KEY `employee_id` (`employee_id`),
+  ADD KEY `approved_by` (`approved_by`);
 
 --
 -- Indexes for table `clients`
@@ -1272,22 +1073,6 @@ ALTER TABLE `clients`
   ADD KEY `service_id` (`service_id`),
   ADD KEY `assigned_sales_id` (`assigned_sales_id`),
   ADD KEY `created_by` (`created_by`);
-
---
--- Indexes for table `client_activity_log`
---
-ALTER TABLE `client_activity_log`
-  ADD PRIMARY KEY (`log_id`),
-  ADD KEY `idx_client_date` (`client_id`,`created_at`);
-
---
--- Indexes for table `client_communications`
---
-ALTER TABLE `client_communications`
-  ADD PRIMARY KEY (`comm_id`),
-  ADD KEY `engagement_id` (`engagement_id`),
-  ADD KEY `idx_client` (`client_id`),
-  ADD KEY `idx_user` (`user_id`);
 
 --
 -- Indexes for table `client_documents`
@@ -1302,32 +1087,10 @@ ALTER TABLE `client_documents`
 --
 ALTER TABLE `client_feedback`
   ADD PRIMARY KEY (`feedback_id`),
+  ADD KEY `client_id` (`client_id`),
   ADD KEY `engagement_id` (`engagement_id`),
   ADD KEY `validated_by` (`validated_by`),
-  ADD KEY `created_by` (`created_by`),
-  ADD KEY `idx_client` (`client_id`),
-  ADD KEY `idx_employee` (`employee_id`),
-  ADD KEY `idx_validated` (`is_validated`),
-  ADD KEY `idx_created` (`created_at`),
-  ADD KEY `idx_rating` (`rating`);
-
---
--- Indexes for table `client_files`
---
-ALTER TABLE `client_files`
-  ADD PRIMARY KEY (`file_id`),
-  ADD KEY `idx_client` (`client_id`),
-  ADD KEY `idx_engagement` (`engagement_id`);
-
---
--- Indexes for table `client_invoices`
---
-ALTER TABLE `client_invoices`
-  ADD PRIMARY KEY (`invoice_id`),
-  ADD UNIQUE KEY `invoice_number` (`invoice_number`),
-  ADD KEY `engagement_id` (`engagement_id`),
-  ADD KEY `idx_client` (`client_id`),
-  ADD KEY `idx_status` (`status`);
+  ADD KEY `created_by` (`created_by`);
 
 --
 -- Indexes for table `client_notes`
@@ -1336,13 +1099,6 @@ ALTER TABLE `client_notes`
   ADD PRIMARY KEY (`note_id`),
   ADD KEY `client_id` (`client_id`),
   ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `client_notifications`
---
-ALTER TABLE `client_notifications`
-  ADD PRIMARY KEY (`notif_id`),
-  ADD KEY `idx_client_read` (`client_id`,`is_read`);
 
 --
 -- Indexes for table `deadline_change_requests`
@@ -1395,12 +1151,29 @@ ALTER TABLE `engagements`
   ADD KEY `idx_dates` (`start_date`,`original_deadline`,`approved_deadline`);
 
 --
+-- Indexes for table `engagement_status_history`
+--
+ALTER TABLE `engagement_status_history`
+  ADD PRIMARY KEY (`history_id`),
+  ADD KEY `engagement_id` (`engagement_id`),
+  ADD KEY `changed_by` (`changed_by`);
+
+--
 -- Indexes for table `enquiries`
 --
 ALTER TABLE `enquiries`
   ADD PRIMARY KEY (`enquiry_id`),
   ADD KEY `idx_email` (`email`),
   ADD KEY `idx_submitted_at` (`submitted_at`);
+
+--
+-- Indexes for table `evidence`
+--
+ALTER TABLE `evidence`
+  ADD PRIMARY KEY (`evidence_id`),
+  ADD KEY `engagement_id` (`engagement_id`),
+  ADD KEY `uploaded_by` (`uploaded_by`),
+  ADD KEY `validated_by` (`validated_by`);
 
 --
 -- Indexes for table `leads`
@@ -1538,31 +1311,6 @@ ALTER TABLE `stamps`
   ADD KEY `uploaded_by` (`uploaded_by`);
 
 --
--- Indexes for table `support_tickets`
---
-ALTER TABLE `support_tickets`
-  ADD PRIMARY KEY (`ticket_id`),
-  ADD KEY `assigned_to` (`assigned_to`),
-  ADD KEY `idx_client` (`client_id`),
-  ADD KEY `idx_status` (`status`);
-
---
--- Indexes for table `task_comments`
---
-ALTER TABLE `task_comments`
-  ADD PRIMARY KEY (`comment_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `idx_engagement` (`engagement_id`);
-
---
--- Indexes for table `ticket_replies`
---
-ALTER TABLE `ticket_replies`
-  ADD PRIMARY KEY (`reply_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `idx_ticket` (`ticket_id`);
-
---
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -1572,20 +1320,6 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `user_id` (`user_id`),
   ADD KEY `role_id` (`role_id`),
   ADD KEY `type_id` (`type_id`);
-
---
--- Indexes for table `user_activity_log`
---
-ALTER TABLE `user_activity_log`
-  ADD PRIMARY KEY (`log_id`),
-  ADD KEY `idx_user_date` (`user_id`,`created_at`);
-
---
--- Indexes for table `user_notifications`
---
-ALTER TABLE `user_notifications`
-  ADD PRIMARY KEY (`notif_id`),
-  ADD KEY `idx_user_read` (`user_id`,`is_read`);
 
 --
 -- Indexes for table `user_roles`
@@ -1633,25 +1367,13 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `cdp_records`
 --
 ALTER TABLE `cdp_records`
-  MODIFY `cdp_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `cdp_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `clients`
 --
 ALTER TABLE `clients`
   MODIFY `client_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT for table `client_activity_log`
---
-ALTER TABLE `client_activity_log`
-  MODIFY `log_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `client_communications`
---
-ALTER TABLE `client_communications`
-  MODIFY `comm_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `client_documents`
@@ -1663,31 +1385,13 @@ ALTER TABLE `client_documents`
 -- AUTO_INCREMENT for table `client_feedback`
 --
 ALTER TABLE `client_feedback`
-  MODIFY `feedback_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `client_files`
---
-ALTER TABLE `client_files`
-  MODIFY `file_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `client_invoices`
---
-ALTER TABLE `client_invoices`
-  MODIFY `invoice_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `feedback_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `client_notes`
 --
 ALTER TABLE `client_notes`
   MODIFY `note_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `client_notifications`
---
-ALTER TABLE `client_notifications`
-  MODIFY `notif_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `deadline_change_requests`
@@ -1699,7 +1403,7 @@ ALTER TABLE `deadline_change_requests`
 -- AUTO_INCREMENT for table `departments`
 --
 ALTER TABLE `departments`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `email_logs`
@@ -1717,13 +1421,25 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `engagements`
 --
 ALTER TABLE `engagements`
-  MODIFY `engagement_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `engagement_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `engagement_status_history`
+--
+ALTER TABLE `engagement_status_history`
+  MODIFY `history_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `enquiries`
 --
 ALTER TABLE `enquiries`
   MODIFY `enquiry_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `evidence`
+--
+ALTER TABLE `evidence`
+  MODIFY `evidence_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `leads`
@@ -1741,7 +1457,7 @@ ALTER TABLE `monthly_point_summary`
 -- AUTO_INCREMENT for table `points_ledger`
 --
 ALTER TABLE `points_ledger`
-  MODIFY `ledger_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ledger_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `posts`
@@ -1801,13 +1517,13 @@ ALTER TABLE `sales_target_bands`
 -- AUTO_INCREMENT for table `service_point_rules`
 --
 ALTER TABLE `service_point_rules`
-  MODIFY `rule_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `rule_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `service_types`
 --
 ALTER TABLE `service_types`
-  MODIFY `service_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
+  MODIFY `service_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `signatures`
@@ -1822,46 +1538,16 @@ ALTER TABLE `stamps`
   MODIFY `stamp_id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `support_tickets`
---
-ALTER TABLE `support_tickets`
-  MODIFY `ticket_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `task_comments`
---
-ALTER TABLE `task_comments`
-  MODIFY `comment_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `ticket_replies`
---
-ALTER TABLE `ticket_replies`
-  MODIFY `reply_id` int NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT for table `user_activity_log`
---
-ALTER TABLE `user_activity_log`
-  MODIFY `log_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `user_notifications`
---
-ALTER TABLE `user_notifications`
-  MODIFY `notif_id` int NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `user_roles`
 --
 ALTER TABLE `user_roles`
-  MODIFY `role_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `role_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `user_types`
@@ -1884,15 +1570,14 @@ ALTER TABLE `annual_performance`
 -- Constraints for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  ADD CONSTRAINT `audit_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `audit_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `cdp_records`
 --
 ALTER TABLE `cdp_records`
-  ADD CONSTRAINT `cdp_records_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `cdp_records_ibfk_2` FOREIGN KEY (`approved_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `cdp_records_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `cdp_records_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `cdp_records_ibfk_2` FOREIGN KEY (`approved_by`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `clients`
@@ -1901,20 +1586,6 @@ ALTER TABLE `clients`
   ADD CONSTRAINT `clients_ibfk_1` FOREIGN KEY (`service_id`) REFERENCES `categories` (`cat_id`),
   ADD CONSTRAINT `clients_ibfk_2` FOREIGN KEY (`assigned_sales_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `clients_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`);
-
---
--- Constraints for table `client_activity_log`
---
-ALTER TABLE `client_activity_log`
-  ADD CONSTRAINT `client_activity_log_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `client_communications`
---
-ALTER TABLE `client_communications`
-  ADD CONSTRAINT `client_communications_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `client_communications_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `client_communications_ibfk_3` FOREIGN KEY (`engagement_id`) REFERENCES `engagements` (`engagement_id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `client_documents`
@@ -1927,25 +1598,10 @@ ALTER TABLE `client_documents`
 -- Constraints for table `client_feedback`
 --
 ALTER TABLE `client_feedback`
-  ADD CONSTRAINT `client_feedback_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `client_feedback_ibfk_2` FOREIGN KEY (`engagement_id`) REFERENCES `engagements` (`engagement_id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `client_feedback_ibfk_3` FOREIGN KEY (`employee_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `client_feedback_ibfk_4` FOREIGN KEY (`validated_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `client_feedback_ibfk_5` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `client_files`
---
-ALTER TABLE `client_files`
-  ADD CONSTRAINT `client_files_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `client_files_ibfk_2` FOREIGN KEY (`engagement_id`) REFERENCES `engagements` (`engagement_id`) ON DELETE SET NULL;
-
---
--- Constraints for table `client_invoices`
---
-ALTER TABLE `client_invoices`
-  ADD CONSTRAINT `client_invoices_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `client_invoices_ibfk_2` FOREIGN KEY (`engagement_id`) REFERENCES `engagements` (`engagement_id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `client_feedback_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`),
+  ADD CONSTRAINT `client_feedback_ibfk_2` FOREIGN KEY (`engagement_id`) REFERENCES `engagements` (`engagement_id`),
+  ADD CONSTRAINT `client_feedback_ibfk_3` FOREIGN KEY (`validated_by`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `client_feedback_ibfk_4` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `client_notes`
@@ -1953,12 +1609,6 @@ ALTER TABLE `client_invoices`
 ALTER TABLE `client_notes`
   ADD CONSTRAINT `client_notes_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`),
   ADD CONSTRAINT `client_notes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
-
---
--- Constraints for table `client_notifications`
---
-ALTER TABLE `client_notifications`
-  ADD CONSTRAINT `client_notifications_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `deadline_change_requests`
@@ -1989,11 +1639,27 @@ ALTER TABLE `employees`
 ALTER TABLE `engagements`
   ADD CONSTRAINT `engagements_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`),
   ADD CONSTRAINT `engagements_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `service_types` (`service_id`),
+  ADD CONSTRAINT `engagements_ibfk_3` FOREIGN KEY (`rule_version_id`) REFERENCES `service_point_rules` (`rule_id`),
   ADD CONSTRAINT `engagements_ibfk_4` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `engagements_ibfk_5` FOREIGN KEY (`assigned_by`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `engagements_ibfk_6` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `engagements_ibfk_7` FOREIGN KEY (`submitted_by`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `engagements_ibfk_8` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `engagement_status_history`
+--
+ALTER TABLE `engagement_status_history`
+  ADD CONSTRAINT `engagement_status_history_ibfk_1` FOREIGN KEY (`engagement_id`) REFERENCES `engagements` (`engagement_id`),
+  ADD CONSTRAINT `engagement_status_history_ibfk_2` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `evidence`
+--
+ALTER TABLE `evidence`
+  ADD CONSTRAINT `evidence_ibfk_1` FOREIGN KEY (`engagement_id`) REFERENCES `engagements` (`engagement_id`),
+  ADD CONSTRAINT `evidence_ibfk_2` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `evidence_ibfk_3` FOREIGN KEY (`validated_by`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `monthly_point_summary`
@@ -2068,7 +1734,7 @@ ALTER TABLE `sales_targets`
 -- Constraints for table `service_point_rules`
 --
 ALTER TABLE `service_point_rules`
-  ADD CONSTRAINT `service_point_rules_ibfk_1` FOREIGN KEY (`service_id`) REFERENCES `service_types` (`service_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `service_point_rules_ibfk_1` FOREIGN KEY (`service_id`) REFERENCES `service_types` (`service_id`),
   ADD CONSTRAINT `service_point_rules_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`);
 
 --
@@ -2090,44 +1756,11 @@ ALTER TABLE `stamps`
   ADD CONSTRAINT `stamps_ibfk_1` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`user_id`);
 
 --
--- Constraints for table `support_tickets`
---
-ALTER TABLE `support_tickets`
-  ADD CONSTRAINT `support_tickets_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`client_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `support_tickets_ibfk_2` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
-
---
--- Constraints for table `task_comments`
---
-ALTER TABLE `task_comments`
-  ADD CONSTRAINT `task_comments_ibfk_1` FOREIGN KEY (`engagement_id`) REFERENCES `engagements` (`engagement_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `task_comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `ticket_replies`
---
-ALTER TABLE `ticket_replies`
-  ADD CONSTRAINT `ticket_replies_ibfk_1` FOREIGN KEY (`ticket_id`) REFERENCES `support_tickets` (`ticket_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `ticket_replies_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `user_roles` (`role_id`) ON DELETE SET NULL,
   ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`type_id`) REFERENCES `user_types` (`type_id`) ON DELETE SET NULL;
-
---
--- Constraints for table `user_activity_log`
---
-ALTER TABLE `user_activity_log`
-  ADD CONSTRAINT `user_activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `user_notifications`
---
-ALTER TABLE `user_notifications`
-  ADD CONSTRAINT `user_notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

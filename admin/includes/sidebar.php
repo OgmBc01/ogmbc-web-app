@@ -43,35 +43,12 @@
                 </ul>
             </li>
 
-            <!-- Operations Menu -->
-            <li class="nav-item">
-                <a class="nav-link menu-toggle-btn" href="#" data-menu="operations">
-                    <i class="bi bi-tools nav-icon"></i>
-                    <span class="nav-text">Operations</span>
-                    <i class="bi bi-chevron-right menu-toggle"></i>
-                </a>
-                <ul class="sub-menu" id="sales-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="clients.php?source=add_client">
-                            <i class="bi bi-plus-circle nav-icon"></i>
-                            <span class="nav-text">Add Client</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./clients.php">
-                            <i class="bi bi-card-checklist nav-icon"></i>
-                            <span class="nav-text">View All Clients</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
             <!-- Engagements Menu with Dropdown -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'engagements.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
                 href="#" data-menu="engagements">
-                    <i class="bi bi-briefcase nav-icon"></i>
-                    <span class="nav-text">Engagements</span>
+                    <i class="bi bi-tools nav-icon"></i>
+                    <span class="nav-text">Operations</span>
                     <i class="bi bi-chevron-right menu-toggle"></i>
                 </a>
                 <ul class="sub-menu" id="engagements-menu">
