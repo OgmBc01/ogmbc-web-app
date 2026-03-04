@@ -104,6 +104,13 @@ ob_start();
                             <br><small>by <?php echo htmlspecialchars($cdp['approved_by_name']); ?> on <?php echo date('M d, Y', strtotime($cdp['approved_at'])); ?></small>
                         <?php elseif ($cdp['status'] == 'REJECTED'): ?>
                             <span class="badge bg-danger">Rejected</span>
+                            <br><small>by <?php echo htmlspecialchars($cdp['approved_by_name']); ?> on <?php echo date('M d, Y', strtotime($cdp['approved_at'])); ?></small>
+                            <?php if (!empty($cdp['approval_notes'])): ?>
+                                <div class="alert alert-danger mt-2">
+                                    <strong>Rejection Reason:</strong><br>
+                                    <?php echo nl2br(htmlspecialchars($cdp['approval_notes'])); ?>
+                                </div>
+                            <?php endif; ?>
                         <?php else: ?>
                             <span class="badge bg-warning">Pending</span>
                         <?php endif; ?>

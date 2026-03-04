@@ -31,12 +31,6 @@ $user_id = $_SESSION['user_id'];
         </div>
 
         <!-- Breadcrumb Navigation -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item active">My Clients</li>
-            </ol>
-        </nav>
 
         <div class="row">
             <div class="col-md-12">

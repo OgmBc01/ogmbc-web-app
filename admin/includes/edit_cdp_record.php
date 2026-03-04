@@ -165,6 +165,14 @@ ob_end_flush();
                     </div>
                     <?php endif; ?>
 
+                    <?php if ($cdp['status'] == 'REJECTED' && !empty($cdp['approval_notes'])): ?>
+                    <div class="alert alert-danger mb-4">
+                        <h6 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>This record was rejected</h6>
+                        <p class="mb-0"><strong>Reason:</strong> <?php echo nl2br(htmlspecialchars($cdp['approval_notes'])); ?></p>
+                        <hr>
+                        <p class="mb-0">Please address the issues above and resubmit.</p>
+                    </div>
+                    <?php endif; ?>
                     <form method="POST" action="" enctype="multipart/form-data">
                         <?php if ($is_hr_admin): ?>
                         <div class="mb-3">

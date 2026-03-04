@@ -10,7 +10,7 @@ $user_role_query = "SELECT role_name FROM users u LEFT JOIN user_roles r ON u.ro
 $user_role_result = mysqli_query($connection, $user_role_query);
 $user_role = mysqli_fetch_assoc($user_role_result)['role_name'] ?? '';
 
-$is_hr_admin = ($user_role == 'hr_admin' || $user_role == 'ceo_gm' || $user_role == 'admin_staff');
+// $is_hr_admin = ($user_role == 'hr_admin' || $user_role == 'ceo_gm' || $user_role == 'admin_staff');
 
 // Get selected year filter
 $selected_year = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
@@ -222,16 +222,13 @@ if ($is_hr_admin) {
                                         <button class="btn btn-sm btn-info" onclick="viewCDP(<?php echo $cdp['cdp_id']; ?>)" title="View Details">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        
                                         <?php if ($cdp['status'] == 'PENDING'): ?>
-                                            <?php if ($is_hr_admin): ?>
-                                                <a href="cdp_annual.php?approve_cdp=<?php echo $cdp['cdp_id']; ?>" class="btn btn-sm btn-success" title="Approve" onclick="return confirm('Approve this CDP record?')">
-                                                    <i class="bi bi-check-lg"></i>
-                                                </a>
-                                                <a href="cdp_annual.php?reject_cdp=<?php echo $cdp['cdp_id']; ?>" class="btn btn-sm btn-danger" title="Reject" onclick="return confirm('Reject this CDP record?')">
-                                                    <i class="bi bi-x-lg"></i>
-                                                </a>
-                                            <?php endif; ?>
+                                            <a href="cdp_annual.php?approve_cdp=<?php echo $cdp['cdp_id']; ?>" class="btn btn-sm btn-success" title="Approve" onclick="return confirm('Approve this CDP record?')">
+                                                <i class="bi bi-check-lg"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-danger" onclick="rejectWithNotes(<?php echo $cdp['cdp_id']; ?>)" title="Reject with Notes">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
                                             <a href="cdp_annual.php?source=edit_cdp&id=<?php echo $cdp['cdp_id']; ?>" class="btn btn-sm btn-warning" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>

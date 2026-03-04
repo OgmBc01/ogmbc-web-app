@@ -160,8 +160,10 @@ if (isset($_GET['reject_request'])) {
 <div class="modal fade" id="engagementDetailsModal" tabindex="-1" aria-labelledby="engagementDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="engagementDetailsModalLabel">Engagement Details</h5>
+            <div class="modal-header bg-dark text-white border-bottom border-secondary" style="border-top-left-radius: .5rem; border-top-right-radius: .5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <h5 class="modal-title" id="engagementDetailsModalLabel">
+                    <i class="bi bi-briefcase me-2"></i>Engagement Details
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="engagementDetailsContent">
@@ -184,7 +186,7 @@ if (isset($_GET['reject_request'])) {
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="border-radius: .5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.12);">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
