@@ -36,28 +36,28 @@ $message_type = '';
                         <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>New Client Information</h5>
                     </div>
                     <div class="card-body">
-                                                <?php if (!empty($message)): ?>
-                                                <div class="alert alert-<?php echo $message_type == 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
-                                                        <?php echo $message; ?>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                </div>
-                                                <?php endif; ?>
+                        <?php if (!empty($message)): ?>
+                            <div class="alert alert-<?php echo $message_type == 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
+                                    <?php echo $message; ?>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
 
-                                                <!-- Success Modal -->
-                                                <div class="modal fade" id="clientSuccessModal" tabindex="-1" aria-labelledby="clientSuccessModalLabel" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header bg-success text-white">
-                                                                <h5 class="modal-title" id="clientSuccessModalLabel"><i class="bi bi-check-circle me-2"></i>Client Added Successfully</h5>
-                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body text-center">
-                                                                <p class="mb-3">The new client has been added to the database.</p>
-                                                                <a href="./clients.php" class="btn btn-success"><i class="bi bi-people me-1"></i> View All Clients</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                        <!-- Success Modal -->
+                        <div class="modal fade" id="clientSuccessModal" tabindex="-1" aria-labelledby="clientSuccessModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title" id="clientSuccessModalLabel"><i class="bi bi-check-circle me-2"></i>Client Added Successfully</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <p class="mb-3">The new client has been added to the database.</p>
+                                        <a href="./clients.php" class="btn btn-success"><i class="bi bi-people me-1"></i> View All Clients</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <form method="POST" action="" id="clientForm">
                             <input type="hidden" name="submit_client" value="1">
@@ -73,14 +73,14 @@ $message_type = '';
                                     <div class="mb-3">
                                         <label for="company_name" class="form-label">Company Name *</label>
                                         <input type="text" id="company_name" name="company_name" class="form-control" 
-                                               value="<?php echo htmlspecialchars($company_name); ?>" required>
+                                            value="<?php echo htmlspecialchars($company_name); ?>" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="trade_license_no" class="form-label">Trade License No</label>
                                         <input type="text" id="trade_license_no" name="trade_license_no" class="form-control" 
-                                               value="<?php echo htmlspecialchars($trade_license_no); ?>">
+                                            value="<?php echo htmlspecialchars($trade_license_no); ?>">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -102,7 +102,24 @@ $message_type = '';
                                             <option value="Japan" <?php echo ($country == 'Japan') ? 'selected' : ''; ?>>Japan</option>
                                             <option value="India" <?php echo ($country == 'India') ? 'selected' : ''; ?>>India</option>
                                             <option value="Russia" <?php echo ($country == 'Russia') ? 'selected' : ''; ?>>Russia</option>
-                                            <!-- Add more countries as needed -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="jurisdiction" class="form-label">Jurisdiction</label>
+                                        <select id="jurisdiction" name="jurisdiction" class="form-control">
+                                            <option value="">Select Jurisdiction</option>
+                                            <?php
+                                            // Fetch jurisdictions from database
+                                            $jurisdiction_query = "SELECT jurisdiction_name FROM jurisdictions WHERE is_active = 1 ORDER BY jurisdiction_name";
+                                            $jurisdiction_result = mysqli_query($connection, $jurisdiction_query);
+                                            if ($jurisdiction_result) {
+                                                while($jur = mysqli_fetch_assoc($jurisdiction_result)) {
+                                                    echo "<option value='" . htmlspecialchars($jur['jurisdiction_name']) . "'>" . htmlspecialchars($jur['jurisdiction_name']) . "</option>";
+                                                }
+                                            }
+                                            ?>
                                         </select>
                                     </div>
                                 </div>
@@ -119,7 +136,32 @@ $message_type = '';
                                     <div class="mb-3">
                                         <label for="business_activity" class="form-label">Business Activity</label>
                                         <input type="text" id="business_activity" name="business_activity" class="form-control" 
-                                               value="<?php echo htmlspecialchars($business_activity); ?>">
+                                            value="<?php echo htmlspecialchars($business_activity); ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="industry" class="form-label">Industry</label>
+                                        <select id="industry" name="industry" class="form-control">
+                                            <option value="">Select Industry</option>
+                                            <?php
+                                            // Fetch industries from database
+                                            $industry_query = "SELECT industry_name, category FROM industries WHERE is_active = 1 ORDER BY category, industry_name";
+                                            $industry_result = mysqli_query($connection, $industry_query);
+                                            $current_category = '';
+                                            if ($industry_result) {
+                                                while($ind = mysqli_fetch_assoc($industry_result)) {
+                                                    if ($current_category != $ind['category']) {
+                                                        if ($current_category != '') echo '</optgroup>';
+                                                        $current_category = $ind['category'];
+                                                        echo '<optgroup label="' . htmlspecialchars($current_category) . '">';
+                                                    }
+                                                    echo "<option value='" . htmlspecialchars($ind['industry_name']) . "'>" . htmlspecialchars($ind['industry_name']) . "</option>";
+                                                }
+                                                if ($current_category != '') echo '</optgroup>';
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -288,14 +330,13 @@ const countryZones = {
     'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan', /* ... add more regions ... */]
 };
 
+
 // Update emirate/zone options based on country selection
 document.getElementById('country').addEventListener('change', function() {
     const country = this.value;
     const emirateSelect = document.getElementById('emirate_zone');
-    
     // Clear existing options
     emirateSelect.innerHTML = '<option value="">Select Emirate/Zone/State</option>';
-    
     if (country && countryZones[country]) {
         countryZones[country].forEach(zone => {
             const option = document.createElement('option');
@@ -304,6 +345,22 @@ document.getElementById('country').addEventListener('change', function() {
             emirateSelect.appendChild(option);
         });
     }
+    // Filter jurisdictions based on selected country
+    const jurisdictionSelect = document.getElementById('jurisdiction');
+    fetch(`get_jurisdictions.php?country=${encodeURIComponent(country)}`)
+        .then(response => response.json())
+        .then(data => {
+            jurisdictionSelect.innerHTML = '<option value="">Select Jurisdiction</option>';
+            if (data.jurisdictions) {
+                data.jurisdictions.forEach(jur => {
+                    const option = document.createElement('option');
+                    option.value = jur.jurisdiction_name;
+                    option.textContent = jur.jurisdiction_name;
+                    jurisdictionSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching jurisdictions:', error));
 });
 
 // Auto-fill service price when service is selected

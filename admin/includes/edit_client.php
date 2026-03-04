@@ -12,14 +12,14 @@ if (!isset($_SESSION['user_id'])) {
 
 // Initialize variables
 $client_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$company_name = $trade_license_no = $country = $emirate_zone = $business_activity = $address = '';
+$company_name = $trade_license_no = $country = $jurisdiction = $emirate_zone = $business_activity = $industry = $address = '';
 $contact_name = $contact_designation = $contact_mobile = $contact_email = '';
 $service_id = $service_description = $expected_start_date = '';
 $payment_currency = 'AED';
 $payment_term = 'Monthly';
 $service_total_fee = '0.00';
 $lead_source = 'website';
-$client_status = 'New Lead'; // default status
+$client_status = 'New Lead';
 $message = '';
 $message_type = '';
 
@@ -36,8 +36,10 @@ if ($client_id > 0) {
         $company_name = $client['company_name'];
         $trade_license_no = $client['trade_license_no'];
         $country = $client['country'];
+        $jurisdiction = $client['jurisdiction'] ?? '';
         $emirate_zone = $client['emirate_zone'];
         $business_activity = $client['business_activity'];
+        $industry = $client['industry'] ?? '';
         $address = $client['address'];
         $contact_name = $client['contact_name'];
         $contact_designation = $client['contact_designation'];
@@ -61,6 +63,13 @@ if ($client_id > 0) {
     $message_type = "error";
 }
 
+// Fetch jurisdictions for dropdown
+$jurisdictions_query = "SELECT jurisdiction_name FROM jurisdictions WHERE is_active = 1 ORDER BY jurisdiction_name";
+$jurisdictions_result = mysqli_query($connection, $jurisdictions_query);
+
+// Fetch industries for dropdown
+$industries_query = "SELECT industry_name, category FROM industries WHERE is_active = 1 ORDER BY category, industry_name";
+$industries_result = mysqli_query($connection, $industries_query);
 ?>
 
 <div class="main-content" id="mainContent">
@@ -97,6 +106,7 @@ if ($client_id > 0) {
                                         <i class="bi bi-building me-2"></i>Company Information
                                     </h6>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="company_name" class="form-label">Company Name *</label>
@@ -104,6 +114,7 @@ if ($client_id > 0) {
                                                value="<?php echo htmlspecialchars($company_name); ?>" required>
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="trade_license_no" class="form-label">Trade License No</label>
@@ -111,6 +122,7 @@ if ($client_id > 0) {
                                                value="<?php echo htmlspecialchars($trade_license_no); ?>">
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="country" class="form-label">Country *</label>
@@ -133,6 +145,25 @@ if ($client_id > 0) {
                                         </select>
                                     </div>
                                 </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="jurisdiction" class="form-label">Jurisdiction</label>
+                                        <select id="jurisdiction" name="jurisdiction" class="form-control">
+                                            <option value="">Select Jurisdiction</option>
+                                            <?php
+                                            if ($jurisdictions_result && mysqli_num_rows($jurisdictions_result) > 0) {
+                                                mysqli_data_seek($jurisdictions_result, 0);
+                                                while($jur = mysqli_fetch_assoc($jurisdictions_result)) {
+                                                    $selected = ($jurisdiction == $jur['jurisdiction_name']) ? 'selected' : '';
+                                                    echo "<option value='" . htmlspecialchars($jur['jurisdiction_name']) . "' {$selected}>" . htmlspecialchars($jur['jurisdiction_name']) . "</option>";
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="emirate_zone" class="form-label">Emirate/Zone/State</label>
@@ -142,6 +173,32 @@ if ($client_id > 0) {
                                         </select>
                                     </div>
                                 </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="industry" class="form-label">Industry</label>
+                                        <select id="industry" name="industry" class="form-control">
+                                            <option value="">Select Industry</option>
+                                            <?php
+                                            if ($industries_result && mysqli_num_rows($industries_result) > 0) {
+                                                mysqli_data_seek($industries_result, 0);
+                                                $current_category = '';
+                                                while($ind = mysqli_fetch_assoc($industries_result)) {
+                                                    if ($current_category != $ind['category']) {
+                                                        if ($current_category != '') echo '</optgroup>';
+                                                        $current_category = $ind['category'];
+                                                        echo '<optgroup label="' . htmlspecialchars($current_category) . '">';
+                                                    }
+                                                    $selected = ($industry == $ind['industry_name']) ? 'selected' : '';
+                                                    echo "<option value='" . htmlspecialchars($ind['industry_name']) . "' {$selected}>" . htmlspecialchars($ind['industry_name']) . "</option>";
+                                                }
+                                                if ($current_category != '') echo '</optgroup>';
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="business_activity" class="form-label">Business Activity</label>
@@ -149,6 +206,7 @@ if ($client_id > 0) {
                                                value="<?php echo htmlspecialchars($business_activity); ?>">
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="lead_source" class="form-label">Lead Source</label>
@@ -160,6 +218,7 @@ if ($client_id > 0) {
                                         </select>
                                     </div>
                                 </div>
+                                
                                 <div class="col-12">
                                     <div class="mb-3">
                                         <label for="address" class="form-label">Address</label>
@@ -175,6 +234,7 @@ if ($client_id > 0) {
                                         <i class="bi bi-person me-2"></i>Contact Person Information
                                     </h6>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="contact_name" class="form-label">Full Name *</label>
@@ -182,6 +242,7 @@ if ($client_id > 0) {
                                                value="<?php echo htmlspecialchars($contact_name); ?>" required>
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="contact_designation" class="form-label">Designation</label>
@@ -189,6 +250,7 @@ if ($client_id > 0) {
                                                value="<?php echo htmlspecialchars($contact_designation); ?>">
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="contact_mobile" class="form-label">Mobile Number *</label>
@@ -196,6 +258,7 @@ if ($client_id > 0) {
                                                value="<?php echo htmlspecialchars($contact_mobile); ?>" required>
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="contact_email" class="form-label">Email Address *</label>
@@ -212,6 +275,7 @@ if ($client_id > 0) {
                                         <i class="bi bi-briefcase me-2"></i>Service Details
                                     </h6>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="service_id" class="form-label">Service Type</label>
@@ -220,14 +284,17 @@ if ($client_id > 0) {
                                             <?php
                                             $services_query = "SELECT * FROM categories ORDER BY cat_title";
                                             $services_result = mysqli_query($connection, $services_query);
-                                            while($service = mysqli_fetch_assoc($services_result)) {
-                                                $selected = ($service_id == $service['cat_id']) ? 'selected' : '';
-                                                echo "<option value='{$service['cat_id']}' {$selected}>{$service['cat_title']} - AED {$service['cat_price']}</option>";
+                                            if ($services_result) {
+                                                while($service = mysqli_fetch_assoc($services_result)) {
+                                                    $selected = ($service_id == $service['cat_id']) ? 'selected' : '';
+                                                    echo "<option value='{$service['cat_id']}' {$selected}>{$service['cat_title']} - AED {$service['cat_price']}</option>";
+                                                }
                                             }
                                             ?>
                                         </select>
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="service_total_fee" class="form-label">Service Total Fee (AED)</label>
@@ -235,6 +302,7 @@ if ($client_id > 0) {
                                                value="<?php echo htmlspecialchars($service_total_fee); ?>" step="0.01" min="0">
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="expected_start_date" class="form-label">Expected Start Date</label>
@@ -242,6 +310,7 @@ if ($client_id > 0) {
                                                value="<?php echo htmlspecialchars($expected_start_date); ?>">
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="payment_currency" class="form-label">Payment Currency</label>
@@ -257,6 +326,7 @@ if ($client_id > 0) {
                                         </select>
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="payment_term" class="form-label">Payment Term</label>
@@ -268,6 +338,7 @@ if ($client_id > 0) {
                                         </select>
                                     </div>
                                 </div>
+                                
                                 <div class="col-12">
                                     <div class="mb-3">
                                         <label for="service_description" class="form-label">Service Description</label>
@@ -315,7 +386,7 @@ if ($client_id > 0) {
 </div>
 
 <script>
-// Country-State/Emirate mapping (same as in add_client.php)
+// Country-State/Emirate mapping
 const countryZones = {
     'United Arab Emirates': ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'],
     'Saudi Arabia': ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam', 'Khobar', 'Dhahran'],
@@ -324,13 +395,13 @@ const countryZones = {
     'Kuwait': ['Kuwait City', 'Hawalli', 'Farwaniya', 'Mubarak Al-Kabeer', 'Ahmadi'],
     'Bahrain': ['Manama', 'Riffa', 'Muharraq', 'Hamad Town', 'Isa Town'],
     'United Kingdom': ['England', 'Scotland', 'Wales', 'Northern Ireland'],
-    'United States': ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California'],
-    'Germany': ['Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg', 'Bremen'],
-    'France': ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Nouvelle-Aquitaine', 'Occitanie'],
-    'China': ['Beijing', 'Shanghai', 'Guangdong', 'Zhejiang', 'Jiangsu'],
-    'Japan': ['Tokyo', 'Osaka', 'Kyoto', 'Hokkaido', 'Okinawa'],
-    'India': ['Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'Uttar Pradesh'],
-    'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan']
+    'United States': ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'],
+    'Germany': ['Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hesse', 'Lower Saxony', 'Mecklenburg-Vorpommern', 'North Rhine-Westphalia', 'Rhineland-Palatinate', 'Saarland', 'Saxony', 'Saxony-Anhalt', 'Schleswig-Holstein', 'Thuringia'],
+    'France': ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Nouvelle-Aquitaine', 'Occitanie', 'Hauts-de-France', 'Grand Est', 'Provence-Alpes-Côte d\'Azur', 'Pays de la Loire', 'Normandy', 'Brittany', 'Centre-Val de Loire', 'Bourgogne-Franche-Comté', 'Corsica'],
+    'China': ['Beijing', 'Shanghai', 'Guangdong', 'Zhejiang', 'Jiangsu', 'Tianjin', 'Chongqing', 'Shandong', 'Sichuan', 'Hubei', 'Fujian', 'Henan', 'Hunan', 'Shaanxi', 'Liaoning', 'Jiangxi', 'Anhui', 'Hebei', 'Heilongjiang', 'Jilin'],
+    'Japan': ['Tokyo', 'Osaka', 'Kyoto', 'Hokkaido', 'Okinawa', 'Aichi', 'Kanagawa', 'Hyogo', 'Fukuoka', 'Hiroshima', 'Miyagi', 'Shizuoka', 'Chiba', 'Saitama', 'Niigata', 'Gunma'],
+    'India': ['Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'Uttar Pradesh', 'Gujarat', 'Rajasthan', 'West Bengal', 'Telangana', 'Andhra Pradesh', 'Madhya Pradesh', 'Kerala', 'Haryana', 'Punjab', 'Bihar', 'Odisha', 'Assam', 'Jharkhand', 'Chhattisgarh', 'Uttarakhand'],
+    'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Chelyabinsk', 'Samara', 'Omsk', 'Rostov-on-Don', 'Ufa', 'Krasnoyarsk', 'Voronezh', 'Perm', 'Volgograd']
 };
 
 // Initialize emirate/zone based on current country
@@ -365,9 +436,10 @@ document.addEventListener('DOMContentLoaded', function() {
 document.getElementById('country').addEventListener('change', function() {
     const country = this.value;
     const emirateSelect = document.getElementById('emirate_zone');
+    const jurisdictionSelect = document.getElementById('jurisdiction');
     
+    // Update emirate/zone dropdown
     emirateSelect.innerHTML = '<option value="">Select Emirate/Zone/State</option>';
-    
     if (country && countryZones[country]) {
         countryZones[country].forEach(zone => {
             const option = document.createElement('option');
@@ -376,9 +448,27 @@ document.getElementById('country').addEventListener('change', function() {
             emirateSelect.appendChild(option);
         });
     }
+    
+    // Filter jurisdictions based on selected country via AJAX
+    if (country) {
+        fetch(`get_jurisdictions.php?country=${encodeURIComponent(country)}`)
+            .then(response => response.json())
+            .then(data => {
+                jurisdictionSelect.innerHTML = '<option value="">Select Jurisdiction</option>';
+                if (data.success && data.jurisdictions) {
+                    data.jurisdictions.forEach(jur => {
+                        const option = document.createElement('option');
+                        option.value = jur.jurisdiction_name;
+                        option.textContent = jur.jurisdiction_name;
+                        jurisdictionSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching jurisdictions:', error));
+    }
 });
 
-// Form validation (same as in add_client.php)
+// Form validation
 document.getElementById('clientForm').addEventListener('submit', function(e) {
     const email = document.getElementById('contact_email').value;
     const mobile = document.getElementById('contact_mobile').value;
@@ -386,14 +476,14 @@ document.getElementById('clientForm').addEventListener('submit', function(e) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         e.preventDefault();
-        showAlert('Please enter a valid email address', 'error');
+        alert('Please enter a valid email address');
         return;
     }
     
-    const mobileRegex = /^[0-9]{8,}$/;
-    if (!mobileRegex.test(mobile.replace(/[^0-9]/g, ''))) {
+    const mobileRegex = /^[0-9+\-\s]{8,}$/;
+    if (!mobileRegex.test(mobile)) {
         e.preventDefault();
-        showAlert('Please enter a valid mobile number (at least 8 digits)', 'error');
+        alert('Please enter a valid mobile number (at least 8 digits)');
         return;
     }
 });

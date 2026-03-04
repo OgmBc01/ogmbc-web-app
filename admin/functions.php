@@ -391,8 +391,10 @@ function insert_clients() {
         $company_name = mysqli_real_escape_string($connection, trim($_POST['company_name']));
         $trade_license_no = mysqli_real_escape_string($connection, trim($_POST['trade_license_no'] ?? ''));
         $country = mysqli_real_escape_string($connection, trim($_POST['country']));
+        $jurisdiction = mysqli_real_escape_string($connection, trim($_POST['jurisdiction'] ?? ''));
         $emirate_zone = mysqli_real_escape_string($connection, trim($_POST['emirate_zone'] ?? ''));
         $business_activity = mysqli_real_escape_string($connection, trim($_POST['business_activity'] ?? ''));
+        $industry = mysqli_real_escape_string($connection, trim($_POST['industry'] ?? ''));
         $address = mysqli_real_escape_string($connection, trim($_POST['address'] ?? ''));
         $contact_name = mysqli_real_escape_string($connection, trim($_POST['contact_name']));
         $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation'] ?? ''));
@@ -424,8 +426,10 @@ function insert_clients() {
                      company_name = '{$company_name}', 
                      trade_license_no = '{$trade_license_no}', 
                      country = '{$country}', 
+                     jurisdiction = '{$jurisdiction}', 
                      emirate_zone = '{$emirate_zone}', 
                      business_activity = '{$business_activity}', 
+                     industry = '{$industry}', 
                      address = '{$address}', 
                      contact_name = '{$contact_name}', 
                      contact_designation = '{$contact_designation}', 
@@ -456,12 +460,12 @@ function insert_clients() {
             
             // Insert new client with password
             $query = "INSERT INTO clients (
-                        company_name, trade_license_no, country, emirate_zone, business_activity, address,
+                        company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
                         contact_name, contact_designation, contact_mobile, contact_email, client_password,
                         service_id, service_description, expected_start_date, payment_currency, payment_term, 
                         service_total_fee, lead_source, client_status
                     ) VALUES (
-                        '{$company_name}', '{$trade_license_no}', '{$country}', '{$emirate_zone}', '{$business_activity}', '{$address}',
+                        '{$company_name}', '{$trade_license_no}', '{$country}', '{$jurisdiction}', '{$emirate_zone}', '{$business_activity}', '{$industry}', '{$address}',
                         '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', '{$hashed_password}',
                         {$service_id}, '{$service_description}', " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
                         '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
@@ -536,11 +540,12 @@ function send_client_welcome_email($email, $company_name, $plain_password) {
     return mail($email, $subject, $message, $headers);
 }
 
-// Function to get all clients
+// Function to get all clients with jurisdiction and industry fields
 if (!function_exists('findAllClients')) {
 function findAllClients() {
     global $connection;
 
+    // Updated query to include jurisdiction and industry
     $query = "SELECT c.*, cat.cat_title as service_name, u.first_name, u.last_name 
               FROM clients c 
               LEFT JOIN categories cat ON c.service_id = cat.cat_id 
@@ -559,6 +564,9 @@ function findAllClients() {
         $contact_name = htmlspecialchars($row['contact_name']);
         $contact_email = htmlspecialchars($row['contact_email']);
         $contact_mobile = htmlspecialchars($row['contact_mobile']);
+        $country = htmlspecialchars($row['country'] ?? 'N/A');
+        $jurisdiction = htmlspecialchars($row['jurisdiction'] ?? 'N/A');
+        $industry = htmlspecialchars($row['industry'] ?? 'N/A');
         $service_name = $row['service_name'] ? htmlspecialchars($row['service_name']) : 'N/A';
         $client_status = $row['client_status'];
         $created_at = date('M j, Y', strtotime($row['created_at']));
@@ -573,44 +581,63 @@ function findAllClients() {
         echo "<td>{$contact_name}</td>";
         echo "<td>{$contact_email}</td>";
         echo "<td>{$contact_mobile}</td>";
+        echo "<td>{$country}</td>";
+        echo "<td>{$jurisdiction}</td>";
+        echo "<td>{$industry}</td>";
         echo "<td>{$service_name}</td>";
         echo "<td><span class='badge {$status_class}'>{$client_status}</span></td>";
         echo "<td>{$sales_person}</td>";
         echo "<td>{$created_at}</td>";
         echo "<td class='action-links'>";
         
-       // Action buttons container - icon only version
+        // Action buttons container - icon only version
         echo "<div class='d-flex gap-1'>";
             
-            // View button
-            echo "<a href='' data-bs-toggle='modal' data-bs-target='#clientDetailsModal' data-id='{$client_id}' onclick='loadClientDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='View Details' data-bs-toggle='tooltip'>
-                    <i class='bi bi-eye text-primary'></i>
-                </a>";
-            
-            // Edit button
-            echo "<a href='clients.php?source=edit_client&id={$client_id}' class='btn btn-light btn-sm rounded-circle p-2' title='Edit' data-bs-toggle='tooltip'>
-                    <i class='bi bi-pencil text-info'></i>
-                </a>";
-            
-            // Review button (for Manager/CEO)
-            if (shouldShowReviewButton($row)) {
-                echo "<a href='' data-bs-toggle='modal' data-bs-target='#reviewModal' data-id='{$client_id}' onclick='loadReviewDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='Review' data-bs-toggle='tooltip'>
-                        <i class='bi bi-clipboard-check text-warning'></i>
-                    </a>";
-            }
+        // View button - FIXED: removed conflicting data-bs-toggle and data-bs-target
+        echo "<button onclick='loadClientDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='View Details' data-bs-toggle='tooltip'>
+                <i class='bi bi-eye text-primary'></i>
+              </button>";
+        
+        // Edit button
+        echo "<a href='clients.php?source=edit_client&id={$client_id}' class='btn btn-light btn-sm rounded-circle p-2' title='Edit' data-bs-toggle='tooltip'>
+                <i class='bi bi-pencil text-info'></i>
+              </a>";
+        
+        // Review button (for Manager/CEO)
+        if (function_exists('shouldShowReviewButton') && shouldShowReviewButton($row)) {
+            echo "<button onclick='loadReviewDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='Review' data-bs-toggle='tooltip'>
+                    <i class='bi bi-clipboard-check text-warning'></i>
+                  </button>";
+        }
 
         echo "</div>";
-
-        // Initialize tooltips if using that version
-        echo "<script>
-        $(document).ready(function(){
-            $('[data-bs-toggle=\"tooltip\"]').tooltip();
-        });
-        </script>";
         
         echo "</td>";
         echo "</tr>";
     }
+}
+}
+
+// Helper function for status badge colors (if not already defined)
+if (!function_exists('getStatusBadgeClass')) {
+function getStatusBadgeClass($status) {
+    $badge_classes = [
+        'New Lead' => 'bg-primary',
+        'Contacted' => 'bg-info',
+        'Qualified' => 'bg-success',
+        'Proposal Drafted' => 'bg-secondary',
+        'Under Manager Review' => 'bg-warning text-dark',
+        'Rejected by Manager' => 'bg-danger',
+        'Approved by Manager' => 'bg-success',
+        'Under CEO Review' => 'bg-warning text-dark',
+        'Rejected by CEO' => 'bg-danger',
+        'Final Proposal Ready' => 'bg-success',
+        'Proposal Sent to Client' => 'bg-info',
+        'Awaiting Client Action' => 'bg-warning',
+        'Signed – Move to Finance' => 'bg-success'
+    ];
+    
+    return $badge_classes[$status] ?? 'bg-secondary';
 }
 }
 

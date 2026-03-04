@@ -2672,3 +2672,315 @@ $activity_result = mysqli_query($connection, $activity_query);
 </div>
 
 <?php include 'includes/footer.php'; ?>
+
+
+=========================================================================
+
+<?php
+// Ensure PHP session is started so AJAX requests send the session cookie
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+<div class="main-content" id="mainContent">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4">Client Management</h2>
+            <a href="clients.php?source=add_client" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add New Client
+            </a>
+        </div>
+
+        <!-- Dashboard KPIs -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card bg-primary text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Total Clients</div>
+                                <div class="h2 mb-0">
+                                    <?php
+                                    $query = "SELECT COUNT(*) as count FROM clients";
+                                    $result = mysqli_query($connection, $query);
+                                    $row = mysqli_fetch_assoc($result);
+                                    echo $row['count'];
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-people fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card bg-warning text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Pending Approval</div>
+                                <div class="h2 mb-0">
+                                    <?php
+                                    $query = "SELECT COUNT(*) as count FROM clients WHERE client_status IN ('Under Manager Review', 'Under CEO Review')";
+                                    $result = mysqli_query($connection, $query);
+                                    $row = mysqli_fetch_assoc($result);
+                                    echo $row['count'];
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-clock-history fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Awaiting Client</div>
+                                <div class="h2 mb-0">
+                                    <?php
+                                    $query = "SELECT COUNT(*) as count FROM clients WHERE client_status = 'Awaiting Client Action'";
+                                    $result = mysqli_query($connection, $query);
+                                    $row = mysqli_fetch_assoc($result);
+                                    echo $row['count'];
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-envelope fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Ready for Finance</div>
+                                <div class="h2 mb-0">
+                                    <?php
+                                    $query = "SELECT COUNT(*) as count FROM clients WHERE client_status = 'Signed – Move to Finance'";
+                                    $result = mysqli_query($connection, $query);
+                                    $row = mysqli_fetch_assoc($result);
+                                    echo $row['count'];
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-check-circle fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-filter me-2"></i>Filters</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="status_filter" class="form-label">Status</label>
+                        <select name="status_filter" id="status_filter" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="New Lead">New Lead</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="Qualified">Qualified</option>
+                            <option value="Proposal Drafted">Proposal Drafted</option>
+                            <option value="Under Manager Review">Under Manager Review</option>
+                            <option value="Approved by Manager">Approved by Manager</option>
+                            <option value="Under CEO Review">Under CEO Review</option>
+                            <option value="Final Proposal Ready">Final Proposal Ready</option>
+                            <option value="Proposal Sent to Client">Proposal Sent to Client</option>
+                            <option value="Awaiting Client Action">Awaiting Client Action</option>
+                            <option value="Signed – Move to Finance">Signed – Move to Finance</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="service_filter" class="form-label">Service Type</label>
+                        <select name="service_filter" id="service_filter" class="form-control">
+                            <option value="">All Services</option>
+                            <?php
+                            $services_query = "SELECT * FROM categories ORDER BY cat_title";
+                            $services_result = mysqli_query($connection, $services_query);
+                            while($service = mysqli_fetch_assoc($services_result)) {
+                                echo "<option value='{$service['cat_id']}'>{$service['cat_title']}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_from" class="form-label">Date From</label>
+                        <input type="date" name="date_from" id="date_from" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_to" class="form-label">Date To</label>
+                        <input type="date" name="date_to" id="date_to" class="form-control">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a href="clients.php" class="btn btn-secondary">Clear Filters</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Clients Table -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-people me-2"></i>All Clients</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="clientsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Company Name</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Country</th>
+                                <th>Jurisdiction</th>
+                                <th>Industry</th>
+                                <th>Service</th>
+                                <th>Status</th>
+                                <th>Sales Person</th>
+                                <th>Created Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php findAllClients(); ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <?php
+                // Check if table is empty
+                $check_query = "SELECT COUNT(*) as total FROM clients";
+                $check_result = mysqli_query($connection, $check_query);
+                $total_clients = mysqli_fetch_assoc($check_result)['total'];
+                
+                if($total_clients == 0): ?>
+                <div class="text-center py-5">
+                    <i class="bi bi-people display-1 text-muted"></i>
+                    <h4 class="mt-3 text-muted">No Clients Found</h4>
+                    <p class="text-muted">Get started by adding your first client.</p>
+                    <a href="clients.php?source=add_client" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-circle"></i> Add First Client
+                    </a>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Client Details Modal (match clients.php structure) -->
+<div class="modal fade" id="clientDetailsModal" tabindex="-1" aria-labelledby="clientDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="clientDetailsModalLabel">Client Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="clientDetailsContent">
+                <!-- Content will be loaded via AJAX -->
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading client details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize filters with current values
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Set filter values from URL
+    document.getElementById('status_filter').value = urlParams.get('status_filter') || '';
+    document.getElementById('service_filter').value = urlParams.get('service_filter') || '';
+    document.getElementById('date_from').value = urlParams.get('date_from') || '';
+    document.getElementById('date_to').value = urlParams.get('date_to') || '';
+    
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+
+
+// Function to load client details (jQuery, match clients.php)
+function loadClientDetails(clientId) {
+    // Show modal and loading spinner
+    $('#clientDetailsModal').modal('show');
+    $('#clientDetailsContent').html('<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading client details...</p></div>');
+    $.ajax({
+        url: 'get_client_details.php',
+        type: 'GET',
+        data: { id: clientId },
+        success: function(response) {
+            $('#clientDetailsContent').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading client details:', error);
+            $('#clientDetailsContent').html('<div class="alert alert-danger">Error loading client details: ' + error + '</div>');
+        }
+    });
+}
+
+// Function to load review details
+window.loadReviewDetails = function(clientId) {
+    // Implement review functionality as needed
+    console.log('Load review for client:', clientId);
+    // You can add a review modal here
+};
+
+// Function to delete document
+window.deleteDocument = function(docId) {
+    if (confirm('Are you sure you want to delete this document?')) {
+        fetch('delete_client_document.php?id=' + docId, {
+            method: 'POST',
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error deleting document: ' + data.message);
+            }
+        })
+        .catch(err => {
+            alert('Error deleting document');
+        });
+    }
+};
+
+// No need for event delegation, as findAllClients() already uses onclick handlers for the view button
+</script>

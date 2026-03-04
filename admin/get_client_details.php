@@ -96,7 +96,7 @@ if (isset($_GET['id'])) {
                 <!-- Client Information -->
                 <div class="col-md-6">
                     <div class="card mb-4">
-                        <div class="card-header text-white">
+                        <div class="card-header" style="background: var(--dark-blue); color: var(--gold);">
                             <h6 class="mb-0"><i class="bi bi-building me-2"></i>Company Information</h6>
                         </div>
                         <div class="card-body">
@@ -114,8 +114,16 @@ if (isset($_GET['id'])) {
                                     <td><?php echo htmlspecialchars($client['country']); ?></td>
                                 </tr>
                                 <tr>
+                                    <th>Jurisdiction:</th>
+                                    <td><?php echo !empty($client['jurisdiction']) ? htmlspecialchars($client['jurisdiction']) : 'N/A'; ?></td>
+                                </tr>
+                                <tr>
                                     <th>Emirate/Zone:</th>
                                     <td><?php echo !empty($client['emirate_zone']) ? htmlspecialchars($client['emirate_zone']) : 'N/A'; ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Industry:</th>
+                                    <td><?php echo !empty($client['industry']) ? htmlspecialchars($client['industry']) : 'N/A'; ?></td>
                                 </tr>
                                 <tr>
                                     <th>Business Activity:</th>
@@ -123,11 +131,19 @@ if (isset($_GET['id'])) {
                                 </tr>
                                 <tr>
                                     <th>Address:</th>
-                                    <td><?php echo !empty($client['address']) ? htmlspecialchars($client['address']) : 'N/A'; ?></td>
+                                    <td><?php echo !empty($client['address']) ? nl2br(htmlspecialchars($client['address'])) : 'N/A'; ?></td>
                                 </tr>
                                 <tr>
                                     <th>Lead Source:</th>
                                     <td><?php echo ucfirst(str_replace('_', ' ', $client['lead_source'])); ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Created Date:</th>
+                                    <td><?php echo date('M j, Y H:i', strtotime($client['created_at'])); ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Last Updated:</th>
+                                    <td><?php echo date('M j, Y H:i', strtotime($client['updated_at'])); ?></td>
                                 </tr>
                             </table>
                         </div>
@@ -137,7 +153,7 @@ if (isset($_GET['id'])) {
                 <!-- Contact Information -->
                 <div class="col-md-6">
                     <div class="card mb-4">
-                        <div class="card-header text-white">
+                        <div class="card-header" style="background: var(--dark-blue); color: var(--gold);">
                             <h6 class="mb-0"><i class="bi bi-person me-2"></i>Contact Information</h6>
                         </div>
                         <div class="card-body">
@@ -197,7 +213,7 @@ if (isset($_GET['id'])) {
             <div class="row">
                 <div class="col-12">
                     <div class="card mb-4">
-                        <div class="card-header text-white">
+                        <div class="card-header" style="background: var(--dark-blue); color: var(--gold);">
                             <h6 class="mb-0"><i class="bi bi-briefcase me-2"></i>Service Details</h6>
                         </div>
                         <div class="card-body">
@@ -238,12 +254,11 @@ if (isset($_GET['id'])) {
             <div class="row">
                 <div class="col-12">
                     <div class="card mb-4">
-                        <div class="card-header text-white">
+                        <div class="card-header" style="background: var(--dark-blue); color: var(--gold);">
                             <h6 class="mb-0"><i class="bi bi-file-earmark me-2"></i>Document Actions</h6>
                         </div>
                         <div class="card-body">
                             <div class="row text-center">
-                                <!-- Replace the button sections in get_client_details.php -->
                                 <div class="col-md-6 mb-3">
                                     <h6>Proposal</h6>
                                     <?php if ($latest_proposal): ?>
@@ -306,7 +321,7 @@ if (isset($_GET['id'])) {
             <div class="row">
                 <div class="col-12">
                     <div class="card mb-4">
-                        <div class="card-header text-white">
+                        <div class="card-header" style="background: var(--dark-blue); color: var(--gold);">
                             <h6 class="mb-0"><i class="bi bi-chat-left-text me-2"></i>Recent Notes</h6>
                         </div>
                         <div class="card-body">
@@ -337,7 +352,7 @@ if (isset($_GET['id'])) {
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header text-white">
+                        <div class="card-header" style="background: var(--dark-blue); color: var(--gold);">
                             <h6 class="mb-0"><i class="bi bi-files me-2"></i>Client Documents</h6>
                         </div>
                         <div class="card-body">
@@ -347,16 +362,12 @@ if (isset($_GET['id'])) {
                                     <input type="hidden" name="client_id" value="<?php echo $client_id; ?>">
 
                                     <div id="documentFieldsWrapper">
-
-                                        <!-- Single document upload block (template) -->
                                         <div class="document-field-set border rounded p-3 mb-3">
-
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <label class="form-label">Document Title</label>
                                                     <input type="text" name="document_title[]" class="form-control" required>
                                                 </div>
-
                                                 <div class="col-md-4">
                                                     <label class="form-label">Document Type</label>
                                                     <select name="document_type[]" class="form-control">
@@ -367,30 +378,21 @@ if (isset($_GET['id'])) {
                                                         <option value="other">Other</option>
                                                     </select>
                                                 </div>
-
                                                 <div class="col-md-4">
                                                     <label class="form-label">Select File</label>
                                                     <input type="file" name="document_file[]" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
                                                 </div>
                                             </div>
-
-                                            <!-- Remove button (except for the first field set) -->
                                             <button type="button" class="btn btn-danger mt-3 removeFieldBtn" style="display:none;">
                                                 <i class="bi bi-x-circle"></i> Remove
                                             </button>
-
                                         </div>
-
                                     </div>
 
-                                    <!-- Add more button -->
                                     <button type="button" id="addDocumentField" class="btn btn-primary mb-3">
                                         <i class="bi bi-plus-circle"></i> Add Another Document
                                     </button>
-
                                     <br>
-
-                                    <!-- Submit -->
                                     <button type="submit" class="btn btn-success">
                                         <i class="bi bi-upload me-1"></i> Upload Documents
                                     </button>
@@ -423,11 +425,8 @@ if (isset($_GET['id'])) {
                                                     <td><?php echo date('M j, Y H:i', strtotime($doc['uploaded_at'])); ?></td>
                                                     <td>
                                                     <?php 
-                                                    // Full file path for server
                                                     $file_path = $doc['file_path'];
-                                                    $full_file_path = '../' . $file_path; // Adjust if files are stored as 'uploads/client_documents/filename'
-
-                                                    // Check if file exists on server
+                                                    $full_file_path = '../' . $file_path;
                                                     $file_exists = file_exists($full_file_path);
 
                                                     if (!empty($doc['file_path']) && $file_exists):
@@ -443,11 +442,11 @@ if (isset($_GET['id'])) {
                                                             <?php if (empty($doc['file_path'])): ?>
                                                                 No file path
                                                             <?php else: ?>
-                                                                File not found (<?php echo htmlspecialchars($doc['file_path']); ?>)
+                                                                File not found
                                                             <?php endif; ?>
                                                         </span>
                                                     <?php endif; ?>
-                                                </td>
+                                                    </td>
                                                     <td>
                                                         <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(<?php echo $doc['doc_id']; ?>)">
                                                             <i class="bi bi-trash"></i> Delete
@@ -481,7 +480,6 @@ if (isset($_GET['id'])) {
 }
 
 // Close database connections safely
-// Only close statements that are valid mysqli_stmt objects
 if (isset($stmt) && $stmt instanceof mysqli_stmt) {
     $stmt->close();
 }

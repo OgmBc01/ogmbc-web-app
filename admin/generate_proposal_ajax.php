@@ -59,18 +59,16 @@ if (isset($_POST['client_id'])) {
         $proposal_ref = 'PROP-' . date('Ymd') . '-' . sprintf('%04d', $client_id) . '-V' . $version;
         
         // Create proposals directory if it doesn't exist
-        $upload_dir = "../uploads/proposals/";
+        $upload_dir = dirname(__DIR__) . '/uploads/proposals/';
         if (!file_exists($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
-        
         // Generate PDF content
         $pdf_content = generateProposalPDFContent($client, $payment_breakdown, $proposal_ref);
-        $filename = "proposal_{$proposal_ref}.html"; // Changed to .html for now
+        $filename = "proposal_{$proposal_ref}.html";
         $file_path = $upload_dir . $filename;
-        
+        $web_file_path = 'uploads/proposals/' . $filename;
         // For this example, we'll create an HTML file
-        // In production, replace this with actual PDF generation
         if(file_put_contents($file_path, $pdf_content)) {
             // Save proposal to database
             $insert_sql = "INSERT INTO proposals (
@@ -92,7 +90,7 @@ if (isset($_POST['client_id'])) {
             $insert_stmt->bind_param("isisdsis", 
                 $client_id, $proposal_ref, $version, $pdf_content,
                 $client['service_total_fee'], $payment_breakdown_json, 
-                $user_id, $file_path
+                $user_id, $web_file_path
             );
             
             if ($insert_stmt->execute()) {
@@ -109,7 +107,7 @@ if (isset($_POST['client_id'])) {
                 echo json_encode([
                     'success' => true, 
                     'message' => 'Proposal generated successfully',
-                    'file_path' => $file_path,
+                    'file_path' => $web_file_path,
                     'proposal_ref' => $proposal_ref,
                     'version' => $version
                 ]);

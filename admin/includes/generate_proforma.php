@@ -383,7 +383,9 @@ function generateProformaNow(clientId) {
         type: 'POST',
         data: { client_id: clientId },
         success: function(response) {
-            console.log("Response received:", response);
+            console.log("Raw response received:", response);
+            console.log("Response type:", typeof response);
+            console.log("Response length:", response.length);
             
             try {
                 var result = JSON.parse(response);
@@ -426,17 +428,17 @@ function generateProformaNow(clientId) {
                 setTimeout(() => {
                     $('#loadingSpinner').hide();
                     $('#generateBtn').prop('disabled', false).html('<i class="bi bi-file-earmark-pdf me-2"></i>Generate Proforma');
-                    alert('Error parsing server response: ' + e.message);
+                    alert('Error parsing server response: ' + e.message + '\n\nResponse preview: ' + response.substring(0, 200));
                 }, 1000);
             }
         },
         error: function(xhr, status, error) {
-            console.error("AJAX error:", status, error);
+            console.error("AJAX error:", status, error, xhr.responseText);
             $('#loadingText').text('Request failed');
             setTimeout(() => {
                 $('#loadingSpinner').hide();
                 $('#generateBtn').prop('disabled', false).html('<i class="bi bi-file-earmark-pdf me-2"></i>Generate Proforma');
-                alert('Request failed: ' + error + '\nStatus: ' + status);
+                alert('Request failed: ' + error + '\nStatus: ' + status + '\n\nResponse: ' + xhr.responseText.substring(0, 500));
             }, 1000);
         }
     });
@@ -551,3 +553,10 @@ function generateProformaNow(clientId) {
     });
 }
 </script>
+
+<!-- JS dependencies: jQuery, TinyMCE, then main.js -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="resources/js/main.js"></script>
+</body>
+</html>

@@ -173,6 +173,9 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <th>Contact Person</th>
                                 <th>Email</th>
                                 <th>Mobile</th>
+                                <th>Country</th>
+                                <th>Jurisdiction</th>
+                                <th>Industry</th>
                                 <th>Service</th>
                                 <th>Status</th>
                                 <th>Sales Person</th>
@@ -183,7 +186,10 @@ if (session_status() === PHP_SESSION_NONE) {
                         <tbody>
                             <?php
                             // Call the function to display all clients
-                            findAllClients();
+                            if (!function_exists('findAllClients')) include dirname(__DIR__) . '/functions.php';
+                            if (function_exists('findAllClients')) {
+                                findAllClients();
+                            }
                             ?>
                         </tbody>
                     </table>
@@ -205,6 +211,53 @@ if (session_status() === PHP_SESSION_NONE) {
                     </a>
                 </div>
                 <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Client Details Modal (SINGLE MODAL - REMOVED FROM CLIENTS.PHP) -->
+<style>
+    #clientDetailsModal .modal-dialog {
+        max-width: 90vw;
+        width: 100%;
+    }
+    #clientDetailsModal .modal-content {
+        min-height: 60vh;
+        overflow-x: auto;
+    }
+    @media (max-width: 768px) {
+        #clientDetailsModal .modal-dialog {
+            max-width: 98vw;
+        }
+        #clientDetailsModal .modal-content {
+            min-height: 40vh;
+        }
+    }
+</style>
+
+<div class="modal fade" id="clientDetailsModal" tabindex="-1" aria-labelledby="clientDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--dark-blue); color: var(--gold);">
+                <h5 class="modal-title" id="clientDetailsModalLabel">
+                    <i class="bi bi-building me-2"></i>Client Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="clientDetailsModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading client details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" id="editClientBtn" class="btn btn-primary">
+                    <i class="bi bi-pencil me-1"></i>Edit Client
+                </a>
             </div>
         </div>
     </div>
@@ -240,110 +293,116 @@ function filterClients() {
     window.location.href = url + params.join('&');
 }
 
-/* -------------------------
-   Client Details modal load
-   - Robustly find client id from:
-     * data-client-id / data-id attributes
-     * href querystring (?id=... or ?client_id=...)
-     * elements with .viewClientBtn or .view-client classes
-   - Ensure modal exists, show spinner, fetch server HTML with credentials
-------------------------- */
-document.addEventListener('click', function(e) {
-    const clicked = e.target.closest('.viewClientBtn, .view-client, [data-client-id], [data-id], a.view-client-link, a.view-client');
-    if (!clicked) return;
-
-    // Try dataset first
-    let clientId = clicked.dataset?.clientId || clicked.dataset?.id || clicked.getAttribute('data-client-id') || clicked.getAttribute('data-id');
-
-    // If not found, try to extract from href query string
-    if (!clientId) {
-        const href = clicked.getAttribute('href') || (clicked.closest && clicked.closest('a') ? clicked.closest('a').getAttribute('href') : null);
-        if (href) {
-            try {
-                const parts = href.split('?');
-                if (parts.length > 1) {
-                    const params = new URLSearchParams(parts[1]);
-                    clientId = params.get('id') || params.get('client_id') || params.get('cid') || params.get('client');
-                }
-            } catch (err) {
-                // ignore parse errors
-            }
-        }
-    }
-
-    if (!clientId) return; // nothing to do
-
+// Function to load client details
+function loadClientDetails(clientId) {
     const modalEl = document.getElementById('clientDetailsModal');
     const modalBody = document.getElementById('clientDetailsModalBody');
+    const editBtn = document.getElementById('editClientBtn');
+    
     if (!modalEl || !modalBody) return;
 
     // Show loading state
     modalBody.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading client details...</p></div>';
+    
+    // Update edit button
+    editBtn.href = 'clients.php?source=edit_client&id=' + clientId;
 
     // Show Bootstrap modal
     const bsModal = new bootstrap.Modal(modalEl);
     bsModal.show();
 
-    // Fetch client details (ensure cookies/session are sent)
+    // Fetch client details using Fetch API (no jQuery dependency)
     fetch('get_client_details.php?id=' + encodeURIComponent(clientId), {
         credentials: 'same-origin',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: { 
+            'X-Requested-With': 'XMLHttpRequest'
+        }
     })
     .then(response => {
-        if (!response.ok) throw new Error('Server returned ' + response.status);
+        if (!response.ok) {
+            throw new Error('Server returned ' + response.status);
+        }
         return response.text();
     })
     .then(html => {
         modalBody.innerHTML = html;
+        
+        // Reinitialize any event listeners for document upload
+        initializeDocumentUpload();
     })
     .catch(err => {
         console.error('Error fetching client details:', err);
-        modalBody.innerHTML = '<div class="alert alert-danger">Failed to load client details. ' + (err.message || '') + '</div>';
+        modalBody.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load client details. ' + (err.message || '') + '</div>';
     });
-});
+}
 
+// Function to initialize document upload handlers
+function initializeDocumentUpload() {
+    // Add document field
+    const addBtn = document.getElementById('addDocumentField');
+    if (addBtn) {
+        addBtn.onclick = function() {
+            let wrapper = document.getElementById('documentFieldsWrapper');
+            let firstSet = document.querySelector('.document-field-set');
+            if (firstSet) {
+                let clone = firstSet.cloneNode(true);
+                clone.querySelectorAll('input').forEach(input => input.value = '');
+                clone.querySelectorAll('select').forEach(select => select.value = 'trade_license');
+                let removeBtn = clone.querySelector('.removeFieldBtn');
+                if (removeBtn) removeBtn.style.display = 'inline-block';
+                wrapper.appendChild(clone);
+            }
+        };
+    }
+    
+    // Remove document field
+    document.querySelectorAll('.removeFieldBtn').forEach(btn => {
+        btn.onclick = function() {
+            this.closest('.document-field-set').remove();
+        };
+    });
+    
+    // Handle form submission
+    const uploadForm = document.getElementById('documentUploadForm');
+    if (uploadForm) {
+        uploadForm.onsubmit = function(e) {
+            e.preventDefault();
+            
+            let formData = new FormData(this);
+            let submitBtn = this.querySelector('button[type="submit"]');
+            let originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Uploading...';
+            submitBtn.disabled = true;
+            
+            fetch('upload_document.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert(result.message);
+                    this.reset();
+                    // Reload client details to show new document
+                    let clientId = this.querySelector('input[name="client_id"]').value;
+                    loadClientDetails(clientId);
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            })
+            .catch(error => {
+                alert('Upload failed: ' + error);
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        };
+    }
+}
 
-
+// Make function globally available
+window.loadClientDetails = loadClientDetails;
 </script>
-
-<!-- Client Details Modal -->
-<style>
-    /* Make modal wider and responsive */
-    #clientDetailsModal .modal-dialog {
-        max-width: 90vw;
-        width: 100%;
-    }
-    #clientDetailsModal .modal-content {
-        min-height: 60vh;
-        overflow-x: auto;
-    }
-    @media (max-width: 768px) {
-        #clientDetailsModal .modal-dialog {
-            max-width: 98vw;
-        }
-        #clientDetailsModal .modal-content {
-            min-height: 40vh;
-        }
-    }
-</style>
-<div class="modal fade" id="clientDetailsModal" tabindex="-1" aria-labelledby="clientDetailsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header card-header">
-                <h5 class="modal-title" id="clientDetailsLabel"><i class="bi bi-person-lines-fill me-2"></i>Client Details</h5>
-                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="clientDetailsModalBody">
-                <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2">Loading client details...</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>

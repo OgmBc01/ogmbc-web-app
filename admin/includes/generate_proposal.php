@@ -380,8 +380,12 @@ function generateProposalNow(clientId) {
         type: 'POST',
         data: { client_id: clientId },
         success: function(response) {
+            console.log("Response received:", response);
+            
             try {
                 var result = JSON.parse(response);
+                console.log("Parsed result:", result);
+                
                 if(result.success) {
                     // Hide loading spinner
                     $('#loadingSpinner').hide();
@@ -414,21 +418,22 @@ function generateProposalNow(clientId) {
                     }, 1000);
                 }
             } catch (e) {
+                console.error("Parse error:", e, "Raw response:", response);
                 $('#loadingText').text('Error parsing response');
                 setTimeout(() => {
                     $('#loadingSpinner').hide();
                     $('#generateBtn').prop('disabled', false).html('<i class="bi bi-file-earmark-pdf me-2"></i>Generate Proposal');
-                    alert('Error parsing server response');
+                    alert('Error parsing server response: ' + e.message);
                 }, 1000);
-                console.error('Parse error:', e);
             }
         },
         error: function(xhr, status, error) {
+            console.error("AJAX error:", status, error);
             $('#loadingText').text('Request failed');
             setTimeout(() => {
                 $('#loadingSpinner').hide();
                 $('#generateBtn').prop('disabled', false).html('<i class="bi bi-file-earmark-pdf me-2"></i>Generate Proposal');
-                alert('Request failed: ' + error);
+                alert('Request failed: ' + error + '\nStatus: ' + status);
             }, 1000);
         }
     });
@@ -543,3 +548,10 @@ function generateProposalNow(clientId) {
     });
 }
 </script>
+
+<!-- JS dependencies: jQuery, TinyMCE, then main.js -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="resources/js/main.js"></script>
+</body>
+</html>
