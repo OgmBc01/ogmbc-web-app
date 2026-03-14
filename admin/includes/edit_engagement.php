@@ -164,25 +164,20 @@ ob_end_flush();
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="client_id" class="form-label">Client *</label>
-                                <select id="client_id" name="client_id" class="form-control" required>
-                                    <option value="">Select Client</option>
-                                    <?php
-                                    if ($clients_result && mysqli_num_rows($clients_result) > 0) {
-                                        mysqli_data_seek($clients_result, 0);
-                                        while ($client = mysqli_fetch_assoc($clients_result)) {
-                                            $selected = ($engagement['client_id'] == $client['client_id']) ? 'selected' : '';
-                                            echo "<option value='{$client['client_id']}' $selected>" . htmlspecialchars($client['company_name']) . "</option>";
-                                        }
-                                    }
-                                    ?>
+                                <label for="client_id" class="form-label">Client * <i class="bi bi-lock-fill text-secondary" title="Read-only"></i></label>
+                                <select id="client_id" name="client_id" class="form-control" required disabled>
+                                    <option value="<?php echo htmlspecialchars($engagement['client_id']); ?>" selected>
+                                        <?php echo htmlspecialchars($engagement['company_name']); ?>
+                                    </option>
                                 </select>
+                                <div class="form-text text-muted">This field is read-only and cannot be changed here.</div>
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="title" class="form-label">Engagement Title *</label>
+                                <label for="title" class="form-label">Engagement Title * <i class="bi bi-lock-fill text-secondary" title="Read-only"></i></label>
                                 <input type="text" id="title" name="title" class="form-control" 
-                                       value="<?php echo htmlspecialchars($engagement['title']); ?>" required>
+                                       value="<?php echo htmlspecialchars($engagement['title']); ?>" required readonly>
+                                <div class="form-text text-muted">This field is read-only to preserve the unique engagement ID.</div>
                             </div>
                         </div>
 

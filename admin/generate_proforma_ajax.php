@@ -86,17 +86,17 @@ try {
     }
     
     // Create proforma directory if it doesn't exist
-    $upload_dir = dirname(__DIR__) . '/uploads/proformas/';
+    $upload_dir = "uploads/proformas/";
     if (!file_exists($upload_dir)) {
         if(!mkdir($upload_dir, 0777, true)) {
             throw new Exception('Failed to create directory: ' . $upload_dir);
         }
     }
+    
     // Generate HTML content
     $html_content = generateProformaHTMLContent($client, $payment_breakdown, $invoice_ref);
     $filename = "proforma_{$invoice_ref}.html";
     $file_path = $upload_dir . $filename;
-    $web_file_path = 'uploads/proformas/' . $filename;
     
     // Create the file
     if(!file_put_contents($file_path, $html_content)) {
@@ -141,7 +141,7 @@ try {
         $payment_breakdown_json, // s
         $validity_period,     // s
         $user_id,             // i
-        $web_file_path        // s
+        $file_path            // s
     );
     
     if (!$insert_stmt->execute()) {
@@ -156,7 +156,7 @@ try {
     echo json_encode([
         'success' => true, 
         'message' => 'Proforma invoice generated successfully',
-        'file_path' => $web_file_path,
+        'file_path' => $file_path,
         'invoice_ref' => $invoice_ref,
         'version' => $version,
         'valid_until' => date('F j, Y', strtotime($validity_period)),

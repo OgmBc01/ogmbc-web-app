@@ -396,6 +396,7 @@ function insert_clients() {
         $business_activity = mysqli_real_escape_string($connection, trim($_POST['business_activity'] ?? ''));
         $industry = mysqli_real_escape_string($connection, trim($_POST['industry'] ?? ''));
         $address = mysqli_real_escape_string($connection, trim($_POST['address'] ?? ''));
+        $contact_title = mysqli_real_escape_string($connection, trim($_POST['contact_title'] ?? ''));
         $contact_name = mysqli_real_escape_string($connection, trim($_POST['contact_name']));
         $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation'] ?? ''));
         $contact_mobile = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
@@ -431,6 +432,7 @@ function insert_clients() {
                      business_activity = '{$business_activity}', 
                      industry = '{$industry}', 
                      address = '{$address}', 
+                     contact_title = '{$contact_title}', 
                      contact_name = '{$contact_name}', 
                      contact_designation = '{$contact_designation}', 
                      contact_mobile = '{$contact_mobile}', 
@@ -461,12 +463,12 @@ function insert_clients() {
             // Insert new client with password
             $query = "INSERT INTO clients (
                         company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
-                        contact_name, contact_designation, contact_mobile, contact_email, client_password,
+                        contact_title, contact_name, contact_designation, contact_mobile, contact_email, client_password,
                         service_id, service_description, expected_start_date, payment_currency, payment_term, 
                         service_total_fee, lead_source, client_status
                     ) VALUES (
                         '{$company_name}', '{$trade_license_no}', '{$country}', '{$jurisdiction}', '{$emirate_zone}', '{$business_activity}', '{$industry}', '{$address}',
-                        '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', '{$hashed_password}',
+                        '{$contact_title}', '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', '{$hashed_password}',
                         {$service_id}, '{$service_description}', " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
                         '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
                     )";
@@ -561,7 +563,18 @@ function findAllClients() {
     while($row = mysqli_fetch_assoc($result)) {
         $client_id = $row['client_id'];
         $company_name = htmlspecialchars($row['company_name']);
+        
+        // Combine title and name for contact person
+        $contact_title = isset($row['contact_title']) ? trim($row['contact_title']) : '';
         $contact_name = htmlspecialchars($row['contact_name']);
+        
+        // Format contact name with title
+        if (!empty($contact_title)) {
+            $formatted_contact = $contact_title . ' ' . $contact_name;
+        } else {
+            $formatted_contact = $contact_name;
+        }
+        
         $contact_email = htmlspecialchars($row['contact_email']);
         $contact_mobile = htmlspecialchars($row['contact_mobile']);
         $country = htmlspecialchars($row['country'] ?? 'N/A');
@@ -578,7 +591,7 @@ function findAllClients() {
         echo "<tr>";
         echo "<td>{$client_id}</td>";
         echo "<td><strong>{$company_name}</strong></td>";
-        echo "<td>{$contact_name}</td>";
+        echo "<td>{$formatted_contact}</td>"; // Now shows "Mr. John Smith" format
         echo "<td>{$contact_email}</td>";
         echo "<td>{$contact_mobile}</td>";
         echo "<td>{$country}</td>";
@@ -593,7 +606,7 @@ function findAllClients() {
         // Action buttons container - icon only version
         echo "<div class='d-flex gap-1'>";
             
-        // View button - FIXED: removed conflicting data-bs-toggle and data-bs-target
+        // View button
         echo "<button onclick='loadClientDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='View Details' data-bs-toggle='tooltip'>
                 <i class='bi bi-eye text-primary'></i>
               </button>";
@@ -615,6 +628,29 @@ function findAllClients() {
         echo "</td>";
         echo "</tr>";
     }
+}
+}
+
+// Helper function for status badge colors (if not already defined)
+if (!function_exists('getStatusBadgeClass')) {
+function getStatusBadgeClass($status) {
+    $badge_classes = [
+        'New Lead' => 'bg-primary',
+        'Contacted' => 'bg-info',
+        'Qualified' => 'bg-success',
+        'Proposal Drafted' => 'bg-secondary',
+        'Under Manager Review' => 'bg-warning text-dark',
+        'Rejected by Manager' => 'bg-danger',
+        'Approved by Manager' => 'bg-success',
+        'Under CEO Review' => 'bg-warning text-dark',
+        'Rejected by CEO' => 'bg-danger',
+        'Final Proposal Ready' => 'bg-success',
+        'Proposal Sent to Client' => 'bg-info',
+        'Awaiting Client Action' => 'bg-warning',
+        'Signed – Move to Finance' => 'bg-success'
+    ];
+    
+    return $badge_classes[$status] ?? 'bg-secondary';
 }
 }
 

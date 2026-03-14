@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
               
 // Initialize variables with empty values
 $company_name = $trade_license_no = $country = $emirate_zone = $business_activity = $address = '';
-$contact_name = $contact_designation = $contact_mobile = $contact_email = '';
+$contact_title = $contact_name = $contact_designation = $contact_mobile = $contact_email = '';
 $service_id = $service_description = $expected_start_date = '';
 $payment_currency = 'AED';
 $payment_term = 'Monthly';
@@ -86,30 +86,30 @@ $message_type = '';
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="country" class="form-label">Country *</label>
-                                        <select id="country" name="country" class="form-control" required>
-                                            <option value="">Select Country</option>
-                                            <option value="United Arab Emirates" <?php echo ($country == 'United Arab Emirates') ? 'selected' : ''; ?>>United Arab Emirates</option>
-                                            <option value="Saudi Arabia" <?php echo ($country == 'Saudi Arabia') ? 'selected' : ''; ?>>Saudi Arabia</option>
-                                            <option value="Qatar" <?php echo ($country == 'Qatar') ? 'selected' : ''; ?>>Qatar</option>
-                                            <option value="Oman" <?php echo ($country == 'Oman') ? 'selected' : ''; ?>>Oman</option>
-                                            <option value="Kuwait" <?php echo ($country == 'Kuwait') ? 'selected' : ''; ?>>Kuwait</option>
-                                            <option value="Bahrain" <?php echo ($country == 'Bahrain') ? 'selected' : ''; ?>>Bahrain</option>
-                                            <option value="United Kingdom" <?php echo ($country == 'United Kingdom') ? 'selected' : ''; ?>>United Kingdom</option>
-                                            <option value="United States" <?php echo ($country == 'United States') ? 'selected' : ''; ?>>United States</option>
-                                            <option value="Germany" <?php echo ($country == 'Germany') ? 'selected' : ''; ?>>Germany</option>
-                                            <option value="France" <?php echo ($country == 'France') ? 'selected' : ''; ?>>France</option>
-                                            <option value="China" <?php echo ($country == 'China') ? 'selected' : ''; ?>>China</option>
-                                            <option value="Japan" <?php echo ($country == 'Japan') ? 'selected' : ''; ?>>Japan</option>
-                                            <option value="India" <?php echo ($country == 'India') ? 'selected' : ''; ?>>India</option>
-                                            <option value="Russia" <?php echo ($country == 'Russia') ? 'selected' : ''; ?>>Russia</option>
-                                        </select>
+                                        <input list="country_list" id="country" name="country" class="form-control" value="<?php echo htmlspecialchars($country); ?>" required>
+                                        <datalist id="country_list">
+                                            <option value="United Arab Emirates">
+                                            <option value="Saudi Arabia">
+                                            <option value="Qatar">
+                                            <option value="Oman">
+                                            <option value="Kuwait">
+                                            <option value="Bahrain">
+                                            <option value="United Kingdom">
+                                            <option value="United States">
+                                            <option value="Germany">
+                                            <option value="France">
+                                            <option value="China">
+                                            <option value="Japan">
+                                            <option value="India">
+                                            <option value="Russia">
+                                        </datalist>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="jurisdiction" class="form-label">Jurisdiction</label>
-                                        <select id="jurisdiction" name="jurisdiction" class="form-control">
-                                            <option value="">Select Jurisdiction</option>
+                                        <input list="jurisdiction_list" id="jurisdiction" name="jurisdiction" class="form-control" value="<?php echo htmlspecialchars($jurisdiction ?? ''); ?>">
+                                        <datalist id="jurisdiction_list">
                                             <?php
                                             // Fetch jurisdictions from database
                                             $jurisdiction_query = "SELECT jurisdiction_name FROM jurisdictions WHERE is_active = 1 ORDER BY jurisdiction_name";
@@ -120,16 +120,15 @@ $message_type = '';
                                                 }
                                             }
                                             ?>
-                                        </select>
+                                        </datalist>
+                                        <div class="form-text">You may select from the list or type a new jurisdiction.</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="emirate_zone" class="form-label">Emirate/Zone/State</label>
-                                        <select id="emirate_zone" name="emirate_zone" class="form-control">
-                                            <option value="">Select Emirate/Zone/State</option>
-                                            <!-- Options will be populated dynamically based on country selection -->
-                                        </select>
+                                        <input list="emirate_zone_list" id="emirate_zone" name="emirate_zone" class="form-control" value="<?php echo htmlspecialchars($emirate_zone ?? ''); ?>">
+                                        <datalist id="emirate_zone_list"></datalist>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -189,8 +188,22 @@ $message_type = '';
                                     <h6 class="border-bottom pb-2 text-primary">
                                         <i class="bi bi-person me-2"></i>Contact Person Information
                                     </h6>
+                                    </div>
+                                <div class="col-md-2">
+                                    <div class="mb-3">
+                                        <label for="contact_title" class="form-label">Title</label>
+                                        <select id="contact_title" name="contact_title" class="form-control">
+                                            <option value="">Select</option>
+                                            <option value="Mr." <?php echo ($contact_title == 'Mr.') ? 'selected' : ''; ?>>Mr.</option>
+                                            <option value="Ms." <?php echo ($contact_title == 'Ms.') ? 'selected' : ''; ?>>Ms.</option>
+                                            <option value="Mrs." <?php echo ($contact_title == 'Mrs.') ? 'selected' : ''; ?>>Mrs.</option>
+                                            <option value="Dr." <?php echo ($contact_title == 'Dr.') ? 'selected' : ''; ?>>Dr.</option>
+                                            <option value="Prof." <?php echo ($contact_title == 'Prof.') ? 'selected' : ''; ?>>Prof.</option>
+                                            <option value="Eng." <?php echo ($contact_title == 'Eng.') ? 'selected' : ''; ?>>Eng.</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="mb-3">
                                         <label for="contact_name" class="form-label">Full Name *</label>
                                         <input type="text" id="contact_name" name="contact_name" class="form-control" 
@@ -331,33 +344,39 @@ const countryZones = {
 };
 
 
-// Update emirate/zone options based on country selection
-document.getElementById('country').addEventListener('change', function() {
-    const country = this.value;
-    const emirateSelect = document.getElementById('emirate_zone');
-    // Clear existing options
-    emirateSelect.innerHTML = '<option value="">Select Emirate/Zone/State</option>';
+// Update emirate/zone options based on country selection or manual input
+function updateEmirateZoneOptions(country) {
+    const emirateInput = document.getElementById('emirate_zone');
+    const datalist = document.getElementById('emirate_zone_list');
+    datalist.innerHTML = '';
     if (country && countryZones[country]) {
         countryZones[country].forEach(zone => {
             const option = document.createElement('option');
             option.value = zone;
-            option.textContent = zone;
-            emirateSelect.appendChild(option);
+            datalist.appendChild(option);
         });
     }
+}
+
+document.getElementById('country').addEventListener('change', function() {
+    const country = this.value;
+    updateEmirateZoneOptions(country);
     // Filter jurisdictions based on selected country
     const jurisdictionSelect = document.getElementById('jurisdiction');
     fetch(`get_jurisdictions.php?country=${encodeURIComponent(country)}`)
         .then(response => response.json())
         .then(data => {
-            jurisdictionSelect.innerHTML = '<option value="">Select Jurisdiction</option>';
-            if (data.jurisdictions) {
-                data.jurisdictions.forEach(jur => {
-                    const option = document.createElement('option');
-                    option.value = jur.jurisdiction_name;
-                    option.textContent = jur.jurisdiction_name;
-                    jurisdictionSelect.appendChild(option);
-                });
+            // Only update datalist if jurisdiction is an input
+            if (jurisdictionSelect.tagName.toLowerCase() === 'input') {
+                const datalist = document.getElementById('jurisdiction_list');
+                datalist.innerHTML = '';
+                if (data.jurisdictions) {
+                    data.jurisdictions.forEach(jur => {
+                        const option = document.createElement('option');
+                        option.value = jur.jurisdiction_name;
+                        datalist.appendChild(option);
+                    });
+                }
             }
         })
         .catch(error => console.error('Error fetching jurisdictions:', error));

@@ -130,10 +130,9 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr class="table-dark">
-                            <th>ID</th>
+                            <th>Engagement ID</th>
                             <th>Client</th>
                             <th>Service</th>
-                            <th>Title</th>
                             <th>Assigned To</th>
                             <th>Start Date</th>
                             <th>Deadline</th>
@@ -216,10 +215,9 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                                 $overdue_days = $engagement['days_overdue'] > 0 ? $engagement['days_overdue'] : 0;
                                 ?>
                                 <tr id="engagement-row-<?php echo $engagement['engagement_id']; ?>">
-                                    <td><?php echo $engagement['engagement_id']; ?></td>
-                                    <td><strong><?php echo htmlspecialchars($engagement['company_name']); ?></strong></td>
+                                    <td><strong><?php echo htmlspecialchars($engagement['title']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($engagement['company_name']); ?></td>
                                     <td><?php echo htmlspecialchars($engagement['service_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($engagement['title']); ?></td>
                                     <td><?php echo htmlspecialchars($engagement['assigned_to_name']); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($engagement['start_date'])); ?></td>
                                     <td>

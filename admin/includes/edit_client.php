@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 // Initialize variables
 $client_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $company_name = $trade_license_no = $country = $jurisdiction = $emirate_zone = $business_activity = $industry = $address = '';
-$contact_name = $contact_designation = $contact_mobile = $contact_email = '';
+$contact_title = $contact_name = $contact_designation = $contact_mobile = $contact_email = '';
 $service_id = $service_description = $expected_start_date = '';
 $payment_currency = 'AED';
 $payment_term = 'Monthly';
@@ -41,6 +41,7 @@ if ($client_id > 0) {
         $business_activity = $client['business_activity'];
         $industry = $client['industry'] ?? '';
         $address = $client['address'];
+        $contact_title = $client['contact_title'] ?? '';
         $contact_name = $client['contact_name'];
         $contact_designation = $client['contact_designation'];
         $contact_mobile = $client['contact_mobile'];
@@ -234,8 +235,23 @@ $industries_result = mysqli_query($connection, $industries_query);
                                         <i class="bi bi-person me-2"></i>Contact Person Information
                                     </h6>
                                 </div>
+
+                                <div class="col-md-2">
+                                    <div class="mb-3">
+                                        <label for="contact_title" class="form-label">Title</label>
+                                        <select id="contact_title" name="contact_title" class="form-control">
+                                            <option value="" <?php echo ($contact_title == '') ? 'selected' : ''; ?>>Select</option>
+                                            <option value="Mr." <?php echo ($contact_title == 'Mr.') ? 'selected' : ''; ?>>Mr.</option>
+                                            <option value="Ms." <?php echo ($contact_title == 'Ms.') ? 'selected' : ''; ?>>Ms.</option>
+                                            <option value="Mrs." <?php echo ($contact_title == 'Mrs.') ? 'selected' : ''; ?>>Mrs.</option>
+                                            <option value="Dr." <?php echo ($contact_title == 'Dr.') ? 'selected' : ''; ?>>Dr.</option>
+                                            <option value="Prof." <?php echo ($contact_title == 'Prof.') ? 'selected' : ''; ?>>Prof.</option>
+                                            <option value="Eng." <?php echo ($contact_title == 'Eng.') ? 'selected' : ''; ?>>Eng.</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="mb-3">
                                         <label for="contact_name" class="form-label">Full Name *</label>
                                         <input type="text" id="contact_name" name="contact_name" class="form-control" 
