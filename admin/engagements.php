@@ -114,7 +114,10 @@ if (isset($_GET['reject_request'])) {
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                <li class="breadcrumb-item active">Engagements</li>
+                <li class="breadcrumb-item"><a href="engagements.php">Engagements</a></li>
+                <?php if (isset($_GET['source']) && $_GET['source'] == 'operations_dashboard'): ?>
+                <li class="breadcrumb-item active">Operations Analytics</li>
+                <?php endif; ?>
             </ol>
         </nav>
 
@@ -146,6 +149,9 @@ if (isset($_GET['reject_request'])) {
                     case 'request_deadline_change';
                         include "includes/request_deadline_change.php";
                         break;
+                    case 'operations_dashboard';
+                        include "includes/operations_dashboard.php";
+                        break;
                     default:
                         include "includes/view_all_engagements.php";
                         break;
@@ -160,7 +166,7 @@ if (isset($_GET['reject_request'])) {
 <div class="modal fade" id="engagementDetailsModal" tabindex="-1" aria-labelledby="engagementDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header bg-dark text-white border-bottom border-secondary" style="border-top-left-radius: .5rem; border-top-right-radius: .5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <div class="modal-header text-white border-bottom border-secondary" style="background-color: #0a2240; border-top-left-radius: .5rem; border-top-right-radius: .5rem; box-shadow: 0 2px 8px #0a2240;">
                 <h5 class="modal-title" id="engagementDetailsModalLabel">
                     <i class="bi bi-briefcase me-2"></i>Engagement Details
                 </h5>

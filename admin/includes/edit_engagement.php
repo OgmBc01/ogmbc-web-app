@@ -161,6 +161,8 @@ ob_end_flush();
 
                     <form method="POST" action="" id="engagementForm">
                         <input type="hidden" name="engagement_id" value="<?php echo $engagement_id; ?>">
+                        <!-- Hidden client_id to ensure it is posted even if select is disabled -->
+                        <input type="hidden" name="client_id" value="<?php echo htmlspecialchars($engagement['client_id']); ?>">
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">

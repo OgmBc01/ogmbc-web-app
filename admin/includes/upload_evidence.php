@@ -41,7 +41,10 @@ if (!$result || mysqli_num_rows($result) == 0) {
 $engagement = mysqli_fetch_assoc($result);
 
 // Fetch existing evidence
-$evidence_query = "SELECT * FROM evidence WHERE engagement_id = $engagement_id ORDER BY uploaded_at DESC";
+$evidence_query = "SELECT ev.*, CONCAT(u.first_name, ' ', u.last_name) as uploaded_by_name
+                   FROM evidence ev
+                   LEFT JOIN users u ON ev.uploaded_by = u.user_id
+                   WHERE ev.engagement_id = $engagement_id ORDER BY ev.uploaded_at DESC";
 $evidence_result = mysqli_query($connection, $evidence_query);
 
 // Handle file upload
@@ -80,10 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_evidence'])) {
             if (move_uploaded_file($file_tmp, $target_path)) {
                 // Save to database
                 $insert_query = "INSERT INTO evidence 
-                                (engagement_id, file_name, file_path, file_size, mime_type, uploaded_by) 
+                                (engagement_id, file_name, file_path, uploaded_by)
                                 VALUES 
                                 ($engagement_id, '" . mysqli_real_escape_string($connection, $file_name) . "', 
-                                 '$new_filename', $file_size, '$file_type', {$_SESSION['user_id']})";
+                                 '$new_filename', {$_SESSION['user_id']})";
                 
                 if (mysqli_query($connection, $insert_query)) {
                     $showSuccessModal = true;
@@ -205,7 +208,6 @@ ob_end_flush();
                                                 <th>File Name</th>
                                                 <th>Uploaded By</th>
                                                 <th>Date</th>
-                                                <th>Size</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -214,23 +216,19 @@ ob_end_flush();
                                             <?php while($evidence = mysqli_fetch_assoc($evidence_result)): ?>
                                             <tr>
                                                 <td>
-                                                    <i class="bi bi-file-earmark me-1"></i>
-                                                    <?php echo htmlspecialchars($evidence['file_name']); ?>
+                                                    <a href="../uploads/evidence/<?php echo $evidence['file_path']; ?>" target="_blank">
+                                                        <i class="bi bi-file-earmark"></i>
+                                                        <?php echo htmlspecialchars($evidence['file_name']); ?>
+                                                    </a>
                                                 </td>
-                                                <td>
-                                                    <?php
-                                                    $uploader_query = "SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE user_id = {$evidence['uploaded_by']}";
-                                                    $uploader_result = mysqli_query($connection, $uploader_query);
-                                                    $uploader = mysqli_fetch_assoc($uploader_result);
-                                                    echo htmlspecialchars($uploader['name']);
-                                                    ?>
-                                                </td>
+                                                <td><?php echo htmlspecialchars($evidence['uploaded_by_name'] ?? ''); ?></td>
                                                 <td><?php echo date('M d, Y H:i', strtotime($evidence['uploaded_at'])); ?></td>
-                                                <td><?php echo round($evidence['file_size'] / 1024, 2); ?> KB</td>
                                                 <td>
-                                                    <?php if ($evidence['is_validated']): ?>
+                                                    <?php 
+                                                    $is_validated = isset($evidence['is_validated']) ? $evidence['is_validated'] : null;
+                                                    if ($is_validated): ?>
                                                         <span class="badge bg-success">Validated</span>
-                                                        <small class="text-muted d-block">by <?php echo $evidence['validated_by']; ?></small>
+                                                        <br><small><?php echo htmlspecialchars($evidence['validated_by_name'] ?? ''); ?></small>
                                                     <?php else: ?>
                                                         <span class="badge bg-warning">Pending</span>
                                                     <?php endif; ?>
@@ -239,8 +237,7 @@ ob_end_flush();
                                                     <a href="../uploads/evidence/<?php echo $evidence['file_path']; ?>" class="btn btn-sm btn-info" target="_blank" title="Download">
                                                         <i class="bi bi-download"></i>
                                                     </a>
-                                                    
-                                                    <?php if (!$evidence['is_validated'] && ($engagement['reviewer_id'] == $_SESSION['user_id'] || $_SESSION['user_role'] == 'CEO_GM' || $_SESSION['user_role'] == 'ADMIN_STAFF')): ?>
+                                                    <?php if ((!isset($evidence['is_validated']) || !$evidence['is_validated']) && ($engagement['reviewer_id'] == $_SESSION['user_id'] || $_SESSION['user_role'] == 'CEO_GM' || $_SESSION['user_role'] == 'ADMIN_STAFF')): ?>
                                                         <a href="engagements.php?source=upload_evidence&id=<?php echo $engagement_id; ?>&validate=<?php echo $evidence['evidence_id']; ?>" class="btn btn-sm btn-success" title="Validate" onclick="return confirm('Mark this evidence as validated?')">
                                                             <i class="bi bi-check-lg"></i>
                                                         </a>

@@ -342,50 +342,67 @@ ob_end_flush();
                 </div>
                 <div class="card-body">
                     <?php if ($evidence_result && mysqli_num_rows($evidence_result) > 0): ?>
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>File Name</th>
-                                        <th>Uploaded By</th>
-                                        <th>Date</th>
-                                        <th>Size</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php while($evidence = mysqli_fetch_assoc($evidence_result)): ?>
-                                    <tr>
-                                        <td>
-                                            <i class="bi bi-file-earmark me-1"></i>
-                                            <?php echo htmlspecialchars($evidence['file_name']); ?>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($evidence['uploaded_by_name']); ?></td>
-                                        <td><?php echo date('M d, Y H:i', strtotime($evidence['uploaded_at'])); ?></td>
-                                        <td><?php echo round($evidence['file_size'] / 1024, 2); ?> KB</td>
-                                        <td>
-                                            <?php if ($evidence['is_validated']): ?>
-                                                <span class="badge bg-success">Validated</span>
-                                                <br><small><?php echo htmlspecialchars($evidence['validated_by_name']); ?></small>
+                        <div class="row g-3">
+                            <?php while($evidence = mysqli_fetch_assoc($evidence_result)): ?>
+                            <div class="col-md-4 col-lg-3">
+                                <div class="card h-100 shadow-sm border">
+                                    <div class="card-body p-2 d-flex flex-column align-items-center justify-content-center">
+                                        <?php
+                                        $file_path = '../uploads/evidence/' . $evidence['file_path'];
+                                        $file_ext = strtolower(pathinfo($evidence['file_name'], PATHINFO_EXTENSION));
+                                        $is_image = in_array($file_ext, ['jpg','jpeg','png','gif','bmp','webp']);
+                                        $is_pdf = ($file_ext === 'pdf');
+                                        ?>
+                                        <div class="mb-2" style="width:100%;height:120px;display:flex;align-items:center;justify-content:center;background:#f8f9fa;border-radius:6px;overflow:hidden;">
+                                            <?php if ($is_image): ?>
+                                                <img src="<?php echo $file_path; ?>" alt="Preview" style="max-width:100%;max-height:100%;object-fit:contain;">
+                                            <?php elseif ($is_pdf): ?>
+                                                <embed src="<?php echo $file_path; ?>#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" width="100%" height="100%" style="min-height:100px;max-height:120px;" />
                                             <?php else: ?>
-                                                <span class="badge bg-warning">Pending</span>
+                                                <i class="bi bi-file-earmark-text fs-1 text-secondary"></i>
                                             <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <a href="../uploads/evidence/<?php echo $evidence['file_path']; ?>" class="btn btn-sm btn-info" target="_blank" title="Download">
-                                                <i class="bi bi-download"></i>
-                                            </a>
-                                            <?php if (!$evidence['is_validated'] && ($engagement['reviewer_id'] == $_SESSION['user_id'] || $_SESSION['user_role'] == 'CEO_GM' || $_SESSION['user_role'] == 'ADMIN_STAFF')): ?>
-                                                <a href="engagements.php?source=upload_evidence&id=<?php echo $engagement_id; ?>&validate=<?php echo $evidence['evidence_id']; ?>" class="btn btn-sm btn-success" title="Validate" onclick="return confirm('Mark this evidence as validated?')">
-                                                    <i class="bi bi-check-lg"></i>
-                                                </a>
+                                        </div>
+                                        <div class="w-100 text-truncate mb-1" title="<?php echo htmlspecialchars($evidence['file_name']); ?>">
+                                            <strong><?php echo htmlspecialchars($evidence['file_name']); ?></strong>
+                                        </div>
+                                        <div class="small text-muted mb-1">By <?php echo htmlspecialchars($evidence['uploaded_by_name']); ?></div>
+                                        <div class="small text-muted mb-2"><?php echo date('M d, Y H:i', strtotime($evidence['uploaded_at'])); ?></div>
+                                        <div class="mb-2">
+                                            <?php 
+                                            $status = $evidence['status'] ?? 'PENDING';
+                                            if ($status === 'APPROVED'): ?>
+                                                <span class="badge bg-success">Approved</span>
+                                            <?php elseif ($status === 'REJECTED'): ?>
+                                                <span class="badge bg-danger">Rejected</span>
+                                                <?php
+                                                // Fetch latest rejection reason from evidence_approval_history
+                                                $reason = '';
+                                                $eid = (int)$evidence['evidence_id'];
+                                                $hist_q = "SELECT reason FROM evidence_approval_history WHERE evidence_id = $eid AND action = 'REJECTED' ORDER BY reviewed_at DESC, history_id DESC LIMIT 1";
+                                                $hist_r = mysqli_query($connection, $hist_q);
+                                                if ($hist_r && $hist_row = mysqli_fetch_assoc($hist_r)) {
+                                                    $reason = $hist_row['reason'];
+                                                }
+                                                if (!empty($reason)) {
+                                                    $trunc = (mb_strlen($reason) > 60) ? mb_substr($reason, 0, 60) . '…' : $reason;
+                                                    echo '<br><small class="text-muted" title="' . htmlspecialchars($reason) . '">Reason: ' . htmlspecialchars($trunc) . '</small>';
+                                                }
+                                                ?>
+                                            <?php else: ?>
+                                                <span class="badge bg-warning text-dark">Pending</span>
                                             <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                    <?php endwhile; ?>
-                                </tbody>
-                            </table>
+                                        </div>
+                                        <div class="d-flex gap-2 w-100 justify-content-center">
+                                            <a href="<?php echo $file_path; ?>" class="btn btn-outline-primary btn-sm" target="_blank">Click to review</a>
+                                            <?php if ($status === 'PENDING'): ?>
+                                                <button class="btn btn-success btn-sm approve-evidence-btn" data-evidence-id="<?php echo $evidence['evidence_id']; ?>">Approve</button>
+                                                <button class="btn btn-danger btn-sm reject-evidence-btn" data-evidence-id="<?php echo $evidence['evidence_id']; ?>">Reject</button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endwhile; ?>
                         </div>
                     <?php else: ?>
                         <p class="text-muted text-center mb-0">No evidence uploaded yet.</p>
@@ -507,6 +524,52 @@ ob_end_flush();
     </div>
 </div>
 
+<!-- Approve Success Modal -->
+<div class="modal fade" id="approveSuccessModal" tabindex="-1" aria-labelledby="approveSuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="approveSuccessModalLabel">Evidence Approved</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
+                    <p class="mb-0">The evidence has been approved successfully.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Reason Modal -->
+<div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="rejectReasonModalLabel">Reject Evidence</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="rejectReasonForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">Please provide a reason for rejection:</label>
+                        <textarea class="form-control" id="rejectionReason" name="reason" rows="3" required></textarea>
+                        <input type="hidden" id="rejectEvidenceId" name="evidence_id" value="">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Submit Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <style>
 .timeline {
     position: relative;
@@ -529,3 +592,92 @@ ob_end_flush();
     z-index: 1;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Approve evidence
+    document.querySelectorAll('.approve-evidence-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const evidenceId = this.getAttribute('data-evidence-id');
+            if (!evidenceId) return;
+            
+            fetch('includes/ajax/evidence_review.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ evidence_id: evidenceId, action: 'APPROVED' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const modal = new bootstrap.Modal(document.getElementById('approveSuccessModal'));
+                    modal.show();
+                    setTimeout(() => { location.reload(); }, 1500);
+                } else {
+                    alert(data.message || 'Approval failed.');
+                }
+            })
+            .catch(() => alert('Approval failed.'));
+        });
+    });
+
+    // Reject evidence - show modal
+    document.querySelectorAll('.reject-evidence-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const evidenceId = this.getAttribute('data-evidence-id');
+            document.getElementById('rejectEvidenceId').value = evidenceId;
+            document.getElementById('rejectionReason').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('rejectReasonModal'));
+            modal.show();
+        });
+    });
+
+    // Handle reject reason form submission
+    const rejectForm = document.getElementById('rejectReasonForm');
+    if (rejectForm) {
+        rejectForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const evidenceId = document.getElementById('rejectEvidenceId').value;
+            const reason = document.getElementById('rejectionReason').value.trim();
+            
+            if (!reason) {
+                alert('Please provide a reason for rejection.');
+                return;
+            }
+            
+            fetch('includes/ajax/evidence_review.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 
+                    evidence_id: evidenceId, 
+                    action: 'REJECTED', 
+                    reason: reason 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const modalEl = document.getElementById('rejectReasonModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    
+                    // Add one-time event listener for modal hidden
+                    const handler = function() {
+                        alert('Evidence rejected.');
+                        location.reload();
+                        modalEl.removeEventListener('hidden.bs.modal', handler);
+                    };
+                    
+                    modalEl.addEventListener('hidden.bs.modal', handler);
+                    modal.hide();
+                } else {
+                    alert(data.message || 'Rejection failed.');
+                }
+            })
+            .catch(() => alert('Rejection failed.'));
+        });
+    }
+});
+</script>

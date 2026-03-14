@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_engagement']))
     $client_id = (int)$_POST['client_id'];
     $service_id = (int)$_POST['service_id'];
     $rule_version_id = (int)$_POST['rule_version_id'];
-    $engagement_id = mysqli_real_escape_string($connection, trim($_POST['engagement_id']));
     $description = mysqli_real_escape_string($connection, trim($_POST['description'] ?? ''));
     $assigned_to = (int)$_POST['assigned_to'];
     $reviewer_id = !empty($_POST['reviewer_id']) ? (int)$_POST['reviewer_id'] : 'NULL';
@@ -53,9 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_engagement']))
     $original_deadline = mysqli_real_escape_string($connection, $_POST['original_deadline']);
     $evidence_required = isset($_POST['evidence_required']) ? 1 : 0;
     $created_by = $_SESSION['user_id'];
+    $title = mysqli_real_escape_string($connection, trim($_POST['title'] ?? ''));
     
     // Validation
-    if (empty($client_id) || empty($service_id) || empty($rule_version_id) || empty($engagement_id) || empty($assigned_to) || empty($start_date) || empty($original_deadline)) {
+    if (empty($client_id) || empty($service_id) || empty($rule_version_id) || empty($description) || empty($assigned_to) || empty($start_date) || empty($original_deadline)) {
         $message = "Please fill in all required fields.";
         $message_type = "danger";
     } elseif (strtotime($original_deadline) <= strtotime($start_date)) {
@@ -65,11 +65,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_engagement']))
         // Insert engagement
         $reviewer_value = ($reviewer_id !== 'NULL') ? $reviewer_id : 'NULL';
         $insert_query = "INSERT INTO engagements 
-                        (engagement_id, client_id, service_id, rule_version_id, description, 
+                        (client_id, service_id, rule_version_id, title, description, 
                          assigned_to, assigned_by, reviewer_id, start_date, original_deadline, 
                          evidence_required, status, created_by) 
                         VALUES 
-                        ('$engagement_id', $client_id, $service_id, $rule_version_id, '$description',
+                        ($client_id, $service_id, $rule_version_id, '$title', '$description',
                          $assigned_to, {$created_by}, $reviewer_value, '$start_date', '$original_deadline',
                          $evidence_required, 'ASSIGNED', $created_by)";
         
@@ -122,13 +122,20 @@ ob_end_flush();
                     <?php endif; ?>
 
                     <form method="POST" action="" id="engagementForm">
+                        <input type="hidden" id="title" name="title" value="<?php echo htmlspecialchars($title); ?>">
+
                         <div class="row">
-                            <div class="col-md-6 mb-3 position-relative">
-                                <label for="client_id" class="form-label">Client *</label>
-                                <input type="text" id="client_search" class="form-control mb-2" placeholder="Type to search client..." autocomplete="off">
-                                <select id="client_id" name="client_id" class="form-control" required style="display:none;"></select>
-                                <div id="client_search_results" class="list-group position-absolute w-100" style="z-index: 10; margin-top:2.2rem;"></div>
-                                <button type="button" id="create_new_client_btn" class="btn btn-outline-primary btn-sm mt-2" style="display:none;">Create New</button>
+                            <div class="col-md-6 mb-3 position-relative d-flex align-items-end">
+                                <div class="flex-grow-1 me-2">
+                                    <label for="client_id" class="form-label">Client *</label>
+                                    <input type="text" id="client_search" class="form-control mb-2" placeholder="Type to search client..." autocomplete="off">
+                                    <select id="client_id" name="client_id" class="form-control" required style="display:none;"></select>
+                                    <div id="client_search_results" class="list-group position-absolute w-100" style="z-index: 10; margin-top:2.2rem;"></div>
+                                </div>
+                                <div class="d-flex flex-column align-items-start">
+                                    <div id="no_client_found_msg" class="text-danger small" style="display:none;">No client found</div>
+                                    <button type="button" id="create_new_client_btn" class="btn btn-outline-primary btn-sm mb-2" style="display:none;">Create New</button>
+                                </div>
                             </div>
                             </script>
                             <script>
@@ -153,13 +160,15 @@ ob_end_flush();
 
                             function showClientResults(filtered) {
                                 resultsDiv.innerHTML = '';
+                                const noClientMsg = document.getElementById('no_client_found_msg');
                                 if (filtered.length === 0) {
-                                    resultsDiv.innerHTML = '<div class="list-group-item">No client found</div>';
+                                    if (noClientMsg) noClientMsg.style.display = 'block';
                                     createBtn.style.display = 'block';
                                     clientSelect.value = '';
                                     clientSelect.style.display = 'none';
                                     return;
                                 }
+                                if (noClientMsg) noClientMsg.style.display = 'none';
                                 createBtn.style.display = 'none';
                                 filtered.forEach(client => {
                                     const item = document.createElement('button');
@@ -172,6 +181,7 @@ ob_end_flush();
                                         clientSelect.style.display = '';
                                         resultsDiv.innerHTML = '';
                                         createBtn.style.display = 'none';
+                                        if (noClientMsg) noClientMsg.style.display = 'none';
                                     };
                                     resultsDiv.appendChild(item);
                                 });
@@ -222,7 +232,8 @@ ob_end_flush();
                             
                             <div class="col-md-6 mb-3">
                                 <label for="engagement_id" class="form-label">Engagement ID</label>
-                                <input type="text" id="engagement_id" name="engagement_id" class="form-control" value="" readonly required>
+                                <input type="text" id="engagement_id" name="title" class="form-control" value="<?php echo htmlspecialchars($title); ?>" readonly required>
+                                <input type="hidden" id="engagement_id_hidden" name="engagement_id" value="">
                             </div>
                         </div>
 
@@ -384,12 +395,19 @@ function generateEngagementID() {
     return `ENG-${datePart}-${randPart}`;
 }
 
-function setEngagementID() {
-    const idField = document.getElementById('engagement_id');
-    if (idField) idField.value = generateEngagementID();
-}
+document.addEventListener('DOMContentLoaded', function() {
+    const engagementIdField = document.getElementById('engagement_id');
+    if (engagementIdField && !engagementIdField.value) {
+        engagementIdField.value = generateEngagementID();
+    }
+    // Regenerate on form submit if empty
+    document.getElementById('engagementForm').addEventListener('submit', function() {
+        if (engagementIdField && !engagementIdField.value) {
+            engagementIdField.value = generateEngagementID();
+        }
+    });
+});
 
-document.addEventListener('DOMContentLoaded', setEngagementID);
 // If form is reset, generate a new ID
 const engagementForm = document.getElementById('engagementForm');
 if (engagementForm) {

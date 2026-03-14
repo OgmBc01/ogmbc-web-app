@@ -45,13 +45,20 @@
 
             <!-- Engagements Menu with Dropdown -->
             <li class="nav-item">
-                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'engagements.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'engagements.php' && (!isset($_GET['source']) || $_GET['source'] == 'view_all')) ? 'active' : ''; ?>" 
                 href="#" data-menu="engagements">
                     <i class="bi bi-tools nav-icon"></i>
                     <span class="nav-text">Operations</span>
                     <i class="bi bi-chevron-right menu-toggle"></i>
                 </a>
                 <ul class="sub-menu" id="engagements-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'operations_dashboard') ? 'active' : ''; ?>" 
+                        href="engagements.php?source=operations_dashboard">
+                            <i class="bi bi-bar-chart-line nav-icon"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'add_engagement') ? 'active' : ''; ?>" 
                         href="engagements.php?source=add_engagement">
