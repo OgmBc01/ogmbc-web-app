@@ -21,8 +21,8 @@ $message = '';
 $message_type = '';
 $showSuccessModal = false;
 
-// Fetch engagement data
-$query = "SELECT e.*, c.company_name, s.service_name 
+// Fetch engagement data with recurrence info
+$query = "SELECT e.*, c.company_name, s.service_name, s.recurrence_pattern as service_recurrence_pattern
           FROM engagements e
           JOIN clients c ON e.client_id = c.client_id
           JOIN service_types s ON e.service_id = s.service_id
@@ -51,7 +51,7 @@ $clients_query = "SELECT client_id, company_name FROM clients ORDER BY company_n
 $clients_result = mysqli_query($connection, $clients_query);
 
 // Fetch services with active rules
-$services_query = "SELECT s.service_id, s.service_name, 
+$services_query = "SELECT s.service_id, s.service_name, s.recurrence_pattern,
                   MAX(r.rule_version) as latest_version
                   FROM service_types s
                   JOIN service_point_rules r ON s.service_id = r.service_id AND r.is_active = 1
@@ -79,6 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_engagement']))
     $status = mysqli_real_escape_string($connection, $_POST['status']);
     $evidence_required = isset($_POST['evidence_required']) ? 1 : 0;
     
+    // Recurrence fields
+    $is_recurring = isset($_POST['is_recurring']) ? 1 : 0;
+    $recurrence_pattern = $is_recurring ? mysqli_real_escape_string($connection, $_POST['recurrence_pattern']) : 'NULL';
+    $recurrence_count = $is_recurring && !empty($_POST['recurrence_count']) ? (int)$_POST['recurrence_count'] : 'NULL';
+    
     // Validation
     if (empty($client_id) || empty($service_id) || empty($rule_version_id) || empty($title) || empty($assigned_to) || empty($start_date) || empty($original_deadline)) {
         $message = "Please fill in all required fields.";
@@ -92,7 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_engagement']))
         $old_status = $engagement['status'];
         $status_changed = ($old_status != $status);
         
-        // Update engagement
+        // Check if recurrence settings changed
+        $recurrence_changed = ($engagement['is_recurring'] != $is_recurring);
+        
+        // Build update query
         $reviewer_value = ($reviewer_id !== 'NULL') ? $reviewer_id : 'NULL';
         
         $update_query = "UPDATE engagements SET 
@@ -106,8 +114,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_engagement']))
                          start_date = '$start_date',
                          original_deadline = '$original_deadline',
                          status = '$status',
-                         evidence_required = $evidence_required
-                         WHERE engagement_id = $engagement_id";
+                         evidence_required = $evidence_required,
+                         is_recurring = $is_recurring";
+        
+        // Only update recurrence fields if needed
+        if ($is_recurring) {
+            $update_query .= ", recurrence_pattern = '$recurrence_pattern',
+                               recurrence_count = " . ($recurrence_count !== 'NULL' ? $recurrence_count : 'NULL');
+            
+            // If this wasn't recurring before, set sequence to 1
+            if (!$engagement['is_recurring']) {
+                $update_query .= ", recurrence_sequence = 1";
+            }
+        } else {
+            // If unchecking recurrence, set fields to NULL/default
+            $update_query .= ", recurrence_pattern = NULL,
+                               recurrence_count = NULL,
+                               recurrence_sequence = 1";
+        }
+        
+        $update_query .= " WHERE engagement_id = $engagement_id";
         
         if (mysqli_query($connection, $update_query)) {
             
@@ -117,6 +143,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_engagement']))
                                 (engagement_id, old_status, new_status, changed_by, notes) 
                                 VALUES ($engagement_id, '$old_status', '$status', {$_SESSION['user_id']}, 'Status updated via edit')";
                 mysqli_query($connection, $history_query);
+            }
+            
+            // Log recurrence change if applicable
+            if ($recurrence_changed) {
+                $recurrence_note = $is_recurring ? "Recurrence enabled ($recurrence_pattern)" : "Recurrence disabled";
+                // Always provide a valid new_status (current $status)
+                $recurrence_log = "INSERT INTO engagement_status_history 
+                                 (engagement_id, old_status, new_status, changed_by, notes) 
+                                 VALUES ($engagement_id, NULL, '$status', {$_SESSION['user_id']}, '$recurrence_note')";
+                mysqli_query($connection, $recurrence_log);
             }
             
             $showSuccessModal = true;
@@ -152,10 +188,29 @@ ob_end_flush();
                 </div>
                 <div class="card-body">
                     
+
                     <?php if (!empty($message) && !$showSuccessModal): ?>
                     <div class="alert alert-<?php echo $message_type; ?> alert-dismissible fade show" role="alert">
                         <?php echo $message; ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if ($engagement['is_recurring']): ?>
+                    <div class="alert alert-info mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-arrow-repeat fs-4 me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Recurring Engagement</h6>
+                                <p class="mb-0 small">
+                                    This is part of a recurring series. 
+                                    Sequence: <?php echo $engagement['recurrence_sequence']; ?>
+                                    <?php if ($engagement['parent_engagement_id']): ?>
+                                        | Parent ID: #<?php echo $engagement['parent_engagement_id']; ?>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     <?php endif; ?>
 
@@ -198,7 +253,7 @@ ob_end_flush();
                                         mysqli_data_seek($services_result, 0);
                                         while ($service = mysqli_fetch_assoc($services_result)) {
                                             $selected = ($engagement['service_id'] == $service['service_id']) ? 'selected' : '';
-                                            echo "<option value='{$service['service_id']}' data-version='{$service['latest_version']}' $selected>" . htmlspecialchars($service['service_name']) . "</option>";
+                                            echo "<option value='{$service['service_id']}' data-version='{$service['latest_version']}' data-recurrence='{$service['recurrence_pattern']}' $selected>" . htmlspecialchars($service['service_name']) . "</option>";
                                         }
                                     }
                                     ?>
@@ -266,7 +321,52 @@ ob_end_flush();
                                     <option value="AWAITING_REVIEW" <?php echo ($engagement['status'] == 'AWAITING_REVIEW') ? 'selected' : ''; ?>>Awaiting Review</option>
                                     <option value="SUBMITTED" <?php echo ($engagement['status'] == 'SUBMITTED') ? 'selected' : ''; ?>>Submitted</option>
                                     <option value="REJECTED" <?php echo ($engagement['status'] == 'REJECTED') ? 'selected' : ''; ?>>Rejected</option>
+                                    <option value="CLOSED" <?php echo ($engagement['status'] == 'CLOSED') ? 'selected' : ''; ?>>Closed</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <!-- Recurring Engagement Section -->
+                        <div class="card mb-3 border-info">
+                            <div class="card-header bg-info bg-opacity-10">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_recurring" name="is_recurring" 
+                                           onchange="toggleRecurringOptions()" <?php echo $engagement['is_recurring'] ? 'checked' : ''; ?>>
+                                    <label class="form-check-label fw-bold" for="is_recurring">
+                                        <i class="bi bi-arrow-repeat me-1"></i> This is a recurring engagement
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="recurringOptions" class="card-body" style="display: <?php echo $engagement['is_recurring'] ? 'block' : 'none'; ?>;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Recurrence Pattern</label>
+                                        <select class="form-control" name="recurrence_pattern" id="recurrence_pattern">
+                                            <option value="monthly" <?php echo ($engagement['recurrence_pattern'] == 'monthly') ? 'selected' : ''; ?>>Monthly</option>
+                                            <option value="quarterly" <?php echo ($engagement['recurrence_pattern'] == 'quarterly') ? 'selected' : ''; ?>>Quarterly</option>
+                                            <option value="yearly" <?php echo ($engagement['recurrence_pattern'] == 'yearly') ? 'selected' : ''; ?>>Yearly</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Number of Occurrences</label>
+                                        <input type="number" class="form-control" name="recurrence_count" id="recurrence_count" 
+                                               value="<?php echo $engagement['recurrence_count'] ?: 12; ?>" min="1" max="60">
+                                        <small class="text-muted">Leave empty for unlimited</small>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info mt-2 mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <?php if ($engagement['is_recurring']): ?>
+                                        Current sequence: <?php echo $engagement['recurrence_sequence']; ?>. 
+                                        <?php if ($engagement['recurrence_count']): ?>
+                                            Will repeat <?php echo $engagement['recurrence_count']; ?> times total.
+                                        <?php else: ?>
+                                            Will repeat indefinitely.
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        New engagements will be automatically created when each instance is closed.
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
 
@@ -349,10 +449,30 @@ ob_end_flush();
 <?php endif; ?>
 
 <script>
+// Toggle recurring options visibility
+function toggleRecurringOptions() {
+    const isChecked = document.getElementById('is_recurring').checked;
+    const optionsDiv = document.getElementById('recurringOptions');
+    
+    if (optionsDiv) {
+        optionsDiv.style.display = isChecked ? 'block' : 'none';
+    }
+}
+
 // Load rule versions when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadRuleVersions(<?php echo $engagement['rule_version_id']; ?>);
     loadEmployees(<?php echo $engagement['assigned_to']; ?>, <?php echo $engagement['reviewer_id'] ?: 'null'; ?>);
+    
+    // Set recurrence pattern based on service if available
+    const serviceSelect = document.getElementById('service_id');
+    if (serviceSelect && serviceSelect.value) {
+        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+        const recurrencePattern = selectedOption.getAttribute('data-recurrence');
+        if (recurrencePattern && recurrencePattern !== 'none') {
+            // Optionally pre-select pattern based on service
+        }
+    }
 });
 
 // Load rule versions when service is selected
@@ -438,6 +558,18 @@ document.getElementById('original_deadline').addEventListener('change', function
     if (startDate && new Date(this.value) <= new Date(startDate)) {
         alert('Deadline must be after start date');
         this.value = '';
+    }
+});
+
+// Form submission warning for recurring changes
+document.getElementById('engagementForm').addEventListener('submit', function(e) {
+    const isRecurring = document.getElementById('is_recurring').checked;
+    const wasRecurring = <?php echo $engagement['is_recurring'] ? 'true' : 'false'; ?>;
+    
+    if (wasRecurring && !isRecurring) {
+        if (!confirm('Warning: Disabling recurrence will stop future auto-creation. Existing recurring chain will remain. Continue?')) {
+            e.preventDefault();
+        }
     }
 });
 </script>

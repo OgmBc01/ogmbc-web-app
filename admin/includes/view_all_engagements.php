@@ -215,7 +215,14 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                                 $overdue_days = $engagement['days_overdue'] > 0 ? $engagement['days_overdue'] : 0;
                                 ?>
                                 <tr id="engagement-row-<?php echo $engagement['engagement_id']; ?>">
-                                    <td><strong><?php echo htmlspecialchars($engagement['title']); ?></strong></td>
+                                    <td>
+                                        <strong><?php echo htmlspecialchars($engagement['title']); ?></strong>
+                                        <?php if (!empty($engagement['is_recurring'])): ?>
+                                            <span class="badge bg-info ms-2" title="Recurring engagement (Sequence <?php echo $engagement['recurrence_sequence']; ?>)">
+                                                <i class="bi bi-arrow-repeat"></i>
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><?php echo htmlspecialchars($engagement['company_name']); ?></td>
                                     <td><?php echo htmlspecialchars($engagement['service_name']); ?></td>
                                     <td><?php echo htmlspecialchars($engagement['assigned_to_name']); ?></td>

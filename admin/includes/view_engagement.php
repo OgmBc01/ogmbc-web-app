@@ -129,6 +129,7 @@ ob_end_flush();
                 </div>
             </div>
 
+
             <!-- Status Banner -->
             <div class="alert alert-<?php 
                 echo $engagement['status'] == 'CLOSED' ? 'success' : 
@@ -149,6 +150,49 @@ ob_end_flush();
                     </div>
                 <?php endif; ?>
             </div>
+
+            <?php if ($engagement['is_recurring']): ?>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Recurring Chain</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-center flex-wrap">
+                        <?php
+                        // Get all engagements in this recurring chain
+                        $chain_query = "SELECT engagement_id, title, start_date, status 
+                                       FROM engagements 
+                                       WHERE (engagement_id = {$engagement['engagement_id']} 
+                                          OR parent_engagement_id = {$engagement['engagement_id']}
+                                          OR engagement_id = (SELECT parent_engagement_id FROM engagements WHERE engagement_id = {$engagement['engagement_id']}))
+                                       ORDER BY start_date ASC";
+                        $chain_result = mysqli_query($connection, $chain_query);
+                        $chain = [];
+                        while ($c = mysqli_fetch_assoc($chain_result)) {
+                            $chain[] = $c;
+                        }
+                        foreach ($chain as $index => $item):
+                            $is_current = ($item['engagement_id'] == $engagement['engagement_id']);
+                            $status_class = $is_current ? 'primary' : ($item['status'] == 'CLOSED' ? 'success' : 'secondary');
+                        ?>
+                            <div class="text-center mx-2">
+                                <div class="chain-node bg-<?php echo $status_class; ?> text-white p-3 rounded-circle mb-2" 
+                                     style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                    <?php echo $index + 1; ?>
+                                </div>
+                                <small class="d-block"><?php echo date('M Y', strtotime($item['start_date'])); ?></small>
+                                <?php if ($is_current): ?>
+                                    <span class="badge bg-primary">Current</span>
+                                <?php endif; ?>
+                            </div>
+                            <?php if ($index < count($chain) - 1): ?>
+                                <i class="bi bi-arrow-right fs-4 mx-2"></i>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Main Content Grid -->
             <div class="row">

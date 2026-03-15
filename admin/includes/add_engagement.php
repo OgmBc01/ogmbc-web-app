@@ -53,6 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_engagement']))
     $evidence_required = isset($_POST['evidence_required']) ? 1 : 0;
     $created_by = $_SESSION['user_id'];
     $title = mysqli_real_escape_string($connection, trim($_POST['title'] ?? ''));
+
+    // Get recurring flag and settings
+    $is_recurring = isset($_POST['is_recurring']) ? 1 : 0;
+    $recurrence_pattern = $is_recurring ? mysqli_real_escape_string($connection, $_POST['recurrence_pattern']) : 'none';
+    $recurrence_count = $is_recurring && !empty($_POST['recurrence_count']) ? (int)$_POST['recurrence_count'] : 'NULL';
+    $recurrence_sequence = 1; // always 1 for first
     
     // Validation
     if (empty($client_id) || empty($service_id) || empty($rule_version_id) || empty($description) || empty($assigned_to) || empty($start_date) || empty($original_deadline)) {
@@ -65,13 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_engagement']))
         // Insert engagement
         $reviewer_value = ($reviewer_id !== 'NULL') ? $reviewer_id : 'NULL';
         $insert_query = "INSERT INTO engagements 
-                        (client_id, service_id, rule_version_id, title, description, 
-                         assigned_to, assigned_by, reviewer_id, start_date, original_deadline, 
-                         evidence_required, status, created_by) 
-                        VALUES 
-                        ($client_id, $service_id, $rule_version_id, '$title', '$description',
-                         $assigned_to, {$created_by}, $reviewer_value, '$start_date', '$original_deadline',
-                         $evidence_required, 'ASSIGNED', $created_by)";
+                (client_id, service_id, rule_version_id, title, description, 
+                 assigned_to, assigned_by, reviewer_id, start_date, original_deadline, 
+                 evidence_required, status, created_by, is_recurring, recurrence_pattern, recurrence_count, recurrence_sequence) 
+                VALUES 
+                ($client_id, $service_id, $rule_version_id, '$title', '$description',
+                 $assigned_to, {$created_by}, $reviewer_value, '$start_date', '$original_deadline',
+                 $evidence_required, 'ASSIGNED', $created_by, $is_recurring, '$recurrence_pattern', $recurrence_count, $recurrence_sequence)";
         
         if (mysqli_query($connection, $insert_query)) {
             $new_engagement_id = mysqli_insert_id($connection);
@@ -321,6 +327,48 @@ ob_end_flush();
                                 </label>
                             </div>
                         </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_recurring" name="is_recurring" 
+                                       onchange="toggleRecurringOptions()" <?php echo isset($_POST['is_recurring']) ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="is_recurring">
+                                    <i class="bi bi-arrow-repeat me-1"></i> This is a recurring engagement
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Recurring options (hidden by default) -->
+                        <div id="recurringOptions" style="display: none;" class="mb-3 p-3 bg-light rounded">
+                            <h6 class="mb-3">Recurring Engagement Settings</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Recurrence Pattern</label>
+                                    <select class="form-control" name="recurrence_pattern" id="recurrence_pattern">
+                                        <option value="monthly">Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Number of Occurrences</label>
+                                    <input type="number" class="form-control" name="recurrence_count" id="recurrence_count" 
+                                           value="12" min="1" max="60">
+                                    <small class="text-muted">Leave empty for unlimited</small>
+                                </div>
+                            </div>
+                            <div class="alert alert-info mt-2 mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                New engagements will be automatically created when each instance is closed.
+                            </div>
+                        </div>
+
+                        <script>
+                        function toggleRecurringOptions() {
+                            const isChecked = document.getElementById('is_recurring').checked;
+                            document.getElementById('recurringOptions').style.display = isChecked ? 'block' : 'none';
+                        }
+                        </script>
 
                         <div class="row mt-4">
                             <div class="col-12 text-center">
