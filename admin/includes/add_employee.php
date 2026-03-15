@@ -20,7 +20,6 @@ $departments_result = $connection->query($departments_query);
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
     // Get form data
-    $user_id = trim($_POST['user_id']);
     $user_email = trim($_POST['user_email']);
     $password = trim($_POST['password']);
     $first_name = trim($_POST['first_name']);
@@ -44,10 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
-            
             $new_filename = "profile_" . time() . "_" . rand(1000, 9999) . ".{$ext}";
             $target = $upload_dir . $new_filename;
-            
             if (move_uploaded_file($file['tmp_name'], $target)) {
                 $user_image = $new_filename;
             }
@@ -55,41 +52,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
     }
 
     // Validate required fields
-    if (empty($user_id) || empty($user_email) || empty($password) || empty($first_name) || empty($last_name) || empty($department_id)) {
+    if (empty($user_email) || empty($password) || empty($first_name) || empty($last_name) || empty($department_id)) {
         $message = "Please fill in all required fields including Department.";
         $message_type = "danger";
     } else {
-        // Insert into database - Note: user_type defaults to 'employee' as per schema
-        $sql = "INSERT INTO employees (user_id, user_email, password, first_name, last_name, user_image, 
-                field_of_study, qualification, highest_graduation, year_of_graduation, salary, department_id, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-        
-        $stmt = $connection->prepare($sql);
-        $stmt->bind_param("issssssssidi", 
-            $user_id, 
-            $user_email, 
-            $password, 
-            $first_name, 
-            $last_name, 
-            $user_image, 
-            $field_of_study, 
-            $qualification, 
-            $highest_graduation, 
-            $year_of_graduation,
-            $salary,
-            $department_id
-        );
+        // 1. Insert into users table first
+        $user_insert_sql = "INSERT INTO users (first_name, last_name, user_image, user_email, password) VALUES (?, ?, ?, ?, ?)";
+        $user_stmt = $connection->prepare($user_insert_sql);
+        $user_stmt->bind_param("sssss", $first_name, $last_name, $user_image, $user_email, $password);
+        if ($user_stmt->execute()) {
+            $new_user_id = $user_stmt->insert_id;
+            $user_stmt->close();
 
-        if ($stmt->execute()) {
-            $new_employee_id = $stmt->insert_id;
-            $stmt->close();
-            
-            // Show success modal
-            $show_success_modal = true;
+            // 2. Insert into employees table using new user_id
+            $sql = "INSERT INTO employees (user_id, user_email, password, first_name, last_name, user_image, 
+                    field_of_study, qualification, highest_graduation, year_of_graduation, salary, department_id, created_at) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+            $stmt = $connection->prepare($sql);
+            $stmt->bind_param("issssssssidi", 
+                $new_user_id, 
+                $user_email, 
+                $password, 
+                $first_name, 
+                $last_name, 
+                $user_image, 
+                $field_of_study, 
+                $qualification, 
+                $highest_graduation, 
+                $year_of_graduation,
+                $salary,
+                $department_id
+            );
+            if ($stmt->execute()) {
+                $new_employee_id = $stmt->insert_id;
+                $stmt->close();
+                // Show success modal
+                $show_success_modal = true;
+            } else {
+                $message = "Failed to add employee. Error: " . $connection->error;
+                $message_type = "danger";
+                $stmt->close();
+            }
         } else {
-            $message = "Failed to add employee. Error: " . $connection->error;
+            $message = "Failed to add user. Error: " . $connection->error;
             $message_type = "danger";
-            $stmt->close();
+            $user_stmt->close();
         }
     }
 }

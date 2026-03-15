@@ -34,12 +34,12 @@ if ($employee_id > 0) {
         $first_name = $employee['first_name'];
         $last_name = $employee['last_name'];
         $current_image = $employee['user_image'];
-        $field_of_study = $employee['field_of_study'];
-        $qualification = $employee['qualification'];
-        $highest_graduation = $employee['highest_graduation'];
-        $year_of_graduation = $employee['year_of_graduation'];
-        $salary = $employee['salary'];
-        $department_id = $employee['department_id'];
+        $field_of_study = $employee['field_of_study'] ?? '';
+        $qualification = $employee['qualification'] ?? '';
+        $highest_graduation = $employee['highest_graduation'] ?? '';
+        $year_of_graduation = $employee['year_of_graduation'] ?? '';
+        $salary = $employee['salary'] ?? '';
+        $department_id = $employee['department_id'] ?? '';
     } else {
         $message = "Employee not found.";
         $message_type = "danger";
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_employee'])) {
                 WHERE employee_id = ?";
         
         $stmt = $connection->prepare($sql);
-        $stmt->bind_param("issssssssidii", 
+        $stmt->bind_param("isssssssssdii", 
             $user_id, 
             $user_email, 
             $password, 
@@ -145,12 +145,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_employee'])) {
             $first_name = $employee['first_name'];
             $last_name = $employee['last_name'];
             $current_image = $employee['user_image'];
-            $field_of_study = $employee['field_of_study'];
-            $qualification = $employee['qualification'];
-            $highest_graduation = $employee['highest_graduation'];
-            $year_of_graduation = $employee['year_of_graduation'];
-            $salary = $employee['salary'];
-            $department_id = $employee['department_id'];
+            $field_of_study = $employee['field_of_study'] ?? '';
+            $qualification = $employee['qualification'] ?? '';
+            $highest_graduation = $employee['highest_graduation'] ?? '';
+            $year_of_graduation = $employee['year_of_graduation'] ?? '';
+            $salary = $employee['salary'] ?? '';
+            $department_id = $employee['department_id'] ?? '';
             
             // Show success modal
             $show_success_modal = true;
@@ -204,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_employee'])) {
                                                 while ($dept = $departments_result->fetch_assoc()) {
                                                     $selected = ($department_id == $dept['id']) ? 'selected' : '';
                                                     echo "<option value='" . $dept['id'] . "' $selected>" . 
-                                                         htmlspecialchars($dept['dept_name']) . "</option>";
+                                                         htmlspecialchars($dept['dept_name'] ?? '') . "</option>";
                                                 }
                                             }
                                             ?>
@@ -214,38 +214,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_employee'])) {
                                     <div class="mb-3">
                                         <label for="user_id" class="form-label"><i class="bi bi-person-badge me-1"></i>User ID *</label>
                                         <input type="number" id="user_id" name="user_id" class="form-control" 
-                                               value="<?php echo htmlspecialchars($user_id); ?>" required>
+                                               value="<?php echo htmlspecialchars((string)($user_id ?? '')); ?>" required>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="user_email" class="form-label"><i class="bi bi-envelope me-1"></i>Email *</label>
                                         <input type="email" id="user_email" name="user_email" class="form-control" 
-                                               value="<?php echo htmlspecialchars($user_email); ?>" required>
+                                               value="<?php echo htmlspecialchars((string)($user_email ?? '')); ?>" required>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="password" class="form-label"><i class="bi bi-lock me-1"></i>Password *</label>
                                         <input type="password" id="password" name="password" class="form-control" 
-                                               value="<?php echo htmlspecialchars($password); ?>" required>
+                                               value="<?php echo htmlspecialchars((string)($password ?? '')); ?>" required>
                                         <div class="form-text">Leave as is to keep current password</div>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="first_name" class="form-label"><i class="bi bi-person me-1"></i>First Name *</label>
                                         <input type="text" id="first_name" name="first_name" class="form-control" 
-                                               value="<?php echo htmlspecialchars($first_name); ?>" required>
+                                               value="<?php echo htmlspecialchars($first_name ?? ''); ?>" required>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="last_name" class="form-label"><i class="bi bi-person me-1"></i>Last Name *</label>
                                         <input type="text" id="last_name" name="last_name" class="form-control" 
-                                               value="<?php echo htmlspecialchars($last_name); ?>" required>
+                                               value="<?php echo htmlspecialchars($last_name ?? ''); ?>" required>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="salary" class="form-label"><i class="bi bi-cash me-1"></i>Salary ($)</label>
                                         <input type="number" step="0.01" id="salary" name="salary" class="form-control" 
-                                               value="<?php echo htmlspecialchars($salary ?: '0.00'); ?>">
+                                               value="<?php echo htmlspecialchars((string)($salary ?? '0.00')); ?>">
                                     </div>
                                 </div>
 
@@ -264,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_employee'])) {
                                             if (!empty($current_image) && file_exists("../uploads/profiles/" . $current_image)) {
                                                 $image_url = "../uploads/profiles/" . $current_image;
                                             } else {
-                                                $name = urlencode($first_name . '+' . $last_name);
+                                                $name = urlencode(($first_name ?? '') . '+' . ($last_name ?? ''));
                                                 $image_url = "https://ui-avatars.com/api/?name=$name&background=f1bf70&color=0f172a&size=40";
                                             }
                                             ?>
@@ -279,25 +279,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_employee'])) {
                                     <div class="mb-3">
                                         <label for="field_of_study" class="form-label"><i class="bi bi-book me-1"></i>Field of Study</label>
                                         <input type="text" id="field_of_study" name="field_of_study" class="form-control" 
-                                               value="<?php echo htmlspecialchars($field_of_study); ?>">
+                                               value="<?php echo htmlspecialchars($field_of_study ?? ''); ?>">
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="qualification" class="form-label"><i class="bi bi-award me-1"></i>Qualification</label>
                                         <input type="text" id="qualification" name="qualification" class="form-control" 
-                                               value="<?php echo htmlspecialchars($qualification); ?>">
+                                               value="<?php echo htmlspecialchars($qualification ?? ''); ?>">
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="highest_graduation" class="form-label"><i class="bi bi-mortarboard me-1"></i>Highest Graduation</label>
                                         <input type="text" id="highest_graduation" name="highest_graduation" class="form-control" 
-                                               value="<?php echo htmlspecialchars($highest_graduation); ?>">
+                                               value="<?php echo htmlspecialchars($highest_graduation ?? ''); ?>">
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="year_of_graduation" class="form-label"><i class="bi bi-calendar me-1"></i>Year of Graduation</label>
                                         <input type="number" id="year_of_graduation" name="year_of_graduation" class="form-control" 
-                                               value="<?php echo htmlspecialchars($year_of_graduation); ?>" 
+                                               value="<?php echo htmlspecialchars((string)($year_of_graduation ?? '')); ?>" 
                                                min="1900" max="<?php echo date('Y'); ?>">
                                     </div>
                                 </div>
@@ -333,7 +333,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_employee'])) {
             <div class="modal-body text-center py-4">
                 <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
                 <h4 class="my-3">Employee Updated Successfully!</h4>
-                <p class="text-muted">The employee "<?php echo htmlspecialchars($first_name . ' ' . $last_name); ?>" has been updated.</p>
+                <p class="text-muted">The employee "<?php echo htmlspecialchars(($first_name ?? '') . ' ' . ($last_name ?? '')); ?>" has been updated.</p>
             </div>
             <div class="modal-footer justify-content-center border-0 pt-0">
                 <a href="employees.php" class="btn btn-success px-4">

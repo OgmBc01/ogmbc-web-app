@@ -75,9 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
             // Upload image
             if (!empty($user_image)) {
                 $target_dir = "../images/";
+                if (!file_exists($target_dir)) {
+                    mkdir($target_dir, 0777, true);
+                }
                 $image_name = time() . '_' . basename($user_image);
                 $target_file = $target_dir . $image_name;
-                
                 if (move_uploaded_file($user_image_temp, $target_file)) {
                     $user_image = $image_name;
                 } else {
@@ -101,6 +103,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
             
             if (mysqli_query($connection, $insert_query)) {
                 $new_user_id = mysqli_insert_id($connection);
+                // Only insert into employees table if user type is 'employee'
+                $is_employee = false;
+                if ($type_id !== 'NULL') {
+                    // Fetch the type_name for the selected type_id
+                    $type_check_query = "SELECT type_name FROM user_types WHERE type_id = $type_id LIMIT 1";
+                    $type_check_result = mysqli_query($connection, $type_check_query);
+                    if ($type_check_result && $type_row = mysqli_fetch_assoc($type_check_result)) {
+                        if (strtolower($type_row['type_name']) === 'employee') {
+                            $is_employee = true;
+                        }
+                    }
+                }
+                if ($is_employee) {
+                    $emp_insert_query = "INSERT INTO employees (user_id, user_email, password, first_name, last_name, user_image, department_id, created_at) VALUES (?, ?, ?, ?, ?, ?, NULL, NOW())";
+                    $emp_stmt = $connection->prepare($emp_insert_query);
+                    $emp_stmt->bind_param("isssss", $new_user_id, $user_email, $hashed_password, $first_name, $last_name, $user_image);
+                    $emp_stmt->execute();
+                    $emp_stmt->close();
+                }
                 $showSuccessModal = true;
                 // Clear form data
                 $username = $first_name = $last_name = $user_email = '';

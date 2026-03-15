@@ -245,15 +245,12 @@ function viewUser(id) {
                 const roleBadge = user.role_name ? 
                     `<span class="badge bg-info">${user.role_name}</span>` : 
                     '<span class="badge bg-secondary">Not Assigned</span>';
-                
                 const typeBadge = user.type_name ? 
                     `<span class="badge bg-success">${user.type_name}</span>` : 
                     '<span class="badge bg-secondary">Not Assigned</span>';
-                
                 const statusBadge = user.user_status == 'active' ? 
                     '<span class="badge bg-success">Active</span>' : 
                     '<span class="badge bg-warning">Inactive</span>';
-                
                 contentDiv.innerHTML = `
                     <div class="text-center mb-3">
                         <img src="../images/${user.user_image || 'default.jpg'}" class="rounded-circle" width="100" height="100" alt="User Image">
@@ -273,6 +270,11 @@ function viewUser(id) {
                         </div>
                     </div>
                 `;
+                // Set the edit button link to use the switch case
+                const editBtn = document.getElementById('editUserBtn');
+                if (editBtn) {
+                    editBtn.href = `users.php?source=edit_user&id=${user.user_id}`;
+                }
             } else {
                 contentDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
             }

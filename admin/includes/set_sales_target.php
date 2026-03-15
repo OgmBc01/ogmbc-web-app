@@ -31,12 +31,11 @@ $message_type = '';
 $showSuccessModal = false;
 $new_target_id = null;
 
-// Get sales employees for dropdown
-$sales_query = "SELECT u.user_id, u.first_name, u.last_name 
-                FROM users u
-                JOIN user_roles r ON u.role_id = r.role_id
-                WHERE r.role_name IN ('sales_staff')
-                ORDER BY u.first_name";
+// Get sales employees for dropdown (from employees table, but use user_id for value)
+$sales_query = "SELECT e.user_id, e.first_name, e.last_name 
+                FROM employees e
+                WHERE e.department_id = 4
+                ORDER BY e.first_name, e.last_name";
 $sales_result = mysqli_query($connection, $sales_query);
 
 // Handle form submission

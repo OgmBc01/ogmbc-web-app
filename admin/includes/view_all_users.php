@@ -185,3 +185,31 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
         </div>
     </div>
 </div>
+
+<!-- User Details Modal with Dark Blue Theme -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #0a2240; color: #f1bf70; border-bottom: 1px solid #f1bf70;">
+                <h5 class="modal-title" id="userDetailsModalLabel">
+                    <i class="bi bi-person-badge me-2"></i>User Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading user details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" id="editUserBtn" class="btn btn-primary" style="background: #f1bf70; border-color: #f1bf70; color: #0a2240;">
+                    <i class="bi bi-pencil me-1"></i>Edit User
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

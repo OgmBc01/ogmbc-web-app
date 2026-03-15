@@ -40,11 +40,9 @@ $sales_result = mysqli_query($connection, $sales_query);
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="page-title">Sales Targets</h1>
         <div>
-            <?php if ($user_role == 'CEO_GM' || $user_role == 'HR_ADMIN' || $user_role == 'ADMIN_STAFF'): ?>
-                <a href="sales_targets.php?source=set_target" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Set New Target
-                </a>
-            <?php endif; ?>
+            <a href="sales_targets.php?source=set_target" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Set New Target
+            </a>
         </div>
     </div>
 
