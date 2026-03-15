@@ -145,19 +145,21 @@ if (isset($_GET['delete']) && $can_validate) {
 
 <!-- Feedback Details Modal -->
 <div class="modal fade" id="feedbackDetailsModal" tabindex="-1" aria-labelledby="feedbackDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl"> <!-- Changed to modal-xl for more space -->
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="feedbackDetailsModalLabel">Feedback Details</h5>
+            <div class="modal-header" style="background: #0a2240; color: #f1bf70;">
+                <h5 class="modal-title" id="feedbackDetailsModalLabel">
+                    <i class="bi bi-chat-quote me-2"></i>Feedback Details
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="feedbackDetailsContent">
+            <div class="modal-body" id="feedbackDetailsContent" style="max-height: 70vh; overflow-y: auto;">
                 <!-- Content will be loaded via AJAX -->
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
+                <div class="text-center py-5">
+                    <div class="spinner-border" style="color: #f1bf70;" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mt-2">Loading feedback details...</p>
+                    <p class="mt-3 text-muted">Loading feedback details...</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -190,32 +192,64 @@ if (isset($_GET['delete']) && $can_validate) {
 <script>
 // View feedback details
 function viewFeedback(id) {
-    const modal = new bootstrap.Modal(document.getElementById('feedbackDetailsModal'));
+    console.log('Viewing feedback ID:', id); // Debug log
+    
+    const modalElement = document.getElementById('feedbackDetailsModal');
+    if (!modalElement) {
+        console.error('Modal element not found!');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(modalElement);
     const contentDiv = document.getElementById('feedbackDetailsContent');
     
+    // Show loading state
     contentDiv.innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
+        <div class="text-center py-5">
+            <div class="spinner-border" style="color: #f1bf70;" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Loading feedback details...</p>
+            <p class="mt-3 text-muted">Loading feedback details...</p>
         </div>
     `;
     
     modal.show();
     
-    fetch('includes/ajax/get_feedback_details.php?id=' + id)
-        .then(response => response.json())
-        .then(data => {
+    // Use absolute path to ensure correct URL
+    fetch('includes/ajax/get_feedback_details.php?id=' + id, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status); // Debug log
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.text(); // Get as text first for debugging
+    })
+    .then(text => {
+        console.log('Raw response:', text.substring(0, 200)); // Debug first 200 chars
+        
+        // Try to parse as JSON
+        try {
+            const data = JSON.parse(text);
             if (data.success) {
                 contentDiv.innerHTML = data.html;
             } else {
-                contentDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                contentDiv.innerHTML = `<div class="alert alert-danger">${data.message || 'Failed to load feedback details'}</div>`;
             }
-        })
-        .catch(error => {
-            contentDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-        });
+        } catch (e) {
+            console.error('JSON parse error:', e);
+            console.error('Response was not valid JSON:', text);
+            contentDiv.innerHTML = `<div class="alert alert-danger">Error: Server returned invalid JSON. Check console for details.</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        contentDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+    });
 }
 
 // Show delete confirmation

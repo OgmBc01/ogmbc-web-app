@@ -28,22 +28,16 @@ if (!$clients_result) {
     die("Error fetching clients: " . mysqli_error($connection));
 }
 
-// FIXED: Get employees for dropdown - using users table directly with role check
-$employees_query = "SELECT u.user_id, u.first_name, u.last_name, r.role_name 
-                   FROM users u
-                   LEFT JOIN user_roles r ON u.role_id = r.role_id
-                   WHERE u.user_status = 'active'
-                   ORDER BY u.first_name";
-$employees_result = mysqli_query($connection, $employees_query);
 
-// DEBUG: Check if employees are found
-if (!$employees_result) {
-    die("Error fetching employees: " . mysqli_error($connection));
+// Get employees for dropdown - using employees table
+
+// Get users for dropdown (all users, or filter by type_id if needed)
+$users_query = "SELECT user_id, first_name, last_name FROM users ORDER BY first_name";
+$users_result = mysqli_query($connection, $users_query);
+if (!$users_result) {
+    die("Error fetching users: " . mysqli_error($connection));
 }
-
-// Count employees for debugging
-$employee_count = mysqli_num_rows($employees_result);
-// echo "<!-- DEBUG: Found $employee_count employees -->";
+$user_count = mysqli_num_rows($users_result);
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
@@ -129,7 +123,7 @@ ob_end_flush();
                     <?php endif; ?>
 
                     <!-- Debug info - remove in production -->
-                    <?php if ($employee_count == 0): ?>
+                    <?php if ($user_count == 0): ?>
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-triangle me-2"></i>
                         No employees found in the system. Please add employees first.
@@ -162,17 +156,30 @@ ob_end_flush();
                             <div class="col-md-6 mb-3">
                                 <label for="employee_id" class="form-label">Employee *</label>
                                 <select id="employee_id" name="employee_id" class="form-control" required>
+                                    </div>
+                                    <!-- Select2 CSS -->
+                                    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+                                    <!-- Select2 JS -->
+                                    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+                                    <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        if (window.jQuery) {
+                                            $('#employee_id').select2({
+                                                placeholder: 'Select or search employee',
+                                                allowClear: true,
+                                                width: '100%'
+                                            });
+                                        }
+                                    });
+                                    </script>
                                     <option value="">Select Employee</option>
                                     <?php 
-                                    if ($employees_result && mysqli_num_rows($employees_result) > 0) {
-                                        mysqli_data_seek($employees_result, 0);
-                                        while($emp = mysqli_fetch_assoc($employees_result)): 
+                                    if ($users_result && mysqli_num_rows($users_result) > 0) {
+                                        mysqli_data_seek($users_result, 0);
+                                        while($user = mysqli_fetch_assoc($users_result)):
                                     ?>
-                                        <option value="<?php echo $emp['user_id']; ?>" <?php echo ($employee_id == $emp['user_id']) ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($emp['first_name'] . ' ' . $emp['last_name']); ?>
-                                            <?php if (!empty($emp['role_name'])): ?>
-                                                (<?php echo htmlspecialchars($emp['role_name']); ?>)
-                                            <?php endif; ?>
+                                        <option value="<?php echo $user['user_id']; ?>" <?php echo ($employee_id == $user['user_id']) ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>
                                         </option>
                                     <?php 
                                         endwhile;

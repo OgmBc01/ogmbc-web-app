@@ -42,11 +42,33 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $employee_id = (int)$_GET['id'];
 
-$query = "SELECT * FROM employees WHERE employee_id = $employee_id";
-$result = mysqli_query($connection, $query);
+// Updated query to join with users, departments, user_roles, and user_types tables
+$sql = "SELECT 
+            e.*, 
+            u.username,
+            u.user_status,
+            u.created_at as user_created_at,
+            u.role_id,
+            u.type_id,
+            r.role_name,
+            r.role_level,
+            t.type_name,
+            d.id as department_id,
+            d.dept_name as department_name,
+            d.dept_code as department_code
+        FROM employees e
+        INNER JOIN users u ON e.user_id = u.user_id
+        LEFT JOIN departments d ON e.department_id = d.id
+        LEFT JOIN user_roles r ON u.role_id = r.role_id
+        LEFT JOIN user_types t ON u.type_id = t.type_id
+        WHERE e.employee_id = ?";
 
-if ($result && mysqli_num_rows($result) > 0) {
-    $employee = mysqli_fetch_assoc($result);
+$stmt = $connection->prepare($sql);
+$stmt->bind_param("i", $employee_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result && $employee = $result->fetch_assoc()) {
     // Ensure all fields exist
     $employee = array_map(function($value) {
         return $value === null ? '' : $value;
@@ -62,7 +84,8 @@ if ($result && mysqli_num_rows($result) > 0) {
     ]);
 }
 if ($result) {
-    mysqli_free_result($result);
+    $result->free();
 }
+$stmt->close();
 ob_end_flush();
 ?>
