@@ -8,6 +8,8 @@ services:
       MYSQL_DATABASE: ogmbc
     volumes:
       - ogmbc_data:/var/lib/mysql
+    ports:
+      - "3306:3306"   # <-- Add this line
 
   second_phpmyadmin:
     image: phpmyadmin/phpmyadmin

@@ -10,5 +10,9 @@
   },
   "devDependencies": {
     "terser": "^5.0.0"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "mysql2": "^3.19.1"
   }
 }
