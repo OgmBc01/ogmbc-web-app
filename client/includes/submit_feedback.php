@@ -1,13 +1,6 @@
 <?php
 ob_start();
 
-// // Check if user is logged in
-// if (!isset($_SESSION['client_id'])) {
-//     ob_end_clean();
-//     echo "<script>window.location.href = '../login.php';</script>";
-//     exit();
-// }
-
 $client_id = $_SESSION['client_id'];
 $engagement_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 

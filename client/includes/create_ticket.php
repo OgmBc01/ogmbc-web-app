@@ -1,14 +1,7 @@
 <?php
 ob_start();
 
-// Check if client_id is set in the session
-// if (!isset($_SESSION['client_id'])) {
-//     ob_end_clean();
-//     echo "<script>window.location.href = '../login.php';</script>";
-//     exit();
-// }
-
-$client_id = $_SESSION['client_id']; // Define client_id from session
+$client_id = $_SESSION['user_id'] ?? 0; // Define client_id from session (user_id for clients)
 
 // Initialize variables
 $subject = '';

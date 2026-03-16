@@ -1,12 +1,6 @@
 <?php
 ob_start();
 
-// if (!isset($_SESSION['client_id'])) {
-//     ob_end_clean();
-//     echo "<script>window.location.href = '../login.php';</script>";
-//     exit();
-// }
-
 $client_id = $_SESSION['client_id'];
 
 // Fetch current client data

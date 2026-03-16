@@ -1,8 +1,8 @@
 <?php
-// Ensure client_id is defined
-// if (!isset($client_id)) {
-//     $client_id = $_SESSION['client_id'] ?? 0;
-// }
+// Ensure client_id is defined using session user_id for clients
+if (!isset($client_id)) {
+    $client_id = $_SESSION['user_id'] ?? 0;
+}
 
 if ($client_id <= 0) {
     echo '<div class="alert alert-danger">Invalid client ID</div>';

@@ -1,3 +1,38 @@
+/* Custom Dropdown Menu Styling for Login Button */
+.dropdown-menu {
+  background: #1e293b;
+  border: 1px solid rgba(241, 191, 112, 0.2);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  min-width: 250px;
+}
+
+.dropdown-menu .dropdown-item {
+  color: #e2e8f0;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background: rgba(241, 191, 112, 0.1);
+  color: #f1bf70;
+}
+
+.dropdown-menu .dropdown-item i {
+  font-size: 1.1rem;
+}
+
+.dropdown-divider {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin: 0.5rem 0;
+}
+
+.badge {
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+}
 /* ================================
    Global Styles
    ================================ */

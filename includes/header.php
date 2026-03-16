@@ -215,32 +215,53 @@ include 'functions.php'
               // Check for admin roles
               $show_admin_link = false;
               if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
-                  $admin_roles = ['admin', 'super_admin', 'moderator'];
-                  $show_admin_link = in_array($_SESSION['user_role'], $admin_roles);
-              }
+                $admin_roles = ['admin', 'super_admin', 'moderator'];
+                $show_admin_link = in_array($_SESSION['user_role'], $admin_roles);
+            }
 
-              if ($show_admin_link): ?>
-                  <!-- Admin Dashboard -->
-                  <li class="nav-item">
-                      <a class="nav-link" href="admin/dashboard.php" target="_blank">
-                        Admin
-                      </a>
-                  </li>
-              <?php endif; ?>
-
-              <!-- Login / Sign up -->
+            if ($show_admin_link): ?>
+              <!-- Admin Dashboard -->
               <li class="nav-item">
-                <?php
-                
-                if (isset($_SESSION['user_id'])) {
-                    // User is logged in - show Sign Out button
-                    echo '<a href="logout.php" class="btn btn-ghost">Sign Out</a>';
-                } else {
-                    // User is not logged in - show Login button
-                    echo '<a href="login.php" target="_blank" class="btn btn-ghost">Login</a>';
-                }
-                ?>
+                  <a class="nav-link" href="admin/dashboard.php" target="_blank">
+                    Admin
+                  </a>
               </li>
+            <?php endif; ?>
+
+            <?php if (!isset($_SESSION['user_id'])): ?>
+            <!-- Login Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="loginDropdown">
+                <li>
+                  <a class="dropdown-item" href="client_login.php">
+                    <i class="bi bi-person-badge me-2" style="color: #f1bf70;"></i>
+                    Login as Client
+                    <span class="badge bg-info ms-2">Client Portal</span>
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item" href="employee_login.php">
+                    <i class="bi bi-shield-lock me-2" style="color: #667eea;"></i>
+                    Login as Employee
+                    <span class="badge bg-primary ms-2">Staff Portal</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['user_id'])): ?>
+            <!-- If logged in, show logout instead -->
+            <li class="nav-item">
+              <a href="logout.php" class="btn btn-ghost">
+                <i class="bi bi-box-arrow-right me-1"></i>Sign Out
+              </a>
+            </li>
+            <?php endif; ?>
             </ul>
           </div>
         </nav>

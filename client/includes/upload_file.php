@@ -1,9 +1,9 @@
 <?php
 ob_start();
 
-// Ensure client_id is defined
+// Ensure client_id is defined using session user_id for clients
 if (!isset($client_id)) {
-    $client_id = $_SESSION['client_id'] ?? 0;
+    $client_id = $_SESSION['user_id'] ?? 0;
 }
 
 if ($client_id <= 0) {
@@ -12,7 +12,6 @@ if ($client_id <= 0) {
 }
 $engagement_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Get engagements for dropdown
 // Get engagements for dropdown - with error handling
 $engagements_query = "SELECT engagement_id, title FROM engagements 
                       WHERE client_id = " . intval($client_id) . " 

@@ -32,33 +32,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if ($stmt = $connection->prepare($sql)) {
             $stmt->bind_param("ss", $username, $username);
-            
             if ($stmt->execute()) {
                 $stmt->store_result();
-                
                 if ($stmt->num_rows == 1) {
-                    // Bind user_id, username, email, user_role, user_status, and password
+                    // Bind result in correct order
                     $stmt->bind_result($user_id, $db_username, $db_email, $db_role, $db_status, $db_password);
-                    
                     if ($stmt->fetch()) {
+                        // Check if password column is not null
+                        if (!isset($db_password)) {
+                            $error = "Password column missing or null.";
+                        }
                         // Check if user is active
-                        if ($db_status != 'active') {
+                        elseif ($db_status != 'active') {
                             $error = "Your account is not active. Please contact administrator.";
                         }
                         // Use password_verify for hashed passwords
                         elseif (password_verify($password, $db_password)) { 
-                            // Regenerate session ID for security
                             session_regenerate_id(true);
-                            
-                            // Save into session
                             $_SESSION['user_id'] = $user_id;
                             $_SESSION['username'] = $db_username;
                             $_SESSION['user_email'] = $db_email;
                             $_SESSION['user_role'] = $db_role;
-                            
-                            // REMOVED last_login update since column doesn't exist
-                            
-                            header("Location: index.php");
+                            header("Location: admin/dashboard.php");
                             exit();
                         } else {
                             $error = "Invalid password.";
@@ -70,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             } else {
                 $error = "Oops! Something went wrong. Please try again later.";
             }
-            
             $stmt->close();
         } else {
             $error = "Database error. Please try again.";
