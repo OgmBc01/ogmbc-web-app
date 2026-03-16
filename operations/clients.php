@@ -12,7 +12,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 ?>
 
-
 <div class="main-content" id="mainContent">
     <div class="container-fluid">
         <!-- Welcome Card (for consistency with engagements.php) -->
