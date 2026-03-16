@@ -340,13 +340,13 @@
                 </ul>
             </li>
             
-            <!-- Services Menu -->
+            <!-- Services Menu
             <li class="nav-item">
                 <a class="nav-link" href="categories.php" data-menu="services">
                     <i class="bi bi-gear nav-icon"></i>
                     <span class="nav-text">Services</span>
                 </a>
-            </li>
+            </li> -->
 
             <!-- Services Config Menu with Dropdown -->
             <li class="nav-item">
