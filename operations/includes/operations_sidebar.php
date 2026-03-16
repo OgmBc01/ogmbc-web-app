@@ -120,6 +120,12 @@
                         <span class="nav-text">Pending Approval</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="cdp_annual.php">
+                        <i class="bi bi-calendar-check nav-icon"></i>
+                        <span class="nav-text">Annual CDP Summary</span>
+                    </a>
+                </li>
             </ul>
         </li>
 
@@ -194,21 +200,19 @@
             </a>
         </li>
 
-        <!-- Notifications -->
+        <!-- Notifications Menu -->
         <li class="nav-item">
             <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'notifications.php') ? 'active' : ''; ?>" 
-               href="notifications.php">
+            href="notifications.php">
                 <i class="bi bi-bell nav-icon"></i>
                 <span class="nav-text">Notifications</span>
                 <?php
                 // Show unread count badge
-                if (isset($_SESSION['user_id'])) {
-                    $notif_query = "SELECT COUNT(*) as unread FROM user_notifications WHERE user_id = " . $_SESSION['user_id'] . " AND is_read = 0";
-                    $notif_result = mysqli_query($connection, $notif_query);
-                    $notif_count = mysqli_fetch_assoc($notif_result)['unread'];
-                    if ($notif_count > 0) {
-                        echo '<span class="badge bg-danger rounded-pill ms-2">' . $notif_count . '</span>';
-                    }
+                $unread_query = "SELECT COUNT(*) as unread FROM user_notifications WHERE user_id = " . $_SESSION['user_id'] . " AND is_read = 0";
+                $unread_result = mysqli_query($connection, $unread_query);
+                $unread_count = mysqli_fetch_assoc($unread_result)['unread'];
+                if ($unread_count > 0) {
+                    echo '<span class="badge bg-danger rounded-pill ms-2">' . $unread_count . '</span>';
                 }
                 ?>
             </a>

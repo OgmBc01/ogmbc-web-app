@@ -80,10 +80,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_evidence'])) {
             if (move_uploaded_file($file_tmp, $target_path)) {
                 // Save to database
                 $insert_query = "INSERT INTO evidence 
-                                (engagement_id, file_name, file_path, file_size, mime_type, uploaded_by)
+                                (engagement_id, file_name, file_path, uploaded_by)
                                 VALUES 
                                 ($engagement_id, '" . mysqli_real_escape_string($connection, $file_name) . "', 
-                                 '$new_filename', $file_size, '$file_type', $user_id)";
+                                 '$new_filename', $user_id)";
                 
                 if (mysqli_query($connection, $insert_query)) {
                     $showSuccessModal = true;
@@ -210,8 +210,6 @@ ob_end_flush();
                                 <div class="file-meta">
                                     <small class="text-muted">
                                         <i class="bi bi-calendar me-1"></i><?php echo date('M d, Y H:i', strtotime($file['uploaded_at'])); ?>
-                                        <span class="mx-2">•</span>
-                                        <i class="bi bi-file-earmark me-1"></i><?php echo round($file['file_size'] / 1024, 1); ?> KB
                                     </small>
                                 </div>
                             </div>

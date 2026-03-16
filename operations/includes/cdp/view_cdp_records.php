@@ -55,57 +55,41 @@ $uplift_by_year = mysqli_query($connection, $uplift_by_year_query);
         </div>
     </div>
 
-    <!-- Statistics Cards -->
+    <!-- Statistics Cards (Unified as type-card) -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-card-body">
-                    <div class="stat-icon bg-primary-soft">
-                        <i class="bi bi-mortarboard text-primary"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-value"><?php echo $stats['total'] ?? 0; ?></h3>
-                        <p class="stat-label">Total Records</p>
-                    </div>
+            <div class="type-card total">
+                <i class="bi bi-mortarboard"></i>
+                <div class="type-details">
+                    <span class="type-label">Total Records</span>
+                    <span class="type-value"><?php echo $stats['total'] ?? 0; ?></span>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-card-body">
-                    <div class="stat-icon bg-success-soft">
-                        <i class="bi bi-check-circle text-success"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-value"><?php echo $stats['approved'] ?? 0; ?></h3>
-                        <p class="stat-label">Approved</p>
-                    </div>
+            <div class="type-card approved">
+                <i class="bi bi-check-circle"></i>
+                <div class="type-details">
+                    <span class="type-label">Approved</span>
+                    <span class="type-value"><?php echo $stats['approved'] ?? 0; ?></span>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-card-body">
-                    <div class="stat-icon bg-warning-soft">
-                        <i class="bi bi-clock-history text-warning"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-value"><?php echo $stats['pending'] ?? 0; ?></h3>
-                        <p class="stat-label">Pending</p>
-                    </div>
+            <div class="type-card pending">
+                <i class="bi bi-clock-history"></i>
+                <div class="type-details">
+                    <span class="type-label">Pending</span>
+                    <span class="type-value"><?php echo $stats['pending'] ?? 0; ?></span>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="stat-card">
-                <div class="stat-card-body">
-                    <div class="stat-icon bg-info-soft">
-                        <i class="bi bi-percent text-info"></i>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-value"><?php echo $stats['total_uplift']; ?>%</h3>
-                        <p class="stat-label">Total Uplift</p>
-                    </div>
+            <div class="type-card uplift">
+                <i class="bi bi-percent"></i>
+                <div class="type-details">
+                    <span class="type-label">Total Uplift</span>
+                    <span class="type-value"><?php echo $stats['total_uplift']; ?>%</span>
                 </div>
             </div>
         </div>
