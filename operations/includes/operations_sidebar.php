@@ -160,7 +160,7 @@
             </ul>
         </li>
 
-        <!-- Performance -->
+        <!-- Performance
         <li class="nav-item">
             <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'performance.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
                href="#" data-menu="performance">
@@ -189,14 +189,27 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> -->
 
-        <!-- Communications -->
+        <!-- Communications (NEW) -->
         <li class="nav-item">
             <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'communications.php') ? 'active' : ''; ?>" 
                href="communications.php">
                 <i class="bi bi-chat-dots nav-icon"></i>
                 <span class="nav-text">Communications</span>
+                <?php
+                // Show unread communications count (optional - you can add a read/unread field later)
+                /*
+                $unread_comms_query = "SELECT COUNT(*) as unread FROM client_communications 
+                                       WHERE user_id = " . $_SESSION['user_id'] . " 
+                                       AND is_read = 0";
+                $unread_comms_result = mysqli_query($connection, $unread_comms_query);
+                $unread_comms = mysqli_fetch_assoc($unread_comms_result)['unread'];
+                if ($unread_comms > 0) {
+                    echo '<span class="badge bg-danger rounded-pill ms-2">' . $unread_comms . '</span>';
+                }
+                */
+                ?>
             </a>
         </li>
 
