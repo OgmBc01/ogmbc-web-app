@@ -20,7 +20,6 @@ if (isset($_GET['mark_read']) && is_numeric($_GET['mark_read'])) {
     $update_query = "UPDATE user_notifications SET is_read = 1 WHERE notif_id = $notif_id AND user_id = $user_id";
     mysqli_query($connection, $update_query);
     
-    // Redirect back to notifications using JavaScript to avoid header issues
     echo "<script>window.location.href = 'notifications.php" . (isset($_GET['source']) ? '?source=' . $_GET['source'] : '') . "';</script>";
     exit();
 }
@@ -75,6 +74,31 @@ if (isset($_GET['delete_all'])) {
 <div class="main-content" id="mainContent">
     <div class="container-fluid">
         
+        <!-- Welcome Card (matching clients.php) -->
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="welcome-card d-flex flex-column flex-md-row align-items-center justify-content-between mb-3">
+                    <div>
+                        <div class="welcome-title mb-1">
+                            <i class="bi bi-bell me-2"></i>Notifications
+                        </div>
+                        <div class="welcome-subtitle">Stay updated with your latest activities and alerts.</div>
+                    </div>
+                    <div class="current-date mt-3 mt-md-0">
+                        <i class="bi bi-calendar-event me-2"></i> <?php echo date('l, F j, Y'); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+                <li class="breadcrumb-item active">Notifications</li>
+            </ol>
+        </nav>
+
         <!-- Alert Messages -->
         <?php if (isset($_SESSION['success_message'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -95,14 +119,6 @@ if (isset($_GET['delete_all'])) {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <?php endif; ?>
-
-        <!-- Breadcrumb Navigation -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item active">Notifications</li>
-            </ol>
-        </nav>
 
         <!-- Alert Messages Container for AJAX -->
         <div id="alertBox"></div>
@@ -135,21 +151,20 @@ if (isset($_GET['delete_all'])) {
 
 <!-- Notification Details Modal -->
 <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" id="notificationModalHeader">
+            <div class="modal-header bg-dark text-white">
                 <h5 class="modal-title" id="notificationModalLabel">
                     <i class="bi bi-bell me-2"></i>Notification Details
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="notificationDetails">
-                <!-- Content will be loaded via AJAX -->
-                <div class="text-center py-4">
+                <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mt-2">Loading notification details...</p>
+                    <p class="mt-3 text-muted">Loading notification details...</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -166,23 +181,15 @@ if (isset($_GET['delete_all'])) {
 function viewNotification(id, type) {
     const modal = new bootstrap.Modal(document.getElementById('notificationModal'));
     const contentDiv = document.getElementById('notificationDetails');
-    const modalHeader = document.getElementById('notificationModalHeader');
     const markReadBtn = document.getElementById('markReadFromModal');
     const deleteBtn = document.getElementById('deleteFromModal');
     
-    // Set header color based on type
-    modalHeader.className = 'modal-header';
-    if (type === 'success') modalHeader.classList.add('bg-success', 'text-white');
-    else if (type === 'warning') modalHeader.classList.add('bg-warning', 'text-dark');
-    else if (type === 'danger') modalHeader.classList.add('bg-danger', 'text-white');
-    else modalHeader.classList.add('bg-info', 'text-white');
-    
     contentDiv.innerHTML = `
-        <div class="text-center py-4">
+        <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Loading notification details...</p>
+            <p class="mt-3 text-muted">Loading notification details...</p>
         </div>
     `;
     
@@ -191,8 +198,15 @@ function viewNotification(id, type) {
     
     modal.show();
     
-    // For now, just show basic info since we don't have an AJAX endpoint yet
-    // We'll create the AJAX endpoint later if needed
+    // For now, just show basic info
+    setTimeout(() => {
+        contentDiv.innerHTML = `
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                Detailed view coming soon.
+            </div>
+        `;
+    }, 500);
 }
 
 // Helper function to show alerts
@@ -207,13 +221,46 @@ function showAlert(message, type) {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>`;
         container.prepend(div);
-    } else {
-        alertBox.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>`;
+        setTimeout(() => div.remove(), 3000);
     }
 }
 </script>
+
+<!-- Dashboard Theme Styles (matching clients.php) -->
+<style>
+.welcome-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    width: 100%;
+}
+.welcome-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.welcome-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+.current-date {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+}
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 1.4rem;
+    }
+    .welcome-card {
+        padding: 18px;
+    }
+}
+</style>
 
 <?php include 'includes/operations_footer.php'; ?>
