@@ -54,7 +54,7 @@ $client_id = $_SESSION['client_id'];
 <div class="modal fade" id="engagementModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header" style="background: #0a2240; color: #f1bf70;">
                 <h5 class="modal-title">Engagement Details</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

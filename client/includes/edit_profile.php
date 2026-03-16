@@ -1,12 +1,21 @@
 <?php
 ob_start();
 
-$client_id = $_SESSION['client_id'];
 
-// Fetch current client data
-$query = "SELECT * FROM clients WHERE client_id = " . intval($client_id);
+// Always set client_id from session
+$client_id = $_SESSION['client_id'] ?? 0;
+
+// Try to fetch client by user_id (primary mapping)
+$query = "SELECT * FROM clients WHERE user_id = " . intval($client_id);
 $result = mysqli_query($connection, $query);
-$client = mysqli_fetch_assoc($result);
+$client = ($result && mysqli_num_rows($result) > 0) ? mysqli_fetch_assoc($result) : null;
+
+// Fallback: try by client_id (legacy mapping)
+if (!$client) {
+    $query = "SELECT * FROM clients WHERE client_id = " . intval($client_id);
+    $result = mysqli_query($connection, $query);
+    $client = ($result && mysqli_num_rows($result) > 0) ? mysqli_fetch_assoc($result) : null;
+}
 
 if (!$client) {
     echo '<div class="alert alert-danger">Client not found</div>';
@@ -51,7 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $message = "Please enter a valid email address.";
         $message_type = "danger";
     } else {
-        // Update client
+        // Update client (by user_id if possible, else by client_id)
+        $update_success = false;
+        // Try update by user_id
         $update_query = "UPDATE clients SET 
                         company_name = '$company_name',
                         trade_license_no = '$trade_license_no',
@@ -63,22 +74,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                         contact_designation = '$contact_designation',
                         contact_mobile = '$contact_mobile',
                         contact_email = '$contact_email'
-                        WHERE client_id = " . intval($client_id);
-        
-        if (mysqli_query($connection, $update_query)) {
+                        WHERE user_id = " . intval($client_id);
+        if (mysqli_query($connection, $update_query) && mysqli_affected_rows($connection) > 0) {
+            $update_success = true;
+        } else {
+            // Fallback: update by client_id
+            $update_query = "UPDATE clients SET 
+                            company_name = '$company_name',
+                            trade_license_no = '$trade_license_no',
+                            country = '$country',
+                            emirate_zone = '$emirate_zone',
+                            business_activity = '$business_activity',
+                            address = '$address',
+                            contact_name = '$contact_name',
+                            contact_designation = '$contact_designation',
+                            contact_mobile = '$contact_mobile',
+                            contact_email = '$contact_email'
+                            WHERE client_id = " . intval($client_id);
+            if (mysqli_query($connection, $update_query) && mysqli_affected_rows($connection) > 0) {
+                $update_success = true;
+            }
+        }
+        if ($update_success) {
             // Log activity
             $log_check = mysqli_query($connection, "SHOW TABLES LIKE 'client_activity_log'");
             if ($log_check && mysqli_num_rows($log_check) > 0) {
                 $log_query = "INSERT INTO client_activity_log 
                              (client_id, activity_type, description, ip_address)
                              VALUES 
-                             (" . intval($client_id) . ", 'profile_update', 'Updated company profile information', '{$_SERVER['REMOTE_ADDR']}')";
+                             (" . intval($client['client_id']) . ", 'profile_update', 'Updated company profile information', '{$_SERVER['REMOTE_ADDR']}')";
                 mysqli_query($connection, $log_query);
             }
-            
             // Update session name
             $_SESSION['client_name'] = $company_name;
-            
             $showSuccessModal = true;
         } else {
             $message = "Error updating profile: " . mysqli_error($connection);
@@ -127,14 +155,14 @@ ob_end_flush();
                             
                             <div class="col-md-6 mb-3">
                                 <label for="company_name" class="form-label">Company Name *</label>
-                                <input type="text" class="form-control" id="company_name" name="company_name" 
-                                       value="<?php echo htmlspecialchars($company_name); ?>" required>
+                                    <input type="text" class="form-control" id="company_name" name="company_name" 
+                                        value="<?php echo htmlspecialchars((string)$company_name); ?>" required>
                             </div>
                             
                             <div class="col-md-6 mb-3">
                                 <label for="trade_license_no" class="form-label">Trade License No</label>
-                                <input type="text" class="form-control" id="trade_license_no" name="trade_license_no" 
-                                       value="<?php echo htmlspecialchars($trade_license_no); ?>">
+                                    <input type="text" class="form-control" id="trade_license_no" name="trade_license_no" 
+                                        value="<?php echo htmlspecialchars((string)$trade_license_no); ?>">
                             </div>
                             
                             <div class="col-md-6 mb-3">
@@ -142,8 +170,8 @@ ob_end_flush();
                                 <select class="form-control" id="country" name="country" required>
                                     <option value="">Select Country</option>
                                     <?php foreach($countries as $c): ?>
-                                        <option value="<?php echo $c; ?>" <?php echo ($country == $c) ? 'selected' : ''; ?>>
-                                            <?php echo $c; ?>
+                                        <option value="<?php echo htmlspecialchars((string)$c); ?>" <?php echo ($country == $c) ? 'selected' : ''; ?> >
+                                            <?php echo htmlspecialchars((string)$c); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -151,18 +179,18 @@ ob_end_flush();
                             
                             <div class="col-md-6 mb-3">
                                 <label for="emirate_zone" class="form-label">Emirate/Zone/State</label>
-                                <input type="text" class="form-control" id="emirate_zone" name="emirate_zone" 
-                                       value="<?php echo htmlspecialchars($emirate_zone); ?>">
+                                    <input type="text" class="form-control" id="emirate_zone" name="emirate_zone" 
+                                        value="<?php echo htmlspecialchars((string)$emirate_zone); ?>">
                             </div>
                             
                             <div class="col-12 mb-3">
                                 <label for="business_activity" class="form-label">Business Activity</label>
-                                <textarea class="form-control" id="business_activity" name="business_activity" rows="2"><?php echo htmlspecialchars($business_activity); ?></textarea>
+                                <textarea class="form-control" id="business_activity" name="business_activity" rows="2"><?php echo htmlspecialchars((string)$business_activity); ?></textarea>
                             </div>
                             
                             <div class="col-12 mb-3">
                                 <label for="address" class="form-label">Address</label>
-                                <textarea class="form-control" id="address" name="address" rows="2"><?php echo htmlspecialchars($address); ?></textarea>
+                                <textarea class="form-control" id="address" name="address" rows="2"><?php echo htmlspecialchars((string)$address); ?></textarea>
                             </div>
                             
                             <div class="col-md-12 mt-3">
@@ -173,26 +201,26 @@ ob_end_flush();
                             
                             <div class="col-md-6 mb-3">
                                 <label for="contact_name" class="form-label">Full Name *</label>
-                                <input type="text" class="form-control" id="contact_name" name="contact_name" 
-                                       value="<?php echo htmlspecialchars($contact_name); ?>" required>
+                                    <input type="text" class="form-control" id="contact_name" name="contact_name" 
+                                        value="<?php echo htmlspecialchars((string)$contact_name); ?>" required>
                             </div>
                             
                             <div class="col-md-6 mb-3">
                                 <label for="contact_designation" class="form-label">Designation</label>
-                                <input type="text" class="form-control" id="contact_designation" name="contact_designation" 
-                                       value="<?php echo htmlspecialchars($contact_designation); ?>">
+                                    <input type="text" class="form-control" id="contact_designation" name="contact_designation" 
+                                        value="<?php echo htmlspecialchars((string)$contact_designation); ?>">
                             </div>
                             
                             <div class="col-md-6 mb-3">
                                 <label for="contact_mobile" class="form-label">Mobile Number *</label>
-                                <input type="text" class="form-control" id="contact_mobile" name="contact_mobile" 
-                                       value="<?php echo htmlspecialchars($contact_mobile); ?>" required>
+                                    <input type="text" class="form-control" id="contact_mobile" name="contact_mobile" 
+                                        value="<?php echo htmlspecialchars((string)$contact_mobile); ?>" required>
                             </div>
                             
                             <div class="col-md-6 mb-3">
                                 <label for="contact_email" class="form-label">Email Address *</label>
-                                <input type="email" class="form-control" id="contact_email" name="contact_email" 
-                                       value="<?php echo htmlspecialchars($contact_email); ?>" required>
+                                    <input type="email" class="form-control" id="contact_email" name="contact_email" 
+                                        value="<?php echo htmlspecialchars((string)$contact_email); ?>" required>
                             </div>
                         </div>
 

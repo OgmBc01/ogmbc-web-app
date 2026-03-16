@@ -1,24 +1,34 @@
 <?php
-// Ensure client_id is defined
-if (!isset($client_id)) {
-    $client_id = $_SESSION['client_id'] ?? 0;
+// Ensure session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
+// Always set client_id from session
+$client_id = $_SESSION['client_id'] ?? 0;
 if ($client_id <= 0) {
-    echo '<div class="alert alert-danger">Invalid client ID</div>';
+    echo '<div class="alert alert-danger">Invalid or missing client session. Please log in again.</div>';
     return;
 }
 
 // Fetch client details with error handling
 $client = null;
-$query = "SELECT * FROM clients WHERE client_id = " . intval($client_id);
+// Try by user_id (most common mapping)
+$query = "SELECT * FROM clients WHERE user_id = " . intval($client_id);
 $result = mysqli_query($connection, $query);
 
 if ($result && mysqli_num_rows($result) > 0) {
     $client = mysqli_fetch_assoc($result);
 } else {
-    echo '<div class="alert alert-danger">Client not found</div>';
-    return;
+    // Fallback: try by client_id (legacy mapping)
+    $query = "SELECT * FROM clients WHERE client_id = " . intval($client_id);
+    $result = mysqli_query($connection, $query);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $client = mysqli_fetch_assoc($result);
+    } else {
+        echo '<div class="alert alert-danger">Client not found</div>';
+        return;
+    }
 }
 
 // Get activity summary

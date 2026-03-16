@@ -1,4 +1,16 @@
 <?php
+// Get the current user's user_id from session
+$user_id = $_SESSION['user_id'] ?? 0;
+$client_id = 0;
+if ($user_id > 0) {
+    // Fetch the actual client_id from the clients table
+    $result_client = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = " . intval($user_id));
+    if ($result_client && mysqli_num_rows($result_client) > 0) {
+        $row = mysqli_fetch_assoc($result_client);
+        $client_id = $row['client_id'];
+    }
+}
+
 // Initialize variables with default values
 $result = null;
 $counts = [
@@ -11,7 +23,7 @@ $counts = [
 
 // Check if support_tickets table exists
 $tables_check = mysqli_query($connection, "SHOW TABLES LIKE 'support_tickets'");
-if (mysqli_num_rows($tables_check) > 0) {
+if ($client_id > 0 && mysqli_num_rows($tables_check) > 0) {
     // Get all tickets for this client
     $query = "SELECT t.*, 
               COUNT(r.reply_id) as reply_count,
@@ -140,7 +152,7 @@ $counts['closed_count'] = $counts['closed_count'] ?? 0;
                             <tr>
                                 <td><strong>#<?php echo $ticket['ticket_id']; ?></strong></td>
                                 <td>
-                                    <a href="support.php?source=view&id=<?php echo $ticket['ticket_id']; ?>" class="text-decoration-none">
+                                    <a href="#" class="text-decoration-none" onclick="viewTicketDetails(<?php echo $ticket['ticket_id']; ?>); return false;">
                                         <?php echo htmlspecialchars($ticket['subject']); ?>
                                     </a>
                                 </td>
@@ -158,9 +170,9 @@ $counts['closed_count'] = $counts['closed_count'] ?? 0;
                                 </td>
                                 <td class="text-center"><?php echo $ticket['reply_count']; ?></td>
                                 <td>
-                                    <a href="support.php?source=view&id=<?php echo $ticket['ticket_id']; ?>" class="btn btn-sm btn-info" title="View">
+                                    <button class="btn btn-sm btn-info" onclick="viewTicketDetails(<?php echo $ticket['ticket_id']; ?>)" title="View">
                                         <i class="bi bi-eye"></i>
-                                    </a>
+                                    </button>
                                     <?php if ($ticket['status'] != 'closed'): ?>
                                     <button class="btn btn-sm btn-primary" onclick="openReplyModal(<?php echo $ticket['ticket_id']; ?>)" title="Reply">
                                         <i class="bi bi-reply"></i>
@@ -184,4 +196,82 @@ $counts['closed_count'] = $counts['closed_count'] ?? 0;
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- Ticket Details Modal -->
+    <div class="modal fade" id="ticketDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #0a2240; color: #f1bf70;">
+                    <h5 class="modal-title"><i class="bi bi-ticket me-2"></i>Ticket Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="ticketDetailsBody">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading ticket details...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function viewTicketDetails(ticketId) {
+        const modal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+        document.getElementById('ticketDetailsBody').innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading ticket details...</p>
+            </div>
+        `;
+        modal.show();
+        fetch('includes/ajax/get_ticket_details.php?ticket_id=' + ticketId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.ticket) {
+                    let html = `<div class="mb-3">
+                        <h5><span class="badge bg-primary">#${data.ticket.ticket_id}</span> ${escapeHtml(data.ticket.subject)}</h5>
+                        <div class="mb-2"><strong>Status:</strong> <span class="badge bg-info">${escapeHtml(data.ticket.status)}</span> &nbsp; <strong>Priority:</strong> <span class="badge bg-warning">${escapeHtml(data.ticket.priority)}</span></div>
+                        <div class="mb-2"><strong>Created:</strong> ${escapeHtml(data.ticket.created_at)}</div>
+                        <div class="mb-2"><strong>Message:</strong><br><div class="border rounded p-2 bg-light">${escapeHtml(data.ticket.message)}</div></div>
+                    </div>`;
+                    if (data.replies && data.replies.length > 0) {
+                        html += `<h6 class="mt-4 mb-2"><i class="bi bi-chat-dots me-1"></i>Replies</h6>`;
+                        html += `<div class="list-group mb-2">`;
+                        data.replies.forEach(function(reply) {
+                            html += `<div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold">${reply.is_staff == 1 ? 'Support' : 'You'}</span>
+                                    <small class="text-muted">${escapeHtml(reply.created_at)}</small>
+                                </div>
+                                <div>${escapeHtml(reply.message)}</div>
+                            </div>`;
+                        });
+                        html += `</div>`;
+                    } else {
+                        html += `<div class="alert alert-info">No replies yet.</div>`;
+                    }
+                    document.getElementById('ticketDetailsBody').innerHTML = html;
+                } else {
+                    document.getElementById('ticketDetailsBody').innerHTML = `<div class="alert alert-danger">${escapeHtml(data.message || 'Failed to load ticket details.')}</div>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('ticketDetailsBody').innerHTML = `<div class="alert alert-danger">Error loading ticket details. Please try again.</div>`;
+            });
+    }
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/[&<>"']/g, function(m) {
+            return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'})[m];
+        });
+    }
+    </script>
 </div>

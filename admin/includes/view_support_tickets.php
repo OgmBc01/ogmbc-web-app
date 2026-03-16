@@ -331,10 +331,13 @@ $tickets_result = mysqli_query($connection, $tickets_query);
                                                 <i class="bi bi-person-plus"></i>
                                             </button>
                                         <?php endif; ?>
-                                        <?php if ($can_manage_tickets): ?>
-                                            <button class="btn btn-outline-danger" onclick="confirmDelete(<?php echo $ticket['ticket_id']; ?>, '<?php echo htmlspecialchars($ticket['subject'], ENT_QUOTES); ?>')" title="Delete">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                        <button class="btn btn-outline-danger" onclick="confirmDelete(<?php echo $ticket['ticket_id']; ?>, '<?php echo htmlspecialchars($ticket['subject'], ENT_QUOTES); ?>')" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <?php if ($ticket['status'] !== 'closed'): ?>
+                                        <button class="btn btn-outline-dark" onclick="closeTicket(<?php echo $ticket['ticket_id']; ?>, '<?php echo htmlspecialchars($ticket['subject'], ENT_QUOTES); ?>')" title="Close Ticket">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -356,6 +359,26 @@ $tickets_result = mysqli_query($connection, $tickets_query);
             </div>
         </div>
     </div>
+
+            <!-- Close Ticket Confirmation Modal -->
+            <div class="modal fade" id="closeTicketModal" tabindex="-1" aria-labelledby="closeTicketModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="closeTicketModalLabel">Confirm Close Ticket</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to <strong>close</strong> ticket: <strong><span id="closeTicketSubject"></span></strong>?</p>
+                            <p class="text-warning"><small>This will mark the ticket as closed. You can reopen it later if needed.</small></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" id="confirmCloseBtn" class="btn btn-dark">Close Ticket</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 </div>
 
 <style>
@@ -415,3 +438,33 @@ $tickets_result = mysqli_query($connection, $tickets_query);
     padding: 40px 20px;
 }
 </style>
+
+<script>
+// Show close ticket confirmation modal
+function closeTicket(id, subject) {
+    document.getElementById('closeTicketSubject').textContent = subject;
+    const modal = new bootstrap.Modal(document.getElementById('closeTicketModal'));
+    document.getElementById('confirmCloseBtn').onclick = function() {
+        // AJAX call to close ticket
+        fetch('includes/ajax/close_ticket.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticket_id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Ticket closed successfully!', 'success');
+                setTimeout(() => { location.reload(); }, 1200);
+            } else {
+                showAlert(data.message || 'Failed to close ticket.', 'danger');
+            }
+        })
+        .catch(error => {
+            showAlert('Error: ' + error.message, 'danger');
+        });
+        modal.hide();
+    };
+    modal.show();
+}
+</script>

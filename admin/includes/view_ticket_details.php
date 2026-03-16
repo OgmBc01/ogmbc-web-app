@@ -107,6 +107,11 @@ switch($ticket['status']) {
                         <li><a class="dropdown-item" href="support_tickets.php?update_status=<?php echo $ticket_id; ?>&status=closed">Closed</a></li>
                     </ul>
                 </div>
+                <?php if ($ticket['status'] !== 'closed'): ?>
+                <button class="btn btn-dark me-2" onclick="closeTicket(<?php echo $ticket_id; ?>, '<?php echo htmlspecialchars($ticket['subject'], ENT_QUOTES); ?>')">
+                    <i class="bi bi-x-circle me-1"></i>Close Ticket
+                </button>
+                <?php endif; ?>
                 <?php if (!$ticket['assigned_to']): ?>
                     <button class="btn btn-warning" onclick="assignTicket(<?php echo $ticket_id; ?>)">
                         <i class="bi bi-person-plus me-1"></i>Assign
@@ -308,3 +313,55 @@ switch($ticket['status']) {
     line-height: 1.5;
 }
 </style>
+
+<script>
+// Show close ticket confirmation modal (reuses modal from view_support_tickets.php if present)
+function closeTicket(id, subject) {
+    // If modal doesn't exist, create it
+    if (!document.getElementById('closeTicketModal')) {
+        const modalHtml = `
+        <div class="modal fade" id="closeTicketModal" tabindex="-1" aria-labelledby="closeTicketModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title" id="closeTicketModalLabel">Confirm Close Ticket</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to <strong>close</strong> ticket: <strong><span id="closeTicketSubject"></span></strong>?</p>
+                        <p class="text-warning"><small>This will mark the ticket as closed. You can reopen it later if needed.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="confirmCloseBtn" class="btn btn-dark">Close Ticket</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    document.getElementById('closeTicketSubject').textContent = subject;
+    const modal = new bootstrap.Modal(document.getElementById('closeTicketModal'));
+    document.getElementById('confirmCloseBtn').onclick = function() {
+        fetch('includes/ajax/close_ticket.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticket_id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Ticket closed successfully!');
+                location.reload();
+            } else {
+                alert(data.message || 'Failed to close ticket.');
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+        modal.hide();
+    };
+    modal.show();
+}
+</script>

@@ -33,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($auth['success']) {
             // Check if this is a client (type_id 2)
             if ($auth['user']['type_id'] == 2) {
+                // Set client_id for client session
+                $_SESSION['client_id'] = $auth['user']['user_id'];
                 $redirect = getRedirectUrl($auth['user']);
                 header("Location: $redirect");
                 exit();

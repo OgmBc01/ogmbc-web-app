@@ -1,13 +1,18 @@
 <?php
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include 'includes/client_header.php';
 include 'includes/client_nav.php';
 include 'includes/client_sidebar.php';
 
-// if (!isset($_SESSION['client_id'])) {
-//     echo "<script>window.location.href = '../login.php';</script>";
-//     exit();
-// }
-
+// Set client_id from session
+if (!isset($_SESSION['client_id']) || empty($_SESSION['client_id'])) {
+    echo "<script>window.location.href = '../login.php';</script>";
+    exit();
+}
 $client_id = $_SESSION['client_id'];
 ?>
 

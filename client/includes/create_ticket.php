@@ -1,7 +1,18 @@
 <?php
 ob_start();
 
-$client_id = $_SESSION['user_id'] ?? 0; // Define client_id from session (user_id for clients)
+
+// Get the current user's user_id from session
+$user_id = $_SESSION['user_id'] ?? 0;
+$client_id = 0;
+if ($user_id > 0) {
+    // Fetch the actual client_id from the clients table
+    $result = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = " . intval($user_id));
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $client_id = $row['client_id'];
+    }
+}
 
 // Initialize variables
 $subject = '';

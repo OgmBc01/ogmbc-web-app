@@ -111,14 +111,14 @@
                 </a>
             </li>
 
-            <!-- Invoices (Optional) -->
+            <!-- Invoices (Optional)
             <li class="nav-item">
                 <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'invoices.php') ? 'active' : ''; ?>" 
                 href="invoices.php">
                     <i class="bi bi-receipt nav-icon"></i>
                     <span class="nav-text">Invoices</span>
                 </a>
-            </li>
+            </li> -->
 
             <!-- Profile -->
             <li class="nav-item">
