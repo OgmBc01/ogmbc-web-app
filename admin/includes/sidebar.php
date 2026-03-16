@@ -374,6 +374,43 @@
                 </ul>
             </li>
 
+            <!-- Support Tickets Menu with Dropdown -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'support_tickets.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                href="#" data-menu="support-tickets">
+                    <i class="bi bi-ticket nav-icon"></i>
+                    <span class="nav-text">Support Tickets</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="support-tickets-menu">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'support_tickets.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                        href="support_tickets.php">
+                            <i class="bi bi-list-ul nav-icon"></i>
+                            <span class="nav-text">All Tickets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="support_tickets.php?status=open">
+                            <i class="bi bi-envelope-open nav-icon"></i>
+                            <span class="nav-text">Open</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="support_tickets.php?status=in_progress">
+                            <i class="bi bi-arrow-repeat nav-icon"></i>
+                            <span class="nav-text">In Progress</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="support_tickets.php?priority=urgent">
+                            <i class="bi bi-exclamation-triangle nav-icon"></i>
+                            <span class="nav-text">Urgent</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Departments Menu with Dropdown -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'departments.php' && !isset($_GET['source'])) ? 'active-sub' : ''; ?>" 
