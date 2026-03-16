@@ -3,11 +3,18 @@ include 'includes/header.php';
 include 'includes/nav.php';
 include 'includes/sidebar.php';
 
+// Initialize session with security settings
+initSession();
+
+// Check if user is logged in
+if (!isLoggedIn()) {
+    header("Location: ../index.php");
+    exit();
+}
+
 // Check if user is admin
-$admin_roles = ['admin', 'super_admin', 'moderator', 'ceo_gm', 'admin_staff'];
-if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $admin_roles)) {
-    // Not authorized - redirect to home page
-    header("Location: ../index.php?error=access_denied");
+if (!isAdmin()) {
+    header("Location: ../index.php");
     exit();
 }
 

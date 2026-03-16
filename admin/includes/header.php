@@ -4,22 +4,23 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Redirect to site root if user is not authenticated or not in allowed admin roles
-$allowed_roles = ['admin', 'super_admin', 'moderator'];
-
 include '../includes/database.php';
 include 'functions.php';
 // Enforce inactivity timeout (30 minutes) for logged-in admin users
 enforce_session_timeout();
 
-// Enforce session and role-based redirects
-$allowed_roles = ['admin', 'super_admin', 'moderator'];
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ../index.php?error=session');
+// Initialize session with security settings
+initSession();
+
+// Check if user is logged in
+if (!isLoggedIn()) {
+    header("Location: ../index.php");
     exit();
 }
-if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $allowed_roles)) {
-    header('Location: ../index.php?error=permission');
+
+// Check if user is admin
+if (!isAdmin()) {
+    header("Location: ../index.php");
     exit();
 }
 ?>

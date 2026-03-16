@@ -105,13 +105,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
                 $new_user_id = mysqli_insert_id($connection);
                 // Only insert into employees table if user type is 'employee'
                 $is_employee = false;
+                $is_client = false;
+                $type_name = '';
                 if ($type_id !== 'NULL') {
                     // Fetch the type_name for the selected type_id
                     $type_check_query = "SELECT type_name FROM user_types WHERE type_id = $type_id LIMIT 1";
                     $type_check_result = mysqli_query($connection, $type_check_query);
                     if ($type_check_result && $type_row = mysqli_fetch_assoc($type_check_result)) {
-                        if (strtolower($type_row['type_name']) === 'employee') {
+                        $type_name = strtolower($type_row['type_name']);
+                        if ($type_name === 'employee') {
                             $is_employee = true;
+                        } else if ($type_name === 'client') {
+                            $is_client = true;
                         }
                     }
                 }
@@ -121,6 +126,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
                     $emp_stmt->bind_param("isssss", $new_user_id, $user_email, $hashed_password, $first_name, $last_name, $user_image);
                     $emp_stmt->execute();
                     $emp_stmt->close();
+                }
+                // Insert into clients table if user type is 'client'
+                if ($is_client) {
+                    $client_insert_query = "INSERT INTO clients (user_id, contact_name, contact_email, client_password, created_at) VALUES (?, ?, ?, ?, NOW())";
+                    $client_stmt = $connection->prepare($client_insert_query);
+                    $contact_name = trim($first_name . ' ' . $last_name);
+                    $client_stmt->bind_param("isss", $new_user_id, $contact_name, $user_email, $hashed_password);
+                    $client_stmt->execute();
+                    $client_stmt->close();
                 }
                 $showSuccessModal = true;
                 // Clear form data
