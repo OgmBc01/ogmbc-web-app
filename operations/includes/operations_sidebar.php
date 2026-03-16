@@ -160,6 +160,41 @@
             </ul>
         </li>
 
+        <!-- Support Tickets -->
+        <li class="nav-item">
+            <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'tickets.php') ? 'active' : ''; ?>" 
+            href="tickets.php">
+                <i class="bi bi-ticket nav-icon"></i>
+                <span class="nav-text">Support Tickets</span>
+                <?php
+                // Show count of open/high priority tickets
+                $ticket_count_query = "SELECT COUNT(*) as open_tickets 
+                                    FROM support_tickets 
+                                    WHERE assigned_to = " . $_SESSION['user_id'] . " 
+                                    AND status IN ('open', 'in_progress')";
+                $ticket_count_result = mysqli_query($connection, $ticket_count_query);
+                $open_tickets = mysqli_fetch_assoc($ticket_count_result)['open_tickets'];
+                if ($open_tickets > 0) {
+                    echo '<span class="badge bg-danger rounded-pill ms-2">' . $open_tickets . '</span>';
+                }
+                
+                // Show urgent tickets count (optional)
+                /*
+                $urgent_query = "SELECT COUNT(*) as urgent 
+                                FROM support_tickets 
+                                WHERE assigned_to = " . $_SESSION['user_id'] . " 
+                                AND priority = 'urgent' 
+                                AND status != 'closed'";
+                $urgent_result = mysqli_query($connection, $urgent_query);
+                $urgent_count = mysqli_fetch_assoc($urgent_result)['urgent'];
+                if ($urgent_count > 0) {
+                    echo '<span class="badge bg-warning rounded-pill ms-2">!</span>';
+                }
+                */
+                ?>
+            </a>
+        </li>
+
         <!-- Performance
         <li class="nav-item">
             <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'performance.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
@@ -214,54 +249,54 @@
         </li>
 
         <!-- Client Feedback with Dropdown -->
-<li class="nav-item">
-    <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'feedback.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
-       href="#" data-menu="feedback">
-        <i class="bi bi-star nav-icon"></i>
-        <span class="nav-text">Client Feedback</span>
-        <i class="bi bi-chevron-right menu-toggle"></i>
-        <?php
-        $new_feedback_query = "SELECT COUNT(*) as new_feedback 
-                               FROM client_feedback 
-                               WHERE employee_id = " . $_SESSION['user_id'] . " 
-                               AND is_validated = 1 
-                               AND is_rejected = 0
-                               AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
-        $new_feedback_result = mysqli_query($connection, $new_feedback_query);
-        $new_feedback = mysqli_fetch_assoc($new_feedback_result)['new_feedback'];
-        if ($new_feedback > 0) {
-            echo '<span class="badge bg-success rounded-pill ms-2">' . $new_feedback . '</span>';
-        }
-        ?>
-    </a>
-    <ul class="sub-menu" id="feedback-menu">
         <li class="nav-item">
-            <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'feedback.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
-               href="feedback.php">
-                <i class="bi bi-list-ul nav-icon"></i>
-                <span class="nav-text">All Feedback</span>
+            <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'feedback.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+            href="#" data-menu="feedback">
+                <i class="bi bi-star nav-icon"></i>
+                <span class="nav-text">Client Feedback</span>
+                <i class="bi bi-chevron-right menu-toggle"></i>
+                <?php
+                $new_feedback_query = "SELECT COUNT(*) as new_feedback 
+                                    FROM client_feedback 
+                                    WHERE employee_id = " . $_SESSION['user_id'] . " 
+                                    AND is_validated = 1 
+                                    AND is_rejected = 0
+                                    AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+                $new_feedback_result = mysqli_query($connection, $new_feedback_query);
+                $new_feedback = mysqli_fetch_assoc($new_feedback_result)['new_feedback'];
+                if ($new_feedback > 0) {
+                    echo '<span class="badge bg-success rounded-pill ms-2">' . $new_feedback . '</span>';
+                }
+                ?>
             </a>
+            <ul class="sub-menu" id="feedback-menu">
+                <li class="nav-item">
+                    <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'feedback.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
+                    href="feedback.php">
+                        <i class="bi bi-list-ul nav-icon"></i>
+                        <span class="nav-text">All Feedback</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="feedback.php?filter=positive">
+                        <i class="bi bi-emoji-smile nav-icon"></i>
+                        <span class="nav-text">Positive</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="feedback.php?filter=recent">
+                        <i class="bi bi-clock-history nav-icon"></i>
+                        <span class="nav-text">Recent</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="feedback.php?filter=high_rating">
+                        <i class="bi bi-star-fill nav-icon"></i>
+                        <span class="nav-text">High Rating (4-5⭐)</span>
+                    </a>
+                </li>
+            </ul>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="feedback.php?filter=positive">
-                <i class="bi bi-emoji-smile nav-icon"></i>
-                <span class="nav-text">Positive</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="feedback.php?filter=recent">
-                <i class="bi bi-clock-history nav-icon"></i>
-                <span class="nav-text">Recent</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="feedback.php?filter=high_rating">
-                <i class="bi bi-star-fill nav-icon"></i>
-                <span class="nav-text">High Rating (4-5⭐)</span>
-            </a>
-        </li>
-    </ul>
-</li>
 
         <!-- Notifications Menu -->
         <li class="nav-item">
