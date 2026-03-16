@@ -78,12 +78,54 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
         </div>
     </div>
 
-    <!-- Users Table -->
+    <!-- Users Table with Filtering -->
     <div class="card shadow-sm">
         <div class="card-header">
             <h5 class="mb-0"><i class="bi bi-people me-2"></i>All Users</h5>
         </div>
         <div class="card-body">
+            <!-- Filter Form -->
+            <form method="GET" class="row g-3 mb-4 align-items-end" style="background: #f8f9fa; border-radius: 8px; padding: 16px;">
+                <div class="col-md-2">
+                    <label for="filter_username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="filter_username" name="filter_username" value="<?php echo htmlspecialchars($_GET['filter_username'] ?? ''); ?>">
+                </div>
+                <div class="col-md-2">
+                    <label for="filter_email" class="form-label">Email</label>
+                    <input type="text" class="form-control" id="filter_email" name="filter_email" value="<?php echo htmlspecialchars($_GET['filter_email'] ?? ''); ?>">
+                </div>
+                <div class="col-md-2">
+                    <label for="filter_role" class="form-label">Role</label>
+                    <select class="form-select" id="filter_role" name="filter_role">
+                        <option value="">All</option>
+                        <?php mysqli_data_seek($role_stats_result, 0); while($role = mysqli_fetch_assoc($role_stats_result)): ?>
+                        <option value="<?php echo $role['role_name']; ?>" <?php if(($_GET['filter_role'] ?? '') == $role['role_name']) echo 'selected'; ?>><?php echo htmlspecialchars($role['role_name']); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filter_type" class="form-label">Type</label>
+                    <select class="form-select" id="filter_type" name="filter_type">
+                        <option value="">All</option>
+                        <?php mysqli_data_seek($type_stats_result, 0); while($type = mysqli_fetch_assoc($type_stats_result)): ?>
+                        <option value="<?php echo $type['type_name']; ?>" <?php if(($_GET['filter_type'] ?? '') == $type['type_name']) echo 'selected'; ?>><?php echo htmlspecialchars($type['type_name']); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filter_status" class="form-label">Status</label>
+                    <select class="form-select" id="filter_status" name="filter_status">
+                        <option value="">All</option>
+                        <option value="active" <?php if(($_GET['filter_status'] ?? '') == 'active') echo 'selected'; ?>>Active</option>
+                        <option value="inactive" <?php if(($_GET['filter_status'] ?? '') == 'inactive') echo 'selected'; ?>>Inactive</option>
+                        <option value="suspended" <?php if(($_GET['filter_status'] ?? '') == 'suspended') echo 'selected'; ?>>Suspended</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary mb-2"><i class="bi bi-funnel me-1"></i> Filter</button>
+                    <a href="users.php" class="btn btn-outline-secondary"><i class="bi bi-x-circle me-1"></i> Clear</a>
+                </div>
+            </form>
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead>
@@ -102,16 +144,38 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
                     </thead>
                     <tbody>
                         <?php  
+                        // Build filter conditions
+                        $where = [];
+                        if (!empty($_GET['filter_username'])) {
+                            $username = mysqli_real_escape_string($connection, $_GET['filter_username']);
+                            $where[] = "u.username LIKE '%$username%'";
+                        }
+                        if (!empty($_GET['filter_email'])) {
+                            $email = mysqli_real_escape_string($connection, $_GET['filter_email']);
+                            $where[] = "u.user_email LIKE '%$email%'";
+                        }
+                        if (!empty($_GET['filter_role'])) {
+                            $role = mysqli_real_escape_string($connection, $_GET['filter_role']);
+                            $where[] = "r.role_name = '$role'";
+                        }
+                        if (!empty($_GET['filter_type'])) {
+                            $type = mysqli_real_escape_string($connection, $_GET['filter_type']);
+                            $where[] = "t.type_name = '$type'";
+                        }
+                        if (!empty($_GET['filter_status'])) {
+                            $status = mysqli_real_escape_string($connection, $_GET['filter_status']);
+                            $where[] = "u.user_status = '$status'";
+                        }
+                        $where_sql = count($where) ? ('WHERE ' . implode(' AND ', $where)) : '';
                         $query = "SELECT u.*, 
                                   r.role_name, r.role_level,
                                   t.type_name
                                   FROM users u
                                   LEFT JOIN user_roles r ON u.role_id = r.role_id
                                   LEFT JOIN user_types t ON u.type_id = t.type_id
+                                  $where_sql
                                   ORDER BY u.user_id DESC";
-                        
                         $result = mysqli_query($connection, $query);
-                        
                         if (!$result) {
                             echo "<tr><td colspan='10' class='text-center text-danger'>Error: " . mysqli_error($connection) . "</td></tr>";
                         } else if (mysqli_num_rows($result) == 0) {
@@ -127,10 +191,9 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
                                 } elseif ($user['role_level'] >= 50) {
                                     $role_class = 'info';
                                 }
-                                
                                 $status_class = $user['user_status'] == 'active' ? 'success' : 'warning';
                                 ?>
-                                <tr>
+                                <tr data-user-id="<?php echo $user['user_id']; ?>">
                                     <td><?php echo $user['user_id']; ?></td>
                                     <td>
                                         <img src="../images/<?php echo $user['user_image'] ?: 'default.jpg'; ?>" 
@@ -159,8 +222,6 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
                                     </td>
                                     <td><span class="badge bg-<?php echo $status_class; ?>"><?php echo $user['user_status']; ?></span></td>
                                     <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
-
-                                    <!-- In the actions column, update the delete button -->
                                     <td>
                                         <button class="btn btn-sm btn-info" onclick="viewUser(<?php echo $user['user_id']; ?>)" title="View Details">
                                             <i class="bi bi-eye"></i>

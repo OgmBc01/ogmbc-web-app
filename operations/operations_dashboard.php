@@ -3,12 +3,7 @@ include 'includes/operations_header.php';
 include 'includes/operations_nav.php';
 include 'includes/operations_sidebar.php';
 
-// Check authentication
-if (!isset($_SESSION['user_id'])) {
-    echo "<script>window.location.href = '../login.php';</script>";
-    exit();
-}
-
+// Set user_id from session (operations employee)
 $user_id = $_SESSION['user_id'];
 $today = date('Y-m-d');
 

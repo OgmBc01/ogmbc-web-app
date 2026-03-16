@@ -129,10 +129,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
                 }
                 // Insert into clients table if user type is 'client'
                 if ($is_client) {
-                    $client_insert_query = "INSERT INTO clients (user_id, contact_name, contact_email, client_password, created_at) VALUES (?, ?, ?, ?, NOW())";
-                    $client_stmt = $connection->prepare($client_insert_query);
                     $contact_name = trim($first_name . ' ' . $last_name);
-                    $client_stmt->bind_param("isss", $new_user_id, $contact_name, $user_email, $hashed_password);
+                    $company_name = $contact_name; // or use a placeholder
+                    $country = 'UAE'; // or use a relevant default
+                    $contact_mobile = '0000000000'; // placeholder, should be updated later
+                    $client_password = $hashed_password;
+                    $contact_email = $user_email;
+                    // Insert required NOT NULL columns, let others default to NULL/default
+                    $client_insert_query = "INSERT INTO clients (user_id, company_name, country, contact_name, contact_mobile, contact_email, client_password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+                    $client_stmt = $connection->prepare($client_insert_query);
+                    $client_stmt->bind_param("issssss", $new_user_id, $company_name, $country, $contact_name, $contact_mobile, $contact_email, $client_password);
                     $client_stmt->execute();
                     $client_stmt->close();
                 }

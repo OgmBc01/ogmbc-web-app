@@ -1,25 +1,27 @@
 <?php
-// Start session and enforce admin-area authorization before any output
+// Start session and enforce operations-area authorization before any output
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Redirect to site root if user is not authenticated or not in allowed admin roles
-$allowed_roles = ['admin', 'super_admin', 'moderator'];
-
 include '../includes/database.php';
 include 'operations_functions.php';
-// Enforce inactivity timeout (30 minutes) for logged-in admin users
+
+// Enforce inactivity timeout (30 minutes) for logged-in users
 enforce_session_timeout();
 
-// Enforce session and role-based redirects
-$allowed_roles = ['admin', 'super_admin', 'moderator'];
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ../index.php?error=session');
+// Initialize session with security settings
+initSession();
+
+// Check if user is logged in
+if (!isLoggedIn()) {
+    header("Location: ../index.php");
     exit();
 }
-if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], $allowed_roles)) {
-    header('Location: ../index.php?error=permission');
+
+// Check specific role (operations access)
+if (!isOperations()) {
+    header("Location: ../index.php");
     exit();
 }
 ?>
