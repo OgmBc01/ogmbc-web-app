@@ -103,8 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
             
             if (mysqli_query($connection, $insert_query)) {
                 $new_user_id = mysqli_insert_id($connection);
-                // Only insert into employees table if user type is 'employee'
-                $is_employee = false;
+                // Only insert into employees table if user type is 'operations' (type_id=1)
+                $is_operations = false;
                 $is_client = false;
                 $type_name = '';
                 if ($type_id !== 'NULL') {
@@ -113,17 +113,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
                     $type_check_result = mysqli_query($connection, $type_check_query);
                     if ($type_check_result && $type_row = mysqli_fetch_assoc($type_check_result)) {
                         $type_name = strtolower($type_row['type_name']);
-                        if ($type_name === 'employee') {
-                            $is_employee = true;
-                        } else if ($type_name === 'client') {
+                        if ($type_name === 'operations' || $type_id == 1) {
+                            $is_operations = true;
+                        } else if ($type_name === 'client' || $type_id == 2) {
                             $is_client = true;
                         }
                     }
                 }
-                if ($is_employee) {
-                    $emp_insert_query = "INSERT INTO employees (user_id, user_email, password, first_name, last_name, user_image, department_id, created_at) VALUES (?, ?, ?, ?, ?, ?, NULL, NOW())";
+                if ($is_operations) {
+                    $emp_insert_query = "INSERT INTO employees (user_id, user_email, password, first_name, last_name, user_image, department_id, created_at, user_type) VALUES (?, ?, ?, ?, ?, ?, NULL, NOW(), ?)";
                     $emp_stmt = $connection->prepare($emp_insert_query);
-                    $emp_stmt->bind_param("isssss", $new_user_id, $user_email, $hashed_password, $first_name, $last_name, $user_image);
+                    $user_type = 'operations';
+                    $emp_stmt->bind_param("issssss", $new_user_id, $user_email, $hashed_password, $first_name, $last_name, $user_image, $user_type);
                     $emp_stmt->execute();
                     $emp_stmt->close();
                 }

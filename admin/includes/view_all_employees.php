@@ -1,7 +1,7 @@
 <?php
 // Suppress PHP errors for AJAX endpoints
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // Check if user is logged in and has appropriate permissions
 if (!isset($_SESSION['user_id'])) {
@@ -27,7 +27,7 @@ $salary_result = $connection->query($salary_sql);
 $salary_stats = $salary_result->fetch_assoc();
 
 // Build the main query with filters applied
-$where_conditions = ["e.user_type = 'employee'"];
+$where_conditions = ["(u.type_id = 1 OR t.type_name = 'operations')"];
 $params = [];
 $types = "";
 
@@ -130,15 +130,17 @@ if (!$result) {
 }
 
 // Get statistics for filtered results
+// Add LEFT JOIN user_types t for stats query to match main query
 $stats_sql = "SELECT 
-                COUNT(*) as total_employees,
-                SUM(CASE WHEN u.user_status = 'active' THEN 1 ELSE 0 END) as active_employees,
-                COUNT(DISTINCT r.role_name) as role_count,
-                COUNT(DISTINCT e.department_id) as department_count
-              FROM employees e
-              INNER JOIN users u ON e.user_id = u.user_id
-              LEFT JOIN user_roles r ON u.role_id = r.role_id
-              WHERE " . $where_clause;
+                                COUNT(*) as total_employees,
+                                SUM(CASE WHEN u.user_status = 'active' THEN 1 ELSE 0 END) as active_employees,
+                                COUNT(DISTINCT r.role_name) as role_count,
+                                COUNT(DISTINCT e.department_id) as department_count
+                            FROM employees e
+                            INNER JOIN users u ON e.user_id = u.user_id
+                            LEFT JOIN user_roles r ON u.role_id = r.role_id
+                            LEFT JOIN user_types t ON u.type_id = t.type_id
+                            WHERE " . $where_clause;
               
 if (!empty($params)) {
     $stmt_stats = $connection->prepare($stats_sql);
