@@ -33,8 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($auth['success']) {
             // Check if this is a client (type_id 2)
             if ($auth['user']['type_id'] == 2) {
-                // Set client_id for client session
-                $_SESSION['client_id'] = $auth['user']['user_id'];
+                // Fetch the real client_id for this user
+                $q = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = " . intval($auth['user']['user_id']));
+                if ($q && mysqli_num_rows($q) > 0) {
+                    $row = mysqli_fetch_assoc($q);
+                    $_SESSION['client_id'] = $row['client_id'];
+                } else {
+                    // fallback: use user_id (legacy, but not recommended)
+                    $_SESSION['client_id'] = $auth['user']['user_id'];
+                }
                 $redirect = getRedirectUrl($auth['user']);
                 header("Location: $redirect");
                 exit();
