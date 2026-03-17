@@ -1,7 +1,15 @@
 <?php
 ob_start();
 
-$client_id = $_SESSION['client_id'];
+$user_id = $_SESSION['user_id'];
+$client_id = 0;
+// Fetch client_id from clients table using user_id
+$client_query = "SELECT client_id FROM clients WHERE user_id = $user_id LIMIT 1";
+$client_result = mysqli_query($connection, $client_query);
+if ($client_result && mysqli_num_rows($client_result) > 0) {
+    $row = mysqli_fetch_assoc($client_result);
+    $client_id = (int)$row['client_id'];
+}
 $engagement_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Initialize variables
@@ -43,33 +51,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
     $rating = (int)$_POST['rating'];
     $feedback_text = mysqli_real_escape_string($connection, trim($_POST['feedback_text']));
     $is_public = isset($_POST['is_public']) ? 1 : 0;
-    
+
     // Validation
     if (empty($engagement_id) || empty($feedback_text)) {
         $message = "Please fill in all required fields.";
         $message_type = "danger";
+    } else if ($client_id == 0) {
+        $message = "Your client account does not exist. Please contact support.";
+        $message_type = "danger";
     } else {
-        // Check if feedback already exists for this engagement
-        $check_query = "SELECT feedback_id FROM client_feedback WHERE engagement_id = $engagement_id AND client_id = $client_id";
-        $check_result = mysqli_query($connection, $check_query);
-        
-        if (mysqli_num_rows($check_result) > 0) {
-            $message = "You have already submitted feedback for this engagement.";
+        // Check if user_id exists in users table
+        $user_check_query = "SELECT user_id FROM users WHERE user_id = $user_id";
+        $user_check_result = mysqli_query($connection, $user_check_query);
+        if (mysqli_num_rows($user_check_result) == 0) {
+            $message = "Your user account does not exist. Please contact support.";
             $message_type = "danger";
         } else {
-            // Insert feedback
-            $insert_query = "INSERT INTO client_feedback 
-                            (client_id, engagement_id, employee_id, feedback_text, rating, is_public, is_positive, created_by)
-                            VALUES 
-                            ($client_id, $engagement_id, 
-                             (SELECT assigned_to FROM engagements WHERE engagement_id = $engagement_id),
-                             '$feedback_text', $rating, $is_public, 1, $client_id)";
-            
-            if (mysqli_query($connection, $insert_query)) {
-                $showSuccessModal = true;
-            } else {
-                $message = "Error submitting feedback: " . mysqli_error($connection);
+            // Check if feedback already exists for this engagement
+            $check_query = "SELECT feedback_id FROM client_feedback WHERE engagement_id = $engagement_id AND client_id = $client_id";
+            $check_result = mysqli_query($connection, $check_query);
+            if (mysqli_num_rows($check_result) > 0) {
+                $message = "You have already submitted feedback for this engagement.";
                 $message_type = "danger";
+            } else {
+                // Insert feedback
+                $insert_query = "INSERT INTO client_feedback 
+                                (client_id, engagement_id, employee_id, feedback_text, rating, is_public, is_positive, created_by)
+                                VALUES 
+                                ($client_id, $engagement_id, 
+                                 (SELECT assigned_to FROM engagements WHERE engagement_id = $engagement_id),
+                                 '$feedback_text', $rating, $is_public, 1, $user_id)";
+                if (mysqli_query($connection, $insert_query)) {
+                    $showSuccessModal = true;
+                } else {
+                    $message = "Error submitting feedback: " . mysqli_error($connection);
+                    $message_type = "danger";
+                }
             }
         }
     }

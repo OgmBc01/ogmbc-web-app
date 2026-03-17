@@ -45,7 +45,17 @@ if (!$result || mysqli_num_rows($result) == 0) {
     exit();
 }
 
+
 $engagement = mysqli_fetch_assoc($result);
+
+// Fetch all documents for this engagement (assignment-specific)
+$docs_query = "SELECT * FROM client_files WHERE engagement_id = $engagement_id ORDER BY uploaded_at DESC";
+$docs_result = mysqli_query($connection, $docs_query);
+
+// Fetch all documents uploaded by this client (across all their engagements)
+$client_id = (int)$engagement['client_id'];
+$client_docs_query = "SELECT * FROM client_files WHERE client_id = $client_id ORDER BY uploaded_at DESC";
+$client_docs_result = mysqli_query($connection, $client_docs_query);
 
 // Get evidence
 $evidence_query = "SELECT * FROM evidence WHERE engagement_id = $engagement_id ORDER BY uploaded_at DESC";
@@ -327,6 +337,107 @@ $overdue_days = abs($engagement['days_remaining']);
             <?php endif; ?>
 
             <!-- Evidence Section -->
+                        <!-- Assignment/Engagement Documents Section -->
+                        <div class="info-card mb-4">
+                            <h6 class="info-title">
+                                <i class="bi bi-folder2-open me-2"></i>Documents for This Engagement
+                            </h6>
+                            <div class="info-content">
+                                <?php if ($docs_result && mysqli_num_rows($docs_result) > 0): ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>File Name</th>
+                                                    <th>Description</th>
+                                                    <th>Uploaded By</th>
+                                                    <th>Type</th>
+                                                    <th>Size</th>
+                                                    <th>Date</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php while($doc = mysqli_fetch_assoc($docs_result)): ?>
+                                                <tr>
+                                                    <td><strong><?php echo htmlspecialchars($doc['file_name']); ?></strong></td>
+                                                    <td><?php echo htmlspecialchars($doc['description']); ?></td>
+                                                    <td>
+                                                        <span class="badge bg-<?php echo $doc['uploaded_by'] === 'client' ? 'primary' : 'secondary'; ?>">
+                                                            <?php echo ucfirst($doc['uploaded_by']); ?> 
+                                                        </span>
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($doc['file_type']); ?></td>
+                                                    <td><?php echo $doc['file_size'] ? round($doc['file_size']/1024, 1) . ' KB' : '-'; ?></td>
+                                                    <td><?php echo date('M d, Y H:i', strtotime($doc['uploaded_at'])); ?></td>
+                                                    <td>
+                                                        <a href="../../../../uploads/client_files/<?php echo rawurlencode($doc['file_path']); ?>" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                                    </td>
+                                                </tr>
+                                                <?php endwhile; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-muted text-center mb-0">No documents uploaded for this engagement.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- All Client Documents Section -->
+                        <div class="info-card mb-4">
+                            <h6 class="info-title">
+                                <i class="bi bi-folder-symlink me-2"></i>All Documents Uploaded by This Client
+                            </h6>
+                            <div class="info-content">
+                                <?php if ($client_docs_result && mysqli_num_rows($client_docs_result) > 0): ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>File Name</th>
+                                                    <th>Description</th>
+                                                    <th>Engagement</th>
+                                                    <th>Uploaded By</th>
+                                                    <th>Type</th>
+                                                    <th>Size</th>
+                                                    <th>Date</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php while($doc = mysqli_fetch_assoc($client_docs_result)): ?>
+                                                <tr>
+                                                    <td><strong><?php echo htmlspecialchars($doc['file_name']); ?></strong></td>
+                                                    <td><?php echo htmlspecialchars($doc['description']); ?></td>
+                                                    <td>
+                                                        <?php if ($doc['engagement_id']): ?>
+                                                            <a href="view_engagement_details.php?id=<?php echo (int)$doc['engagement_id']; ?>">#<?php echo (int)$doc['engagement_id']; ?></a>
+                                                        <?php else: ?>
+                                                            <span class="text-muted">-</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-<?php echo $doc['uploaded_by'] === 'client' ? 'primary' : 'secondary'; ?>">
+                                                            <?php echo ucfirst($doc['uploaded_by']); ?> 
+                                                        </span>
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($doc['file_type']); ?></td>
+                                                    <td><?php echo $doc['file_size'] ? round($doc['file_size']/1024, 1) . ' KB' : '-'; ?></td>
+                                                    <td><?php echo date('M d, Y H:i', strtotime($doc['uploaded_at'])); ?></td>
+                                                    <td>
+                                                        <a href="../../../../uploads/client_files/<?php echo rawurlencode($doc['file_path']); ?>" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                                    </td>
+                                                </tr>
+                                                <?php endwhile; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-muted text-center mb-0">No documents uploaded by this client.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
             <div class="info-card mb-4">
                 <h6 class="info-title">
                     <i class="bi bi-file-earmark me-2"></i>Evidence

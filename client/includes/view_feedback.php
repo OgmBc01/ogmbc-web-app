@@ -1,7 +1,19 @@
+
 <?php
-// Ensure client_id is defined
-if (!isset($client_id)) {
-    $client_id = $_SESSION['client_id'] ?? 0;
+// Ensure $connection is available and session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Always get client_id for the logged-in user
+$user_id = $_SESSION['user_id'] ?? 0;
+$client_id = 0;
+if ($user_id > 0) {
+    $client_query = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = $user_id LIMIT 1");
+    if ($client_query && mysqli_num_rows($client_query) > 0) {
+        $row = mysqli_fetch_assoc($client_query);
+        $client_id = (int)$row['client_id'];
+    }
 }
 
 if ($client_id <= 0) {

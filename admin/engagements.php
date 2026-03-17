@@ -44,8 +44,7 @@ if (isset($_GET['delete'])) {
         }
     }
     
-    header("Location: engagements.php");
-    exit();
+    // No redirect, just show the message
 }
 
 /* ===============================

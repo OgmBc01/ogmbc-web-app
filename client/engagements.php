@@ -32,7 +32,7 @@ $client_id = $_SESSION['client_id'];
                 }
 
                 switch($source) {
-                    case 'view_details';
+                    case 'view_details':
                         include "includes/view_engagement_details.php";
                         break;
                     case 'upload_file';

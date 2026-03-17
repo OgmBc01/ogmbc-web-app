@@ -152,29 +152,57 @@ ob_end_flush();
 
                     <!-- Upload Form -->
                     <div class="upload-area" id="uploadArea">
-                        <form method="POST" action="" enctype="multipart/form-data" id="uploadForm">
-                            <div class="upload-box text-center p-5" id="dropZone">
-                                <i class="bi bi-cloud-arrow-up display-1 text-muted"></i>
-                                <h5 class="mt-3">Drag & Drop Files Here</h5>
-                                <p class="text-muted">or</p>
-                                <label for="evidence_file" class="btn btn-primary">
-                                    <i class="bi bi-folder2-open me-2"></i>Browse Files
-                                </label>
-                                <input type="file" id="evidence_file" name="evidence_file" style="display: none;" 
-                                       accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
-                                <p class="text-muted small mt-3">
-                                    <i class="bi bi-info-circle me-1"></i>
-                                    Max file size: 10MB | Allowed: PDF, JPG, PNG, GIF, DOC, DOCX
-                                </p>
-                                <div id="fileInfo" class="mt-3 text-start" style="display: none;"></div>
+                        <?php if ($engagement['status'] === 'CLOSED'): ?>
+                            <div class="alert alert-warning text-center my-4">
+                                <i class="bi bi-lock-fill me-2"></i>
+                                This engagement is <strong>closed</strong>. Uploading new evidence is no longer allowed.
                             </div>
-                            
-                            <div class="text-center mt-4">
-                                <button type="submit" name="upload_evidence" class="btn btn-success btn-lg" id="uploadBtn" disabled>
-                                    <i class="bi bi-cloud-upload me-2"></i>Upload File
-                                </button>
-                            </div>
-                        </form>
+                            <form method="POST" action="" enctype="multipart/form-data" id="uploadForm">
+                                <div class="upload-box text-center p-5" id="dropZone" style="pointer-events: none; opacity: 0.6;">
+                                    <i class="bi bi-cloud-arrow-up display-1 text-muted"></i>
+                                    <h5 class="mt-3">Drag & Drop Files Here</h5>
+                                    <p class="text-muted">or</p>
+                                    <label for="evidence_file" class="btn btn-primary disabled" aria-disabled="true">
+                                        <i class="bi bi-folder2-open me-2"></i>Browse Files
+                                    </label>
+                                    <input type="file" id="evidence_file" name="evidence_file" style="display: none;" disabled 
+                                           accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
+                                    <p class="text-muted small mt-3">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Max file size: 10MB | Allowed: PDF, JPG, PNG, GIF, DOC, DOCX
+                                    </p>
+                                    <div id="fileInfo" class="mt-3 text-start" style="display: none;"></div>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <button type="submit" name="upload_evidence" class="btn btn-success btn-lg" id="uploadBtn" disabled>
+                                        <i class="bi bi-cloud-upload me-2"></i>Upload File
+                                    </button>
+                                </div>
+                            </form>
+                        <?php else: ?>
+                            <form method="POST" action="" enctype="multipart/form-data" id="uploadForm">
+                                <div class="upload-box text-center p-5" id="dropZone">
+                                    <i class="bi bi-cloud-arrow-up display-1 text-muted"></i>
+                                    <h5 class="mt-3">Drag & Drop Files Here</h5>
+                                    <p class="text-muted">or</p>
+                                    <label for="evidence_file" class="btn btn-primary">
+                                        <i class="bi bi-folder2-open me-2"></i>Browse Files
+                                    </label>
+                                    <input type="file" id="evidence_file" name="evidence_file" style="display: none;" 
+                                           accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
+                                    <p class="text-muted small mt-3">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Max file size: 10MB | Allowed: PDF, JPG, PNG, GIF, DOC, DOCX
+                                    </p>
+                                    <div id="fileInfo" class="mt-3 text-start" style="display: none;"></div>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <button type="submit" name="upload_evidence" class="btn btn-success btn-lg" id="uploadBtn" disabled>
+                                        <i class="bi bi-cloud-upload me-2"></i>Upload File
+                                    </button>
+                                </div>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

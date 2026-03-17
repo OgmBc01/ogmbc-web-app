@@ -1,4 +1,15 @@
+
 <?php
+// Ensure session is started and $connection is available
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Get the logged-in employee's user_id from session
+$user_id = $_SESSION['user_id'] ?? 0;
+
+$employee_id = $user_id;
+
 // Get filter parameters
 $type_filter = isset($_GET['type']) ? $_GET['type'] : '';
 $source_filter = isset($_GET['source']) ? $_GET['source'] : '';
@@ -6,7 +17,7 @@ $month_filter = isset($_GET['month']) ? (int)$_GET['month'] : 0;
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : $current_year;
 
 // Build where clause
-$where = ["employee_id = $user_id"];
+$where = ["employee_id = $employee_id"];
 
 if (!empty($type_filter)) {
     $where[] = "points_type = '" . mysqli_real_escape_string($connection, $type_filter) . "'";
@@ -35,11 +46,12 @@ $totals = mysqli_fetch_assoc($total_result);
 $net = $totals['total_earned'] - $totals['total_deducted'];
 
 // Get distinct years for filter
-$years_query = "SELECT DISTINCT YEAR(created_at) as year FROM points_ledger WHERE employee_id = $user_id ORDER BY year DESC";
+
+$years_query = "SELECT DISTINCT YEAR(created_at) as year FROM points_ledger WHERE employee_id = $employee_id ORDER BY year DESC";
 $years_result = mysqli_query($connection, $years_query);
 
 // Get distinct sources for filter
-$sources_query = "SELECT DISTINCT source_type FROM points_ledger WHERE employee_id = $user_id ORDER BY source_type";
+$sources_query = "SELECT DISTINCT source_type FROM points_ledger WHERE employee_id = $employee_id ORDER BY source_type";
 $sources_result = mysqli_query($connection, $sources_query);
 
 // Pagination

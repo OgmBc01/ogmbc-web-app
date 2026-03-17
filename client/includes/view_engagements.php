@@ -183,7 +183,9 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                 <div class="card h-100 shadow-sm">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span class="badge bg-<?php echo $status_class; ?>"><?php echo $status_text; ?></span>
-                        <small class="text-muted">#<?php echo $eng['engagement_id']; ?></small>
+                        <a href="engagements.php?source=view_details&id=<?php echo $eng['engagement_id']; ?>" class="text-decoration-none fw-bold" style="color: #0a2240;">
+                            ENG-<?php echo date('dmy', strtotime($eng['created_at'])); ?>-<?php echo $eng['engagement_id']; ?>
+                        </a>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title"><?php echo htmlspecialchars($eng['title']); ?></h5>

@@ -93,6 +93,15 @@ $requests_query = "SELECT dcr.*,
                    ORDER BY dcr.created_at DESC";
 $requests_result = mysqli_query($connection, $requests_query);
 
+// Fetch all documents for this engagement (assignment-specific)
+$docs_query = "SELECT * FROM client_files WHERE engagement_id = $engagement_id ORDER BY uploaded_at DESC";
+$docs_result = mysqli_query($connection, $docs_query);
+
+// Fetch all documents uploaded by this client (across all their engagements)
+$client_id = (int)$engagement['client_id'];
+$client_docs_query = "SELECT * FROM client_files WHERE client_id = $client_id ORDER BY uploaded_at DESC";
+$client_docs_result = mysqli_query($connection, $client_docs_query);
+
 ob_end_flush();
 ?>
 
@@ -374,7 +383,253 @@ ob_end_flush();
             </div>
             <?php endif; ?>
 
+            <!-- Comments Section -->
+            <?php
+            // Fetch comments for this engagement
+            $comments_query = "SELECT c.*, 
+                              CONCAT(u.first_name, ' ', u.last_name) as user_name,
+                              u.user_image,
+                              u.user_email
+                              FROM task_comments c
+                              LEFT JOIN users u ON c.user_id = u.user_id
+                              WHERE c.engagement_id = $engagement_id
+                              ORDER BY c.created_at DESC";
+            $comments_result = mysqli_query($connection, $comments_query);
+            // Handle new comment submission
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_comment'])) {
+                $comment_text = mysqli_real_escape_string($connection, trim($_POST['comment_text']));
+                $user_id = (int)$_SESSION['user_id'];
+                if (!empty($comment_text)) {
+                    $insert_query = "INSERT INTO task_comments (engagement_id, user_id, comment, created_at) 
+                                   VALUES ($engagement_id, $user_id, '$comment_text', NOW())";
+                    if (mysqli_query($connection, $insert_query)) {
+                        echo '<script>window.location.reload();</script>';
+                        exit();
+                    }
+                }
+            }
+            ?>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Comments & Discussion</h6>
+                    <span class="badge bg-primary"><?php echo mysqli_num_rows($comments_result); ?> comments</span>
+                </div>
+                <div class="card-body">
+                    <!-- Add Comment Form -->
+                    <form method="POST" action="" class="mb-4">
+                        <div class="input-group">
+                            <input type="text" name="comment_text" class="form-control" 
+                                   placeholder="Type your comment here..." required maxlength="1000">
+                            <button type="submit" name="submit_comment" class="btn btn-primary">
+                                <i class="bi bi-send me-1"></i>Post Comment
+                            </button>
+                        </div>
+                        <small class="text-muted mt-1"><i class="bi bi-info-circle"></i> Maximum 1000 characters</small>
+                    </form>
+                    <!-- Comments List -->
+                    <?php if ($comments_result && mysqli_num_rows($comments_result) > 0): ?>
+                        <div class="comments-timeline">
+                            <?php while($comment = mysqli_fetch_assoc($comments_result)):
+                                $is_admin = ($comment['user_id'] != $engagement['client_id']);
+                                $avatar_url = !empty($comment['user_image']) 
+                                    ? '../images/' . $comment['user_image'] 
+                                    : 'https://ui-avatars.com/api/?name=' . urlencode($comment['user_name'] ?? 'User') . '&background=f1bf70&color=0a2240&size=40';
+                            ?>
+                            <div class="comment-item mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 me-3">
+                                        <img src="<?php echo $avatar_url; ?>" 
+                                             alt="<?php echo htmlspecialchars($comment['user_name'] ?? 'User'); ?>"
+                                             class="rounded-circle" width="40" height="40"
+                                             onerror="this.src='https://ui-avatars.com/api/?name=User&background=f1bf70&color=0a2240&size=40'">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div>
+                                                <strong class="me-2"><?php echo htmlspecialchars($comment['user_name'] ?? 'Unknown User'); ?></strong>
+                                                <?php if ($is_admin): ?>
+                                                    <span class="badge bg-primary-soft text-primary" style="background: rgba(241,191,112,0.1);">Operations</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-success-soft text-success" style="background: rgba(40,167,69,0.1);">Client</span>
+                                                <?php endif; ?>
+                                            </div>
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock me-1"></i>
+                                                <?php echo date('M d, Y H:i', strtotime($comment['created_at'])); ?>
+                                            </small>
+                                        </div>
+                                        <div class="comment-content p-3 rounded" style="background: #f8f9fa;">
+                                            <p class="mb-0"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endwhile; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center py-4">
+                            <i class="bi bi-chat display-4 text-muted"></i>
+                            <p class="text-muted mt-2">No comments yet. Start the discussion!</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+<style>
+/* Comments Section Styles */
+.comments-timeline {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.comment-item {
+    transition: transform 0.2s;
+}
+
+.comment-item:hover {
+    transform: translateX(5px);
+}
+
+.comment-content {
+    border-left: 3px solid #f1bf70;
+    transition: all 0.2s;
+}
+
+.comment-content:hover {
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Custom badge backgrounds */
+.bg-primary-soft {
+    background: rgba(241, 191, 112, 0.1);
+}
+.bg-success-soft {
+    background: rgba(40, 167, 69, 0.1);
+}
+
+/* Scrollbar styling */
+.comments-timeline::-webkit-scrollbar {
+    width: 6px;
+}
+
+.comments-timeline::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.comments-timeline::-webkit-scrollbar-thumb {
+    background: #f1bf70;
+    border-radius: 10px;
+}
+
+.comments-timeline::-webkit-scrollbar-thumb:hover {
+    background: #e5b465;
+}
+</style>
+
             <!-- Evidence Section -->
+                        <!-- Assignment/Engagement Documents Section -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="bi bi-folder2-open me-2"></i>Documents for This Engagement</h6>
+                            </div>
+                            <div class="card-body">
+                                <?php if ($docs_result && mysqli_num_rows($docs_result) > 0): ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>File Name</th>
+                                                    <th>Description</th>
+                                                    <th>Uploaded By</th>
+                                                    <th>Type</th>
+                                                    <th>Size</th>
+                                                    <th>Date</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php while($doc = mysqli_fetch_assoc($docs_result)): ?>
+                                                <tr>
+                                                    <td><strong><?php echo htmlspecialchars($doc['file_name']); ?></strong></td>
+                                                    <td><?php echo htmlspecialchars($doc['description']); ?></td>
+                                                    <td>
+                                                        <span class="badge bg-<?php echo $doc['uploaded_by'] === 'client' ? 'primary' : 'secondary'; ?>">
+                                                            <?php echo ucfirst($doc['uploaded_by']); ?> 
+                                                        </span>
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($doc['file_type']); ?></td>
+                                                    <td><?php echo $doc['file_size'] ? round($doc['file_size']/1024, 1) . ' KB' : '-'; ?></td>
+                                                    <td><?php echo date('M d, Y H:i', strtotime($doc['uploaded_at'])); ?></td>
+                                                    <td>
+                                                        <a href="../uploads/client_files/<?php echo rawurlencode($doc['file_path']); ?>" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                                    </td>
+                                                </tr>
+                                                <?php endwhile; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-muted text-center mb-0">No documents uploaded for this engagement.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- All Client Documents Section -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="bi bi-folder-symlink me-2"></i>All Documents Uploaded by This Client</h6>
+                            </div>
+                            <div class="card-body">
+                                <?php if ($client_docs_result && mysqli_num_rows($client_docs_result) > 0): ?>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>File Name</th>
+                                                    <th>Description</th>
+                                                    <th>Engagement</th>
+                                                    <th>Uploaded By</th>
+                                                    <th>Type</th>
+                                                    <th>Size</th>
+                                                    <th>Date</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php while($doc = mysqli_fetch_assoc($client_docs_result)): ?>
+                                                <tr>
+                                                    <td><strong><?php echo htmlspecialchars($doc['file_name']); ?></strong></td>
+                                                    <td><?php echo htmlspecialchars($doc['description']); ?></td>
+                                                    <td>
+                                                        <?php if ($doc['engagement_id']): ?>
+                                                            <a href="view_engagement.php?id=<?php echo (int)$doc['engagement_id']; ?>">#<?php echo (int)$doc['engagement_id']; ?></a>
+                                                        <?php else: ?>
+                                                            <span class="text-muted">-</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-<?php echo $doc['uploaded_by'] === 'client' ? 'primary' : 'secondary'; ?>">
+                                                            <?php echo ucfirst($doc['uploaded_by']); ?> 
+                                                        </span>
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($doc['file_type']); ?></td>
+                                                    <td><?php echo $doc['file_size'] ? round($doc['file_size']/1024, 1) . ' KB' : '-'; ?></td>
+                                                    <td><?php echo date('M d, Y H:i', strtotime($doc['uploaded_at'])); ?></td>
+                                                    <td>
+                                                        <a href="../uploads/client_files/<?php echo rawurlencode($doc['file_path']); ?>" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                                    </td>
+                                                </tr>
+                                                <?php endwhile; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="text-muted text-center mb-0">No documents uploaded by this client.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h6 class="mb-0"><i class="bi bi-file-earmark me-2"></i>Evidence Uploaded</h6>
@@ -502,7 +757,7 @@ ob_end_flush();
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <?php if ($request['status'] == 'PENDING' && ($_SESSION['user_role'] == 'CEO_GM' || $_SESSION['user_role'] == 'ADMIN_STAFF')): ?>
+                                        <?php if ($request['status'] == 'PENDING'): ?>
                                             <a href="engagements.php?approve_request=<?php echo $request['request_id']; ?>" class="btn btn-sm btn-success" onclick="return confirm('Approve this deadline change?')">
                                                 <i class="bi bi-check-lg"></i> Approve
                                             </a>

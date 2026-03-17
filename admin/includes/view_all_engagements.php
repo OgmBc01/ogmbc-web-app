@@ -245,26 +245,20 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                                         <button class="btn btn-sm btn-info" onclick="viewEngagement(<?php echo $engagement['engagement_id']; ?>)" title="View Details">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        
                                         <?php if ($engagement['status'] != 'CLOSED'): ?>
                                             <a href="engagements.php?source=edit_engagement&id=<?php echo $engagement['engagement_id']; ?>" class="btn btn-sm btn-warning" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            
                                             <a href="engagements.php?source=upload_evidence&id=<?php echo $engagement['engagement_id']; ?>" class="btn btn-sm btn-success" title="Upload Evidence">
                                                 <i class="bi bi-upload"></i>
                                             </a>
-                                            
                                             <a href="engagements.php?source=request_deadline_change&id=<?php echo $engagement['engagement_id']; ?>" class="btn btn-sm btn-primary" title="Request Deadline Change">
                                                 <i class="bi bi-calendar-plus"></i>
                                             </a>
                                         <?php endif; ?>
-                                        
-                                        <?php if ($_SESSION['user_role'] == 'CEO_GM' || $_SESSION['user_role'] == 'ADMIN_STAFF'): ?>
                                         <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $engagement['engagement_id']; ?>, '<?php echo htmlspecialchars($engagement['title'], ENT_QUOTES); ?>')" title="Delete">
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <?php

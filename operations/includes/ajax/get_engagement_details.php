@@ -259,6 +259,19 @@ ob_start();
                     <div class="file-info">
                         <span class="file-name"><?php echo htmlspecialchars($file['file_name']); ?></span>
                         <small class="text-muted">Uploaded on <?php echo date('M d, Y', strtotime($file['uploaded_at'])); ?></small>
+                        <?php 
+                        // Evidence status badge
+                        $status = 'Pending';
+                        $badge = 'warning';
+                        if (isset($file['status'])) {
+                            if ($file['status'] == 'APPROVED') { $status = 'Approved'; $badge = 'success'; }
+                            elseif ($file['status'] == 'REJECTED') { $status = 'Rejected'; $badge = 'danger'; }
+                        } elseif (isset($file['is_validated'])) {
+                            if ($file['is_validated'] == 1) { $status = 'Approved'; $badge = 'success'; }
+                            elseif ($file['is_validated'] == 0) { $status = 'Pending'; $badge = 'warning'; }
+                        }
+                        ?>
+                        <span class="badge bg-<?php echo $badge; ?> ms-2"><?php echo $status; ?></span>
                     </div>
                     <a href="../uploads/evidence/<?php echo $file['file_path']; ?>" class="btn btn-sm btn-outline-primary" download>
                         <i class="bi bi-download"></i>
@@ -274,20 +287,20 @@ ob_start();
     <div class="info-card">
         <h6 class="info-title"><i class="bi bi-chat me-2"></i>Comments</h6>
         <div class="info-content">
-            <!-- Comment Form -->
-            <form class="comment-form mb-3" onsubmit="addComment(event, <?php echo $engagement_id; ?>)">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="commentText" placeholder="Add a comment..." required>
-                    <button class="btn btn-primary" type="submit">
-                        <i class="bi bi-send"></i>
-                    </button>
-                </div>
-            </form>
+            <!-- Comment Button -->
+            <div class="mb-3">
+                <a href="engagements.php?source=view&id=<?php echo $engagement_id; ?>" class="btn btn-primary w-100">
+                    <i class="bi bi-chat"></i> Comment
+                </a>
+            </div>
             
             <!-- Comments List -->
-            <div class="comments-list">
+            <div class="comments-list" style="max-height: 220px; overflow-y: auto;">
                 <?php if (!empty($comments)): ?>
-                    <?php foreach($comments as $comment): ?>
+                    <?php 
+                    // Show most recent comments first
+                    $display_comments = array_slice($comments, 0, 20); // show up to 20, but scroller will show 4
+                    foreach($display_comments as $comment): ?>
                     <div class="comment-item">
                         <strong><?php echo htmlspecialchars($comment['user_name']); ?></strong>
                         <small class="text-muted"><?php echo date('M d, H:i', strtotime($comment['created_at'])); ?></small>
@@ -413,31 +426,7 @@ ob_start();
 }
 </style>
 
-<script>
-function addComment(event, engagementId) {
-    event.preventDefault();
-    const commentText = document.getElementById('commentText').value;
-    
-    fetch('includes/ajax/add_comment.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'engagement_id=' + engagementId + '&comment=' + encodeURIComponent(commentText)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Error adding comment: ' + data.message);
-        }
-    })
-    .catch(error => {
-        alert('Error adding comment');
-    });
-}
-</script>
+<!-- No comment JS needed: comment button links to full details page. -->
 
 <?php
 $html = ob_get_clean();

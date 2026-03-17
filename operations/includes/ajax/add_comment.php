@@ -51,12 +51,12 @@ if (empty($comment)) {
     exit;
 }
 
-// Verify engagement belongs to this user
-$check_query = "SELECT engagement_id FROM engagements WHERE engagement_id = $engagement_id AND assigned_to = $user_id";
+// Verify engagement exists
+$check_query = "SELECT engagement_id FROM engagements WHERE engagement_id = $engagement_id";
 $check_result = mysqli_query($connection, $check_query);
 
 if (!$check_result || mysqli_num_rows($check_result) == 0) {
-    echo json_encode(['success' => false, 'message' => 'Engagement not found or access denied']);
+    echo json_encode(['success' => false, 'message' => 'Engagement not found']);
     exit;
 }
 

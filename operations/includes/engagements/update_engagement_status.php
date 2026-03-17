@@ -133,8 +133,15 @@ function calculate_engagement_points($connection, $engagement_id) {
     // Add to points ledger
     $ledger = "INSERT INTO points_ledger 
                (employee_id, source_type, source_id, points, points_type, description, created_by)
-               VALUES ({$data['assigned_to']}, 'ENGAGEMENT', $engagement_id, $points, 'EARNED', 
-               'Points awarded for completing engagement: {$data['title']}', {$data['assigned_to']})";
+               VALUES (
+                   {$data['assigned_to']}, 
+                   'ENGAGEMENT', 
+                   " . ($engagement_id !== null ? $engagement_id : 'NULL') . ", 
+                   $points, 
+                   'EARNED', 
+                   'Points awarded for completing engagement: {$data['title']}', 
+                   {$data['assigned_to']}
+               )";
     mysqli_query($connection, $ledger);
 }
 

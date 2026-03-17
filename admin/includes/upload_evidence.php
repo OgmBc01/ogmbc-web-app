@@ -113,7 +113,7 @@ if (isset($_GET['validate']) && is_numeric($_GET['validate'])) {
     $evidence_id = (int)$_GET['validate'];
     
     // Check if user is reviewer
-    if ($engagement['reviewer_id'] == $_SESSION['user_id'] || $_SESSION['user_role'] == 'CEO_GM' || $_SESSION['user_role'] == 'ADMIN_STAFF') {
+    if ($engagement['reviewer_id'] == $_SESSION['user_id']) {
         $update_query = "UPDATE evidence SET is_validated = 1, validated_by = {$_SESSION['user_id']}, validated_at = NOW() WHERE evidence_id = $evidence_id";
         mysqli_query($connection, $update_query);
         
@@ -237,7 +237,7 @@ ob_end_flush();
                                                     <a href="../uploads/evidence/<?php echo $evidence['file_path']; ?>" class="btn btn-sm btn-info" target="_blank" title="Download">
                                                         <i class="bi bi-download"></i>
                                                     </a>
-                                                    <?php if ((!isset($evidence['is_validated']) || !$evidence['is_validated']) && ($engagement['reviewer_id'] == $_SESSION['user_id'] || $_SESSION['user_role'] == 'CEO_GM' || $_SESSION['user_role'] == 'ADMIN_STAFF')): ?>
+                                                    <?php if ((!isset($evidence['is_validated']) || !$evidence['is_validated']) && ($engagement['reviewer_id'] == $_SESSION['user_id'])): ?>
                                                         <a href="engagements.php?source=upload_evidence&id=<?php echo $engagement_id; ?>&validate=<?php echo $evidence['evidence_id']; ?>" class="btn btn-sm btn-success" title="Validate" onclick="return confirm('Mark this evidence as validated?')">
                                                             <i class="bi bi-check-lg"></i>
                                                         </a>
