@@ -307,6 +307,48 @@
             </a>
         </li> -->
 
+        <!-- Activities / Timesheet -->
+        <li class="nav-item">
+            <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'activities.php') ? 'active' : ''; ?>" 
+            href="#" data-menu="activities">
+                <i class="bi bi-calendar-check nav-icon"></i>
+                <span class="nav-text">My Activities</span>
+                <i class="bi bi-chevron-right menu-toggle"></i>
+            </a>
+            <ul class="sub-menu" id="activities-menu">
+                <li class="nav-item">
+                    <a class="nav-link" href="activities.php#daily">
+                        <i class="bi bi-calendar-day nav-icon"></i>
+                        <span class="nav-text">Daily Log</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="activities.php#tasks">
+                        <i class="bi bi-list-check nav-icon"></i>
+                        <span class="nav-text">My Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="activities.php#schedule">
+                        <i class="bi bi-calendar-week nav-icon"></i>
+                        <span class="nav-text">Weekly Schedule</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="activities.php#expenses">
+                        <i class="bi bi-cash-stack nav-icon"></i>
+                        <span class="nav-text">Expenses</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="activities.php#reports">
+                        <i class="bi bi-file-earmark-spreadsheet nav-icon"></i>
+                        <span class="nav-text">Reports</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- Profile -->
         <li class="nav-item">
             <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'profile.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
