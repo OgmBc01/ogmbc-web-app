@@ -255,6 +255,36 @@
                 </ul>
             </li>
 
+            <!-- Employee Activities Menu -->
+            <li class="nav-item">
+                <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'employee_activities.php') ? 'active' : ''; ?>" 
+                href="#" data-menu="employee-activities">
+                    <i class="bi bi-calendar-check nav-icon"></i>
+                    <span class="nav-text">Employee Activities</span>
+                    <i class="bi bi-chevron-right menu-toggle"></i>
+                </a>
+                <ul class="sub-menu" id="employee-activities-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="employee_activities.php">
+                            <i class="bi bi-list-ul nav-icon"></i>
+                            <span class="nav-text">All Activities</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="employee_activities.php?tab=expenses&status=Pending">
+                            <i class="bi bi-cash-stack nav-icon"></i>
+                            <span class="nav-text">Pending Expenses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="employee_activities.php?tab=reports&report_type=monthly">
+                            <i class="bi bi-file-earmark-spreadsheet nav-icon"></i>
+                            <span class="nav-text">Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- Points Ledger Menu with Dropdown -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'points_ledger.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 

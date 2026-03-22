@@ -35,16 +35,18 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    echo json_encode(['success' => false, 'message' => 'Invalid employee ID']);
+    echo json_encode(['success' => false, 'message' => 'Invalid employee or user ID']);
     exit;
 }
 
-$employee_id = (int)$_GET['id'];
+$id = (int)$_GET['id'];
 
-// Updated query to join with users, departments, user_roles, and user_types tables
+// Try to find by employee_id first, then by user_id
 $sql = "SELECT 
             e.*, 
+            u.user_id,
             u.username,
             u.user_status,
             u.created_at as user_created_at,
@@ -61,10 +63,10 @@ $sql = "SELECT
         LEFT JOIN departments d ON e.department_id = d.id
         LEFT JOIN user_roles r ON u.role_id = r.role_id
         LEFT JOIN user_types t ON u.type_id = t.type_id
-        WHERE e.employee_id = ?";
+        WHERE e.employee_id = ? OR u.user_id = ?";
 
 $stmt = $connection->prepare($sql);
-$stmt->bind_param("i", $employee_id);
+$stmt->bind_param("ii", $id, $id);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -73,9 +75,18 @@ if ($result && $employee = $result->fetch_assoc()) {
     $employee = array_map(function($value) {
         return $value === null ? '' : $value;
     }, $employee);
+    $html = '<div class="mb-2"><strong>Name:</strong> ' . htmlspecialchars($employee['first_name'] . ' ' . $employee['last_name']) . '</div>';
+    $html .= '<div class="mb-2"><strong>Username:</strong> ' . htmlspecialchars($employee['username']) . '</div>';
+    $html .= '<div class="mb-2"><strong>Department:</strong> ' . htmlspecialchars($employee['department_name']) . '</div>';
+    $html .= '<div class="mb-2"><strong>Role:</strong> ' . htmlspecialchars($employee['role_name']) . '</div>';
+    $html .= '<div class="mb-2"><strong>User Status:</strong> ' . htmlspecialchars($employee['user_status']) . '</div>';
+    $html .= '<div class="mb-2"><strong>Type:</strong> ' . htmlspecialchars($employee['type_name']) . '</div>';
+    $email = isset($employee['email']) ? $employee['email'] : (isset($employee['user_email']) ? $employee['user_email'] : '');
+    $html .= '<div class="mb-2"><strong>Email:</strong> ' . htmlspecialchars($email) . '</div>';
+    $html .= '<div class="mb-2"><strong>Joined:</strong> ' . htmlspecialchars($employee['user_created_at']) . '</div>';
     echo json_encode([
         'success' => true,
-        'employee' => $employee
+        'html' => $html
     ]);
 } else {
     echo json_encode([
