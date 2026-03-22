@@ -139,6 +139,18 @@ $satisfaction_rate = $feedback['total_feedback'] > 0
                             </p>
                         </div>
                         <div class="col-md-4 text-md-end">
+                            <div class="page-navigation-group mb-2">
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="page_navigation" id="nav_dashboard" autocomplete="off" checked onclick="window.location.href='operations_dashboard.php'">
+                                    <label class="btn btn-light active" for="nav_dashboard">
+                                        <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                                    </label>
+                                    <input type="radio" class="btn-check" name="page_navigation" id="nav_performers" autocomplete="off" onclick="window.location.href='operations_perfromers.php'">
+                                    <label class="btn btn-outline-light" for="nav_performers">
+                                        <i class="bi bi-trophy-fill me-1"></i> Top Performers
+                                    </label>
+                                </div>
+                            </div>
                             <span class="current-date">
                                 <i class="bi bi-calendar3 me-2"></i><?php echo date('l, F j, Y'); ?>
                             </span>

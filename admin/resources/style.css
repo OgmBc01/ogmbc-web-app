@@ -1,4 +1,4 @@
-        :root {
+:root {
             --dark-blue: #0f172a;
             --medium-blue: #1e293b;
             --light-blue: #334155;
@@ -758,51 +758,71 @@
 }
 
 .stat-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
-    padding: 20px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 18px 18px 10px 0;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    border: none;
+    border-left: 6px solid #007bff; /* Default blue, overridden below */
+    height: 100%;
+    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    position: relative;
+}
+.stat-card.stat-blue { border-left-color: #007bff; }
+.stat-card.stat-green { border-left-color: #28a745; }
+.stat-card.stat-teal { border-left-color: #17a2b8; }
+
+.stat-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    transform: translateY(-3px) scale(1.01);
+    border-left-width: 8px;
+}
+.stat-card-body {
     display: flex;
     align-items: center;
-    color: white;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    gap: 18px;
+    padding: 0;
 }
-
-.stat-card:nth-child(2) {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.stat-card:nth-child(3) {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-.stat-card:nth-child(4) {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-}
-
 .stat-icon {
-    font-size: 2.5rem;
-    margin-right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-right: 8px;
+    color: inherit;
+    box-shadow: none;
 }
-
-.stat-details h3 {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin-bottom: 5px;
+.stat-card.stat-blue .stat-icon,
+.stat-card.stat-green .stat-icon,
+.stat-card.stat-teal .stat-icon {
+    background: none !important;
 }
-
-.stat-number {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin: 0;
+.stat-content {
+    flex: 1;
 }
-
-.chart-container {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    height: 300px;
-    margin-bottom: 30px;
+.stat-value {
+    font-size: 2.1rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+    color: #1a2240;
+    line-height: 1.1;
+    letter-spacing: 0.5px;
+}
+.stat-label {
+    color: #495057;
+    margin-bottom: 4px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+.stat-progress {
+    font-size: 0.97rem;
+    margin-top: 2px;
+    color: #6c757d;
 }
 
 /* Badge styles */

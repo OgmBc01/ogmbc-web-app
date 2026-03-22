@@ -275,6 +275,18 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 <div class="main-content" id="mainContent">
     <div class="container-fluid">
         
+        <!-- Dashboard/Performers Switcher -->
+        <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-end align-items-center">
+                <div class="btn-group" role="group" aria-label="Dashboard Switcher">
+                    <input type="radio" class="btn-check" name="dashboardSwitcher" id="dashboardRadio" autocomplete="off" checked onclick="window.location.href='dashboard.php'">
+                    <label class="btn btn-outline-primary" for="dashboardRadio">Dashboard</label>
+                    <input type="radio" class="btn-check" name="dashboardSwitcher" id="performersRadio" autocomplete="off" onclick="window.location.href='performers.php'">
+                    <label class="btn btn-outline-primary" for="performersRadio">Top Performers</label>
+                </div>
+            </div>
+        </div>
+
         <!-- Welcome Header with Date -->
         <div class="row mb-4">
             <div class="col-12">
@@ -1007,6 +1019,15 @@ function refreshActivity() {
 
 <style>
 /* Modern Dashboard Styles */
+.btn-group .btn-check:checked + .btn-outline-primary,
+.btn-group .btn-check:checked + .btn-primary {
+    background: #0a2240;
+    color: #fff;
+    font-weight: 600;
+    border-color: #0a2240;
+    box-shadow: 0 2px 8px rgba(10,34,64,0.10);
+    transition: background 0.2s, color 0.2s;
+}
 .welcome-card {
     background: linear-gradient(135deg, #0a2240 0%, #1a3a5a 100%);
     border-radius: 20px;

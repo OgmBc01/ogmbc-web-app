@@ -50,8 +50,7 @@ if (!isAdmin()) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Please enter your password to access Bank Accounts module.</p>
-                <form id="authForm">
+?>
                     <div class="mb-3">
                         <label for="user_password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="user_password" name="user_password" required>

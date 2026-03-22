@@ -87,16 +87,16 @@ $stmt->close();
                                     </h5>
                                     <div class="info-item">
                                         <span class="info-label"><i class="bi bi-shield me-2"></i>User Role</span>
-                                        <span class="info-value badge bg-primary"><?php echo htmlspecialchars($user['user_role']); ?></span>
+                                        <span class="info-value badge bg-primary"><?php echo htmlspecialchars($user['user_role'] ?? ''); ?></span>
                                     </div>
                                     <div class="info-item">
                                         <span class="info-label"><i class="bi bi-person-workspace me-2"></i>User Type</span>
-                                        <span class="info-value badge bg-info"><?php echo htmlspecialchars($user['user_type']); ?></span>
+                                        <span class="info-value badge bg-info"><?php echo htmlspecialchars($user['user_type'] ?? ''); ?></span>
                                     </div>
                                     <div class="info-item">
                                         <span class="info-label"><i class="bi bi-circle-fill me-2"></i>Account Status</span>
-                                        <span class="info-value badge bg-<?php echo $user['user_status'] === 'active' ? 'success' : 'secondary'; ?>">
-                                            <?php echo htmlspecialchars($user['user_status']); ?>
+                                        <span class="info-value badge bg-<?php echo ($user['user_status'] ?? '') === 'active' ? 'success' : 'secondary'; ?>">
+                                            <?php echo htmlspecialchars($user['user_status'] ?? ''); ?>
                                         </span>
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@ $stmt->close();
                         </div>
 
                         <!-- Employee Information (if applicable) -->
-                        <?php if ($user['user_type'] === 'employee'): ?>
+                        <?php if (isset($user['user_type']) && $user['user_type'] === 'employee'): ?>
                         <div class="row mt-3">
                             <div class="col-12">
                                 <div class="info-card employee-info">
