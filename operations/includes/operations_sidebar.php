@@ -58,15 +58,6 @@
             </ul>
         </li>
 
-        <!-- Tasks (Kanban/Board View) -->
-        <li class="nav-item">
-            <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'tasks.php') ? 'active' : ''; ?>" 
-               href="tasks.php">
-                <i class="bi bi-kanban nav-icon"></i>
-                <span class="nav-text">Task Board</span>
-            </a>
-        </li>
-
         <!-- Clients -->
         <li class="nav-item">
             <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'clients.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
@@ -298,7 +289,7 @@
             </ul>
         </li>
 
-        <!-- Notifications Menu -->
+        <!-- Notifications Menu
         <li class="nav-item">
             <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'notifications.php') ? 'active' : ''; ?>" 
             href="notifications.php">
@@ -314,7 +305,7 @@
                 }
                 ?>
             </a>
-        </li>
+        </li> -->
 
         <!-- Profile -->
         <li class="nav-item">

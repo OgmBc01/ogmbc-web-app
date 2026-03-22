@@ -66,7 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
             if ($evidence_count == 0) {
                 $message = "Cannot submit engagement without uploading required evidence.";
                 $message_type = "danger";
-                ob_end_flush();
+                if (ob_get_level() > 0) {
+                    ob_end_flush();
+                }
             }
         }
         
@@ -132,7 +134,7 @@ function calculate_engagement_points($connection, $engagement_id) {
     
     // Add to points ledger
     $ledger = "INSERT INTO points_ledger 
-               (employee_id, source_type, source_id, points, points_type, description, created_by)
+               (employee_id, source_type, source_id, points, points_type, description, notes, created_by)
                VALUES (
                    {$data['assigned_to']}, 
                    'ENGAGEMENT', 
@@ -140,12 +142,15 @@ function calculate_engagement_points($connection, $engagement_id) {
                    $points, 
                    'EARNED', 
                    'Points awarded for completing engagement: {$data['title']}', 
+                   '',
                    {$data['assigned_to']}
                )";
     mysqli_query($connection, $ledger);
 }
 
-ob_end_flush();
+if (ob_get_level() > 0) {
+    ob_end_flush();
+}
 ?>
 
 <div class="container-fluid">

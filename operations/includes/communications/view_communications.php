@@ -460,7 +460,7 @@ $communications_result = mysqli_query($connection, $communications_query);
 
 /* Pro Tip Card - Gradient */
 .gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(90deg, #0a2240 0%, #003366 100%) !important;
     color: #fff;
     border-radius: 18px;
     box-shadow: 0 6px 24px rgba(102, 126, 234, 0.18);

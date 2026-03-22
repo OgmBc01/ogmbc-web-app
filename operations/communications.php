@@ -348,7 +348,7 @@ function showSuccess(message) {
 <!-- Dashboard Theme Styles -->
 <style>
 .welcome-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #0a2240 0%, #003366 100%);
     border-radius: 20px;
     padding: 30px;
     color: white;

@@ -136,4 +136,31 @@ function confirmDelete(id, title) {
 }
 </script>
 
+<style>
+.welcome-card {
+    background: linear-gradient(135deg, #0a2342 0%, #193a5e 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(10, 35, 66, 0.18);
+}
+.welcome-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.welcome-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 1.4rem;
+    }
+    .welcome-card {
+        padding: 18px;
+    }
+}
+</style>
 <?php include 'includes/operations_footer.php'; ?>

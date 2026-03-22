@@ -182,11 +182,11 @@ function showSuccess(message) {
 <!-- Dashboard Theme Styles (from operations_dashboard.php) -->
 <style>
 .welcome-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a2240 0%, #1a3a5a 100%);
     border-radius: 20px;
     padding: 30px;
     color: white;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 30px rgba(10, 34, 64, 0.3);
 }
 .welcome-title {
     font-size: 1.8rem;

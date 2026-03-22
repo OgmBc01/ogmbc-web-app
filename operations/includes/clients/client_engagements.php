@@ -247,7 +247,7 @@ $stats = mysqli_fetch_assoc($stats_result);
 }
 
 .pro-tip-card.engagements-tip {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a2634 100%);
+    background: linear-gradient(90deg, #0a2240 0%, #003366 100%);
     border-radius: 16px;
     padding: 20px;
     color: white;

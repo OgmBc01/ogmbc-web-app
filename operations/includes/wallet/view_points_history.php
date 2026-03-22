@@ -1,3 +1,8 @@
+/* Gradient Background Utility */
+.gradient-bg {
+    background: linear-gradient(90deg, #0a2240 0%, #003366 100%) !important;
+    color: #fff !important;
+}
 
 <?php
 // Ensure session is started and $connection is available
@@ -388,6 +393,15 @@ $transactions_result = mysqli_query($connection, $transactions_query);
 
 .empty-state i {
     color: #dee2e6;
+}
+
+/* Pro Tip Card Gradient */
+.pro-tip-card {
+    background: linear-gradient(90deg, #0a2240 0%, #003366 100%);
+    color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+    padding: 20px;
 }
 
 /* Badge background utilities */

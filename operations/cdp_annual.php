@@ -15,18 +15,6 @@ $user_id = $_SESSION['user_id'];
 ?>
 <div class="main-content" id="mainContent">
     <div class="container-fluid">
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="welcome-card">
-                    <h2 class="welcome-title">
-                        <i class="bi bi-mortarboard me-2"></i>Annual CDP Summary
-                    </h2>
-                    <p class="welcome-subtitle">
-                        View your annual career development progress, uplifts, and achievements here.
-                    </p>
-                </div>
-            </div>
-        </div>
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm">

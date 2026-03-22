@@ -1,19 +1,16 @@
 <?php
-ob_start();
+
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    ob_end_clean();
-    header("Location: ../login.php");
-    exit();
+    $_SESSION['error_message'] = "You must be logged in to access this page.";
+    // No redirect, just show error message
 }
 
 // Get engagement ID from URL
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['error_message'] = "Invalid engagement ID.";
-    ob_end_clean();
-    header("Location: engagements.php");
-    exit();
+    // No redirect, just show error message
 }
 
 $engagement_id = (int)$_GET['id'];
@@ -31,9 +28,7 @@ $result = mysqli_query($connection, $query);
 
 if (!$result || mysqli_num_rows($result) == 0) {
     $_SESSION['error_message'] = "Engagement not found.";
-    ob_end_clean();
-    header("Location: engagements.php");
-    exit();
+    // No redirect, just show error message
 }
 
 $engagement = mysqli_fetch_assoc($result);
@@ -41,9 +36,7 @@ $engagement = mysqli_fetch_assoc($result);
 // Check if engagement can be edited (not closed)
 if ($engagement['status'] == 'CLOSED') {
     $_SESSION['error_message'] = "Closed engagements cannot be edited.";
-    ob_end_clean();
-    header("Location: engagements.php");
-    exit();
+    // No redirect, just show error message
 }
 
 // Fetch clients for dropdown
@@ -172,8 +165,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_engagement']))
         }
     }
 }
-
-ob_end_flush();
 ?>
 
 <div class="container-fluid">

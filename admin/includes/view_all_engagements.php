@@ -1,3 +1,13 @@
+</style>
+<style>
+.welcome-card {
+    background: linear-gradient(135deg, #0a2240 0%, #1a3a5a 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(10, 34, 64, 0.3);
+}
+</style>
 <?php
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {

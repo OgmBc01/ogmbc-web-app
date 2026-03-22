@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Note: session_start() is already called in the parent file (clients.php)
 
 // Call the function to handle insert/update
 insert_clients();
@@ -11,21 +11,20 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Initialize variables
-
 $client_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$company_name = $trade_license_no = $country = $jurisdiction = $emirate_zone = $business_activity = $industry = $address = null;
-$contact_title = $contact_name = $contact_designation = $contact_mobile = $contact_email = null;
-$service_id = $service_description = $expected_start_date = null;
-$payment_currency = null;
-$payment_term = null;
-$service_total_fee = null;
-$lead_source = null;
-$client_status = null;
+$company_name = $trade_license_no = $country = $jurisdiction = $emirate_zone = $business_activity = $industry = $address = '';
+$contact_title = $contact_name = $contact_designation = $contact_mobile = $contact_email = '';
+$service_id = $service_description = $expected_start_date = '';
+$payment_currency = 'AED';
+$payment_term = 'Monthly';
+$service_total_fee = '0.00';
+$lead_source = 'website';
+$client_status = 'New Lead';
 $message = '';
 $message_type = '';
+$show_success_modal = false;
 
 // Fetch client data if editing existing client
-
 if ($client_id > 0) {
     $sql = "SELECT * FROM clients WHERE client_id = ?";
     $stmt = $connection->prepare($sql);
@@ -56,34 +55,26 @@ if ($client_id > 0) {
         $service_total_fee = $client['service_total_fee'] ?? '0.00';
         $lead_source = $client['lead_source'] ?? 'website';
         $client_status = $client['client_status'] ?? 'New Lead';
+        
+        // Check if success modal should be shown (from session)
+        if (isset($_SESSION['client_update_success'])) {
+            $show_success_modal = true;
+            unset($_SESSION['client_update_success']);
+        }
+        // Check for error messages
+        if (isset($_SESSION['error_message'])) {
+            $message = $_SESSION['error_message'];
+            $message_type = "danger";
+            unset($_SESSION['error_message']);
+        }
     } else {
         $message = "Client not found.";
         $message_type = "error";
-        // Set all fields to first available dropdown value if possible
-        $country = 'United Arab Emirates';
-        $jurisdiction = '';
-        $emirate_zone = '';
-        $industry = '';
-        $contact_title = '';
-        $payment_currency = 'AED';
-        $payment_term = 'Monthly';
-        $lead_source = 'website';
-        $client_status = 'New Lead';
     }
     $stmt->close();
 } else {
     $message = "Invalid client ID.";
     $message_type = "error";
-    // Set all fields to first available dropdown value if possible
-    $country = 'United Arab Emirates';
-    $jurisdiction = '';
-    $emirate_zone = '';
-    $industry = '';
-    $contact_title = '';
-    $payment_currency = 'AED';
-    $payment_term = 'Monthly';
-    $lead_source = 'website';
-    $client_status = 'New Lead';
 }
 
 // Fetch jurisdictions for dropdown
@@ -118,6 +109,33 @@ $industries_result = mysqli_query($connection, $industries_query);
                         </div>
                         <?php endif; ?>
 
+                        <!-- Success Modal -->
+                        <div class="modal fade" id="clientSuccessModal" tabindex="-1" aria-labelledby="clientSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title" id="clientSuccessModalLabel">
+                                            <i class="bi bi-check-circle-fill me-2"></i>Success!
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center py-4">
+                                        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                                        <h5 class="mt-3">Client Updated Successfully!</h5>
+                                        <p class="text-muted mb-0">The client "<?php echo htmlspecialchars($company_name); ?>" has been updated.</p>
+                                    </div>
+                                    <div class="modal-footer justify-content-center border-0 pt-0">
+                                        <a href="clients.php" class="btn btn-success px-4">
+                                            <i class="bi bi-list-ul me-2"></i>View All Clients
+                                        </a>
+                                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                                            <i class="bi bi-pencil me-2"></i>Continue Editing
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <form method="POST" action="" id="clientForm">
                             <input type="hidden" name="submit_client" value="1">
                             <input type="hidden" name="client_id" value="<?php echo $client_id; ?>">
@@ -149,50 +167,51 @@ $industries_result = mysqli_query($connection, $industries_query);
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="country" class="form-label">Country *</label>
-                                        <input list="country_list" id="country" name="country" class="form-control" value="<?php echo htmlspecialchars($country); ?>" required />
-                                        <datalist id="country_list">
-                                            <option value="United Arab Emirates">
-                                            <option value="Saudi Arabia">
-                                            <option value="Qatar">
-                                            <option value="Oman">
-                                            <option value="Kuwait">
-                                            <option value="Bahrain">
-                                            <option value="United Kingdom">
-                                            <option value="United States">
-                                            <option value="Germany">
-                                            <option value="France">
-                                            <option value="China">
-                                            <option value="Japan">
-                                            <option value="India">
-                                            <option value="Russia">
-                                        </datalist>
+                                        <select id="country" name="country" class="form-control" required>
+                                            <option value="">Select Country</option>
+                                            <option value="United Arab Emirates" <?php echo ($country == 'United Arab Emirates') ? 'selected' : ''; ?>>United Arab Emirates</option>
+                                            <option value="Saudi Arabia" <?php echo ($country == 'Saudi Arabia') ? 'selected' : ''; ?>>Saudi Arabia</option>
+                                            <option value="Qatar" <?php echo ($country == 'Qatar') ? 'selected' : ''; ?>>Qatar</option>
+                                            <option value="Oman" <?php echo ($country == 'Oman') ? 'selected' : ''; ?>>Oman</option>
+                                            <option value="Kuwait" <?php echo ($country == 'Kuwait') ? 'selected' : ''; ?>>Kuwait</option>
+                                            <option value="Bahrain" <?php echo ($country == 'Bahrain') ? 'selected' : ''; ?>>Bahrain</option>
+                                            <option value="United Kingdom" <?php echo ($country == 'United Kingdom') ? 'selected' : ''; ?>>United Kingdom</option>
+                                            <option value="United States" <?php echo ($country == 'United States') ? 'selected' : ''; ?>>United States</option>
+                                            <option value="Germany" <?php echo ($country == 'Germany') ? 'selected' : ''; ?>>Germany</option>
+                                            <option value="France" <?php echo ($country == 'France') ? 'selected' : ''; ?>>France</option>
+                                            <option value="China" <?php echo ($country == 'China') ? 'selected' : ''; ?>>China</option>
+                                            <option value="Japan" <?php echo ($country == 'Japan') ? 'selected' : ''; ?>>Japan</option>
+                                            <option value="India" <?php echo ($country == 'India') ? 'selected' : ''; ?>>India</option>
+                                            <option value="Russia" <?php echo ($country == 'Russia') ? 'selected' : ''; ?>>Russia</option>
+                                        </select>
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="jurisdiction" class="form-label">Jurisdiction</label>
-                                        <input list="jurisdiction_list" id="jurisdiction" name="jurisdiction" class="form-control" value="<?php echo htmlspecialchars($jurisdiction); ?>" />
-                                        <datalist id="jurisdiction_list">
+                                        <select id="jurisdiction" name="jurisdiction" class="form-control">
+                                            <option value="">Select Jurisdiction</option>
                                             <?php
                                             if ($jurisdictions_result && mysqli_num_rows($jurisdictions_result) > 0) {
                                                 mysqli_data_seek($jurisdictions_result, 0);
                                                 while($jur = mysqli_fetch_assoc($jurisdictions_result)) {
-                                                    echo "<option value='" . htmlspecialchars($jur['jurisdiction_name']) . "'>" . htmlspecialchars($jur['jurisdiction_name']) . "</option>";
+                                                    $selected = ($jurisdiction == $jur['jurisdiction_name']) ? 'selected' : '';
+                                                    echo "<option value='" . htmlspecialchars($jur['jurisdiction_name']) . "' {$selected}>" . htmlspecialchars($jur['jurisdiction_name']) . "</option>";
                                                 }
                                             }
                                             ?>
-                                        </datalist>
+                                        </select>
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="emirate_zone" class="form-label">Emirate/Zone/State</label>
-                                        <input list="emirate_zone_list" id="emirate_zone" name="emirate_zone" class="form-control" value="<?php echo htmlspecialchars($emirate_zone); ?>" />
-                                        <datalist id="emirate_zone_list">
-                                            <!-- Options will be populated dynamically by JS -->
-                                        </datalist>
+                                        <select id="emirate_zone" name="emirate_zone" class="form-control">
+                                            <option value="">Select Emirate/Zone/State</option>
+                                            <!-- Options will be populated dynamically -->
+                                        </select>
                                     </div>
                                 </div>
                                 
@@ -406,7 +425,7 @@ $industries_result = mysqli_query($connection, $industries_query);
 
                             <div class="row mt-4">
                                 <div class="col-12 text-center">
-                                    <button type="submit" class="btn btn-primary btn-lg me-2">
+                                    <button type="submit" name="update_client" class="btn btn-primary btn-lg me-2">
                                         <i class="bi bi-check-circle me-1"></i> Update Client
                                     </button>
                                     <a href="./clients.php" class="btn btn-outline-secondary btn-lg">
@@ -441,75 +460,74 @@ const countryZones = {
     'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Chelyabinsk', 'Samara', 'Omsk', 'Rostov-on-Don', 'Ufa', 'Krasnoyarsk', 'Voronezh', 'Perm', 'Volgograd']
 };
 
-// Initialize emirate/zone and jurisdiction based on current country and preselected values
+// Initialize emirate/zone based on current country
 document.addEventListener('DOMContentLoaded', function() {
-    const countryInput = document.getElementById('country');
-    const emirateInput = document.getElementById('emirate_zone');
-    const emirateDatalist = document.getElementById('emirate_zone_list');
-    const currentEmirate = <?php echo json_encode($emirate_zone); ?>;
-    const jurisdictionInput = document.getElementById('jurisdiction');
-    const jurisdictionDatalist = document.getElementById('jurisdiction_list');
-    const currentJurisdiction = <?php echo json_encode($jurisdiction); ?>;
-
-    // Populate emirate/zone datalist
-    function populateEmirateDatalist(country, selectedEmirate) {
-        emirateDatalist.innerHTML = '';
-        if (country && countryZones[country]) {
-            countryZones[country].forEach(zone => {
-                const option = document.createElement('option');
-                option.value = zone;
-                emirateDatalist.appendChild(option);
-            });
-        }
-        // If no zones for country, add current emirate as option
-        if (selectedEmirate && (!countryZones[country] || !countryZones[country].includes(selectedEmirate))) {
+    const country = document.getElementById('country').value;
+    const emirateSelect = document.getElementById('emirate_zone');
+    const currentEmirate = '<?php echo $emirate_zone; ?>';
+    
+    if (country && countryZones[country]) {
+        countryZones[country].forEach(zone => {
             const option = document.createElement('option');
-            option.value = selectedEmirate;
-            emirateDatalist.appendChild(option);
-        }
+            option.value = zone;
+            option.textContent = zone;
+            if (zone === currentEmirate) {
+                option.selected = true;
+            }
+            emirateSelect.appendChild(option);
+        });
     }
-
-    // Initial population
-    populateEmirateDatalist(countryInput.value, currentEmirate);
-    emirateInput.value = currentEmirate || '';
-
-    // Populate jurisdiction datalist (already rendered by PHP)
-    jurisdictionInput.value = currentJurisdiction || '';
+    
+    // If no zones for country, add current emirate as option
+    if (currentEmirate && !emirateSelect.querySelector(`option[value="${currentEmirate}"]`)) {
+        const option = document.createElement('option');
+        option.value = currentEmirate;
+        option.textContent = currentEmirate;
+        option.selected = true;
+        emirateSelect.appendChild(option);
+    }
+    
+    // Show success modal if flag is set
+    <?php if ($show_success_modal): ?>
+    var successModal = new bootstrap.Modal(document.getElementById('clientSuccessModal'), {
+        backdrop: 'static',
+        keyboard: false
+    });
+    successModal.show();
+    <?php endif; ?>
 });
 
 // Update emirate/zone options when country changes
 document.getElementById('country').addEventListener('change', function() {
     const country = this.value;
-    const emirateDatalist = document.getElementById('emirate_zone_list');
-    const emirateInput = document.getElementById('emirate_zone');
-    const jurisdictionInput = document.getElementById('jurisdiction');
-    const jurisdictionDatalist = document.getElementById('jurisdiction_list');
-
-    // Update emirate/zone datalist
-    emirateDatalist.innerHTML = '';
+    const emirateSelect = document.getElementById('emirate_zone');
+    const jurisdictionSelect = document.getElementById('jurisdiction');
+    
+    // Update emirate/zone dropdown
+    emirateSelect.innerHTML = '<option value="">Select Emirate/Zone/State</option>';
     if (country && countryZones[country]) {
         countryZones[country].forEach(zone => {
             const option = document.createElement('option');
             option.value = zone;
-            emirateDatalist.appendChild(option);
+            option.textContent = zone;
+            emirateSelect.appendChild(option);
         });
     }
-    emirateInput.value = '';
-
+    
     // Filter jurisdictions based on selected country via AJAX
     if (country) {
         fetch(`get_jurisdictions.php?country=${encodeURIComponent(country)}`)
             .then(response => response.json())
             .then(data => {
-                jurisdictionDatalist.innerHTML = '';
+                jurisdictionSelect.innerHTML = '<option value="">Select Jurisdiction</option>';
                 if (data.success && data.jurisdictions) {
                     data.jurisdictions.forEach(jur => {
                         const option = document.createElement('option');
                         option.value = jur.jurisdiction_name;
-                        jurisdictionDatalist.appendChild(option);
+                        option.textContent = jur.jurisdiction_name;
+                        jurisdictionSelect.appendChild(option);
                     });
                 }
-                jurisdictionInput.value = '';
             })
             .catch(error => console.error('Error fetching jurisdictions:', error));
     }

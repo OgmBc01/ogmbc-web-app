@@ -39,11 +39,9 @@ $uplift_by_year_query = "SELECT
 $uplift_by_year = mysqli_query($connection, $uplift_by_year_query);
 ?>
 
-<div class="container-fluid">
-    <!-- Welcome Header -->
     <div class="row g-4 mb-4">
         <div class="col-12">
-            <div class="welcome-card d-flex flex-column flex-md-row align-items-center justify-content-between mb-3">
+            <div class="welcome-card d-flex flex-column flex-md-row align-items-center justify-content-between mb-3" style="background: linear-gradient(135deg, #0a2342 0%, #193a5e 100%); border-radius: 20px; padding: 30px; color: white; box-shadow: 0 10px 30px rgba(10, 35, 66, 0.18);">
                 <div>
                     <div class="welcome-title mb-1"><i class="bi bi-mortarboard me-2"></i>Career Development</div>
                     <div class="welcome-subtitle">Track your certifications, courses, and professional growth.</div>
@@ -312,11 +310,11 @@ $uplift_by_year = mysqli_query($connection, $uplift_by_year_query);
 <style>
 
 .welcome-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a2342 0%, #193a5e 100%);
     border-radius: 20px;
     padding: 30px;
     color: white;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 30px rgba(10, 35, 66, 0.18);
 }
 .welcome-title {
     font-size: 1.8rem;
@@ -336,10 +334,10 @@ $uplift_by_year = mysqli_query($connection, $uplift_by_year_query);
     backdrop-filter: blur(5px);
 }
 .gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, #0a2342 0%, #193a5e 100%) !important;
     color: #fff;
     border-radius: 18px;
-    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.18);
+    box-shadow: 0 6px 24px rgba(10, 35, 66, 0.18);
     padding: 28px 24px;
     margin-bottom: 24px;
 }
@@ -454,8 +452,9 @@ $uplift_by_year = mysqli_query($connection, $uplift_by_year_query);
     margin-left: 22px;
 }
 
+
 .pro-tip-card.cdp-tip {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a2634 100%);
+    background: linear-gradient(135deg, #0a2342 0%, #193a5e 100%);
     border-radius: 16px;
     padding: 20px;
     color: white;

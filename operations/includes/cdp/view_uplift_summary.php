@@ -224,9 +224,10 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <style>
 .uplift-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, #0a2342 0%, #193a5e 100%);
     border-radius: 16px;
     padding: 25px;
+    color: white;
 }
 
 .type-uplift-card {

@@ -536,6 +536,7 @@ function insert_clients() {
     global $connection;
 
     if (isset($_POST['submit_client'])) {
+        $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
         // Sanitize and validate inputs
         $client_id = intval($_POST['client_id'] ?? 0);
         $company_name = mysqli_real_escape_string($connection, trim($_POST['company_name']));
@@ -562,17 +563,17 @@ function insert_clients() {
 
         // Validation
         if (empty($company_name) || empty($contact_name) || empty($contact_mobile) || empty($contact_email)) {
-            echo "<script>showAlert('Please fill in all required fields', 'error');</script>";
+            $_SESSION['error_message'] = 'Please fill in all required fields';
             return;
         }
 
         if (!filter_var($contact_email, FILTER_VALIDATE_EMAIL)) {
-            echo "<script>showAlert('Please enter a valid email address', 'error');</script>";
+            $_SESSION['error_message'] = 'Please enter a valid email address';
             return;
         }
 
         if ($client_id > 0) {
-            // Update existing client - don't change password on update
+            // Update existing client
             $query = "UPDATE clients SET 
                      company_name = '{$company_name}', 
                      trade_license_no = '{$trade_license_no}', 
@@ -598,11 +599,6 @@ function insert_clients() {
                      WHERE client_id = {$client_id}";
 
             $success_message = "Client updated successfully!";
-            $redirect_param = "updated=true";
-            $client_query = mysqli_query($connection, $query);
-            
-            // Store plain password for display (not used in update)
-            $plain_password = '';
         } else {
             // Generate a unique password for new client
             $plain_password = generate_client_password($company_name, $contact_name);
@@ -623,34 +619,32 @@ function insert_clients() {
                         '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
                     )";
 
-            $success_message = "Client added successfully! A password has been generated for the client.";
-            $redirect_param = "added=true&show_password=true";
-            $client_query = mysqli_query($connection, $query);
-            
-            // Get the newly created client ID
-            $new_client_id = mysqli_insert_id($connection);
+            $success_message = "Client added successfully!";
         }
 
+        $client_query = mysqli_query($connection, $query);
+
         if (!$client_query) {
-            die('Query Failed: ' . mysqli_error($connection));
+            $_SESSION['error_message'] = 'Query Failed: ' . mysqli_error($connection);
+            return;
         } else {
-            // Show success message
-            echo "<script>showAlert('{$success_message}', 'success');</script>";
-
-            // After successful insertion, send email
+            // Get the newly created client ID if new
             if ($client_id == 0) {
+                $new_client_id = mysqli_insert_id($connection);
+                // Send welcome email with credentials
                 send_client_welcome_email($contact_email, $company_name, $plain_password);
-            }
-
-            // If it's a new client, store the plain password in session to display
-            if ($client_id == 0 && isset($plain_password)) {
+                // Store password in session for modal display
                 $_SESSION['new_client_password'] = $plain_password;
                 $_SESSION['new_client_email'] = $contact_email;
                 $_SESSION['new_client_name'] = $company_name;
-                $redirect_param = "added=true&show_password=true&id=" . $new_client_id;
+                // Set success flag
+                $_SESSION['client_update_success'] = true;
+                // No redirect, let the page reload naturally
+            } else {
+                // For updates, set success flag
+                $_SESSION['client_update_success'] = true;
+                // No redirect, let the page reload naturally
             }
-
-            echo "<script>setTimeout(() => { window.location.href = 'clients.php?{$redirect_param}'; }, 1500);</script>";
         }
     }
 }
