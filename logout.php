@@ -17,8 +17,8 @@ if (isset($_GET['confirm']) && $_GET['confirm'] == 'true') {
         );
     }
 
-    // Redirect to login page with logout message
-    header("Location: login.php?logout=success");
+    // Redirect to home page after logout
+    header("Location: index.php?logout=success");
     exit();
 }
 
@@ -85,7 +85,7 @@ if (isset($_GET['confirm']) && $_GET['confirm'] == 'true') {
         <p class="text-muted mb-4">Are you sure you want to logout from your account?</p>
         
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <a href="logout.php?confirm=true" class="btn btn-logout me-md-2">
+            <a href="logout.php?confirm=true" class="btn btn-logout me-md-2" onclick="event.preventDefault(); window.location.href='index.php?logout=success';">
                 <i class="bi bi-box-arrow-right me-2"></i> Yes, Logout
             </a>
             <a href="javascript:history.back()" class="btn btn-cancel">
