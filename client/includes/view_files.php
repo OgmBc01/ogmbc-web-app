@@ -67,7 +67,7 @@ if (!$engagements_result) {
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="page-title">File Exchange</h1>
+        <h1 class="page-title">Engagements Files Exchange</h1>
         <a href="files.php?source=upload" class="btn btn-primary">
             <i class="bi bi-cloud-upload"></i> Upload New File
         </a>

@@ -276,16 +276,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
     <div class="container-fluid">
         
         <!-- Dashboard/Performers Switcher -->
-        <div class="row mb-3">
-            <div class="col-12 d-flex justify-content-end align-items-center">
-                <div class="btn-group" role="group" aria-label="Dashboard Switcher">
-                    <input type="radio" class="btn-check" name="dashboardSwitcher" id="dashboardRadio" autocomplete="off" checked onclick="window.location.href='dashboard.php'">
-                    <label class="btn btn-outline-primary" for="dashboardRadio">Dashboard</label>
-                    <input type="radio" class="btn-check" name="dashboardSwitcher" id="performersRadio" autocomplete="off" onclick="window.location.href='performers.php'">
-                    <label class="btn btn-outline-primary" for="performersRadio">Top Performers</label>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Welcome Header with Date -->
         <div class="row mb-4">
@@ -307,9 +298,15 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                             </p>
                         </div>
                         <div class="col-md-4 text-md-end">
-                            <span class="current-date">
+                            <span class="current-date mb-2 d-block">
                                 <i class="bi bi-calendar3 me-2"></i><?php echo date('l, F j, Y'); ?>
                             </span>
+                            <div class="btn-group mt-2" role="group" aria-label="Dashboard Switcher">
+                                <input type="radio" class="btn-check" name="dashboardSwitcher" id="dashboardRadio" autocomplete="off" checked onclick="window.location.href='dashboard.php'">
+                                <label class="btn btn-outline-primary" for="dashboardRadio">Dashboard</label>
+                                <input type="radio" class="btn-check" name="dashboardSwitcher" id="performersRadio" autocomplete="off" onclick="window.location.href='performers.php'">
+                                <label class="btn btn-outline-primary" for="performersRadio">Top Performers</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -319,8 +316,8 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
         <!-- Key Metrics Row 1 - Core Stats -->
         <div class="row g-4 mb-4">
             <!-- Total Users Card -->
-            <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card" onclick="window.location.href='users.php'" style="cursor: pointer;">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 d-flex">
+                <div class="stat-card flex-fill" onclick="window.location.href='users.php'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-primary-soft">
                             <i class="bi bi-people-fill text-primary"></i>
@@ -338,7 +335,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Active Users Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card">
+                <div class="stat-card flex-fill">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-success-soft">
                             <i class="bi bi-person-check-fill text-success"></i>
@@ -356,7 +353,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Total Clients Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card" onclick="window.location.href='clients.php'" style="cursor: pointer;">
+                <div class="stat-card flex-fill" onclick="window.location.href='clients.php'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-info-soft">
                             <i class="bi bi-building text-info"></i>
@@ -374,7 +371,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Total Engagements Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card" onclick="window.location.href='engagements.php'" style="cursor: pointer;">
+                <div class="stat-card flex-fill" onclick="window.location.href='engagements.php'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-warning-soft">
                             <i class="bi bi-briefcase-fill text-warning"></i>
@@ -393,7 +390,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Overdue Engagements Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card <?php echo $engagement_stats['overdue_engagements'] > 0 ? 'border-danger' : ''; ?>">
+                <div class="stat-card flex-fill <?php echo $engagement_stats['overdue_engagements'] > 0 ? 'border-danger' : ''; ?>">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-danger-soft">
                             <i class="bi bi-exclamation-triangle-fill text-danger"></i>
@@ -411,7 +408,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Completion Rate Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card">
+                <div class="stat-card flex-fill">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-secondary-soft">
                             <i class="bi bi-pie-chart-fill text-secondary"></i>
@@ -431,8 +428,8 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
         <!-- Key Metrics Row 2 - Secondary Stats -->
         <div class="row g-4 mb-4">
             <!-- Total Points Card -->
-            <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 d-flex">
+                <div class="stat-card flex-fill">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-purple-soft">
                             <i class="bi bi-trophy-fill text-purple"></i>
@@ -450,7 +447,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Total Feedback Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card" onclick="window.location.href='client_feedback.php'" style="cursor: pointer;">
+                <div class="stat-card flex-fill" onclick="window.location.href='client_feedback.php'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-success-soft">
                             <i class="bi bi-star-fill text-success"></i>
@@ -468,7 +465,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Support Tickets Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card <?php echo $feedback_stats['unresolved_tickets'] > 0 ? 'border-warning' : ''; ?>" onclick="window.location.href='support_tickets.php'" style="cursor: pointer;">
+                <div class="stat-card flex-fill <?php echo $feedback_stats['unresolved_tickets'] > 0 ? 'border-warning' : ''; ?>" onclick="window.location.href='support_tickets.php'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-warning-soft">
                             <i class="bi bi-ticket-fill text-warning"></i>
@@ -486,7 +483,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Total Posts Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card" onclick="window.location.href='posts.php'" style="cursor: pointer;">
+                <div class="stat-card flex-fill" onclick="window.location.href='posts.php'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-info-soft">
                             <i class="bi bi-file-post-fill text-info"></i>
@@ -504,7 +501,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Quick Stats - Placeholder for future -->
             <div class="col-xl-4 col-md-8">
-                <div class="stat-card bg-light">
+                <div class="stat-card flex-fill bg-light">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-secondary-soft">
                             <i class="bi bi-graph-up text-secondary"></i>
@@ -530,7 +527,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-graph-up me-2 text-primary"></i>
+                            <i class="bi bi-graph-up me-2" style="color:#C9A13B;"></i>
                             Engagement Trends (Last 6 Months)
                         </h5>
                         <div class="btn-group">
@@ -549,7 +546,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-pie-chart me-2 text-primary"></i>
+                            <i class="bi bi-pie-chart me-2" style="color:#C9A13B;"></i>
                             Engagement Status
                         </h5>
                     </div>
@@ -567,7 +564,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-tags me-2 text-primary"></i>
+                            <i class="bi bi-tags me-2" style="color:#C9A13B;"></i>
                             Service Type Breakdown
                         </h5>
                     </div>
@@ -582,7 +579,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-people me-2 text-primary"></i>
+                            <i class="bi bi-people me-2" style="color:#C9A13B;"></i>
                             User Role Distribution
                         </h5>
                     </div>
@@ -600,7 +597,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card h-100">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-clock-history me-2 text-primary"></i>
+                            <i class="bi bi-clock-history me-2" style="color:#C9A13B;"></i>
                             Recent Activity
                         </h5>
                         <button class="btn btn-sm btn-outline-secondary" onclick="refreshActivity()">
@@ -646,7 +643,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card h-100">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-trophy me-2 text-primary"></i>
+                            <i class="bi bi-trophy me-2" style="color:#C9A13B;"></i>
                             Top Performers
                         </h5>
                         <a href="employees.php" class="btn btn-sm btn-outline-primary">View All</a>
@@ -691,7 +688,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card h-100">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-exclamation-triangle me-2 text-primary"></i>
+                            <i class="bi bi-exclamation-triangle me-2" style="color:#C9A13B;"></i>
                             Pending Actions
                         </h5>
                     </div>
@@ -733,7 +730,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-bar-chart me-2 text-primary"></i>
+                            <i class="bi bi-bar-chart me-2" style="color:#C9A13B;"></i>
                             Monthly Sales Target Progress
                         </h5>
                         <a href="sales_targets.php" class="btn btn-sm btn-outline-primary">View All</a>
@@ -777,7 +774,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="bi bi-lightning-charge me-2 text-primary"></i>
+                            <i class="bi bi-lightning-charge me-2" style="color:#C9A13B;"></i>
                             Quick Actions
                         </h5>
                     </div>
@@ -1070,7 +1067,8 @@ function refreshActivity() {
     display: inline-block;
 }
 
-/* Statistics Cards */
+
+/* Statistics Cards - Responsive */
 .stat-card {
     background: white;
     border-radius: 20px;
@@ -1079,6 +1077,9 @@ function refreshActivity() {
     transition: all 0.3s ease;
     border: 1px solid rgba(0, 0, 0, 0.05);
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
 }
 
 .stat-card:hover {
@@ -1095,19 +1096,23 @@ function refreshActivity() {
 }
 
 .stat-card-body {
-
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    height: 100%;
+    justify-content: center;
 }
 
 .stat-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 2.1rem;
     flex-shrink: 0;
+    margin-bottom: 12px;
 }
 
 .bg-primary-soft { background: rgba(102, 126, 234, 0.1); }
@@ -1120,6 +1125,8 @@ function refreshActivity() {
 
 .stat-content {
     flex: 1;
+    width: 100%;
+    text-align: center;
 }
 
 .stat-value {
@@ -1138,6 +1145,19 @@ function refreshActivity() {
 
 .stat-progress {
     font-size: 0.95rem;
+}
+
+@media (max-width: 1200px) {
+    .col-xl-2 { flex: 0 0 33.333333%; max-width: 33.333333%; }
+}
+@media (max-width: 992px) {
+    .col-lg-3, .col-xl-2 { flex: 0 0 50%; max-width: 50%; }
+}
+@media (max-width: 768px) {
+    .col-md-4, .col-lg-3, .col-xl-2 { flex: 0 0 100%; max-width: 100%; }
+    .stat-card-body { flex-direction: row; align-items: center; justify-content: flex-start; }
+    .stat-icon { margin-bottom: 0; margin-right: 12px; width: 48px; height: 48px; font-size: 1.4rem; }
+    .stat-content { text-align: left; }
 }
 
 /* Dashboard Cards */

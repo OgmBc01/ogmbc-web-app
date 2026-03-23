@@ -1,4 +1,5 @@
 <?php
+
 // Start session and enforce admin-area authorization before any output
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

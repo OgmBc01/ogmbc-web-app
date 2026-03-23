@@ -207,7 +207,7 @@ $current_year = date('Y');
 
             <!-- Notifications Card -->
             <div class="col-xl-3 col-md-6">
-                <div class="stat-card" onclick="window.location.href='notifications.php'" style="cursor: pointer;">
+                <div class="stat-card">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-warning-soft">
                             <i class="bi bi-bell-fill text-warning"></i>

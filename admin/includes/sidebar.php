@@ -82,6 +82,14 @@
                 </ul>
             </li>
 
+            <!-- Documents Module Link - Admin Side -->
+            <li class="nav-item">
+                <a class="nav-link" href="admin_documents.php">
+                    <i class="bi bi-folder2-open nav-icon"></i>
+                    <span class="nav-text">Documents</span>
+                </a>
+            </li>
+
             <!-- Users Menu with Dropdown -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'users.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 

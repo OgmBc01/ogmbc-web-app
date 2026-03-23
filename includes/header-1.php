@@ -56,175 +56,198 @@ include 'functions.php'
 </head>
 <body>
 
-<header>
-    <div class="container nav">
-        <a class="brand d-flex align-items-center" href="index.php">
-            <img src="resources/img/logo.png" alt="OGM Consultants Logo" class="logo-img me-2" />
-            <span>OGM Business Consultants</span>
+    <header>
+      <div class="container nav">
+        <a class="brand d-flex align-items-center me-lg-5 me-3" href="index.php" style="min-width:220px;">
+          <img src="resources/img/logo.png" alt="OGM Consultants Logo" class="logo-img me-2" />
+          <span style="font-size:0.85rem; line-height:1.05; white-space:normal; text-align:left; display:block;">
+            OGM Business<br>Consultants
+          </span>
         </a>
 
-        <nav class="menu navbar navbar-expand-lg" id="menu" style="height: 40px;">
-            <div class="container-fluid">
-                <ul class="navbar-nav mx-auto">
-                <!-- Home -->
-                <li class="nav-item">
-                    <a class="nav-link" href="index.php">Home</a>
-                </li>
-                
-                <!-- About -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    About
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                        <li class="dropdown-submenu">
-                            <a class="dropdown-item" href="about.php">About Us</a>
-                        </li>
+        <nav class="menu navbar navbar-expand-lg flex-grow-1" id="menu" style="height: 40px;">
+          <div class="container-fluid ps-lg-5">
+            <ul class="navbar-nav flex-grow-1 justify-content-lg-end ms-lg-auto">
+              <!-- Home -->
+              <li class="nav-item">
+                  <a class="nav-link" href="index.php">Home</a>
+              </li>
+              
+              <!-- About -->
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  About
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                      <li class="dropdown-submenu">
+                          <a class="dropdown-item" href="about.php">About Us</a>
+                      </li>
 
-                        <li class="dropdown-submenu">
-                            <a class="dropdown-item" href="our-team.php">Our Team</a>
-                        </li>
+                      <li class="dropdown-submenu">
+                          <a class="dropdown-item" href="our-team.php">Our Team</a>
+                      </li>
 
-                        <!-- Profile -->
-                        <li class="dropdown-submenu">
-                            <a class="dropdown-item" href="ogmbc-profile.php">Company Profile</a>
-                        </li>
+                      <!-- Profile -->
+                      <li class="dropdown-submenu">
+                          <a class="dropdown-item" href="ogmbc-profile.php">Company Profile</a>
+                      </li>
+                  </ul>
+              </li>
+
+              <!-- Services Dropdown -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Services
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                  
+                  <!-- Business Setup (nested) -->
+                  <li class="dropdown-submenu">
+                    <a class="dropdown-item dropdown-toggle" href="#">Business Setup</a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="uae-bussiness-formation.php">UAE Company Formation</a></li>
+                      <li><a class="dropdown-item" href="usa-company-formation.php">USA Company Formation</a></li>
+                      <li><a class="dropdown-item" href="uk-company-formation.php">UK Company Formation</a></li>
+                      <li><a class="dropdown-item" href="cayman-company-formation.php">Cayman Company Formation</a></li>
+                      <li><a class="dropdown-item" href="estonia-company-formation.php">Estonia Company Formation</a></li>
+                      <li><a class="dropdown-item" href="e-commerce.php">E-commerce Business Formation</a></li>
                     </ul>
-                </li>
+                  </li>
 
-                <!-- Services Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Services
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                    
-                    <!-- Business Setup (nested) -->
-                    <li class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#">Business Setup</a>
-                        <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="uae-bussiness-formation.php">UAE Company Formation</a></li>
-                        <li><a class="dropdown-item" href="usa-company-formation.php">USA Company Formation</a></li>
-                        <li><a class="dropdown-item" href="uk-company-formation.php">UK Company Formation</a></li>
-                        <li><a class="dropdown-item" href="cayman-company-formation.php">Cayman Company Formation</a></li>
-                        <li><a class="dropdown-item" href="estonia-company-formation.php">Estonia Company Formation</a></li>
-                        <li><a class="dropdown-item" href="e-commerce.php">E-commerce Business Formation</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- Accounting & Taxation (nested) -->
-                    <li class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#">Accounting & Taxation</a>
-                        <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="bookkeeping.php">Bookkeeping</a></li>
-                        <li><a class="dropdown-item" href="cfo-services.php">CFO Services</a></li>
-                        <li><a class="dropdown-item" href="management-accounting-&-kpi.php">Management Accounting & KPIs</a></li>
-                        <li><a class="dropdown-item" href="tax-consultancy.php">Tax Consultancy</a></li>
-                        <li><a class="dropdown-item" href="business-planning.php">Business Planning</a></li>
-                        <li><a class="dropdown-item" href="business-valuation.php">Business Valuation</a></li>
-                        <li><a class="dropdown-item" href="transfer-pricing.php">Transfer Pricing</a></li>
-                        <li><a class="dropdown-item" href="supply-chain.php">Supply Chain</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- Support (nested) -->
-                    <li class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#">Statutory Compliance</a>
-                        <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="corporate-governance.php">Corporate Governance</a></li>
-                        <li><a class="dropdown-item" href="internal-controlling.php">Internal Controlling</a></li>
-                        <li><a class="dropdown-item" href="audit-&-audit-support.php">Audit & Audit Support</a></li>
-                        <li><a class="dropdown-item" href="financial-statement-reporting.php">Financial Statement Reporting</a></li>
-                        <li><a class="dropdown-item" href="ifrs-advisory.php">IFRS Advisory</a></li>
-                        <li><a class="dropdown-item" href="due-diligence.php">Due Diligence</a></li>
-                        <li><a class="dropdown-item" href="aml-support.php">AML Support</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- Statutory Compliance (nested) -->
-                    <li class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#">Support</a>
-                        <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="bank-account-opening.php">Bank Account Opening</a></li>
-                        <li><a class="dropdown-item" href="annual-renewal-services.php">Annual Renewal Services</a></li>
-                        <li><a class="dropdown-item" href="office-space.php">Office Space Provision</a></li>
-                        </ul>
-                    </li>
+                  <!-- Accounting & Taxation (nested) -->
+                  <li class="dropdown-submenu">
+                    <a class="dropdown-item dropdown-toggle" href="#">Accounting & Taxation</a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="bookkeeping.php">Bookkeeping</a></li>
+                      <li><a class="dropdown-item" href="cfo-services.php">CFO Services</a></li>
+                      <li><a class="dropdown-item" href="management-accounting-&-kpi.php">Management Accounting & KPIs</a></li>
+                      <li><a class="dropdown-item" href="tax-consultancy.php">Tax Consultancy</a></li>
+                      <li><a class="dropdown-item" href="business-planning.php">Business Planning</a></li>
+                      <li><a class="dropdown-item" href="business-valuation.php">Business Valuation</a></li>
+                      <li><a class="dropdown-item" href="transfer-pricing.php">Transfer Pricing</a></li>
+                      <li><a class="dropdown-item" href="supply-chain.php">Supply Chain</a></li>
                     </ul>
-                </li>
-                
-                <!-- Wall of Love -->
-                <li class="nav-item position-relative">
-                    <a class="nav-link Wall-of-love-link position-relative" href="our-wall-of-love.php">
-                        <span class="Wall-of-love-text">Our Wall Of Love</span>
-                        <span class="love-stars">
-                            <i class="bi bi-star-fill love-star star-1"></i>
-                            <i class="bi bi-star-fill love-star star-2"></i>
-                            <i class="bi bi-heart-fill love-heart"></i>
-                        </span>
-                        <span class="link-border"></span>
-                    </a>
-                </li>
+                  </li>
 
-                <!-- Plan your Business -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Business Planning
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                        <li class="dropdown-submenu">
-                            <a class="dropdown-item" href="check-business-health.php">Check your Company Health</a>
-                        </li>
-
-                        <li class="dropdown-submenu">
-                            <a class="dropdown-item" href="uae-business-setup-cost-calculator.php">UAE Business Setup Cost Calculator</a>
-                        </li>
+                  <!-- Support (nested) -->
+                  <li class="dropdown-submenu">
+                    <a class="dropdown-item dropdown-toggle" href="#">Statutory Compliance</a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="corporate-governance.php">Corporate Governance</a></li>
+                      <li><a class="dropdown-item" href="internal-controlling.php">Internal Controlling</a></li>
+                      <li><a class="dropdown-item" href="audit-&-audit-support.php">Audit & Audit Support</a></li>
+                      <li><a class="dropdown-item" href="financial-statement-reporting.php">Financial Statement Reporting</a></li>
+                      <li><a class="dropdown-item" href="ifrs-advisory.php">IFRS Advisory</a></li>
+                      <li><a class="dropdown-item" href="due-diligence.php">Due Diligence</a></li>
+                      <li><a class="dropdown-item" href="aml-support.php">AML Support</a></li>
                     </ul>
-                </li>
+                  </li>
 
-                <!-- Contact -->
-                <li class="nav-item">
-                    <a class="nav-link" href="contact.php">Contact</a>
-                </li>
-
-                <?php
-                // Check for admin roles
-                $show_admin_link = false;
-                if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
-                    $admin_roles = ['admin', 'super_admin', 'moderator'];
-                    $show_admin_link = in_array($_SESSION['user_role'], $admin_roles);
-                }
-
-                if ($show_admin_link): ?>
-                    <!-- Admin Dashboard -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin/dashboard.php" target="_blank">
-                            Admin
-                        </a>
-                    </li>
-                <?php endif; ?>
-
-                <!-- Login / Sign up -->
-                <li class="nav-item">
-                    <?php
-                    
-                    if (isset($_SESSION['user_id'])) {
-                        // User is logged in - show Sign Out button
-                        echo '<a href="logout.php" class="btn btn-ghost">Sign Out</a>';
-                    } else {
-                        // User is not logged in - show Login button
-                        echo '<a href="login.php" target="_blank" class="btn btn-ghost">Login</a>';
-                    }
-                    ?>
-                </li>
+                  <!-- Statutory Compliance (nested) -->
+                  <li class="dropdown-submenu">
+                    <a class="dropdown-item dropdown-toggle" href="#">Support</a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="bank-account-opening.php">Bank Account Opening</a></li>
+                      <li><a class="dropdown-item" href="annual-renewal-services.php">Annual Renewal Services</a></li>
+                      <li><a class="dropdown-item" href="office-space.php">Office Space Provision</a></li>
+                    </ul>
+                  </li>
                 </ul>
-            </div>
+              </li>
+              
+              <!-- Wall of Love -->
+              <li class="nav-item position-relative">
+                  <a class="nav-link Wall-of-love-link position-relative" href="our-wall-of-love.php">
+                      <span class="Wall-of-love-text">Our Wall Of Love</span>
+                      <span class="love-stars">
+                          <i class="bi bi-star-fill love-star star-1"></i>
+                          <i class="bi bi-star-fill love-star star-2"></i>
+                          <i class="bi bi-heart-fill love-heart"></i>
+                      </span>
+                      <span class="link-border"></span>
+                  </a>
+              </li>
+
+              <!-- Plan your Business -->
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Business Planning
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                      <li class="dropdown-submenu">
+                          <a class="dropdown-item" href="check-business-health.php">Check your Company Health</a>
+                      </li>
+
+                      <li class="dropdown-submenu">
+                          <a class="dropdown-item" href="uae-business-setup-cost-calculator.php">UAE Business Setup Cost Calculator</a>
+                      </li>
+                  </ul>
+              </li>
+
+              <!-- Contact -->
+              <li class="nav-item">
+                  <a class="nav-link" href="contact.php">Contact</a>
+              </li>
+
+              <?php
+              // Check for admin roles
+              $show_admin_link = false;
+              if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+                $admin_roles = ['admin', 'super_admin', 'moderator'];
+                $show_admin_link = in_array($_SESSION['user_role'], $admin_roles);
+            }
+
+            if ($show_admin_link): ?>
+              <!-- Admin Dashboard -->
+              <li class="nav-item">
+                  <a class="nav-link" href="admin/dashboard.php" target="_blank">
+                    Admin
+                  </a>
+              </li>
+            <?php endif; ?>
+
+            <?php if (!isset($_SESSION['user_id'])): ?>
+            <!-- Login Dropdown -->
+            <li class="nav-item dropdown ms-lg-auto">
+              <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="loginDropdown">
+                <li>
+                  <a class="dropdown-item" href="client_login.php">
+                    <i class="bi bi-person-badge me-2" style="color: #f1bf70;"></i>
+                    Login as Client
+                    <span class="badge bg-info ms-2">Client Portal</span>
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item" href="employee_login.php">
+                    <i class="bi bi-shield-lock me-2" style="color: #667eea;"></i>
+                    Login as Employee
+                    <span class="badge bg-primary ms-2">Staff Portal</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['user_id'])): ?>
+            <!-- If logged in, show logout instead -->
+            <li class="nav-item">
+              <a href="logout.php" class="btn btn-ghost">
+                <i class="bi bi-box-arrow-right me-1"></i>Sign Out
+              </a>
+            </li>
+            <?php endif; ?>
+            </ul>
+          </div>
         </nav>
 
-    <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
-    <span></span>
-    <span></span>
-    <span></span>
-    </button>
-    </div>
-</header>
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+        </button>
+      </div>
+    </header>

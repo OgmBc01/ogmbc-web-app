@@ -52,6 +52,13 @@
                 </ul>
             </li>
 
+            <!-- Documents -->
+            <li class="nav-item">
+                <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'documents.php') ? 'active' : ''; ?>" href="documents.php">
+                    <i class="bi bi-folder2-open nav-icon"></i>
+                    <span class="nav-text">Docs & Templates</span>
+                </a>
+            </li>
             <!-- File Exchange -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'files.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 

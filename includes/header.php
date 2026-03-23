@@ -82,14 +82,16 @@ include 'functions.php'
     <!-- Header / Navigation -->
     <header>
       <div class="container nav">
-        <a class="brand d-flex align-items-center" href="index.php">
+        <a class="brand d-flex align-items-center me-lg-5 me-3" href="index.php" style="min-width:220px;">
           <img src="resources/img/logo.png" alt="OGM Consultants Logo" class="logo-img me-2" />
-          <span>OGM Business Consultants</span>
+          <span style="font-size:0.85rem; line-height:1.05; white-space:normal; text-align:left; display:block;">
+            OGM Business<br>Consultants
+          </span>
         </a>
 
-        <nav class="menu navbar navbar-expand-lg" id="menu" style="height: 40px;">
-          <div class="container-fluid">
-            <ul class="navbar-nav mx-auto">
+        <nav class="menu navbar navbar-expand-lg flex-grow-1" id="menu" style="height: 40px;">
+          <div class="container-fluid ps-lg-5">
+            <ul class="navbar-nav flex-grow-1 justify-content-lg-end ms-lg-auto">
               <!-- Home -->
               <li class="nav-item">
                   <a class="nav-link" href="index.php">Home</a>
@@ -230,7 +232,7 @@ include 'functions.php'
 
             <?php if (!isset($_SESSION['user_id'])): ?>
             <!-- Login Dropdown -->
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown ms-lg-auto">
               <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-box-arrow-in-right me-1"></i>Login
               </a>

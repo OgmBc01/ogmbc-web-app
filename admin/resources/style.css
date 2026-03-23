@@ -1,3 +1,20 @@
+/* Document List Card Header and Body Customization */
+.dashboard-card .card-header {
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(30, 41, 59, 0.10);
+    background-color: var(--medium-blue);
+    color: var(--gold);
+    border-radius: 12px 12px 12px 12px;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.dashboard-card .card-body {
+    box-shadow: 0 4px 18px rgba(30, 41, 59, 0.10);
+    border-radius: 0 0 12px 12px;
+    background: #fff;
+    padding: 1.5rem;
+}
 :root {
             --dark-blue: #0f172a;
             --medium-blue: #1e293b;

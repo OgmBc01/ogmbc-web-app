@@ -3,11 +3,6 @@ include 'includes/client_header.php';
 include 'includes/client_nav.php';
 include 'includes/client_sidebar.php';
 
-// if (!isset($_SESSION['client_id'])) {
-//     echo "<script>window.location.href = '../login.php';</script>";
-//     exit();
-// }
-
 $client_id = $_SESSION['client_id'];
 ?>
 

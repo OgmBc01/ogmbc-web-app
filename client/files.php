@@ -3,11 +3,6 @@ include 'includes/client_header.php';
 include 'includes/client_nav.php';
 include 'includes/client_sidebar.php';
 
-// if (!isset($_SESSION['client_id'])) {
-//     echo "<script>window.location.href = '../login.php';</script>";
-//     exit();
-// }
-
 $client_id = $_SESSION['client_id'];
 ?>
 
@@ -16,7 +11,7 @@ $client_id = $_SESSION['client_id'];
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item active">File Exchange</li>
+                <li class="breadcrumb-item active">Engagements Files Exchange</li>
             </ol>
         </nav>
 
