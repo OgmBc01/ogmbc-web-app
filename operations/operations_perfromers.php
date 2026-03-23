@@ -381,74 +381,10 @@ if ($previous_period_stats['active_employees'] > 0) {
             </div>
         </div>
 
-        <!-- Period Stats Row -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="stat-card stat-blue">
-                    <div class="stat-card-body">
-                        <div class="stat-icon bg-primary-soft">
-                            <i class="bi bi-people-fill text-primary"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value"><?php echo number_format($period_stats['active_employees'] ?? 0); ?></h3>
-                            <p class="stat-label">Active Employees</p>
-                            <div class="stat-progress">
-                                <?php if ($employees_change > 0): ?>
-                                    <small class="text-success">↑ <?php echo $employees_change; ?>% vs previous</small>
-                                <?php elseif ($employees_change < 0): ?>
-                                    <small class="text-danger">↓ <?php echo abs($employees_change); ?>% vs previous</small>
-                                <?php else: ?>
-                                    <small class="text-muted">No change vs previous</small>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card stat-green">
-                    <div class="stat-card-body">
-                        <div class="stat-icon bg-success-soft">
-                            <i class="bi bi-trophy-fill text-success"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value"><?php echo number_format($period_stats['total_points_awarded'] ?? 0); ?></h3>
-                            <p class="stat-label">Points Awarded</p>
-                            <div class="stat-progress">
-                                <?php if ($points_change > 0): ?>
-                                    <small class="text-success">↑ <?php echo $points_change; ?>% vs previous</small>
-                                <?php elseif ($points_change < 0): ?>
-                                    <small class="text-danger">↓ <?php echo abs($points_change); ?>% vs previous</small>
-                                <?php else: ?>
-                                    <small class="text-muted">No change vs previous</small>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card stat-teal">
-                    <div class="stat-card-body">
-                        <div class="stat-icon bg-info-soft">
-                            <i class="bi bi-bar-chart-fill text-info"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value"><?php echo number_format($period_stats['total_transactions'] ?? 0); ?></h3>
-                            <p class="stat-label">Transactions</p>
-                            <div class="stat-progress">
-                                <small class="text-muted">Avg <?php echo round($period_stats['avg_points_per_transaction'] ?? 0); ?> pts/transaction</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Top 3 Performers Display -->
         <div class="row mb-5">
             <div class="col-12">
-                <div class="dashboard-card">
+                <div class="dashboard-card shadow-lg p-4" style="border-radius: 20px;">
                     <div class="card-header py-3 px-4">
                         <h5 class="card-title">
                             <i class="bi bi-trophy-fill me-2 text-warning"></i>
@@ -562,6 +498,70 @@ if ($previous_period_stats['active_employees'] > 0) {
                                         </a>
                                     <?php endif; ?>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <!-- Period Stats Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card stat-blue">
+                    <div class="stat-card-body">
+                        <div class="stat-icon bg-primary-soft">
+                            <i class="bi bi-people-fill text-primary"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value"><?php echo number_format($period_stats['active_employees'] ?? 0); ?></h3>
+                            <p class="stat-label">Active Employees</p>
+                            <div class="stat-progress">
+                                <?php if ($employees_change > 0): ?>
+                                    <small class="text-success">↑ <?php echo $employees_change; ?>% vs previous</small>
+                                <?php elseif ($employees_change < 0): ?>
+                                    <small class="text-danger">↓ <?php echo abs($employees_change); ?>% vs previous</small>
+                                <?php else: ?>
+                                    <small class="text-muted">No change vs previous</small>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card stat-green">
+                    <div class="stat-card-body">
+                        <div class="stat-icon bg-success-soft">
+                            <i class="bi bi-trophy-fill text-success"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value"><?php echo number_format($period_stats['total_points_awarded'] ?? 0); ?></h3>
+                            <p class="stat-label">Points Awarded</p>
+                            <div class="stat-progress">
+                                <?php if ($points_change > 0): ?>
+                                    <small class="text-success">↑ <?php echo $points_change; ?>% vs previous</small>
+                                <?php elseif ($points_change < 0): ?>
+                                    <small class="text-danger">↓ <?php echo abs($points_change); ?>% vs previous</small>
+                                <?php else: ?>
+                                    <small class="text-muted">No change vs previous</small>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card stat-teal">
+                    <div class="stat-card-body">
+                        <div class="stat-icon bg-info-soft">
+                            <i class="bi bi-bar-chart-fill text-info"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value"><?php echo number_format($period_stats['total_transactions'] ?? 0); ?></h3>
+                            <p class="stat-label">Transactions</p>
+                            <div class="stat-progress">
+                                <small class="text-muted">Avg <?php echo round($period_stats['avg_points_per_transaction'] ?? 0); ?> pts/transaction</small>
                             </div>
                         </div>
                     </div>

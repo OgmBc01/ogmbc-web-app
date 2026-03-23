@@ -19,7 +19,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $engagement_id = (int)$_GET['id'];
 
 // Fetch engagement details and verify ownership
-$query = "SELECT e.*, c.company_name, s.service_name
+$query = "SELECT e.*, c.company_name, s.service_name, s.service_category
           FROM engagements e
           JOIN clients c ON e.client_id = c.client_id
           JOIN service_types s ON e.service_id = s.service_id
@@ -42,9 +42,135 @@ $allowed_transitions = [
     'CLOSED' => []
 ];
 
+// Define engagement types that require checklist
+$checklist_required_types = ['Monthly Bookkeeping', 'Backlog accounting', 'Monthly Internal Audit'];
+
+// Define checklist items with categories
+$checklist_items = [
+    'client_meeting' => [
+        'label' => 'Last Visit / Meeting',
+        'icon' => 'bi-calendar-check',
+        'category' => 'client_interaction',
+        'required' => true
+    ],
+    'report_delivered' => [
+        'label' => 'Report delivered till',
+        'icon' => 'bi-file-text',
+        'category' => 'reporting',
+        'required' => false
+    ],
+    'bank_reconciliation' => [
+        'label' => 'Bank reconciliation',
+        'icon' => 'bi-bank',
+        'category' => 'accounting',
+        'required' => true
+    ],
+    'account_receivables' => [
+        'label' => 'Account receivables',
+        'icon' => 'bi-credit-card',
+        'category' => 'accounting',
+        'required' => true
+    ],
+    'account_payables' => [
+        'label' => 'Account payables',
+        'icon' => 'bi-receipt',
+        'category' => 'accounting',
+        'required' => true
+    ],
+    'depreciation' => [
+        'label' => 'Depreciation',
+        'icon' => 'bi-graph-down',
+        'category' => 'accounting',
+        'required' => true
+    ],
+    'prepayments' => [
+        'label' => 'Prepayments',
+        'icon' => 'bi-clock-history',
+        'category' => 'accounting',
+        'required' => true
+    ],
+    'leave_salary' => [
+        'label' => 'Leave salary',
+        'icon' => 'bi-briefcase',
+        'category' => 'payroll',
+        'required' => true
+    ],
+    'gratuity' => [
+        'label' => 'Gratuity',
+        'icon' => 'bi-gift',
+        'category' => 'payroll',
+        'required' => true
+    ],
+    'salaries' => [
+        'label' => 'Salaries',
+        'icon' => 'bi-cash-stack',
+        'category' => 'payroll',
+        'required' => true
+    ],
+    'sales' => [
+        'label' => 'Sales',
+        'icon' => 'bi-graph-up',
+        'category' => 'transactions',
+        'required' => true
+    ],
+    'purchase' => [
+        'label' => 'Purchase',
+        'icon' => 'bi-cart',
+        'category' => 'transactions',
+        'required' => true
+    ],
+    'inventory' => [
+        'label' => 'Inventory',
+        'icon' => 'bi-box-seam',
+        'category' => 'transactions',
+        'required' => true
+    ],
+    'documentation_filing' => [
+        'label' => 'Documentation and filing',
+        'icon' => 'bi-folder2',
+        'category' => 'documentation',
+        'required' => true
+    ],
+    'expected_completion_date' => [
+        'label' => 'Expected date to complete',
+        'icon' => 'bi-calendar-date',
+        'category' => 'planning',
+        'required' => true,
+        'type' => 'date'
+    ],
+    'other_matters' => [
+        'label' => 'Any other matter',
+        'icon' => 'bi-chat-text',
+        'category' => 'notes',
+        'required' => false,
+        'type' => 'textarea'
+    ],
+    'tb_issues' => [
+        'label' => 'TB issues',
+        'icon' => 'bi-exclamation-triangle',
+        'category' => 'issues',
+        'required' => true,
+        'type' => 'textarea'
+    ]
+];
+
 $message = '';
 $message_type = '';
 $showSuccessModal = false;
+$checklist_data = [];
+$checklist_completed = false;
+
+// Check if engagement requires checklist
+$requires_checklist = in_array($engagement['service_name'], $checklist_required_types);
+
+// Load existing checklist data if any
+if ($requires_checklist) {
+    $checklist_query = "SELECT * FROM engagement_checklist WHERE engagement_id = $engagement_id";
+    $checklist_result = mysqli_query($connection, $checklist_query);
+    if ($checklist_result && mysqli_num_rows($checklist_result) > 0) {
+        $checklist_data = mysqli_fetch_assoc($checklist_result);
+    }
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
@@ -57,8 +183,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         $message = "Invalid status transition from {$engagement['status']} to $new_status.";
         $message_type = "danger";
     } else {
+        // Check if checklist is required for closing
+        if ($new_status == 'CLOSED' && $requires_checklist) {
+            $checklist_valid = true;
+            $missing_items = [];
+            // DEBUG: Uncomment to see POST data
+            echo '<pre>'; print_r($_POST); echo '</pre>';
+            foreach ($checklist_items as $key => $item) {
+                if ($item['required']) {
+                    $post_key = 'checklist_' . $key;
+                    $value = isset($_POST[$post_key]) ? trim($_POST[$post_key]) : '';
+                    // Special debug for report_delivered
+                    if ($key === 'report_delivered') { echo 'report_delivered POST: '; var_dump($value); }
+                    if ($value === '' || $value === null) {
+                        $checklist_valid = false;
+                        $missing_items[] = $item['label'];
+                    }
+                }
+            }
+            
+            if (!$checklist_valid) {
+                $message = "Cannot close this engagement. Please complete all required checklist items:<br><ul><li>" . implode("</li><li>", array_map('htmlspecialchars', $missing_items)) . "</li></ul>";
+                $message_type = "danger";
+            } else {
+                // Save checklist data
+                $checklist_data_save = [];
+                foreach ($checklist_items as $key => $item) {
+                    $value = isset($_POST['checklist_' . $key]) ? mysqli_real_escape_string($connection, trim($_POST['checklist_' . $key])) : '';
+                    $checklist_data_save[$key] = $value;
+                }
+                
+                // Insert or update checklist
+                if ($checklist_data) {
+                    $update_checklist = "UPDATE engagement_checklist SET ";
+                    $updates = [];
+                    foreach ($checklist_items as $key => $item) {
+                        $updates[] = "$key = '{$checklist_data_save[$key]}'";
+                    }
+                    $updates[] = "completed_at = NOW()";
+                    $update_checklist .= implode(", ", $updates);
+                    $update_checklist .= " WHERE engagement_id = $engagement_id";
+                    mysqli_query($connection, $update_checklist);
+                } else {
+                    $insert_checklist = "INSERT INTO engagement_checklist (engagement_id, ";
+                    $values = "";
+                    $fields = [];
+                    $field_values = [];
+                    foreach ($checklist_items as $key => $item) {
+                        $fields[] = $key;
+                        $field_values[] = "'{$checklist_data_save[$key]}'";
+                    }
+                    $insert_checklist .= implode(", ", $fields) . ", completed_at) VALUES ($engagement_id, ";
+                    $insert_checklist .= implode(", ", $field_values) . ", NOW())";
+                    mysqli_query($connection, $insert_checklist);
+                }
+            }
+        }
+        
         // Check if evidence is required and uploaded
-        if ($new_status == 'SUBMITTED' && $engagement['evidence_required']) {
+        if (empty($message) && $new_status == 'SUBMITTED' && $engagement['evidence_required']) {
             $evidence_check = "SELECT COUNT(*) as count FROM evidence WHERE engagement_id = $engagement_id";
             $evidence_result = mysqli_query($connection, $evidence_check);
             $evidence_count = mysqli_fetch_assoc($evidence_result)['count'];
@@ -66,9 +249,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
             if ($evidence_count == 0) {
                 $message = "Cannot submit engagement without uploading required evidence.";
                 $message_type = "danger";
-                if (ob_get_level() > 0) {
-                    ob_end_flush();
-                }
             }
         }
         
@@ -97,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     }
 }
 
-// Function to calculate points (simplified)
+// Function to calculate points
 function calculate_engagement_points($connection, $engagement_id) {
     $query = "SELECT e.*, r.points_within_deadline, r.points_tier_1, r.points_tier_2, r.points_tier_3
               FROM engagements e
@@ -108,12 +288,10 @@ function calculate_engagement_points($connection, $engagement_id) {
     
     if (!$data) return;
     
-    // Calculate delay days
     $completion_date = new DateTime();
     $deadline = new DateTime($data['approved_deadline'] ?? $data['original_deadline']);
     $delay_days = $completion_date > $deadline ? $completion_date->diff($deadline)->days : 0;
     
-    // Determine points based on delay
     if ($delay_days == 0) {
         $points = $data['points_within_deadline'];
     } elseif ($delay_days >= 5 && $delay_days <= 15) {
@@ -124,7 +302,6 @@ function calculate_engagement_points($connection, $engagement_id) {
         $points = $data['points_tier_3'];
     }
     
-    // Update engagement with points
     $update = "UPDATE engagements SET 
                points_awarded = $points,
                delay_days = $delay_days,
@@ -132,13 +309,12 @@ function calculate_engagement_points($connection, $engagement_id) {
                WHERE engagement_id = $engagement_id";
     mysqli_query($connection, $update);
     
-    // Add to points ledger
     $ledger = "INSERT INTO points_ledger 
                (employee_id, source_type, source_id, points, points_type, description, notes, created_by)
                VALUES (
                    {$data['assigned_to']}, 
                    'ENGAGEMENT', 
-                   " . ($engagement_id !== null ? $engagement_id : 'NULL') . ", 
+                   $engagement_id, 
                    $points, 
                    'EARNED', 
                    'Points awarded for completing engagement: {$data['title']}', 
@@ -155,7 +331,7 @@ if (ob_get_level() > 0) {
 
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header dark-header">
                     <h5 class="card-title">
@@ -174,9 +350,18 @@ if (ob_get_level() > 0) {
                             <span class="text-muted">Client: <?php echo htmlspecialchars($engagement['company_name']); ?></span>
                             <span class="badge bg-<?php 
                                 echo $engagement['status'] == 'IN_PROGRESS' ? 'primary' : 
-                                    ($engagement['status'] == 'AWAITING_REVIEW' ? 'warning' : 'secondary'); 
+                                    ($engagement['status'] == 'AWAITING_REVIEW' ? 'warning' : 
+                                    ($engagement['status'] == 'SUBMITTED' ? 'info' : 'secondary')); 
                             ?>">Current: <?php echo $engagement['status']; ?></span>
                         </div>
+                        <?php if ($requires_checklist): ?>
+                            <div class="mt-2">
+                                <span class="badge bg-info">
+                                    <i class="bi bi-clipboard-check me-1"></i>
+                                    Completion Checklist Required
+                                </span>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
                     <?php if (!empty($message) && !$showSuccessModal): ?>
@@ -202,8 +387,176 @@ if (ob_get_level() > 0) {
                             </small>
                         </div>
 
+                        <!-- Checklist Section - Only show when closing and required -->
+                        <?php if ($requires_checklist): ?>
+                        <div id="checklistSection" style="display: none;">
+                            <hr>
+                            <div class="checklist-container">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-clipboard-check fs-4 me-2 text-primary"></i>
+                                    <h5 class="mb-0">Engagement Completion Checklist</h5>
+                                    <span class="badge bg-danger ms-2">Required for Closing</span>
+                                </div>
+                                <p class="text-muted small mb-3">Please complete all required fields before closing this engagement.</p>
+                                
+                                <div class="row">
+                                    <!-- Client Interaction Section -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="checklist-section">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-chat-dots me-2"></i>Client Interaction
+                                            </h6>
+                                            <?php foreach ($checklist_items as $key => $item): ?>
+                                                <?php if ($item['category'] == 'client_interaction'): ?>
+                                                <div class="checklist-item">
+                                                    <label class="form-label fw-semibold">
+                                                        <i class="bi <?php echo $item['icon']; ?> me-2 text-muted"></i>
+                                                        <?php echo $item['label']; ?>
+                                                        <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
+                                                    </label>
+                                                    <?php if (isset($item['type']) && $item['type'] == 'date'): ?>
+                                                        <input type="date" class="form-control" name="checklist_<?php echo $key; ?>" 
+                                                               value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                    <?php elseif (isset($item['type']) && $item['type'] == 'textarea'): ?>
+                                                        <textarea class="form-control" name="checklist_<?php echo $key; ?>" rows="2" 
+                                                                  placeholder="Enter <?php echo strtolower($item['label']); ?>..."><?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?></textarea>
+                                                    <?php else: ?>
+                                                        <input type="text" class="form-control" name="checklist_<?php echo $key; ?>" 
+                                                               placeholder="Enter <?php echo strtolower($item['label']); ?>"
+                                                               value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Accounting Section -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="checklist-section">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-calculator me-2"></i>Accounting Tasks
+                                            </h6>
+                                            <?php foreach ($checklist_items as $key => $item): ?>
+                                                <?php if ($item['category'] == 'accounting'): ?>
+                                                <div class="checklist-item">
+                                                    <label class="form-label fw-semibold">
+                                                        <i class="bi <?php echo $item['icon']; ?> me-2 text-muted"></i>
+                                                        <?php echo $item['label']; ?>
+                                                        <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
+                                                    </label>
+                                                    <input type="text" class="form-control" name="checklist_<?php echo $key; ?>" 
+                                                           placeholder="Enter <?php echo strtolower($item['label']); ?>"
+                                                           value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Payroll Section -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="checklist-section">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-cash-stack me-2"></i>Payroll & Benefits
+                                            </h6>
+                                            <?php foreach ($checklist_items as $key => $item): ?>
+                                                <?php if ($item['category'] == 'payroll'): ?>
+                                                <div class="checklist-item">
+                                                    <label class="form-label fw-semibold">
+                                                        <i class="bi <?php echo $item['icon']; ?> me-2 text-muted"></i>
+                                                        <?php echo $item['label']; ?>
+                                                        <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
+                                                    </label>
+                                                    <input type="text" class="form-control" name="checklist_<?php echo $key; ?>" 
+                                                           placeholder="Enter <?php echo strtolower($item['label']); ?>"
+                                                           value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Transactions Section -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="checklist-section">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-arrow-left-right me-2"></i>Transactions
+                                            </h6>
+                                            <?php foreach ($checklist_items as $key => $item): ?>
+                                                <?php if ($item['category'] == 'transactions'): ?>
+                                                <div class="checklist-item">
+                                                    <label class="form-label fw-semibold">
+                                                        <i class="bi <?php echo $item['icon']; ?> me-2 text-muted"></i>
+                                                        <?php echo $item['label']; ?>
+                                                        <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
+                                                    </label>
+                                                    <input type="text" class="form-control" name="checklist_<?php echo $key; ?>" 
+                                                           placeholder="Enter <?php echo strtolower($item['label']); ?>"
+                                                           value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Documentation & Planning -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="checklist-section">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-folder2 me-2"></i>Documentation & Planning
+                                            </h6>
+                                            <?php foreach ($checklist_items as $key => $item): ?>
+                                                <?php if (in_array($item['category'], ['documentation', 'planning'])): ?>
+                                                <div class="checklist-item">
+                                                    <label class="form-label fw-semibold">
+                                                        <i class="bi <?php echo $item['icon']; ?> me-2 text-muted"></i>
+                                                        <?php echo $item['label']; ?>
+                                                        <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
+                                                    </label>
+                                                    <?php if (isset($item['type']) && $item['type'] == 'date'): ?>
+                                                        <input type="date" class="form-control" name="checklist_<?php echo $key; ?>" 
+                                                               value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                    <?php else: ?>
+                                                        <input type="text" class="form-control" name="checklist_<?php echo $key; ?>" 
+                                                               placeholder="Enter <?php echo strtolower($item['label']); ?>"
+                                                               value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Notes & Issues -->
+                                    <div class="col-12 mb-4">
+                                        <div class="checklist-section">
+                                            <h6 class="section-title">
+                                                <i class="bi bi-chat-text me-2"></i>Additional Notes & Issues
+                                            </h6>
+                                            <?php foreach ($checklist_items as $key => $item): ?>
+                                                <?php if (in_array($item['category'], ['notes', 'issues'])): ?>
+                                                <div class="checklist-item">
+                                                    <label class="form-label fw-semibold">
+                                                        <i class="bi <?php echo $item['icon']; ?> me-2 text-muted"></i>
+                                                        <?php echo $item['label']; ?>
+                                                        <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
+                                                    </label>
+                                                    <textarea class="form-control" name="checklist_<?php echo $key; ?>" rows="3" 
+                                                              placeholder="Enter <?php echo strtolower($item['label']); ?>..."><?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?></textarea>
+                                                </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                        </div>
+                        <?php endif; ?>
+
                         <div class="mb-3">
-                            <label for="notes" class="form-label">Notes (Optional)</label>
+                            <label for="notes" class="form-label">Status Change Notes (Optional)</label>
                             <textarea class="form-control" id="notes" name="notes" rows="3" 
                                       placeholder="Add any notes about this status change..."></textarea>
                         </div>
@@ -224,6 +577,9 @@ if (ob_get_level() > 0) {
                                 <div class="alert alert-success">
                                     <i class="bi bi-check-circle me-2"></i>
                                     Closing this engagement will award points based on completion time.
+                                    <?php if ($requires_checklist): ?>
+                                        <strong>Please complete the checklist above before closing.</strong>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -255,6 +611,7 @@ if (ob_get_level() > 0) {
                         ✅ <strong>IN PROGRESS → AWAITING REVIEW:</strong> Ready for review, ensure evidence is uploaded.<br>
                         ✅ <strong>AWAITING REVIEW → SUBMITTED:</strong> Final submission, cannot be changed after this.<br>
                         ✅ <strong>SUBMITTED → CLOSED:</strong> Engagement complete, points will be awarded.
+                        <?php if ($requires_checklist): ?> For Monthly bookkeeping, Backlog Accounting, and Monthly Internal Audit engagements, a completion checklist must be filled.<?php endif; ?>
                     </p>
                 </div>
                 <div class="col-md-3 text-md-end">
@@ -264,6 +621,23 @@ if (ob_get_level() > 0) {
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusSelect = document.getElementById('new_status');
+    const checklistSection = document.getElementById('checklistSection');
+    
+    statusSelect.addEventListener('change', function() {
+        if (checklistSection) {
+            if (this.value === 'CLOSED') {
+                checklistSection.style.display = 'block';
+            } else {
+                checklistSection.style.display = 'none';
+            }
+        }
+    });
+});
+</script>
 
 <?php if ($showSuccessModal): ?>
 <!-- Success Modal -->
@@ -315,5 +689,73 @@ if (ob_get_level() > 0) {
     border-radius: 16px;
     padding: 20px;
     color: white;
+}
+
+.checklist-container {
+    background: #fef9e6;
+    border-radius: 16px;
+    padding: 20px;
+    border-left: 4px solid #ffc107;
+}
+
+.checklist-section {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.checklist-section:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.section-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ffc107;
+    display: inline-block;
+}
+
+.checklist-item {
+    margin-bottom: 15px;
+}
+
+.checklist-item:last-child {
+    margin-bottom: 0;
+}
+
+.checklist-item .form-label {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.checklist-item .form-control {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.checklist-item .form-control:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+.bg-info {
+    background-color: #17a2b8 !important;
+}
+
+@media (max-width: 768px) {
+    .checklist-container {
+        padding: 15px;
+    }
+    
+    .checklist-section {
+        margin-bottom: 20px;
+    }
 }
 </style>

@@ -21,8 +21,8 @@ function initSession() {
         session_regenerate_id(true);
         $_SESSION['CREATED'] = time();
     }
-    // Set secure session cookie parameters
-    if (PHP_SESSION_ACTIVE) {
+    // Set secure session cookie parameters BEFORE any output
+    if (PHP_SESSION_ACTIVE && !headers_sent()) {
         $cookieParams = session_get_cookie_params();
         setcookie(
             session_name(),
