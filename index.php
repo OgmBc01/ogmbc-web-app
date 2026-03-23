@@ -2,6 +2,18 @@
 include 'includes/database.php';
 include 'includes/header.php';
 ?>
+<script>
+// Remove query params from URL after redirect (e.g., ?logout=success)
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.history && history.replaceState) {
+    const url = new URL(window.location.href);
+    if (url.search) {
+      url.search = '';
+      history.replaceState(null, document.title, url.pathname);
+    }
+  }
+});
+</script>
 
 <!-- Hero Section (Carousel) -->
   <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">

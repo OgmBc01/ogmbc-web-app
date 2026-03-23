@@ -66,7 +66,6 @@ include 'functions.php'
         </a>
 
         <nav class="menu navbar navbar-expand-lg flex-grow-1" id="menu" style="height: 40px;">
-          <div class="container-fluid ps-lg-5">
             <ul class="navbar-nav flex-grow-1 justify-content-lg-end ms-lg-auto">
               <!-- Home -->
               <li class="nav-item">
@@ -185,9 +184,10 @@ include 'functions.php'
               </li>
 
               <!-- Contact -->
-              <li class="nav-item">
-                  <a class="nav-link" href="contact.php">Contact</a>
-              </li>
+
+                  <li class="nav-item me-3">
+                    <a class="nav-link" href="contact.php">Contact</a>
+                  </li>
 
               <?php
               // Check for admin roles
@@ -234,14 +234,13 @@ include 'functions.php'
 
             <?php if (isset($_SESSION['user_id'])): ?>
             <!-- If logged in, show logout instead -->
-            <li class="nav-item">
+            <li class="nav-item ms-2">
               <a href="logout.php" class="btn btn-ghost">
                 <i class="bi bi-box-arrow-right me-1"></i>Sign Out
               </a>
             </li>
             <?php endif; ?>
             </ul>
-          </div>
         </nav>
 
         <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">

@@ -90,7 +90,6 @@ include 'functions.php'
         </a>
 
         <nav class="menu navbar navbar-expand-lg flex-grow-1" id="menu" style="height: 40px;">
-          <div class="container-fluid ps-lg-5">
             <ul class="navbar-nav flex-grow-1 justify-content-lg-end ms-lg-auto">
               <!-- Home -->
               <li class="nav-item">
@@ -209,26 +208,9 @@ include 'functions.php'
               </li>
 
               <!-- Contact -->
-              <li class="nav-item">
-                  <a class="nav-link" href="contact.php">Contact</a>
+              <li class="nav-item me-3">
+                <a class="nav-link" href="contact.php">Contact</a>
               </li>
-
-              <?php
-              // Check for admin roles
-              $show_admin_link = false;
-              if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
-                $admin_roles = ['admin', 'super_admin', 'moderator'];
-                $show_admin_link = in_array($_SESSION['user_role'], $admin_roles);
-            }
-
-            if ($show_admin_link): ?>
-              <!-- Admin Dashboard -->
-              <li class="nav-item">
-                  <a class="nav-link" href="admin/dashboard.php" target="_blank">
-                    Admin
-                  </a>
-              </li>
-            <?php endif; ?>
 
             <?php if (!isset($_SESSION['user_id'])): ?>
             <!-- Login Dropdown -->
@@ -258,20 +240,19 @@ include 'functions.php'
 
             <?php if (isset($_SESSION['user_id'])): ?>
             <!-- If logged in, show logout instead -->
-            <li class="nav-item">
+            <li class="nav-item ms-2">
               <a href="logout.php" class="btn btn-ghost">
                 <i class="bi bi-box-arrow-right me-1"></i>Sign Out
               </a>
             </li>
             <?php endif; ?>
             </ul>
-          </div>
         </nav>
 
         <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </div>
     </header>
