@@ -75,11 +75,12 @@ if (isset($_GET['id'])) {
             $notes_result = false;
         }
         
-        // Get client documents
-        $docs_sql = "SELECT cd.*, u.first_name, u.last_name 
-                    FROM client_documents cd 
-                    LEFT JOIN users u ON cd.uploaded_by = u.user_id 
-                    WHERE cd.client_id = ? 
+        // Get client documents: show all general documents and specific documents shared with this client
+        $docs_sql = "SELECT cd.*, u.first_name, u.last_name
+                    FROM client_documents cd
+                    LEFT JOIN users u ON cd.uploaded_by = u.user_id
+                    WHERE cd.document_type = 'general'
+                       OR cd.document_id IN (SELECT document_id FROM document_client_access WHERE client_id = ?)
                     ORDER BY cd.uploaded_at DESC";
         $docs_stmt = $connection->prepare($docs_sql);
         if ($docs_stmt) {
@@ -447,11 +448,7 @@ if (isset($_GET['id'])) {
                                                         </span>
                                                     <?php endif; ?>
                                                     </td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument(<?php echo $doc['doc_id']; ?>)">
-                                                            <i class="bi bi-trash"></i> Delete
-                                                        </button>
-                                                    </td>
+                                                    <!-- Delete button removed; document deletion is managed in the document_management module -->
                                                 </tr>
                                             <?php endwhile; ?>
                                         <?php else: ?>

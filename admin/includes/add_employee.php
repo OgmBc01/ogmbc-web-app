@@ -50,16 +50,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
             }
         }
     }
+    
+    // Password strength validation
+    $password_strength = validatePasswordStrength($password);
 
     // Validate required fields
     if (empty($user_email) || empty($password) || empty($first_name) || empty($last_name) || empty($department_id)) {
         $message = "Please fill in all required fields including Department.";
         $message_type = "danger";
+    } elseif (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
+        $message = "Please enter a valid email address.";
+        $message_type = "danger";
+    } elseif ($password_strength['score'] < 3) {
+        $message = "Password is too weak. Please use a stronger password.<br>
+                    <small>Requirements: " . implode(", ", $password_strength['requirements']) . "</small>";
+        $message_type = "danger";
     } else {
+        // Hash password
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        
         // 1. Insert into users table first
         $user_insert_sql = "INSERT INTO users (first_name, last_name, user_image, user_email, password) VALUES (?, ?, ?, ?, ?)";
         $user_stmt = $connection->prepare($user_insert_sql);
-        $user_stmt->bind_param("sssss", $first_name, $last_name, $user_image, $user_email, $password);
+        $user_stmt->bind_param("sssss", $first_name, $last_name, $user_image, $user_email, $hashed_password);
         if ($user_stmt->execute()) {
             $new_user_id = $user_stmt->insert_id;
             $user_stmt->close();
@@ -72,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
             $stmt->bind_param("issssssssidi", 
                 $new_user_id, 
                 $user_email, 
-                $password, 
+                $hashed_password, 
                 $first_name, 
                 $last_name, 
                 $user_image, 
@@ -100,6 +113,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
         }
     }
 }
+
+// Function to validate password strength
+function validatePasswordStrength($password) {
+    $score = 0;
+    $requirements = [];
+    
+    // Length check (minimum 8 characters)
+    if (strlen($password) >= 8) {
+        $score++;
+    } else {
+        $requirements[] = "Minimum 8 characters";
+    }
+    
+    // Contains uppercase letter
+    if (preg_match('/[A-Z]/', $password)) {
+        $score++;
+    } else {
+        $requirements[] = "At least one uppercase letter";
+    }
+    
+    // Contains lowercase letter
+    if (preg_match('/[a-z]/', $password)) {
+        $score++;
+    } else {
+        $requirements[] = "At least one lowercase letter";
+    }
+    
+    // Contains number
+    if (preg_match('/[0-9]/', $password)) {
+        $score++;
+    } else {
+        $requirements[] = "At least one number";
+    }
+    
+    // Contains special character
+    if (preg_match('/[^a-zA-Z0-9]/', $password)) {
+        $score++;
+    } else {
+        $requirements[] = "At least one special character (!@#$%^&*)";
+    }
+    
+    // Determine strength level
+    if ($score >= 5) {
+        $strength = 'very_strong';
+        $strength_text = 'Very Strong';
+        $strength_color = 'success';
+        $strength_icon = 'bi-shield-check';
+    } elseif ($score >= 4) {
+        $strength = 'strong';
+        $strength_text = 'Strong';
+        $strength_color = 'primary';
+        $strength_icon = 'bi-shield-check';
+    } elseif ($score >= 3) {
+        $strength = 'medium';
+        $strength_text = 'Medium';
+        $strength_color = 'warning';
+        $strength_icon = 'bi-shield-exclamation';
+    } elseif ($score >= 2) {
+        $strength = 'weak';
+        $strength_text = 'Weak';
+        $strength_color = 'danger';
+        $strength_icon = 'bi-shield-x';
+    } else {
+        $strength = 'very_weak';
+        $strength_text = 'Very Weak';
+        $strength_color = 'danger';
+        $strength_icon = 'bi-shield-x';
+    }
+    
+    return [
+        'score' => $score,
+        'strength' => $strength,
+        'strength_text' => $strength_text,
+        'strength_color' => $strength_color,
+        'strength_icon' => $strength_icon,
+        'requirements' => $requirements
+    ];
+}
 ?>
 
 <!-- Main Content -->
@@ -126,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
                         </div>
                         <?php endif; ?>
 
-                        <form method="POST" action="" enctype="multipart/form-data">
+                        <form method="POST" action="" enctype="multipart/form-data" id="employeeForm">
                             <div class="row">
                                 <!-- Left Column - Required Fields -->
                                 <div class="col-md-6">
@@ -136,6 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
                                             <option value="">Select Department</option>
                                             <?php
                                             if ($departments_result && $departments_result->num_rows > 0) {
+                                                mysqli_data_seek($departments_result, 0);
                                                 while ($dept = $departments_result->fetch_assoc()) {
                                                     $selected = ($department_id == $dept['id']) ? 'selected' : '';
                                                     echo "<option value='" . $dept['id'] . "' $selected>" . 
@@ -147,21 +239,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="user_id" class="form-label"><i class="bi bi-person-badge me-1"></i>User ID *</label>
-                                        <input type="number" id="user_id" name="user_id" class="form-control" 
-                                               value="<?php echo htmlspecialchars($user_id); ?>" required>
-                                    </div>
-
-                                    <div class="mb-3">
                                         <label for="user_email" class="form-label"><i class="bi bi-envelope me-1"></i>Email *</label>
-                                        <input type="email" id="user_email" name="user_email" class="form-control" 
-                                               value="<?php echo htmlspecialchars($user_email); ?>" required>
+                                             <input type="email" id="user_email" name="user_email" class="form-control" value="" autocomplete="off" required>
                                     </div>
 
+                                    <!-- Password Section with Strength Meter -->
                                     <div class="mb-3">
                                         <label for="password" class="form-label"><i class="bi bi-lock me-1"></i>Password *</label>
-                                        <input type="password" id="password" name="password" class="form-control" 
-                                               value="<?php echo htmlspecialchars($password); ?>" required>
+                                        <div class="input-group">
+                                              <input type="password" id="password" name="password" class="form-control" value="" autocomplete="new-password" minlength="8" required>
+                                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div id="passwordStrength" class="mt-2" style="display: none;">
+                                            <div class="strength-meter">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <small class="text-muted">Password Strength:</small>
+                                                    <small id="strengthText" class="fw-bold"></small>
+                                                </div>
+                                                <div class="progress" style="height: 8px;">
+                                                    <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                                </div>
+                                                <div id="strengthRequirements" class="mt-2">
+                                                    <small class="text-muted d-block mb-1">Password requirements:</small>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div id="reqLength" class="requirement-item">
+                                                                <i class="bi bi-circle me-1"></i> Minimum 8 characters
+                                                            </div>
+                                                            <div id="reqUpper" class="requirement-item">
+                                                                <i class="bi bi-circle me-1"></i> At least one uppercase letter
+                                                            </div>
+                                                            <div id="reqLower" class="requirement-item">
+                                                                <i class="bi bi-circle me-1"></i> At least one lowercase letter
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div id="reqNumber" class="requirement-item">
+                                                                <i class="bi bi-circle me-1"></i> At least one number
+                                                            </div>
+                                                            <div id="reqSpecial" class="requirement-item">
+                                                                <i class="bi bi-circle me-1"></i> At least one special character
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="confirm_password" class="form-label"><i class="bi bi-lock-fill me-1"></i>Confirm Password *</label>
+                                        <div class="input-group">
+                                            <input type="password" id="confirm_password" name="confirm_password" class="form-control" value="" autocomplete="new-password" required>
+                                            <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div id="passwordMatch" class="mt-1"></div>
                                     </div>
 
                                     <div class="mb-3">
@@ -177,9 +313,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="salary" class="form-label"><i class="bi bi-cash me-1"></i>Salary ($)</label>
-                                        <input type="number" step="0.01" id="salary" name="salary" class="form-control" 
-                                               value="<?php echo htmlspecialchars($salary ?: '0.00'); ?>">
+                                        <label for="salary" class="form-label"><i class="bi bi-cash me-1"></i>Salary (AED)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">AED</span>
+                                            <input type="number" step="0.01" id="salary" name="salary" class="form-control" 
+                                                   value="<?php echo htmlspecialchars($salary ?: '0.00'); ?>">
+                                        </div>
+                                        <div class="form-text">Enter employee's monthly salary in AED</div>
                                     </div>
                                 </div>
 
@@ -224,7 +364,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
                                     <button type="submit" name="add_employee" class="btn btn-primary btn-lg me-2">
                                         <i class="bi bi-check-circle me-1"></i> Add Employee
                                     </button>
-                                    <button type="reset" class="btn btn-outline-secondary btn-lg">
+                                    <button type="reset" class="btn btn-outline-secondary btn-lg" onclick="resetForm()">
                                         <i class="bi bi-x-circle me-1"></i> Reset
                                     </button>
                                 </div>
@@ -316,4 +456,282 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_employee'])) {
         background-size: 16px;
         padding-right: 2.5rem;
     }
+    
+    /* Password Strength Meter Styles */
+    .strength-meter {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .requirement-item {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-bottom: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    .requirement-item.met {
+        color: #28a745;
+    }
+    
+    .requirement-item.met i {
+        color: #28a745;
+    }
+    
+    .requirement-item i {
+        font-size: 0.7rem;
+    }
+    
+    #passwordMatch {
+        font-size: 0.75rem;
+        margin-top: 5px;
+    }
+    
+    .match-success {
+        color: #28a745;
+    }
+    
+    .match-error {
+        color: #dc3545;
+    }
+    
+    /* Progress bar animations */
+    .progress-bar {
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    
+    /* Strength bar colors */
+    .progress-bar.bg-success { background-color: #198754 !important; }
+    .progress-bar.bg-primary { background-color: #0d6efd !important; }
+    .progress-bar.bg-warning { background-color: #ffc107 !important; }
+    .progress-bar.bg-danger { background-color: #dc3545 !important; }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        color: #0f172a;
+        font-weight: 500;
+    }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const strengthDiv = document.getElementById('passwordStrength');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const passwordMatchDiv = document.getElementById('passwordMatch');
+    
+    // Requirement elements
+    const reqLength = document.getElementById('reqLength');
+    const reqUpper = document.getElementById('reqUpper');
+    const reqLower = document.getElementById('reqLower');
+    const reqNumber = document.getElementById('reqNumber');
+    const reqSpecial = document.getElementById('reqSpecial');
+    
+    // Password strength validation function
+    function validatePasswordStrength(password) {
+        let score = 0;
+        const requirements = {
+            length: password.length >= 8,
+            upper: /[A-Z]/.test(password),
+            lower: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[^a-zA-Z0-9]/.test(password)
+        };
+        
+        // Count met requirements
+        if (requirements.length) score++;
+        if (requirements.upper) score++;
+        if (requirements.lower) score++;
+        if (requirements.number) score++;
+        if (requirements.special) score++;
+        
+        // Update requirement indicators
+        updateRequirement(reqLength, requirements.length, 'Minimum 8 characters');
+        updateRequirement(reqUpper, requirements.upper, 'At least one uppercase letter');
+        updateRequirement(reqLower, requirements.lower, 'At least one lowercase letter');
+        updateRequirement(reqNumber, requirements.number, 'At least one number');
+        updateRequirement(reqSpecial, requirements.special, 'At least one special character');
+        
+        // Determine strength
+        let strength = '';
+        let strengthTextValue = '';
+        let strengthColor = '';
+        let width = 0;
+        
+        if (score >= 5) {
+            strength = 'very-strong';
+            strengthTextValue = 'Very Strong';
+            strengthColor = 'success';
+            width = 100;
+        } else if (score >= 4) {
+            strength = 'strong';
+            strengthTextValue = 'Strong';
+            strengthColor = 'primary';
+            width = 80;
+        } else if (score >= 3) {
+            strength = 'medium';
+            strengthTextValue = 'Medium';
+            strengthColor = 'warning';
+            width = 60;
+        } else if (score >= 2) {
+            strength = 'weak';
+            strengthTextValue = 'Weak';
+            strengthColor = 'danger';
+            width = 40;
+        } else {
+            strength = 'very-weak';
+            strengthTextValue = 'Very Weak';
+            strengthColor = 'danger';
+            width = 20;
+        }
+        
+        // Update strength bar
+        strengthBar.className = `progress-bar bg-${strengthColor}`;
+        strengthBar.style.width = `${width}%`;
+        strengthText.textContent = strengthTextValue;
+        strengthText.className = `fw-bold text-${strengthColor}`;
+        
+        return { score, strength, requirements };
+    }
+    
+    function updateRequirement(element, isMet, text) {
+        if (isMet) {
+            element.innerHTML = `<i class="bi bi-check-circle-fill me-1 text-success"></i> ${text}`;
+            element.classList.add('met');
+        } else {
+            element.innerHTML = `<i class="bi bi-circle me-1"></i> ${text}`;
+            element.classList.remove('met');
+        }
+    }
+    
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+        
+        if (confirm.length === 0) {
+            passwordMatchDiv.innerHTML = '';
+            return;
+        }
+        
+        if (password === confirm) {
+            passwordMatchDiv.innerHTML = '<i class="bi bi-check-circle-fill me-1 text-success"></i> Passwords match';
+            passwordMatchDiv.className = 'match-success';
+        } else {
+            passwordMatchDiv.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1 text-danger"></i> Passwords do not match';
+            passwordMatchDiv.className = 'match-error';
+        }
+    }
+    
+    // Real-time password strength checking
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            if (password.length > 0) {
+                strengthDiv.style.display = 'block';
+                validatePasswordStrength(password);
+            } else {
+                strengthDiv.style.display = 'none';
+            }
+            
+            checkPasswordMatch();
+        });
+    }
+    
+    if (confirmInput) {
+        confirmInput.addEventListener('input', checkPasswordMatch);
+    }
+    
+    // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirm = document.getElementById('toggleConfirmPassword');
+    
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('bi-eye');
+            this.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+    }
+    
+    if (toggleConfirm) {
+        toggleConfirm.addEventListener('click', function() {
+            const type = confirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('bi-eye');
+            this.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+    }
+});
+
+// Form submission validation
+document.getElementById('employeeForm')?.addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm_password').value;
+    const email = document.getElementById('user_email').value;
+    const department = document.getElementById('department_id').value;
+    const firstName = document.getElementById('first_name').value;
+    const lastName = document.getElementById('last_name').value;
+    
+    // Validate required fields
+    if (!firstName || !lastName || !email || !department || !password) {
+        e.preventDefault();
+        alert('Please fill in all required fields.');
+        return false;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        e.preventDefault();
+        alert('Please enter a valid email address.');
+        return false;
+    }
+    
+    // Check password strength
+    if (password.length < 8) {
+        e.preventDefault();
+        alert('Password must be at least 8 characters long.');
+        return false;
+    }
+    
+    // Check if password meets strength requirements (score >= 3)
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^a-zA-Z0-9]/.test(password)) score++;
+    
+    if (score < 3) {
+        e.preventDefault();
+        alert('Password is too weak. Please use a stronger password that includes:\n- Minimum 8 characters\n- Uppercase and lowercase letters\n- Numbers\n- Special characters');
+        return false;
+    }
+    
+    if (password !== confirm) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+        return false;
+    }
+    
+    return true;
+});
+
+function resetForm() {
+    if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+        document.getElementById('employeeForm').reset();
+        // Reset password strength display
+        const strengthDiv = document.getElementById('passwordStrength');
+        if (strengthDiv) strengthDiv.style.display = 'none';
+        const passwordMatchDiv = document.getElementById('passwordMatch');
+        if (passwordMatchDiv) passwordMatchDiv.innerHTML = '';
+    }
+}
+</script>

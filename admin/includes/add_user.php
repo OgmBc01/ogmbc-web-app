@@ -42,6 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
     $user_image = $_FILES['user_image']['name'];
     $user_image_temp = $_FILES['user_image']['tmp_name'];
     
+    // Password strength validation
+    $password_strength = validatePasswordStrength($password);
+    
     // Validation
     if (empty($username) || empty($first_name) || empty($last_name) || empty($user_email) || empty($password)) {
         $message = "Please fill in all required fields.";
@@ -49,8 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
     } elseif (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
         $message = "Please enter a valid email address.";
         $message_type = "danger";
-    } elseif (strlen($password) < 6) {
-        $message = "Password must be at least 6 characters long.";
+    } elseif ($password_strength['score'] < 3) {
+        $message = "Password is too weak. Please use a stronger password.<br>
+                    <small>Requirements: " . implode(", ", $password_strength['requirements']) . "</small>";
         $message_type = "danger";
     } elseif ($password !== $confirm_password) {
         $message = "Passwords do not match.";
@@ -157,6 +161,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
     }
 }
 
+// Function to validate password strength
+function validatePasswordStrength($password) {
+    $score = 0;
+    $requirements = [];
+    
+    // Length check (minimum 8 characters)
+    if (strlen($password) >= 8) {
+        $score++;
+    } else {
+        $requirements[] = "Minimum 8 characters";
+    }
+    
+    // Contains uppercase letter
+    if (preg_match('/[A-Z]/', $password)) {
+        $score++;
+    } else {
+        $requirements[] = "At least one uppercase letter";
+    }
+    
+    // Contains lowercase letter
+    if (preg_match('/[a-z]/', $password)) {
+        $score++;
+    } else {
+        $requirements[] = "At least one lowercase letter";
+    }
+    
+    // Contains number
+    if (preg_match('/[0-9]/', $password)) {
+        $score++;
+    } else {
+        $requirements[] = "At least one number";
+    }
+    
+    // Contains special character
+    if (preg_match('/[^a-zA-Z0-9]/', $password)) {
+        $score++;
+    } else {
+        $requirements[] = "At least one special character (!@#$%^&*)";
+    }
+    
+    // Determine strength level
+    if ($score >= 5) {
+        $strength = 'very_strong';
+        $strength_text = 'Very Strong';
+        $strength_color = 'success';
+        $strength_icon = 'bi-shield-check';
+    } elseif ($score >= 4) {
+        $strength = 'strong';
+        $strength_text = 'Strong';
+        $strength_color = 'primary';
+        $strength_icon = 'bi-shield-check';
+    } elseif ($score >= 3) {
+        $strength = 'medium';
+        $strength_text = 'Medium';
+        $strength_color = 'warning';
+        $strength_icon = 'bi-shield-exclamation';
+    } elseif ($score >= 2) {
+        $strength = 'weak';
+        $strength_text = 'Weak';
+        $strength_color = 'danger';
+        $strength_icon = 'bi-shield-x';
+    } else {
+        $strength = 'very_weak';
+        $strength_text = 'Very Weak';
+        $strength_color = 'danger';
+        $strength_icon = 'bi-shield-x';
+    }
+    
+    return [
+        'score' => $score,
+        'strength' => $strength,
+        'strength_text' => $strength_text,
+        'strength_color' => $strength_color,
+        'strength_icon' => $strength_icon,
+        'requirements' => $requirements
+    ];
+}
+
 ob_end_flush();
 ?>
 
@@ -183,8 +265,8 @@ ob_end_flush();
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="username" class="form-label">Username *</label>
-                                <input type="text" id="username" name="username" class="form-control" 
-                                       value="<?php echo htmlspecialchars($username); ?>" required>
+                                    <input type="text" id="username" name="username" class="form-control" value="" autocomplete="off" required>
+                                <small class="text-muted">Letters, numbers, and underscores only</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="user_email" class="form-label">Email *</label>
@@ -206,16 +288,62 @@ ob_end_flush();
                             </div>
                         </div>
 
+                        <!-- Password Section with Strength Meter -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">Password *</label>
-                                <input type="password" id="password" name="password" class="form-control" 
-                                       minlength="6" required>
-                                <div class="form-text">Minimum 6 characters</div>
+                                <div class="input-group">
+                                     <input type="password" id="password" name="password" class="form-control" value="" autocomplete="new-password" minlength="8" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div id="passwordStrength" class="mt-2" style="display: none;">
+                                    <div class="strength-meter">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted">Password Strength:</small>
+                                            <small id="strengthText" class="fw-bold"></small>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                        <div id="strengthRequirements" class="mt-2">
+                                            <small class="text-muted d-block mb-1">Password requirements:</small>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div id="reqLength" class="requirement-item">
+                                                        <i class="bi bi-circle me-1"></i> Minimum 8 characters
+                                                    </div>
+                                                    <div id="reqUpper" class="requirement-item">
+                                                        <i class="bi bi-circle me-1"></i> At least one uppercase letter
+                                                    </div>
+                                                    <div id="reqLower" class="requirement-item">
+                                                        <i class="bi bi-circle me-1"></i> At least one lowercase letter
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div id="reqNumber" class="requirement-item">
+                                                        <i class="bi bi-circle me-1"></i> At least one number
+                                                    </div>
+                                                    <div id="reqSpecial" class="requirement-item">
+                                                        <i class="bi bi-circle me-1"></i> At least one special character
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-text">Password must be strong. See requirements above.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="confirm_password" class="form-label">Confirm Password *</label>
-                                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                                <div class="input-group">
+                                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" value="" autocomplete="new-password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div id="passwordMatch" class="mt-1"></div>
                             </div>
                         </div>
 
@@ -329,7 +457,207 @@ ob_end_flush();
 </script>
 <?php endif; ?>
 
+<style>
+/* Password Strength Meter Styles */
+.strength-meter {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.requirement-item {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+}
+
+.requirement-item.met {
+    color: #28a745;
+}
+
+.requirement-item.met i {
+    color: #28a745;
+}
+
+.requirement-item i {
+    font-size: 0.7rem;
+}
+
+#passwordMatch {
+    font-size: 0.75rem;
+    margin-top: 5px;
+}
+
+.match-success {
+    color: #28a745;
+}
+
+.match-error {
+    color: #dc3545;
+}
+
+/* Progress bar animations */
+.progress-bar {
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+/* Strength bar colors */
+.progress-bar.very-weak { background-color: #dc3545; width: 20%; }
+.progress-bar.weak { background-color: #fd7e14; width: 40%; }
+.progress-bar.medium { background-color: #ffc107; width: 60%; }
+.progress-bar.strong { background-color: #0d6efd; width: 80%; }
+.progress-bar.very-strong { background-color: #198754; width: 100%; }
+</style>
+
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const strengthDiv = document.getElementById('passwordStrength');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const passwordMatchDiv = document.getElementById('passwordMatch');
+    
+    // Requirement elements
+    const reqLength = document.getElementById('reqLength');
+    const reqUpper = document.getElementById('reqUpper');
+    const reqLower = document.getElementById('reqLower');
+    const reqNumber = document.getElementById('reqNumber');
+    const reqSpecial = document.getElementById('reqSpecial');
+    
+    // Password strength validation function
+    function validatePasswordStrength(password) {
+        let score = 0;
+        const requirements = {
+            length: password.length >= 8,
+            upper: /[A-Z]/.test(password),
+            lower: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[^a-zA-Z0-9]/.test(password)
+        };
+        
+        // Count met requirements
+        if (requirements.length) score++;
+        if (requirements.upper) score++;
+        if (requirements.lower) score++;
+        if (requirements.number) score++;
+        if (requirements.special) score++;
+        
+        // Update requirement indicators
+        updateRequirement(reqLength, requirements.length, 'Minimum 8 characters');
+        updateRequirement(reqUpper, requirements.upper, 'At least one uppercase letter');
+        updateRequirement(reqLower, requirements.lower, 'At least one lowercase letter');
+        updateRequirement(reqNumber, requirements.number, 'At least one number');
+        updateRequirement(reqSpecial, requirements.special, 'At least one special character');
+        
+        // Determine strength
+        let strength = '';
+        let strengthTextValue = '';
+        let strengthColor = '';
+        let width = 0;
+        
+        if (score >= 5) {
+            strength = 'very-strong';
+            strengthTextValue = 'Very Strong';
+            strengthColor = 'success';
+            width = 100;
+        } else if (score >= 4) {
+            strength = 'strong';
+            strengthTextValue = 'Strong';
+            strengthColor = 'primary';
+            width = 80;
+        } else if (score >= 3) {
+            strength = 'medium';
+            strengthTextValue = 'Medium';
+            strengthColor = 'warning';
+            width = 60;
+        } else if (score >= 2) {
+            strength = 'weak';
+            strengthTextValue = 'Weak';
+            strengthColor = 'danger';
+            width = 40;
+        } else {
+            strength = 'very-weak';
+            strengthTextValue = 'Very Weak';
+            strengthColor = 'danger';
+            width = 20;
+        }
+        
+        // Update strength bar
+        strengthBar.className = `progress-bar bg-${strengthColor}`;
+        strengthBar.style.width = `${width}%`;
+        strengthText.textContent = strengthTextValue;
+        strengthText.className = `fw-bold text-${strengthColor}`;
+        
+        return { score, strength, requirements };
+    }
+    
+    function updateRequirement(element, isMet, text) {
+        if (isMet) {
+            element.innerHTML = `<i class="bi bi-check-circle-fill me-1 text-success"></i> ${text}`;
+            element.classList.add('met');
+        } else {
+            element.innerHTML = `<i class="bi bi-circle me-1"></i> ${text}`;
+            element.classList.remove('met');
+        }
+    }
+    
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+        
+        if (confirm.length === 0) {
+            passwordMatchDiv.innerHTML = '';
+            return;
+        }
+        
+        if (password === confirm) {
+            passwordMatchDiv.innerHTML = '<i class="bi bi-check-circle-fill me-1 text-success"></i> Passwords match';
+            passwordMatchDiv.className = 'match-success';
+        } else {
+            passwordMatchDiv.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1 text-danger"></i> Passwords do not match';
+            passwordMatchDiv.className = 'match-error';
+        }
+    }
+    
+    // Real-time password strength checking
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        
+        if (password.length > 0) {
+            strengthDiv.style.display = 'block';
+            validatePasswordStrength(password);
+        } else {
+            strengthDiv.style.display = 'none';
+        }
+        
+        checkPasswordMatch();
+    });
+    
+    confirmInput.addEventListener('input', checkPasswordMatch);
+    
+    // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirm = document.getElementById('toggleConfirmPassword');
+    
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('bi-eye');
+        this.querySelector('i').classList.toggle('bi-eye-slash');
+    });
+    
+    toggleConfirm.addEventListener('click', function() {
+        const type = confirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmInput.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('bi-eye');
+        this.querySelector('i').classList.toggle('bi-eye-slash');
+    });
+});
+
+// Form submission validation
 document.getElementById('userForm')?.addEventListener('submit', function(e) {
     const password = document.getElementById('password').value;
     const confirm = document.getElementById('confirm_password').value;
@@ -340,12 +668,36 @@ document.getElementById('userForm')?.addEventListener('submit', function(e) {
     if (!usernameRegex.test(username)) {
         e.preventDefault();
         alert('Username can only contain letters, numbers, and underscores.');
-        return;
+        return false;
+    }
+    
+    // Check password strength
+    if (password.length < 8) {
+        e.preventDefault();
+        alert('Password must be at least 8 characters long.');
+        return false;
+    }
+    
+    // Check if password meets strength requirements (score >= 3)
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^a-zA-Z0-9]/.test(password)) score++;
+    
+    if (score < 3) {
+        e.preventDefault();
+        alert('Password is too weak. Please use a stronger password that includes:\n- Minimum 8 characters\n- Uppercase and lowercase letters\n- Numbers\n- Special characters');
+        return false;
     }
     
     if (password !== confirm) {
         e.preventDefault();
         alert('Passwords do not match!');
+        return false;
     }
+    
+    return true;
 });
 </script>
