@@ -1,7 +1,4 @@
 <?php
-// Note: session_start() is already called in the parent file (clients.php)
-
-// Call the function to handle insert/update
 insert_clients();
 
 // Check if user is logged in

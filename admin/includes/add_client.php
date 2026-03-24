@@ -1,13 +1,10 @@
 <?php
-// Call the function
-insert_clients();
-
 // Check if user is logged in and has permission
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit();
 }
-              
+
 // Initialize variables with empty values
 $company_name = $trade_license_no = $country = $emirate_zone = $business_activity = $address = '';
 $contact_title = $contact_name = $contact_designation = $contact_mobile = $contact_email = '';
@@ -18,6 +15,72 @@ $service_total_fee = '0.00';
 $lead_source = 'website';
 $message = '';
 $message_type = '';
+
+// Handle form submission (inline, like add_department.php)
+if (isset($_POST['submit_client'])) {
+    $company_name = mysqli_real_escape_string($connection, $_POST['company_name']);
+    $trade_license_no = mysqli_real_escape_string($connection, $_POST['trade_license_no']);
+    $country = mysqli_real_escape_string($connection, $_POST['country']);
+    $jurisdiction = mysqli_real_escape_string($connection, $_POST['jurisdiction']);
+    $emirate_zone = mysqli_real_escape_string($connection, $_POST['emirate_zone']);
+    $business_activity = mysqli_real_escape_string($connection, $_POST['business_activity']);
+    $industry = mysqli_real_escape_string($connection, $_POST['industry']);
+    $address = mysqli_real_escape_string($connection, $_POST['address']);
+    $contact_title = mysqli_real_escape_string($connection, $_POST['contact_title']);
+    $contact_name = mysqli_real_escape_string($connection, $_POST['contact_name']);
+    $contact_designation = mysqli_real_escape_string($connection, $_POST['contact_designation']);
+    $contact_mobile = mysqli_real_escape_string($connection, $_POST['contact_mobile']);
+    $contact_email = mysqli_real_escape_string($connection, $_POST['contact_email']);
+    $service_id = isset($_POST['service_id']) && $_POST['service_id'] !== '' ? intval($_POST['service_id']) : 'NULL';
+    $service_description = mysqli_real_escape_string($connection, $_POST['service_description']);
+    $expected_start_date = mysqli_real_escape_string($connection, $_POST['expected_start_date']);
+    $payment_currency = mysqli_real_escape_string($connection, $_POST['payment_currency']);
+    $payment_term = mysqli_real_escape_string($connection, $_POST['payment_term']);
+    $service_total_fee = mysqli_real_escape_string($connection, $_POST['service_total_fee']);
+    $lead_source = mysqli_real_escape_string($connection, $_POST['lead_source']);
+
+    // Validate required fields
+    if (empty($company_name) || empty($contact_name) || empty($contact_mobile) || empty($contact_email)) {
+        $message = "Please fill in all required fields.";
+        $message_type = "danger";
+    } else if (!filter_var($contact_email, FILTER_VALIDATE_EMAIL)) {
+        $message = "Please enter a valid email address.";
+        $message_type = "danger";
+    } else if (!empty($service_id)) {
+        // Check if service_id exists in categories
+        $check_service = mysqli_query($connection, "SELECT cat_id FROM categories WHERE cat_id = '$service_id'");
+        if (mysqli_num_rows($check_service) == 0) {
+            $message = "Selected service does not exist.";
+            $message_type = "danger";
+        }
+    }
+
+    // Only proceed if no error
+    if (empty($message)) {
+        // Generate a random password for the client
+        $plain_password = bin2hex(random_bytes(4));
+        $hashed_password = password_hash($plain_password, PASSWORD_DEFAULT);
+
+        $insert_query = "INSERT INTO clients (
+            company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
+            contact_title, contact_name, contact_designation, contact_mobile, contact_email, client_password,
+            service_id, service_description, expected_start_date, payment_currency, payment_term, service_total_fee, lead_source, client_status
+        ) VALUES (
+            '$company_name', '$trade_license_no', '$country', '$jurisdiction', '$emirate_zone', '$business_activity', '$industry', '$address',
+            '$contact_title', '$contact_name', '$contact_designation', '$contact_mobile', '$contact_email', '$hashed_password',
+            $service_id, '$service_description', " . ($expected_start_date ? "'$expected_start_date'" : "NULL") . ",
+            '$payment_currency', '$payment_term', '$service_total_fee', '$lead_source', 'New Lead'
+        )";
+
+        if (mysqli_query($connection, $insert_query)) {
+            echo "<script>window.location.href = 'clients.php?added=true';</script>";
+            exit();
+        } else {
+            $message = "Error adding client: " . mysqli_error($connection);
+            $message_type = "danger";
+        }
+    }
+}
 ?>
 
 <div class="main-content" id="mainContent">
@@ -37,27 +100,11 @@ $message_type = '';
                     </div>
                     <div class="card-body">
                         <?php if (!empty($message)): ?>
-                            <div class="alert alert-<?php echo $message_type == 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
-                                    <?php echo $message; ?>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <div class="alert alert-<?php echo $message_type; ?> alert-dismissible fade show" role="alert">
+                                <?php echo $message; ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         <?php endif; ?>
-
-                        <!-- Success Modal -->
-                        <div class="modal fade" id="clientSuccessModal" tabindex="-1" aria-labelledby="clientSuccessModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-success text-white">
-                                        <h5 class="modal-title" id="clientSuccessModalLabel"><i class="bi bi-check-circle me-2"></i>Client Added Successfully</h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-center">
-                                        <p class="mb-3">The new client has been added to the database.</p>
-                                        <a href="./clients.php" class="btn btn-success"><i class="bi bi-people me-1"></i> View All Clients</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <form method="POST" action="" id="clientForm">
                             <input type="hidden" name="submit_client" value="1">
@@ -188,7 +235,7 @@ $message_type = '';
                                     <h6 class="border-bottom pb-2 text-primary">
                                         <i class="bi bi-person me-2"></i>Contact Person Information
                                     </h6>
-                                    </div>
+                                </div>
                                 <div class="col-md-2">
                                     <div class="mb-3">
                                         <label for="contact_title" class="form-label">Title</label>
@@ -249,8 +296,7 @@ $message_type = '';
                                             $services_query = "SELECT * FROM categories ORDER BY cat_title";
                                             $services_result = mysqli_query($connection, $services_query);
                                             while($service = mysqli_fetch_assoc($services_result)) {
-                                                $selected = ($service_id == $service['cat_id']) ? 'selected' : '';
-                                                echo "<option value='{$service['cat_id']}' {$selected}>{$service['cat_title']} - AED {$service['cat_price']}</option>";
+                                                echo "<option value='{$service['cat_id']}'>{$service['cat_title']} - AED {$service['cat_price']}</option>";
                                             }
                                             ?>
                                         </select>
@@ -275,14 +321,14 @@ $message_type = '';
                                     <div class="mb-3">
                                         <label for="payment_currency" class="form-label">Payment Currency</label>
                                         <select id="payment_currency" name="payment_currency" class="form-control">
-                                            <option value="AED" <?php echo ($payment_currency == 'AED') ? 'selected' : ''; ?>>AED - UAE Dirham</option>
-                                            <option value="USD" <?php echo ($payment_currency == 'USD') ? 'selected' : ''; ?>>USD - US Dollar</option>
-                                            <option value="EUR" <?php echo ($payment_currency == 'EUR') ? 'selected' : ''; ?>>EUR - Euro</option>
-                                            <option value="GBP" <?php echo ($payment_currency == 'GBP') ? 'selected' : ''; ?>>GBP - British Pound</option>
-                                            <option value="CNY" <?php echo ($payment_currency == 'CNY') ? 'selected' : ''; ?>>CNY - Chinese Yuan</option>
-                                            <option value="JPY" <?php echo ($payment_currency == 'JPY') ? 'selected' : ''; ?>>JPY - Japanese Yen</option>
-                                            <option value="RUB" <?php echo ($payment_currency == 'RUB') ? 'selected' : ''; ?>>RUB - Russian Ruble</option>
-                                            <option value="INR" <?php echo ($payment_currency == 'INR') ? 'selected' : ''; ?>>INR - Indian Rupee</option>
+                                            <option value="AED">AED - UAE Dirham</option>
+                                            <option value="USD">USD - US Dollar</option>
+                                            <option value="EUR">EUR - Euro</option>
+                                            <option value="GBP">GBP - British Pound</option>
+                                            <option value="CNY">CNY - Chinese Yuan</option>
+                                            <option value="JPY">JPY - Japanese Yen</option>
+                                            <option value="RUB">RUB - Russian Ruble</option>
+                                            <option value="INR">INR - Indian Rupee</option>
                                         </select>
                                     </div>
                                 </div>
@@ -290,10 +336,10 @@ $message_type = '';
                                     <div class="mb-3">
                                         <label for="payment_term" class="form-label">Payment Term</label>
                                         <select id="payment_term" name="payment_term" class="form-control">
-                                            <option value="Monthly" <?php echo ($payment_term == 'Monthly') ? 'selected' : ''; ?>>Monthly</option>
-                                            <option value="Quarterly" <?php echo ($payment_term == 'Quarterly') ? 'selected' : ''; ?>>Quarterly</option>
-                                            <option value="Bi-yearly" <?php echo ($payment_term == 'Bi-yearly') ? 'selected' : ''; ?>>Bi-yearly (2 payments)</option>
-                                            <option value="One-time" <?php echo ($payment_term == 'One-time') ? 'selected' : ''; ?>>One-time</option>
+                                            <option value="Monthly">Monthly</option>
+                                            <option value="Quarterly">Quarterly</option>
+                                            <option value="Bi-yearly">Bi-yearly (2 payments)</option>
+                                            <option value="One-time">One-time</option>
                                         </select>
                                     </div>
                                 </div>
@@ -324,6 +370,20 @@ $message_type = '';
     </div>
 </div>
 
+<!-- Toast Container - Positioned fixed at bottom right -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <strong>Success!</strong> Client added successfully.
+                <br><small class="text-white-50">Redirecting to clients list...</small>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 <script>
 // Country-State/Emirate mapping
 const countryZones = {
@@ -334,19 +394,17 @@ const countryZones = {
     'Kuwait': ['Kuwait City', 'Hawalli', 'Farwaniya', 'Mubarak Al-Kabeer', 'Ahmadi'],
     'Bahrain': ['Manama', 'Riffa', 'Muharraq', 'Hamad Town', 'Isa Town'],
     'United Kingdom': ['England', 'Scotland', 'Wales', 'Northern Ireland'],
-    'United States': ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', /* ... add more states ... */],
-    'Germany': ['Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg', 'Bremen', /* ... add more states ... */],
-    'France': ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Nouvelle-Aquitaine', 'Occitanie', /* ... add more regions ... */],
-    'China': ['Beijing', 'Shanghai', 'Guangdong', 'Zhejiang', 'Jiangsu', /* ... add more provinces ... */],
-    'Japan': ['Tokyo', 'Osaka', 'Kyoto', 'Hokkaido', 'Okinawa', /* ... add more prefectures ... */],
-    'India': ['Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'Uttar Pradesh', /* ... add more states ... */],
-    'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan', /* ... add more regions ... */]
+    'United States': ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'],
+    'Germany': ['Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hesse', 'Lower Saxony', 'Mecklenburg-Vorpommern', 'North Rhine-Westphalia', 'Rhineland-Palatinate', 'Saarland', 'Saxony', 'Saxony-Anhalt', 'Schleswig-Holstein', 'Thuringia'],
+    'France': ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Nouvelle-Aquitaine', 'Occitanie', 'Hauts-de-France', 'Grand Est', 'Provence-Alpes-Côte d\'Azur', 'Pays de la Loire', 'Normandy', 'Brittany', 'Centre-Val de Loire', 'Bourgogne-Franche-Comté', 'Corsica'],
+    'China': ['Beijing', 'Shanghai', 'Guangdong', 'Zhejiang', 'Jiangsu', 'Tianjin', 'Chongqing', 'Shandong', 'Sichuan', 'Hubei', 'Fujian', 'Henan', 'Hunan', 'Shaanxi', 'Liaoning', 'Jiangxi', 'Anhui', 'Hebei', 'Heilongjiang', 'Jilin'],
+    'Japan': ['Tokyo', 'Osaka', 'Kyoto', 'Hokkaido', 'Okinawa', 'Aichi', 'Kanagawa', 'Hyogo', 'Fukuoka', 'Hiroshima', 'Miyagi', 'Shizuoka', 'Chiba', 'Saitama', 'Niigata', 'Gunma'],
+    'India': ['Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'Uttar Pradesh', 'Gujarat', 'Rajasthan', 'West Bengal', 'Telangana', 'Andhra Pradesh', 'Madhya Pradesh', 'Kerala', 'Haryana', 'Punjab', 'Bihar', 'Odisha', 'Assam', 'Jharkhand', 'Chhattisgarh', 'Uttarakhand'],
+    'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Chelyabinsk', 'Samara', 'Omsk', 'Rostov-on-Don', 'Ufa', 'Krasnoyarsk', 'Voronezh', 'Perm', 'Volgograd']
 };
 
-
-// Update emirate/zone options based on country selection or manual input
+// Update emirate/zone options based on country selection
 function updateEmirateZoneOptions(country) {
-    const emirateInput = document.getElementById('emirate_zone');
     const datalist = document.getElementById('emirate_zone_list');
     datalist.innerHTML = '';
     if (country && countryZones[country]) {
@@ -358,19 +416,20 @@ function updateEmirateZoneOptions(country) {
     }
 }
 
+// Country change event
 document.getElementById('country').addEventListener('change', function() {
     const country = this.value;
     updateEmirateZoneOptions(country);
+    
     // Filter jurisdictions based on selected country
-    const jurisdictionSelect = document.getElementById('jurisdiction');
+    const jurisdictionInput = document.getElementById('jurisdiction');
     fetch(`get_jurisdictions.php?country=${encodeURIComponent(country)}`)
         .then(response => response.json())
         .then(data => {
-            // Only update datalist if jurisdiction is an input
-            if (jurisdictionSelect.tagName.toLowerCase() === 'input') {
+            if (jurisdictionInput.tagName.toLowerCase() === 'input') {
                 const datalist = document.getElementById('jurisdiction_list');
                 datalist.innerHTML = '';
-                if (data.jurisdictions) {
+                if (data.jurisdictions && data.jurisdictions.length > 0) {
                     data.jurisdictions.forEach(jur => {
                         const option = document.createElement('option');
                         option.value = jur.jurisdiction_name;
@@ -388,8 +447,6 @@ document.getElementById('service_id').addEventListener('change', function() {
     const serviceFeeInput = document.getElementById('service_total_fee');
     
     if (serviceId) {
-        // You can implement AJAX call to get service price here
-        // For now, we'll use a simple approach - you can enhance this
         fetch('get_service_price.php?service_id=' + serviceId)
             .then(response => response.json())
             .then(data => {
@@ -408,30 +465,30 @@ document.getElementById('clientForm').addEventListener('submit', function(e) {
     const email = document.getElementById('contact_email').value;
     const mobile = document.getElementById('contact_mobile').value;
     
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         e.preventDefault();
-        showAlert('Please enter a valid email address', 'error');
+        alert('Please enter a valid email address');
         return;
     }
     
-    // Basic mobile validation (at least 8 digits)
     const mobileRegex = /^[0-9]{8,}$/;
     if (!mobileRegex.test(mobile.replace(/[^0-9]/g, ''))) {
         e.preventDefault();
-        showAlert('Please enter a valid mobile number (at least 8 digits)', 'error');
+        alert('Please enter a valid mobile number (at least 8 digits)');
         return;
     }
 });
 
-// Show success modal if redirected after add
+// Show toast and redirect after successful client addition using session variable
 document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('added') === 'true') {
-        const modal = new bootstrap.Modal(document.getElementById('clientSuccessModal'));
-        modal.show();
-    }
+    <?php if (!empty($_SESSION['client_update_success'])): ?>
+        const toastElement = document.getElementById('clientSuccessToast');
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+        setTimeout(function() {
+            window.location.href = 'clients.php';
+        }, 2000);
+    <?php unset($_SESSION['client_update_success']); endif; ?>
 });
-</script>
 </script>
