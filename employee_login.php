@@ -20,10 +20,6 @@ if (isLoggedIn()) {
 
 $error = '';
 $username = '';
-$bg_gradient = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
-$portal_name = "Employee Portal";
-$icon = "bi-shield-lock";
-$icon_color = "#667eea";
 
 // Handle login POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -61,12 +57,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root {
-            --primary: #667eea;
-            --primary-dark: #5a67d8;
+            --primary: #f1bf70;
+            --primary-dark: #e5b465;
+            --primary-light: #fce6c0;
             --secondary: #1e293b;
             --dark: #0f172a;
             --light: #e2e8f0;
             --gold: #f1bf70;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --input-bg: #ffffff;
         }
         
         * {
@@ -76,49 +77,63 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
+
         body {
-            background: <?php echo $bg_gradient; ?>;
+            background: #ffffff;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
             position: relative;
+            overflow: hidden;
         }
-        
-        .background-pattern {
+
+        /* Subtle Mesh Gradient Background */
+        body::before {
+            content: '';
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 0 L100 100 M100 0 L0 100" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></svg>');
-            background-size: 30px 30px;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(241, 191, 112, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 60% 70%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Subtle grid pattern overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
             pointer-events: none;
             z-index: 0;
         }
         
         .container {
             width: 100%;
-            max-width: 450px;
+            max-width: 350px;
             position: relative;
             z-index: 1;
+            animation: fadeInUp 0.6s ease-out;
         }
         
-        .card {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            animation: slideUp 0.5s ease-out;
-        }
-        
-        @keyframes slideUp {
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -126,24 +141,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
         
+        /* Form Container with Shadow */
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 1.3rem 1.1rem 1.1rem 1.1rem;
+            box-shadow: 0 10px 24px -8px rgba(241, 191, 112, 0.08);
+            border: 1px solid rgba(241, 191, 112, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 28px 48px -16px rgba(241, 191, 112, 0.16);
+        }
+        
         .logo {
             text-align: center;
             margin-bottom: 1.5rem;
         }
         
-        .logo i {
-            font-size: 3rem;
-            color: <?php echo $icon_color; ?>;
-            background: rgba(255,255,255,0.1);
-            padding: 1rem;
-            border-radius: 50%;
-            margin-bottom: 1rem;
+        .logo img {
+            height: 36px;
+            margin-bottom: 0.5rem;
         }
         
+
         .logo h1 {
-            color: white;
-            font-size: 1.8rem;
-            margin-top: 0.5rem;
+            color: var(--text-dark);
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+            letter-spacing: -0.5px;
         }
         
         .portal-badge {
@@ -151,197 +181,283 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 2rem;
         }
         
+
         .portal-badge span {
-            background: rgba(102, 126, 234, 0.2);
-            color: <?php echo $primary; ?>;
-            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, rgba(241, 191, 112, 0.12) 0%, rgba(241, 191, 112, 0.05) 100%);
+            color: var(--primary-dark);
+            padding: 0.32rem 0.8rem;
             border-radius: 50px;
-            font-size: 0.9rem;
+            font-size: 0.72rem;
             font-weight: 600;
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(241, 191, 112, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+
+        .portal-badge span i {
+            font-size: 1rem;
+            color: var(--primary);
         }
         
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.85rem;
         }
         
+
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #e2e8f0;
-            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.82rem;
         }
         
-        .input-group {
+        .input-wrapper {
             position: relative;
         }
         
+
         .input-icon {
             position: absolute;
-            left: 15px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: <?php echo $primary; ?>;
-            font-size: 1.2rem;
+            color: var(--primary);
+            font-size: 1.1rem;
             z-index: 1;
+            transition: color 0.2s ease;
         }
         
+
         .form-control {
             width: 100%;
-            padding: 0.9rem 1rem 0.9rem 2.8rem;
-            background: rgba(15, 23, 42, 0.6);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
+            padding: 0.55rem 0.7rem 0.55rem 2.1rem;
+            background: var(--input-bg);
+            border: 1.2px solid var(--primary);
+            border-radius: 10px;
+            color: var(--text-dark);
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
         }
-        
+
         .form-control:focus {
             outline: none;
-            border-color: <?php echo $primary; ?>;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(241, 191, 112, 0.15);
         }
-        
+
         .form-control::placeholder {
-            color: rgba(255,255,255,0.3);
+            color: #b6b6b6;
         }
         
-        .btn {
-            width: 100%;
-            padding: 1rem;
-            background: <?php echo $primary; ?>;
-            color: white;
+        /* Password Toggle Button */
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
+            color: var(--primary);
             cursor: pointer;
-            transition: all 0.3s;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            transition: color 0.2s ease;
+            z-index: 1;
+        }
+
+        .password-toggle:hover {
+            color: var(--secondary);
+        }
+
+        .password-toggle i {
+            font-size: 1.1rem;
         }
         
+        /* Button Styling */
+
+        .btn {
+            width: 100%;
+            padding: 0.6rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--secondary);
+            border: none;
+            border-radius: 10px;
+            font-size: 0.93rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 0.4rem;
+            box-shadow: 0 2px 8px rgba(241, 191, 112, 0.18);
+        }
+
         .btn:hover {
-            background: <?php echo $primary; ?>;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 20px rgba(241, 191, 112, 0.35);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: var(--dark);
         }
-        
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
         .btn i {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
         
         .links {
             text-align: center;
-            margin-top: 1.5rem;
+            margin-top: 1.1rem;
         }
         
+
         .links a {
-            color: <?php echo $primary; ?>;
+            color: var(--primary-dark);
             text-decoration: none;
-            transition: color 0.3s;
+            font-weight: 500;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            font-size: 0.9rem;
         }
-        
+
         .links a:hover {
-            color: white;
+            color: var(--primary);
+            gap: 8px;
         }
         
+        /* Error Message Styling */
+
         .error {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
+            background: #fef2f2;
+            color: #dc2626;
             padding: 1rem;
-            border-radius: 12px;
+            border-radius: 14px;
             margin-bottom: 1.5rem;
-            border-left: 4px solid #f87171;
+            border-left: 4px solid var(--primary);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+
+        .error i {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            color: var(--primary);
         }
         
-        .success {
-            background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #4ade80;
-        }
-        
-        .back-link {
-            text-align: center;
-            margin-top: 1rem;
-        }
-        
-        .back-link a {
-            color: rgba(255,255,255,0.6);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: color 0.3s;
-        }
-        
-        .back-link a:hover {
-            color: white;
-        }
-        
+        /* Role Hint Styling */
+
         .role-hint {
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 0.8rem;
-            margin-top: 1.5rem;
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.6);
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 0.6rem;
+            margin-top: 1rem;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            border: 1px solid var(--primary);
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+        }
+
+        .role-hint i {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-top: 2px;
+        }
+
+        .role-hint-content {
+            flex: 1;
+        }
+
+        .role-hint-content strong {
+            color: var(--primary-dark);
         }
         
-        .role-hint i {
-            color: <?php echo $gold; ?>;
+        /* Responsive adjustments */
+        @media (max-width: 520px) {
+            .card {
+                padding: 1.75rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+            
+            .logo img {
+                height: 45px;
+            }
+        }
+        
+        /* Remove autofill styling */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+            box-shadow: 0 0 0 30px white inset !important;
         }
     </style>
 </head>
 <body>
-    <div class="background-pattern"></div>
     <div class="container">
         <div class="card">
             <div class="logo">
-                <img src="resources/img/logo.png" alt="OGMBC Logo" style="height:50px;">
+                <img src="resources/img/logo.png" alt="OGMBC Logo">
                 <h1>Welcome Back</h1>
             </div>
             
             <div class="portal-badge">
-                <span><i class="bi <?php echo $icon; ?> me-2"></i><?php echo $portal_name; ?></span>
+                <span>
+                    <i class="bi bi-shield-lock"></i>
+                    Employee Portal
+                </span>
             </div>
             
             <?php if (!empty($error)): ?>
                 <div class="error">
                     <i class="bi bi-exclamation-triangle-fill"></i>
-                    <?php echo $error; ?>
+                    <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
             
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div class="form-group">
                     <label for="username">Username or Email</label>
-                    <div class="input-group">
+                    <div class="input-wrapper">
                         <i class="bi bi-person input-icon"></i>
                         <input type="text" id="username" name="username" class="form-control" 
                                placeholder="Enter your username or email" 
-                               value="<?php echo htmlspecialchars($username); ?>" required>
+                               value="<?php echo htmlspecialchars($username); ?>" 
+                               autocomplete="username"
+                               required>
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <div class="input-group">
+                    <div class="input-wrapper">
                         <i class="bi bi-lock input-icon"></i>
                         <input type="password" id="password" name="password" class="form-control" 
-                               placeholder="Enter your password" required>
+                               placeholder="Enter your password" 
+                               autocomplete="current-password"
+                               required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
                     </div>
                 </div>
                 
@@ -358,11 +474,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 
                 <div class="role-hint">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Employee access includes Admin, Operations, and Staff portals.
+                    <i class="bi bi-info-circle-fill"></i>
+                    <div class="role-hint-content">
+                        <strong>Employee access includes:</strong> Admin, Operations, and Staff portals.<br>
+                        <span class="small">Contact your supervisor if you need assistance with login credentials.</span>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
+    
+    <script>
+        // Password visibility toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            
+            if (togglePassword && passwordInput) {
+                togglePassword.addEventListener('click', function() {
+                    // Toggle the type attribute
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    // Toggle the eye icon
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('bi-eye');
+                        icon.classList.toggle('bi-eye-slash');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
