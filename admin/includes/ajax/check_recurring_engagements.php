@@ -5,7 +5,7 @@
  */
 
 // Security key to prevent unauthorized access
-define('CRON_SECRET_KEY', 'MySuperSecretKey123!'); // Change this!
+define('CRON_SECRET_KEY', 'MySuperSecretKey@OmniOGM123!');
 
 if (!isset($_GET['key']) || $_GET['key'] !== CRON_SECRET_KEY) {
     die('Unauthorized');
@@ -24,3 +24,6 @@ echo json_encode([
     'created_count' => count($created),
     'details' => $created
 ]);
+
+
+//open in browser to run the check immediately: http://localhost:8010/admin/includes/ajax/check_recurring_engagements.php?key=MySuperSecretKey123!

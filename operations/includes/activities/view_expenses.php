@@ -127,17 +127,20 @@ mysqli_data_seek($expenses_result, 0);
                                 <td><?php echo htmlspecialchars($exp['mode_of_transport'] ?: '-'); ?></td>
                                 <td class="fw-bold text-success">AED <?php echo number_format($exp['amount'], 2); ?></td>
                                 <td><span class="badge bg-<?php echo $status_color; ?>"><?php echo $exp['status']; ?></span></td>
-                                <td>
-                                    <?php if($exp['receipt_file']): ?>
-                                        <a href="../../uploads/expenses/<?php echo $exp['receipt_file']; ?>" class="btn btn-sm btn-outline-info" target="_blank" title="View Receipt">
-                                            <i class="bi bi-receipt"></i>
-                                        </a>
-                                    <?php endif; ?>
+                                <td class="text-center">
                                     <?php if($exp['status'] == 'Pending'): ?>
-                                        <button class="btn btn-sm btn-outline-warning" onclick="editExpense(<?php echo $exp['expense_id']; ?>)">
+                                        <button class="btn btn-sm btn-warning me-1" onclick="editExpense(<?php echo $exp['expense_id']; ?>)" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                     <?php endif; ?>
+                                    <?php if($exp['receipt_file']): ?>
+                                        <a href="../../uploads/expenses/<?php echo $exp['receipt_file']; ?>" class="btn btn-sm btn-info me-1" target="_blank" title="View Receipt">
+                                            <i class="bi bi-receipt"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteExpense(<?php echo $exp['expense_id']; ?>)" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                             <?php endwhile; ?>

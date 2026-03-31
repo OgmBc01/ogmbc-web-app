@@ -38,27 +38,28 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-if (!isset($_GET['week_start']) || empty($_GET['week_start'])) {
-    echo json_encode(['success' => false, 'message' => 'Week start date required']);
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid expense ID']);
     exit;
 }
 
-$week_start = mysqli_real_escape_string($connection, $_GET['week_start']);
+$expense_id = (int)$_GET['id'];
 
-$query = "SELECT * FROM employee_weekly_schedule 
-          WHERE employee_id = $user_id 
-          AND week_start_date = '$week_start'";
+$query = "SELECT * FROM employee_expenses 
+          WHERE expense_id = $expense_id AND employee_id = $user_id";
 $result = mysqli_query($connection, $query);
 
-if (mysqli_num_rows($result) > 0) {
-    $schedule = mysqli_fetch_assoc($result);
-    echo json_encode([
-        'success' => true,
-        'schedule' => json_decode($schedule['schedule_data'], true)
-    ]);
-} else {
-    echo json_encode(['success' => true, 'schedule' => null]);
+if (!$result || mysqli_num_rows($result) == 0) {
+    echo json_encode(['success' => false, 'message' => 'Expense not found']);
+    exit;
 }
+
+$expense = mysqli_fetch_assoc($result);
+$expense = array_map(function($value) {
+    return $value === null ? '' : $value;
+}, $expense);
+
+echo json_encode(['success' => true, 'expense' => $expense]);
 
 ob_end_flush();
 ?>

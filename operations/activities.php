@@ -244,6 +244,7 @@ $current_week = date('W');
     </div>
 </div>
 
+
 <!-- Add Expense Modal -->
 <div class="modal fade" id="addExpenseModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -308,6 +309,73 @@ $current_week = date('W');
     </div>
 </div>
 
+<!-- Edit Expense Modal -->
+<div class="modal fade" id="editExpenseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Expense</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editExpenseForm" method="POST" action="includes/activities/edit_expense.php" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="expense_id" id="edit_expense_id">
+                    <div class="mb-3">
+                        <label class="form-label">Expense Date *</label>
+                        <input type="date" name="expense_date" id="edit_expense_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Client</label>
+                        <select name="client_id" id="edit_client_id" class="form-select">
+                            <option value="">Select Client</option>
+                            <?php
+                            $clients_query = "SELECT client_id, company_name FROM clients ORDER BY company_name";
+                            $clients_result = mysqli_query($connection, $clients_query);
+                            mysqli_data_seek($clients_result, 0);
+                            while($client = mysqli_fetch_assoc($clients_result)) {
+                                echo "<option value='{$client['client_id']}'>" . htmlspecialchars($client['company_name']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Expense Type</label>
+                            <select name="expense_type" id="edit_expense_type" class="form-select">
+                                <option value="Transport">Transport</option>
+                                <option value="Meals">Meals</option>
+                                <option value="Supplies">Supplies</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Mode of Transport</label>
+                            <input type="text" name="mode_of_transport" id="edit_mode_of_transport" class="form-control" placeholder="e.g., Bus, Metro, Taxi">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount *</label>
+                        <input type="number" step="0.01" name="amount" id="edit_amount" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" id="edit_description" class="form-control" rows="2" placeholder="Additional details..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Receipt (Optional)</label>
+                        <input type="file" name="receipt_file" class="form-control" accept="image/*,.pdf">
+                        <div class="form-text" id="current_receipt_info"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Update Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Weekly Schedule Modal -->
 <div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -361,6 +429,28 @@ $current_week = date('W');
     </div>
 </div>
 
+
+
+<script>
+// Persist selected tab using localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    // Restore last selected tab
+    const lastTab = localStorage.getItem('activityTab');
+    if (lastTab) {
+        const trigger = document.querySelector(`[data-bs-target="${lastTab}"]`);
+        if (trigger) {
+            new bootstrap.Tab(trigger).show();
+        }
+    }
+    // Listen for tab changes
+    document.querySelectorAll('#activityTabs button[data-bs-toggle="tab"]').forEach(btn => {
+        btn.addEventListener('shown.bs.tab', function(e) {
+            localStorage.setItem('activityTab', e.target.getAttribute('data-bs-target'));
+        });
+    });
+});
+</script>
+
 <script>
 function showAddActivityModal() {
     document.getElementById('addActivityForm').reset();
@@ -399,6 +489,63 @@ function showAddTaskModal(taskId = null) {
 function showAddExpenseModal() {
     document.getElementById('addExpenseForm').reset();
     new bootstrap.Modal(document.getElementById('addExpenseModal')).show();
+}
+
+// Edit expense function
+function editExpense(id) {
+    fetch('includes/ajax/get_expense_details.php?id=' + id)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const expense = data.expense;
+                document.getElementById('edit_expense_id').value = expense.expense_id;
+                document.getElementById('edit_expense_date').value = expense.expense_date;
+                document.getElementById('edit_client_id').value = expense.client_id;
+                document.getElementById('edit_expense_type').value = expense.expense_type;
+                document.getElementById('edit_mode_of_transport').value = expense.mode_of_transport;
+                document.getElementById('edit_amount').value = expense.amount;
+                document.getElementById('edit_description').value = expense.description;
+                // Show current receipt info
+                const receiptInfo = document.getElementById('current_receipt_info');
+                if (expense.receipt_file) {
+                    receiptInfo.innerHTML = '<i class="bi bi-receipt me-1"></i> Current file: ' + expense.receipt_file;
+                } else {
+                    receiptInfo.innerHTML = '<i class="bi bi-info-circle me-1"></i> No receipt uploaded';
+                }
+                const modal = new bootstrap.Modal(document.getElementById('editExpenseModal'));
+                modal.show();
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            showAlert('Error loading expense details', 'danger');
+        });
+}
+
+// Delete expense function
+function deleteExpense(id) {
+    if (confirm('Are you sure you want to delete this expense? This action cannot be undone.')) {
+        fetch('includes/ajax/delete_expense.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'expense_id=' + id
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            showAlert('Error deleting expense', 'danger');
+        });
+    }
 }
 
 function showScheduleModal(weekStart) {
@@ -472,6 +619,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+</script>
 </script>
 
 <style>
