@@ -1,19 +1,32 @@
-/* Gradient Background Utility */
-.gradient-bg {
-    background: linear-gradient(90deg, #0a2240 0%, #003366 100%) !important;
-    color: #fff !important;
-}
-
 <?php
 // Ensure session is started and $connection is available
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+if (!isset($connection)) {
+    // Try to include DB connection if not already set
+    $db_path1 = __DIR__ . '/../../../admin/includes/db.php';
+    $db_path2 = __DIR__ . '/../../admin/includes/db.php';
+    if (file_exists($db_path1)) {
+        include_once $db_path1;
+    } elseif (file_exists($db_path2)) {
+        include_once $db_path2;
+    }
+}
 
-// Get the logged-in employee's user_id from session
-$user_id = $_SESSION['user_id'] ?? 0;
+// Get the logged-in user's user_id from session
+$user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+$employee_id = 0;
+if ($user_id > 0) {
+    // Find employee_id for this user_id
+    $emp_res = mysqli_query($connection, "SELECT employee_id FROM employees WHERE user_id = $user_id LIMIT 1");
+    if ($emp_res && $emp_row = mysqli_fetch_assoc($emp_res)) {
+        $employee_id = (int)$emp_row['employee_id'];
+    }
+}
 
-$employee_id = $user_id;
+// Set current year if not set
+$current_year = isset($current_year) ? $current_year : (int)date('Y');
 
 // Get filter parameters
 $type_filter = isset($_GET['type']) ? $_GET['type'] : '';
@@ -23,7 +36,6 @@ $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : $current_year;
 
 // Build where clause
 $where = ["employee_id = $employee_id"];
-
 if (!empty($type_filter)) {
     $where[] = "points_type = '" . mysqli_real_escape_string($connection, $type_filter) . "'";
 }
@@ -35,7 +47,6 @@ if ($month_filter > 0) {
 } else if ($year_filter) {
     $where[] = "YEAR(created_at) = $year_filter";
 }
-
 $where_clause = implode(' AND ', $where);
 
 // Get total points for period
@@ -51,7 +62,6 @@ $totals = mysqli_fetch_assoc($total_result);
 $net = $totals['total_earned'] - $totals['total_deducted'];
 
 // Get distinct years for filter
-
 $years_query = "SELECT DISTINCT YEAR(created_at) as year FROM points_ledger WHERE employee_id = $employee_id ORDER BY year DESC";
 $years_result = mysqli_query($connection, $years_query);
 
