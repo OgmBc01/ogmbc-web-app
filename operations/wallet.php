@@ -27,34 +27,58 @@ $current_month = date('m');
             </ol>
         </nav>
 
-        <div class="row">
-            <div class="col-md-12">
-                <?php
-                if (isset($_GET['source'])) {
-                    $source = $_GET['source'];
-                } else {
-                    $source = 'summary';
-                }
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4" id="walletTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link <?php echo (!isset($_GET['source']) || $_GET['source'] == 'summary') ? 'active' : ''; ?>" 
+                        id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">
+                    <i class="bi bi-wallet2 me-2"></i>Summary
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'history') ? 'active' : ''; ?>" 
+                        id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
+                    <i class="bi bi-clock-history me-2"></i>Transaction History
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'monthly') ? 'active' : ''; ?>" 
+                        id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab">
+                    <i class="bi bi-calendar-month me-2"></i>Monthly Breakdown
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link <?php echo (isset($_GET['source']) && $_GET['source'] == 'redemption_history') ? 'active' : ''; ?>" 
+                        id="redemption-tab" data-bs-toggle="tab" data-bs-target="#redemption" type="button" role="tab">
+                    <i class="bi bi-cash-stack me-2"></i>Redemptions
+                </button>
+            </li>
+        </ul>
 
-                switch($source) {
-                    case 'history':
-                        include "includes/wallet/view_points_history.php";
-                        break;
-                    case 'monthly':
-                        include "includes/wallet/view_monthly_breakdown.php";
-                        break;
-                    case 'transaction':
-                        include "includes/wallet/view_transaction_details.php";
-                        break;
-                    default:
-                        include "includes/wallet/view_wallet_summary.php";
-                        break;
-                }
-                ?>
+        <div class="tab-content" id="walletTabsContent">
+            <!-- Summary Tab -->
+            <div class="tab-pane fade <?php echo (!isset($_GET['source']) || $_GET['source'] == 'summary') ? 'show active' : ''; ?>" id="summary" role="tabpanel">
+                <?php include "includes/wallet/view_wallet_summary.php"; ?>
+            </div>
+
+            <!-- Transaction History Tab -->
+            <div class="tab-pane fade <?php echo (isset($_GET['source']) && $_GET['source'] == 'history') ? 'show active' : ''; ?>" id="history" role="tabpanel">
+                <?php include "includes/wallet/view_points_history.php"; ?>
+            </div>
+
+            <!-- Monthly Breakdown Tab -->
+            <div class="tab-pane fade <?php echo (isset($_GET['source']) && $_GET['source'] == 'monthly') ? 'show active' : ''; ?>" id="monthly" role="tabpanel">
+                <?php include "includes/wallet/view_monthly_breakdown.php"; ?>
+            </div>
+
+            <!-- Redemption History Tab -->
+            <div class="tab-pane fade <?php echo (isset($_GET['source']) && $_GET['source'] == 'redemption_history') ? 'show active' : ''; ?>" id="redemption" role="tabpanel">
+                <?php include "includes/wallet/redemption_history.php"; ?>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Transaction Details Modal -->
 <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
@@ -81,6 +105,9 @@ $current_month = date('m');
         </div>
     </div>
 </div>
+
+<!-- Redeem Points Modal -->
+<?php include "includes/wallet/redeem_points_modal.php"; ?>
 
 <script>
 // View transaction details
@@ -200,9 +227,16 @@ function viewTransaction(id) {
         });
 }
 
+
 // Helper function to format numbers
 function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// Show redeem points modal
+function showRedeemModal() {
+    const modal = new bootstrap.Modal(document.getElementById('redeemPointsModal'));
+    modal.show();
 }
 </script>
 

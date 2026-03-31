@@ -26,6 +26,42 @@ $month_stats = mysqli_fetch_assoc($month_stats_result);
 $month_net = $month_stats['month_points'] - $month_stats['month_deducted'];
 $cashable_points = max(0, $month_net - 1000); // From your business rules
 
+
+// Get eligible points for redemption (Engagement + Client Feedback + Manual Adjustment)
+$eligible_query = "SELECT 
+    COALESCE(SUM(CASE WHEN source_type IN ('ENGAGEMENT', 'CLIENT_FEEDBACK', 'MANUAL_ADJUSTMENT') AND points_type = 'EARNED' THEN points ELSE 0 END), 0) as eligible_points,
+    COALESCE(SUM(CASE WHEN source_type = 'REDEMPTION' AND points_type = 'DEDUCTED' THEN points ELSE 0 END), 0) as redeemed_points
+    FROM points_ledger 
+    WHERE employee_id = $user_id 
+    AND MONTH(created_at) = $current_month 
+    AND YEAR(created_at) = $current_year";
+$eligible_result = mysqli_query($connection, $eligible_query);
+$eligible_data = mysqli_fetch_assoc($eligible_result);
+
+$total_eligible = $eligible_data['eligible_points'];
+$redeemed = $eligible_data['redeemed_points'];
+$net_eligible = max(0, $total_eligible - 1000);
+$available_for_redemption = max(0, $net_eligible - $redeemed);
+
+// Check if there's a pending request
+
+// Check if there's any redemption request for the month (any status)
+$any_request_query = "SELECT request_id, status FROM points_redemption_requests 
+                  WHERE employee_id = $user_id 
+                  AND month = $current_month 
+                  AND year = $current_year ";
+$any_request_result = mysqli_query($connection, $any_request_query);
+$has_any_request = mysqli_num_rows($any_request_result) > 0;
+$has_pending = false;
+if ($has_any_request) {
+    while ($row = mysqli_fetch_assoc($any_request_result)) {
+        if ($row['status'] === 'PENDING') {
+            $has_pending = true;
+            break;
+        }
+    }
+}
+
 // Get source breakdown
 $source_query = "SELECT 
     source_type,
@@ -101,17 +137,38 @@ $projected_aed = $projected_cashable; // 1 AED per point
         </div>
     </div>
 
-    <!-- Projected Earnings -->
+    <!-- Redeem Action Card -->
     <div class="col-xl-3 col-md-6">
-        <div class="stat-card stat-card-info">
-            <div class="stat-card-body d-flex align-items-center">
-                <div class="stat-icon">
-                    <i class="bi bi-graph-up-arrow text-info"></i>
+        <div class="stat-card stat-card-info" style="border-left-color: #28a745;">
+            <div class="stat-card-body d-flex align-items-center justify-content-between flex-wrap">
+                <div class="d-flex align-items-center flex-grow-1 min-w-0">
+                    <div class="stat-icon bg-success-soft">
+                        <i class="bi bi-cash-coin text-success"></i>
+                    </div>
+                    <div class="stat-content ms-3 min-w-0">
+                        <h3 class="stat-value mb-0">AED <?php echo number_format($available_for_redemption); ?></h3>
+                        <p class="stat-label mb-0">Available to Redeem</p>
+                        <small class="text-muted">From Engagements, Feedback & Manual Adjustments</small>
+                    </div>
                 </div>
-                <div class="stat-content ms-3">
-                    <h3 class="stat-value mb-0">AED <?php echo number_format($projected_aed); ?></h3>
-                    <p class="stat-label mb-0">Projected Cash</p>
-                    <small class="text-muted">Based on current month</small>
+                <div class="d-flex align-items-center mt-3 mt-md-0 ms-md-3">
+                <?php if ($available_for_redemption > 0 && !$has_any_request): ?>
+                    <button class="btn btn-success btn-sm" style="white-space:nowrap;" onclick="showRedeemModal()">
+                        <i class="bi bi-cash-stack me-1"></i>Redeem
+                    </button>
+                <?php elseif ($has_pending): ?>
+                    <span class="badge bg-warning p-2">
+                        <i class="bi bi-clock me-1"></i>Pending
+                    </span>
+                <?php elseif ($has_any_request): ?>
+                    <span class="badge bg-danger p-2">
+                        <i class="bi bi-x-circle me-1"></i>Request Exists
+                    </span>
+                <?php elseif ($available_for_redemption <= 0 && $month_net > 0): ?>
+                    <span class="badge bg-secondary p-2">
+                        <i class="bi bi-lock me-1"></i>Not Eligible
+                    </span>
+                <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -145,10 +202,10 @@ $projected_aed = $projected_cashable; // 1 AED per point
                     <i class="bi bi-info-circle me-1"></i>
                     Cashable points = max(0, Monthly Total - 1,000)
                 </small>
-                <?php if ($cashable_points > 0): ?>
+                <?php if ($available_for_redemption > 0): ?>
                     <span class="badge bg-success">
                         <i class="bi bi-check-circle me-1"></i>
-                        <?php echo number_format($cashable_points); ?> cashable this month
+                        <?php echo number_format($available_for_redemption); ?> points available to redeem
                     </span>
                 <?php endif; ?>
             </div>
@@ -177,30 +234,37 @@ $projected_aed = $projected_cashable; // 1 AED per point
                             
                             $source_icon = 'briefcase';
                             $source_color = 'primary';
+                            $is_redeemable = false;
                             switch(strtolower($source['source_type'])) {
                                 case 'engagement':
                                     $source_icon = 'briefcase';
                                     $source_color = 'primary';
+                                    $is_redeemable = true;
                                     break;
                                 case 'client_feedback':
                                     $source_icon = 'star';
                                     $source_color = 'warning';
+                                    $is_redeemable = true;
                                     break;
                                 case 'sales_target':
                                     $source_icon = 'graph-up';
                                     $source_color = 'success';
+                                    $is_redeemable = false;
                                     break;
                                 case 'cdp':
                                     $source_icon = 'mortarboard';
                                     $source_color = 'info';
+                                    $is_redeemable = false;
                                     break;
                                 case 'manual_adjustment':
                                     $source_icon = 'pencil-square';
                                     $source_color = 'secondary';
+                                    $is_redeemable = true;
                                     break;
                                 default:
                                     $source_icon = 'tag';
                                     $source_color = 'dark';
+                                    $is_redeemable = false;
                             }
                         ?>
                         <div class="source-item mb-3">
@@ -211,6 +275,11 @@ $projected_aed = $projected_cashable; // 1 AED per point
                                     </span>
                                     <strong><?php echo ucwords(str_replace('_', ' ', $source['source_type'])); ?></strong>
                                     <small class="text-muted ms-2">(<?php echo $source['count']; ?> entries)</small>
+                                    <?php if ($is_redeemable || strtolower($source['source_type']) === 'client_feedback'): ?>
+                                        <span class="badge bg-success-soft text-success ms-2">
+                                            <i class="bi bi-cash-stack me-1"></i>Redeemable
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="text-end">
                                     <span class="fw-bold text-success">+<?php echo number_format($source['total_points']); ?></span>
@@ -266,13 +335,16 @@ $projected_aed = $projected_cashable; // 1 AED per point
                                 case 'cdp':
                                     $source_icon = 'mortarboard';
                                     break;
+                                case 'redemption':
+                                    $source_icon = 'cash-stack';
+                                    break;
                                 default:
                                     $source_icon = 'tag';
                             }
                         ?>
                         <div class="transaction-item">
-                            <div class="transaction-icon bg-<?php echo $source_icon == 'briefcase' ? 'primary' : ($source_icon == 'star' ? 'warning' : ($source_icon == 'mortarboard' ? 'info' : 'secondary')); ?>-soft">
-                                <i class="bi bi-<?php echo $source_icon; ?> text-<?php echo $source_icon == 'briefcase' ? 'primary' : ($source_icon == 'star' ? 'warning' : ($source_icon == 'mortarboard' ? 'info' : 'secondary')); ?>"></i>
+                            <div class="transaction-icon bg-<?php echo $source_icon == 'briefcase' ? 'primary' : ($source_icon == 'star' ? 'warning' : ($source_icon == 'mortarboard' ? 'info' : ($source_icon == 'cash-stack' ? 'success' : 'secondary'))); ?>-soft">
+                                <i class="bi bi-<?php echo $source_icon; ?> text-<?php echo $source_icon == 'briefcase' ? 'primary' : ($source_icon == 'star' ? 'warning' : ($source_icon == 'mortarboard' ? 'info' : ($source_icon == 'cash-stack' ? 'success' : 'secondary'))); ?>"></i>
                             </div>
                             <div class="transaction-details">
                                 <div class="d-flex justify-content-between align-items-start">
@@ -323,17 +395,29 @@ $projected_aed = $projected_cashable; // 1 AED per point
                 <div class="col-md-8">
                     <h6 class="text-white mb-2">
                         <i class="bi bi-info-circle me-2"></i>
-                        How Cashable Points Work
+                        How Redemption Works
                     </h6>
                     <p class="text-white-50 mb-md-0">
-                        <strong>Cashable Points = max(0, Monthly Total Points - 1,000)</strong><br>
-                        You earn 1 AED for every cashable point. Points are calculated monthly and paid quarterly.
+                        <strong>Only points from Engagements and Client Feedback are redeemable!</strong><br>
+                        You need at least 1,000 points in a month. The excess (points above 1,000) can be redeemed.<br>
+                        Example: 1,500 total points → 500 redeemable → AED 500 upon approval.
                     </p>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <div class="example-box bg-white-soft p-3 rounded">
-                        <small class="text-white-50">Example:</small>
-                        <div class="text-white fw-bold">1,500 points → 500 cashable → AED 500</div>
+                        <small class="text-white-50">Your Status:</small>
+                        <div class="text-white fw-bold">
+                            <?php if ($available_for_redemption > 0): ?>
+                                <?php echo number_format($available_for_redemption); ?> points available
+                                <i class="bi bi-check-circle ms-1"></i>
+                            <?php elseif ($month_net >= 1000 && $available_for_redemption == 0 && $redeemed > 0): ?>
+                                You've already redeemed <?php echo number_format($redeemed); ?> points
+                            <?php elseif ($month_net < 1000): ?>
+                                Need <?php echo number_format(1000 - $month_net); ?> more points to be eligible
+                            <?php else: ?>
+                                No redeemable points from Engagements & Feedback
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>

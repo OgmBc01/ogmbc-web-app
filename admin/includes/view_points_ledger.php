@@ -3,27 +3,27 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-// Get the logged-in employee's user_id from session
-$user_id = $_SESSION['user_id'] ?? 0;
-
-
-$employee_id = $user_id;
-
-// Debug: Uncomment to check if employee_id is correct
-echo "<!-- Debug: User ID: $user_id, Employee ID: $employee_id -->";
-
 // Get current date for context
 $current_year = date('Y');
 
-// Get filter parameters
-$type_filter = isset($_GET['type']) ? $_GET['type'] : '';
-$source_filter = isset($_GET['source']) ? $_GET['source'] : '';
-$month_filter = isset($_GET['month']) ? (int)$_GET['month'] : 0;
-$year_filter = isset($_GET['year']) ? (int)$_GET['year'] : $current_year;
+// Only apply filters if the filter form is submitted (i.e., if the request has any GET params except 'source' or 'page')
+$filter_applied = false;
+foreach($_GET as $key => $val) {
+    if (!in_array($key, ['source','page']) && $val !== '' && $val !== '0') {
+        $filter_applied = true;
+        break;
+    }
+}
+
+$type_filter = $filter_applied && isset($_GET['type']) ? $_GET['type'] : '';
+$source_filter = $filter_applied && isset($_GET['source']) ? $_GET['source'] : '';
+$month_filter = $filter_applied && isset($_GET['month']) ? (int)$_GET['month'] : 0;
+$year_filter = $filter_applied && isset($_GET['year']) ? (int)$_GET['year'] : 0;
 
 
-$where = ["employee_id = $user_id"];
+
+// In admin, always show all transactions by default
+$where = ["1=1"];
 
 if (!empty($type_filter)) {
     $where[] = "points_type = '" . mysqli_real_escape_string($connection, $type_filter) . "'";
@@ -60,11 +60,13 @@ $net = ($totals['total_earned'] ?? 0) - ($totals['total_deducted'] ?? 0);
 
 // Get distinct years for filter
 
-$years_query = "SELECT DISTINCT YEAR(created_at) as year FROM points_ledger WHERE employee_id = $user_id ORDER BY year DESC";
+
+// Get distinct years for filter
+$years_query = "SELECT DISTINCT YEAR(created_at) as year FROM points_ledger ORDER BY year DESC";
 $years_result = mysqli_query($connection, $years_query);
 
 // Get distinct sources for filter
-$sources_query = "SELECT DISTINCT source_type FROM points_ledger WHERE employee_id = $user_id ORDER BY source_type";
+$sources_query = "SELECT DISTINCT source_type FROM points_ledger ORDER BY source_type";
 $sources_result = mysqli_query($connection, $sources_query);
 
 // Pagination
@@ -101,24 +103,15 @@ $transactions_result = mysqli_query($connection, $transactions_query);
                 </ol>
             </nav>
         </div>
-        <a href="wallet.php" class="btn btn-outline-secondary">
+        <a href="points_ledger.php?source=monthly_summary" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i>Back to Summary
         </a>
     </div>
 
     <?php if ($total_records == 0): ?>
-    <!-- Debug Info - Remove in production -->
     <div class="alert alert-info mb-4">
         <i class="bi bi-info-circle me-2"></i>
-        <strong>Debug Info:</strong> No transactions found for employee ID: <?php echo $employee_id; ?> (User ID: <?php echo $user_id; ?>)
-        <hr>
-        <small>Check if:
-        <ul class="mb-0 mt-2">
-            <li>The employee exists in the employees table</li>
-            <li>Points have been awarded to this employee</li>
-            <li>The employee_id in points_ledger matches <?php echo $employee_id; ?></li>
-        </ul>
-        </small>
+        No transactions found for the selected filter(s).
     </div>
     <?php endif; ?>
 
@@ -158,7 +151,7 @@ $transactions_result = mysqli_query($connection, $transactions_query);
         <div class="collapse show" id="historyFilters">
             <div class="filters-body">
                 <form method="GET" action="" class="row g-3">
-                    <input type="hidden" name="source" value="history">
+                    <input type="hidden" name="source" value="view_ledger">
                     
                     <div class="col-md-2">
                         <label class="form-label">Year</label>
@@ -364,9 +357,6 @@ $transactions_result = mysqli_query($connection, $transactions_query);
                     <i class="bi bi-clock-history display-1"></i>
                     <h5 class="mt-3">No Transactions Found</h5>
                     <p class="text-muted">No transactions match your criteria.</p>
-                    <?php if ($employee_id == $user_id): ?>
-                    <p class="text-muted small">Employee ID: <?php echo $employee_id; ?></p>
-                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>

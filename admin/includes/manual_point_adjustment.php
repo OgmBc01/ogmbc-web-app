@@ -31,11 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_adjustment']))
     } else {
         // Insert manual adjustment (simplified - no approval required for testing)
         $insert_query = "INSERT INTO points_ledger 
-                        (employee_id, source_type, points, points_type, description, created_by)
-                        VALUES 
-                        ($employee_id, 'MANUAL_ADJUSTMENT', $points, 
-                         '" . ($points >= 0 ? 'EARNED' : 'DEDUCTED') . "',
-                         '$description', {$_SESSION['user_id']})";
+                (employee_id, source_type, points, points_type, description, notes, created_by)
+                VALUES 
+                ($employee_id, 'MANUAL_ADJUSTMENT', $points, 
+                 '" . ($points >= 0 ? 'EARNED' : 'DEDUCTED') . "',
+                 '$description', '', {$_SESSION['user_id']})";
         
         if (mysqli_query($connection, $insert_query)) {
             $showSuccessModal = true;

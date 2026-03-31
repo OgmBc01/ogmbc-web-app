@@ -129,24 +129,25 @@ if (isset($_GET['close_month']) && ($user_role == 'CEO_GM' || $user_role == 'ADM
                     $source = 'view_ledger';
                 }
 
+                $view_ledger_path = "includes/view_points_ledger.php";
                 switch($source) {
-                    case 'view_ledger';
-                        include "includes/view_points_ledger.php";
+                    case 'view_ledger':
+                        include $view_ledger_path;
                         break;
-                    case 'monthly_summary';
+                    case 'monthly_summary':
                         include "includes/monthly_point_summary.php";
                         break;
-                    case 'quarterly_payout';
+                    case 'quarterly_payout':
                         include "includes/quarterly_payout.php";
                         break;
-                    case 'employee_wallet';
+                    case 'employee_wallet':
                         include "includes/employee_wallet.php";
                         break;
-                    case 'manual_adjustment';
+                    case 'manual_adjustment':
                         include "includes/manual_point_adjustment.php";
                         break;
                     default:
-                        include "includes/view_points_ledger.php";
+                        include $view_ledger_path;
                         break;
                 }
                 ?>

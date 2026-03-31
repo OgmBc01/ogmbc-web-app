@@ -16,50 +16,47 @@ if (!isset($connection)) {
 
 // Get the logged-in user's user_id from session
 $user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
-$employee_id = 0;
-if ($user_id > 0) {
-    // Find employee_id for this user_id
-    $emp_res = mysqli_query($connection, "SELECT employee_id FROM employees WHERE user_id = $user_id LIMIT 1");
-    if ($emp_res && $emp_row = mysqli_fetch_assoc($emp_res)) {
-        $employee_id = (int)$emp_row['employee_id'];
-    }
-}
 
-// Set current year if not set
-$current_year = isset($current_year) ? $current_year : (int)date('Y');
+// IMPORTANT: points_ledger uses user_id directly, not employee_id
+// So we use $user_id for querying points_ledger
+$employee_id = $user_id; // Use user_id for points_ledger queries
 
 // Get filter parameters
-$type_filter = isset($_GET['type']) ? $_GET['type'] : '';
-$source_filter = isset($_GET['source']) ? $_GET['source'] : '';
-$month_filter = isset($_GET['month']) ? (int)$_GET['month'] : 0;
-$year_filter = isset($_GET['year']) ? (int)$_GET['year'] : $current_year;
+$type_filter = isset($_GET['type']) && $_GET['type'] !== '' ? mysqli_real_escape_string($connection, $_GET['type']) : '';
+$source_filter = isset($_GET['source_filter']) && $_GET['source_filter'] !== '' ? mysqli_real_escape_string($connection, $_GET['source_filter']) : '';
+$month_filter = isset($_GET['month']) && $_GET['month'] !== '' ? (int)$_GET['month'] : 0;
+$year_filter = isset($_GET['year']) && $_GET['year'] !== '' ? (int)$_GET['year'] : 0;
 
 // Build where clause
 $where = ["employee_id = $employee_id"];
+
 if (!empty($type_filter)) {
-    $where[] = "points_type = '" . mysqli_real_escape_string($connection, $type_filter) . "'";
+    $where[] = "points_type = '$type_filter'";
 }
 if (!empty($source_filter)) {
-    $where[] = "source_type = '" . mysqli_real_escape_string($connection, $source_filter) . "'";
+    $where[] = "source_type = '$source_filter'";
 }
 if ($month_filter > 0) {
-    $where[] = "MONTH(created_at) = $month_filter AND YEAR(created_at) = $year_filter";
-} else if ($year_filter) {
+    $where[] = "MONTH(created_at) = $month_filter";
+}
+if ($year_filter > 0) {
     $where[] = "YEAR(created_at) = $year_filter";
 }
+
 $where_clause = implode(' AND ', $where);
 
-// Get total points for period
+// Get total points for period (for summary card)
 $total_query = "SELECT 
     COALESCE(SUM(CASE WHEN points_type IN ('EARNED', 'ADJUSTMENT') THEN points ELSE 0 END), 0) as total_earned,
     COALESCE(SUM(CASE WHEN points_type = 'DEDUCTED' THEN points ELSE 0 END), 0) as total_deducted,
     COUNT(*) as transaction_count
     FROM points_ledger 
     WHERE $where_clause";
+
 $total_result = mysqli_query($connection, $total_query);
 $totals = mysqli_fetch_assoc($total_result);
 
-$net = $totals['total_earned'] - $totals['total_deducted'];
+$net = ($totals['total_earned'] ?? 0) - ($totals['total_deducted'] ?? 0);
 
 // Get distinct years for filter
 $years_query = "SELECT DISTINCT YEAR(created_at) as year FROM points_ledger WHERE employee_id = $employee_id ORDER BY year DESC";
@@ -77,8 +74,8 @@ $offset = ($page - 1) * $per_page;
 // Get total records for pagination
 $count_query = "SELECT COUNT(*) as total FROM points_ledger WHERE $where_clause";
 $count_result = mysqli_query($connection, $count_query);
-$total_records = mysqli_fetch_assoc($count_result)['total'];
-$total_pages = ceil($total_records / $per_page);
+$total_records = $count_result ? mysqli_fetch_assoc($count_result)['total'] : 0;
+$total_pages = $total_records > 0 ? ceil($total_records / $per_page) : 1;
 
 // Get transactions
 $transactions_query = "SELECT * FROM points_ledger 
@@ -119,13 +116,13 @@ $transactions_result = mysqli_query($connection, $transactions_query);
             <div class="col-md-4">
                 <div class="summary-item">
                     <span class="summary-label">Earned</span>
-                    <span class="summary-value text-success">+<?php echo number_format($totals['total_earned']); ?></span>
+                    <span class="summary-value text-success">+<?php echo number_format($totals['total_earned'] ?? 0); ?></span>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="summary-item">
                     <span class="summary-label">Deducted</span>
-                    <span class="summary-value text-danger">-<?php echo number_format($totals['total_deducted']); ?></span>
+                    <span class="summary-value text-danger">-<?php echo number_format($totals['total_deducted'] ?? 0); ?></span>
                 </div>
             </div>
         </div>
@@ -147,11 +144,18 @@ $transactions_result = mysqli_query($connection, $transactions_query);
                         <label class="form-label">Year</label>
                         <select name="year" class="form-select">
                             <option value="">All Years</option>
-                            <?php while($year = mysqli_fetch_assoc($years_result)): ?>
+                            <?php 
+                            if ($years_result && mysqli_num_rows($years_result) > 0):
+                                mysqli_data_seek($years_result, 0);
+                                while($year = mysqli_fetch_assoc($years_result)): 
+                            ?>
                                 <option value="<?php echo $year['year']; ?>" <?php echo $year_filter == $year['year'] ? 'selected' : ''; ?>>
                                     <?php echo $year['year']; ?>
                                 </option>
-                            <?php endwhile; ?>
+                            <?php 
+                                endwhile;
+                            endif;
+                            ?>
                         </select>
                     </div>
                     
@@ -169,13 +173,20 @@ $transactions_result = mysqli_query($connection, $transactions_query);
                     
                     <div class="col-md-3">
                         <label class="form-label">Source</label>
-                        <select name="source" class="form-select">
+                        <select name="source_filter" class="form-select">
                             <option value="">All Sources</option>
-                            <?php while($src = mysqli_fetch_assoc($sources_result)): ?>
+                            <?php 
+                            if ($sources_result && mysqli_num_rows($sources_result) > 0):
+                                mysqli_data_seek($sources_result, 0);
+                                while($src = mysqli_fetch_assoc($sources_result)): 
+                            ?>
                                 <option value="<?php echo $src['source_type']; ?>" <?php echo $source_filter == $src['source_type'] ? 'selected' : ''; ?>>
                                     <?php echo ucwords(str_replace('_', ' ', $src['source_type'])); ?>
                                 </option>
-                            <?php endwhile; ?>
+                            <?php 
+                                endwhile;
+                            endif;
+                            ?>
                         </select>
                     </div>
                     
@@ -224,93 +235,123 @@ $transactions_result = mysqli_query($connection, $transactions_query);
                                 <th>Type</th>
                                 <th class="text-end">Points</th>
                                 <th>Status</th>
+                                <th>Redemption</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php while($trans = mysqli_fetch_assoc($transactions_result)): 
                                 $source_badge = 'secondary';
                                 $source_icon = 'tag';
-                                switch(strtolower($trans['source_type'])) {
+                                $is_redeemable = false;
+                                $source_type_lower = strtolower($trans['source_type']);
+                                
+                                switch($source_type_lower) {
                                     case 'engagement':
                                         $source_badge = 'primary';
                                         $source_icon = 'briefcase';
+                                        $is_redeemable = true;
                                         break;
                                     case 'client_feedback':
+                                    case 'feedback':
                                         $source_badge = 'warning';
                                         $source_icon = 'star';
+                                        $is_redeemable = true;
                                         break;
                                     case 'sales_target':
                                         $source_badge = 'success';
                                         $source_icon = 'graph-up';
+                                        $is_redeemable = false;
                                         break;
                                     case 'cdp':
                                         $source_badge = 'info';
                                         $source_icon = 'mortarboard';
+                                        $is_redeemable = false;
                                         break;
+                                    case 'redemption':
+                                        $source_badge = 'success';
+                                        $source_icon = 'cash-stack';
+                                        $is_redeemable = false;
+                                        break;
+                                    case 'manual_adjustment':
+                                        $source_badge = 'secondary';
+                                        $source_icon = 'pencil';
+                                        $is_redeemable = true;
+                                        break;
+                                    default:
+                                        $source_badge = 'secondary';
+                                        $source_icon = 'tag';
+                                        $is_redeemable = false;
                                 }
+                                
                                 $type_class = $trans['points_type'] == 'EARNED' ? 'success' : 
                                              ($trans['points_type'] == 'DEDUCTED' ? 'danger' : 'warning');
                                 $sign = $trans['points_type'] == 'EARNED' ? '+' : 
                                        ($trans['points_type'] == 'DEDUCTED' ? '-' : '±');
+                                
+                                // Check if this transaction was part of a redemption
+                                $redemption_status = '';
+                                if ($source_type_lower == 'redemption' && $trans['points_type'] == 'DEDUCTED') {
+                                    $redemption_status = '<span class="badge bg-success"><i class="bi bi-cash-stack me-1"></i>Redeemed</span>';
+                                } elseif ($is_redeemable && $trans['points_type'] == 'EARNED') {
+                                    $redemption_status = '<span class="badge bg-info-soft text-info">Eligible</span>';
+                                } else {
+                                    $redemption_status = '<span class="badge bg-secondary-soft text-secondary">Not eligible</span>';
+                                }
                             ?>
-                            <tr>
-                                <td>
-                                    <small class="text-muted">
-                                        <?php echo date('M d, Y', strtotime($trans['created_at'])); ?>
-                                        <br>
-                                        <?php echo date('H:i', strtotime($trans['created_at'])); ?>
-                                    </small>
-                                </td>
-                                <td>
-                                    <span class="badge bg-<?php echo $source_badge; ?>-soft text-<?php echo $source_badge; ?>">
-                                        <i class="bi bi-<?php echo $source_icon; ?> me-1"></i>
-                                        <?php echo ucwords(str_replace('_', ' ', $trans['source_type'])); ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <?php echo htmlspecialchars($trans['description'] ?? '-'); ?>
-                                    <?php if (!empty($trans['notes'])): ?>
-                                        <br><small class="text-muted"><?php echo htmlspecialchars($trans['notes']); ?></small>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <span class="badge bg-<?php echo $type_class; ?>">
-                                        <?php echo ucfirst(strtolower($trans['points_type'])); ?>
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    <span class="fw-bold text-<?php echo $type_class; ?>">
-                                        <?php echo $sign . abs($trans['points']); ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <?php if ($trans['requires_approval'] && !$trans['approved_by']): ?>
-                                        <span class="badge bg-warning">
-                                            <i class="bi bi-clock me-1"></i>Pending
+                                <tr>
+                                    <td>
+                                        <small class="text-muted">
+                                            <?php echo date('M d, Y', strtotime($trans['created_at'])); ?>
+                                            <br>
+                                            <?php echo date('H:i', strtotime($trans['created_at'])); ?>
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-<?php echo $source_badge; ?>-soft text-<?php echo $source_badge; ?>">
+                                            <i class="bi bi-<?php echo $source_icon; ?> me-1"></i>
+                                            <?php echo ucwords(str_replace('_', ' ', $trans['source_type'])); ?>
                                         </span>
-                                    <?php elseif ($trans['approved_by']): ?>
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-check-circle me-1"></i>Approved
+                                    </td>
+                                    <td>
+                                        <?php echo htmlspecialchars($trans['description'] ?? '-'); ?>
+                                        <?php if (!empty($trans['notes'])): ?>
+                                            <br><small class="text-muted"><?php echo htmlspecialchars($trans['notes']); ?></small>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-<?php echo $type_class; ?>">
+                                            <?php echo ucfirst(strtolower($trans['points_type'])); ?>
                                         </span>
-                                    <?php else: ?>
-                                        <span class="badge bg-secondary">
-                                            <i class="bi bi-check me-1"></i>Auto
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="fw-bold text-<?php echo $type_class; ?>">
+                                            <?php echo $sign . abs($trans['points']); ?>
                                         </span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td>
+                                        <?php if ($trans['requires_approval'] && !$trans['approved_by']): ?>
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-clock me-1"></i>Pending
+                                            </span>
+                                        <?php elseif ($trans['approved_by']): ?>
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>Approved
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-check me-1"></i>Auto
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo $redemption_status; ?></td>
+                                </tr>
                             <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>
-                <div id="no-more-transactions" class="text-center text-muted my-3" style="display:none;">
-                    <em>No more transactions to load.</em>
-                </div>
-
-                <!-- Infinite scroll disables classic pagination -->
             <?php else: ?>
-                <div class="empty-state">
-                    <i class="bi bi-clock-history display-1"></i>
+                <div class="empty-state py-5">
+                    <i class="bi bi-clock-history display-1 text-muted"></i>
                     <h5 class="mt-3">No Transactions Found</h5>
                     <p class="text-muted">No transactions match your criteria.</p>
                 </div>
@@ -377,6 +418,7 @@ $transactions_result = mysqli_query($connection, $transactions_query);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 12px 12px 0 0;
 }
 
 .dark-header .card-title {
@@ -405,107 +447,22 @@ $transactions_result = mysqli_query($connection, $transactions_query);
     color: #dee2e6;
 }
 
-/* Pro Tip Card Gradient */
-.pro-tip-card {
-    background: linear-gradient(90deg, #0a2240 0%, #003366 100%);
-    color: #fff;
-    border-radius: 16px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
-    padding: 20px;
-}
-
 /* Badge background utilities */
 .bg-primary-soft { background: rgba(13, 110, 253, 0.1); }
 .bg-success-soft { background: rgba(25, 135, 84, 0.1); }
 .bg-warning-soft { background: rgba(255, 193, 7, 0.1); }
 .bg-info-soft { background: rgba(13, 202, 240, 0.1); }
+.bg-secondary-soft { background: rgba(108, 117, 125, 0.1); }
 </style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 function exportCSV() {
-    // Get current filter values
     const urlParams = new URLSearchParams(window.location.search);
     const year = urlParams.get('year') || '';
     const month = urlParams.get('month') || '';
-    const source = urlParams.get('source') || '';
+    const source = urlParams.get('source_filter') || '';
     const type = urlParams.get('type') || '';
-    // Redirect to export endpoint
     window.location.href = 'includes/ajax/export_transactions.php?year=' + year + '&month=' + month + '&source=' + source + '&type=' + type;
-}
-
-// Infinite scroll for transactions
-let currentPage = 1;
-let loading = false;
-let hasMore = true;
-
-$(window).scroll(function() {
-    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-        if (!loading && hasMore) {
-            loadMoreTransactions();
-        }
-    }
-});
-
-function loadMoreTransactions() {
-    loading = true;
-    currentPage++;
-
-    // Get current filter values from form (if present)
-    const type = $("select[name='type']").val() || '';
-    const source = $("select[name='source']").val() || '';
-    const month = $("select[name='month']").val() || '';
-    const year = $("select[name='year']").val() || '';
-
-    $.ajax({
-        url: 'includes/ajax/load_more_transactions.php',
-        method: 'POST',
-        dataType: 'json',
-        data: {
-            page: currentPage,
-            type: type,
-            source: source,
-            month: month,
-            year: year
-        },
-        success: function(response) {
-            if (response.success) {
-                if (response.data.transactions.length > 0) {
-                    appendTransactions(response.data.transactions);
-                }
-                hasMore = response.data.pagination.has_next;
-                loading = false;
-                if (!hasMore) {
-                    $('#no-more-transactions').show();
-                }
-            }
-        }
-    });
-}
-
-function appendTransactions(transactions) {
-    let html = '';
-    transactions.forEach(t => {
-        const typeClass = t.points_type === 'EARNED' ? 'success' : 
-                         (t.points_type === 'DEDUCTED' ? 'danger' : 'warning');
-        const sign = t.points_type === 'EARNED' ? '+' : 
-                    (t.points_type === 'DEDUCTED' ? '-' : '±');
-        html += `
-            <tr>
-                <td><small class="text-muted">${t.date}<br>${t.time}</small></td>
-                <td><span class="badge bg-primary-soft text-primary">${t.source.replace(/_/g, ' ')}</span></td>
-                <td>${t.description || '-'}</td>
-                <td><span class="badge bg-${typeClass}">${t.points_type}</span></td>
-                <td class="text-end"><span class="fw-bold text-${typeClass}">${sign}${Math.abs(t.points)}</span></td>
-                <td>
-                    ${t.requires_approval ? (t.approved ? 
-                        '<span class="badge bg-success">Approved</span>' : 
-                        '<span class="badge bg-warning">Pending</span>') : 
-                        '<span class="badge bg-secondary">Auto</span>'}
-                </td>
-            </tr>
-        `;
-    });
-    $('#transactions-table tbody').append(html);
 }
 </script>

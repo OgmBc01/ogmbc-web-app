@@ -293,6 +293,7 @@
                 </ul>
             </li>
 
+
             <!-- Points Ledger Menu with Dropdown -->
             <li class="nav-item">
                 <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'points_ledger.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
@@ -337,6 +338,14 @@
                         </a>
                     </li>
                 </ul>
+            </li>
+
+            <!-- Redemptions Menu Link -->
+            <li class="nav-item">
+                <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'redemptions.php') ? 'active' : ''; ?>" href="redemptions.php">
+                    <i class="bi bi-cash-stack nav-icon"></i>
+                    <span class="nav-text">Redemptions</span>
+                </a>
             </li>
 
             <!-- CDP & Annual Performance Menu with Dropdown -->
