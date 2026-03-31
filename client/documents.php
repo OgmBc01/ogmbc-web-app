@@ -5,82 +5,6 @@ include 'includes/client_sidebar.php';
 
 $client_id = $_SESSION['client_id'];
 
-// Handle document download
-if (isset($_GET['download']) && isset($_GET['document_id'])) {
-    $document_id = intval($_GET['document_id']);
-    
-    // Check access
-    $access_query = "SELECT d.* FROM client_documents d
-                     WHERE d.document_id = $document_id 
-                     AND d.is_active = 1
-                     AND (d.document_type = 'general' 
-                          OR EXISTS (SELECT 1 FROM document_client_access 
-                                     WHERE document_id = d.document_id 
-                                     AND client_id = $client_id))
-                     AND (d.expires_at IS NULL OR d.expires_at > CURDATE())";
-    $access_result = mysqli_query($connection, $access_query);
-    $document = mysqli_fetch_assoc($access_result);
-    
-    if ($document) {
-        // Log download
-        $log_query = "INSERT INTO document_access_logs (document_id, client_id, access_type, ip_address, user_agent) 
-                      VALUES ($document_id, $client_id, 'download', '{$_SERVER['REMOTE_ADDR']}', '{$_SERVER['HTTP_USER_AGENT']}')";
-        mysqli_query($connection, $log_query);
-        
-        // Update download count
-        mysqli_query($connection, "UPDATE client_documents SET download_count = download_count + 1 WHERE document_id = $document_id");
-        
-        // Serve file
-        $file_path = $document['file_path'];
-        $file_name = $document['file_original_name'];
-        
-        if (file_exists($file_path)) {
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . $file_name . '"');
-            header('Content-Length: ' . filesize($file_path));
-            readfile($file_path);
-            exit();
-        }
-    }
-    exit();
-}
-
-// Handle document preview
-if (isset($_GET['preview']) && isset($_GET['document_id'])) {
-    $document_id = intval($_GET['document_id']);
-    
-    // Check access
-    $access_query = "SELECT d.* FROM client_documents d
-                     WHERE d.document_id = $document_id 
-                     AND d.is_active = 1
-                     AND (d.document_type = 'general' 
-                          OR EXISTS (SELECT 1 FROM document_client_access 
-                                     WHERE document_id = d.document_id 
-                                     AND client_id = $client_id))
-                     AND (d.expires_at IS NULL OR d.expires_at > CURDATE())";
-    $access_result = mysqli_query($connection, $access_query);
-    $document = mysqli_fetch_assoc($access_result);
-    
-    if ($document) {
-        // Log view
-        $log_query = "INSERT INTO document_access_logs (document_id, client_id, access_type, ip_address, user_agent) 
-                      VALUES ($document_id, $client_id, 'view', '{$_SERVER['REMOTE_ADDR']}', '{$_SERVER['HTTP_USER_AGENT']}')";
-        mysqli_query($connection, $log_query);
-        
-        // Update view count
-        mysqli_query($connection, "UPDATE client_documents SET view_count = view_count + 1 WHERE document_id = $document_id");
-        
-        // Store document in session for preview
-        $_SESSION['preview_document'] = $document;
-        echo '<script>window.location.href = "document_preview.php?document_id=' . $document_id . '";</script>';
-        exit();
-    } else {
-        $_SESSION['error'] = "You don't have permission to view this document.";
-        echo '<script>window.location.href = "documents.php";</script>';
-        exit();
-    }
-}
-
 // Get documents for client
 $documents_query = "SELECT d.*, 
                     GROUP_CONCAT(DISTINCT c.category_name ORDER BY c.category_name SEPARATOR ', ') as categories
@@ -135,23 +59,15 @@ unset($_SESSION['success']);
         <!-- Page Header -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="welcome-card">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h2 class="welcome-title">
-                                <i class="bi bi-folder2-open me-2" style="color:#C9A13B;"></i>
-                                My Documents
-                            </h2>
-                            <p class="welcome-subtitle">
-                                Access and download important documents shared with you
-                            </p>
-                        </div>
-                        <div class="col-md-4 text-md-end">
-                            <div class="current-date">
-                                <i class="bi bi-calendar3 me-2" style="color:#C9A13B;"></i>
-                                <?php echo date('l, F j, Y'); ?>
-                            </div>
-                        </div>
+                <div class="welcome-card d-flex flex-column flex-md-row align-items-center justify-content-between">
+                    <div>
+                        <h2 class="welcome-title">
+                            <i class="bi bi-folder2-open me-2"></i>My Documents
+                        </h2>
+                        <p class="welcome-subtitle">Access and download important documents shared with you</p>
+                    </div>
+                    <div class="current-date mt-3 mt-md-0">
+                        <i class="bi bi-calendar-event me-2"></i> <?php echo date('l, F j, Y'); ?>
                     </div>
                 </div>
             </div>
@@ -160,55 +76,55 @@ unset($_SESSION['success']);
         <!-- Alert Messages -->
         <?php if ($error_message): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2" style="color:#C9A13B;"></i> <?php echo htmlspecialchars($error_message); ?>
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> <?php echo htmlspecialchars($error_message); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
         
         <?php if ($success_message): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2" style="color:#C9A13B;"></i> <?php echo htmlspecialchars($success_message); ?>
+                <i class="bi bi-check-circle-fill me-2"></i> <?php echo htmlspecialchars($success_message); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 
         <!-- Statistics Cards -->
-        <div class="row g-3 mb-3">
+        <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="stat-card shadow-sm p-2" style="border-radius:10px; min-height:90px; border-left:5px solid #2563eb;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="stat-icon d-flex align-items-center justify-content-center" style="background:#f0f4ff; border-radius:8px; width:38px; height:38px;">
-                            <i class="bi bi-files fs-4" style="color:#C9A13B;"></i>
+                <div class="stat-card stat-card-primary">
+                    <div class="stat-card-body d-flex align-items-center">
+                        <div class="stat-icon bg-primary-soft">
+                            <i class="bi bi-files text-primary"></i>
                         </div>
-                        <div class="stat-content ms-2">
-                            <div class="stat-value text-primary fw-bold" style="font-size:1.3rem; margin-bottom:2px;"><?php echo number_format($stats['total_documents']); ?></div>
-                            <div class="stat-label text-primary" style="font-size:0.95rem;">Available Documents</div>
+                        <div class="stat-content ms-3">
+                            <h3 class="stat-value mb-0"><?php echo number_format($stats['total_documents']); ?></h3>
+                            <p class="stat-label mb-0">Available Documents</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card shadow-sm p-2" style="border-radius:10px; min-height:90px; border-left:5px solid #0ea5e9;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="stat-icon d-flex align-items-center justify-content-center" style="background:#eaf6fb; border-radius:8px; width:38px; height:38px;">
-                            <i class="bi bi-eye fs-4" style="color:#C9A13B;"></i>
+                <div class="stat-card stat-card-info">
+                    <div class="stat-card-body d-flex align-items-center">
+                        <div class="stat-icon bg-info-soft">
+                            <i class="bi bi-eye text-info"></i>
                         </div>
-                        <div class="stat-content ms-2">
-                            <div class="stat-value text-info fw-bold" style="font-size:1.3rem; margin-bottom:2px;"><?php echo number_format($stats['total_views']); ?></div>
-                            <div class="stat-label text-info" style="font-size:0.95rem;">Total Views</div>
+                        <div class="stat-content ms-3">
+                            <h3 class="stat-value mb-0"><?php echo number_format($stats['total_views']); ?></h3>
+                            <p class="stat-label mb-0">Total Views</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stat-card shadow-sm p-2" style="border-radius:10px; min-height:90px; border-left:5px solid #22c55e;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="stat-icon d-flex align-items-center justify-content-center" style="background:#eafbf0; border-radius:8px; width:38px; height:38px;">
-                            <i class="bi bi-download fs-4" style="color:#C9A13B;"></i>
+                <div class="stat-card stat-card-success">
+                    <div class="stat-card-body d-flex align-items-center">
+                        <div class="stat-icon bg-success-soft">
+                            <i class="bi bi-download text-success"></i>
                         </div>
-                        <div class="stat-content ms-2">
-                            <div class="stat-value text-success fw-bold" style="font-size:1.3rem; margin-bottom:2px;"><?php echo number_format($stats['total_downloads']); ?></div>
-                            <div class="stat-label text-success" style="font-size:0.95rem;">Total Downloads</div>
+                        <div class="stat-content ms-3">
+                            <h3 class="stat-value mb-0"><?php echo number_format($stats['total_downloads']); ?></h3>
+                            <p class="stat-label mb-0">Total Downloads</p>
                         </div>
                     </div>
                 </div>
@@ -219,11 +135,10 @@ unset($_SESSION['success']);
         <div class="row g-4">
             <!-- Documents List -->
             <div class="col-lg-8">
-                <div class="dashboard-card shadow-sm">
-                    <div class="card-header d-flex align-items-center justify-content-between px-3 py-2" style="min-height:56px;">
-                        <h5 class="card-title mb-0 d-flex align-items-center">
-                            <i class="bi bi-folder2-open me-2" style="color:#C9A13B;"></i>
-                            Available Documents
+                <div class="dashboard-card">
+                    <div class="card-header dark-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">
+                            <i class="bi bi-folder2-open me-2"></i>Available Documents
                         </h5>
                         <div class="input-group" style="width: 250px;">
                             <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
@@ -236,23 +151,20 @@ unset($_SESSION['success']);
                                 <?php while ($doc = mysqli_fetch_assoc($documents_result)): 
                                     $ext = strtolower(pathinfo($doc['file_original_name'], PATHINFO_EXTENSION));
                                     $file_icon = 'bi-file-earmark-text';
-                                    $file_color = 'text-primary';
+                                    $file_color = 'primary';
                                     
                                     if ($ext == 'pdf') {
                                         $file_icon = 'bi-file-earmark-pdf';
-                                        $file_color = 'text-danger';
+                                        $file_color = 'danger';
                                     } elseif (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
                                         $file_icon = 'bi-file-earmark-image';
-                                        $file_color = 'text-success';
+                                        $file_color = 'success';
                                     } elseif (in_array($ext, ['doc', 'docx'])) {
                                         $file_icon = 'bi-file-earmark-word';
-                                        $file_color = 'text-info';
+                                        $file_color = 'info';
                                     } elseif (in_array($ext, ['xls', 'xlsx'])) {
                                         $file_icon = 'bi-file-earmark-excel';
-                                        $file_color = 'text-success';
-                                    } elseif (in_array($ext, ['ppt', 'pptx'])) {
-                                        $file_icon = 'bi-file-earmark-slides';
-                                        $file_color = 'text-warning';
+                                        $file_color = 'success';
                                     }
                                     
                                     $is_expiring_soon = $doc['expires_at'] && strtotime($doc['expires_at']) < strtotime('+7 days') && strtotime($doc['expires_at']) > time();
@@ -261,7 +173,7 @@ unset($_SESSION['success']);
                                         <div class="document-card">
                                             <div class="d-flex align-items-start mb-3">
                                                 <div class="document-icon me-3">
-                                                    <i class="bi <?php echo $file_icon; ?> fs-2" style="color:#C9A13B;"></i>
+                                                    <i class="bi <?php echo $file_icon; ?> fs-2 text-<?php echo $file_color; ?>"></i>
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <h6 class="document-title mb-1"><?php echo htmlspecialchars($doc['document_title']); ?></h6>
@@ -296,11 +208,11 @@ unset($_SESSION['success']);
                                                 </div>
                                             </div>
                                             <div class="document-actions d-flex justify-content-end gap-2">
-                                                <a href="?preview=1&document_id=<?php echo $doc['document_id']; ?>" class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-eye" style="color:#C9A13B;"></i> Preview
+                                                <a href="preview_document.php?id=<?php echo $doc['document_id']; ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i> Preview
                                                 </a>
-                                                <a href="?download=1&document_id=<?php echo $doc['document_id']; ?>" class="btn btn-sm btn-primary">
-                                                    <i class="bi bi-download" style="color:#C9A13B;"></i> Download
+                                                <a href="download_document.php?id=<?php echo $doc['document_id']; ?>" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-download"></i> Download
                                                 </a>
                                             </div>
                                         </div>
@@ -308,10 +220,9 @@ unset($_SESSION['success']);
                                 <?php endwhile; ?>
                             </div>
                         <?php else: ?>
-                            <div class="text-center py-5">
+                            <div class="empty-state">
                                 <i class="bi bi-folder-x display-1 text-muted"></i>
-                                         <i class="bi bi-folder-x display-1" style="color:#C9A13B;"></i>
-                                <h5 class="text-muted mt-3">No Documents Available</h5>
+                                <h5 class="mt-3">No Documents Available</h5>
                                 <p class="text-muted">There are no documents shared with you at this time.</p>
                             </div>
                         <?php endif; ?>
@@ -322,11 +233,10 @@ unset($_SESSION['success']);
             <!-- Sidebar -->
             <div class="col-lg-4">
                 <!-- Recent Activity -->
-                <div class="dashboard-card mb-4 shadow-sm">
-                    <div class="card-header px-3 py-2">
-                        <h5 class="card-title mb-0">
-                                <i class="bi bi-clock-history me-2" style="color:#C9A13B;"></i>
-                            Recent Activity
+                <div class="dashboard-card mb-4">
+                    <div class="card-header dark-header">
+                        <h5 class="card-title">
+                            <i class="bi bi-clock-history me-2"></i>Recent Activity
                         </h5>
                     </div>
                     <div class="card-body p-0">
@@ -334,8 +244,8 @@ unset($_SESSION['success']);
                             <div class="activity-feed">
                                 <?php while ($recent = mysqli_fetch_assoc($recent_result)): ?>
                                     <div class="activity-item">
-                                        <div class="activity-icon bg-<?php echo $recent['access_type'] == 'view' ? 'info' : 'success'; ?>-soft">
-                                            <i class="bi bi-<?php echo $recent['access_type'] == 'view' ? 'eye' : 'download'; ?>" style="color:#C9A13B;"></i>
+                                        <div class="activity-icon bg-<?php echo $recent['access_type'] == 'view' ? 'info-soft' : 'success-soft'; ?>">
+                                            <i class="bi bi-<?php echo $recent['access_type'] == 'view' ? 'eye' : 'download'; ?> text-<?php echo $recent['access_type'] == 'view' ? 'info' : 'success'; ?>"></i>
                                         </div>
                                         <div class="activity-content">
                                             <p class="activity-text mb-0">
@@ -350,9 +260,8 @@ unset($_SESSION['success']);
                                 <?php endwhile; ?>
                             </div>
                         <?php else: ?>
-                            <div class="text-center py-4">
-                                <i class="bi bi-activity fs-1 text-muted"></i>
-                                         <i class="bi bi-activity fs-1" style="color:#C9A13B;"></i>
+                            <div class="empty-state py-4">
+                                <i class="bi bi-activity display-4 text-muted"></i>
                                 <p class="text-muted mt-2">No recent activity</p>
                             </div>
                         <?php endif; ?>
@@ -360,29 +269,28 @@ unset($_SESSION['success']);
                 </div>
                 
                 <!-- Document Tips -->
-                <div class="dashboard-card shadow-sm">
-                    <div class="card-header px-3 py-2">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-lightbulb me-2" style="color:#C9A13B;"></i>
-                            Quick Tips
+                <div class="dashboard-card">
+                    <div class="card-header dark-header">
+                        <h5 class="card-title">
+                            <i class="bi bi-lightbulb me-2"></i>Quick Tips
                         </h5>
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled mb-0">
                             <li class="mb-3 d-flex align-items-start">
-                                <i class="bi bi-eye-fill me-2 mt-1" style="color:#C9A13B;"></i>
+                                <i class="bi bi-eye-fill me-2 mt-1 text-primary"></i>
                                 <span class="small">Click <strong>Preview</strong> to view documents online without downloading</span>
                             </li>
                             <li class="mb-3 d-flex align-items-start">
-                                <i class="bi bi-download-fill me-2 mt-1" style="color:#C9A13B;"></i>
+                                <i class="bi bi-download-fill me-2 mt-1 text-success"></i>
                                 <span class="small">Use <strong>Download</strong> to save a copy to your device</span>
                             </li>
                             <li class="mb-3 d-flex align-items-start">
-                                <i class="bi bi-hourglass-split me-2 mt-1" style="color:#C9A13B;"></i>
+                                <i class="bi bi-hourglass-split me-2 mt-1 text-warning"></i>
                                 <span class="small">Check expiration dates for time-sensitive documents</span>
                             </li>
                             <li class="d-flex align-items-start">
-                                <i class="bi bi-envelope-fill me-2 mt-1" style="color:#C9A13B;"></i>
+                                <i class="bi bi-envelope-fill me-2 mt-1 text-info"></i>
                                 <span class="small">Contact support if you can't access a document</span>
                             </li>
                         </ul>
@@ -392,6 +300,193 @@ unset($_SESSION['success']);
         </div>
     </div>
 </div>
+
+<style>
+/* Welcome Card */
+.welcome-card {
+    background: linear-gradient(135deg, #0a2240 0%, #1a2f4f 100%);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(10, 34, 64, 0.3);
+}
+.welcome-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.welcome-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+.current-date {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+}
+
+/* Stat Cards */
+.stat-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    border-left: 6px solid #e0e0e0;
+    padding: 0;
+    transition: box-shadow 0.2s;
+    height: 100%;
+}
+.stat-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.stat-card-primary { border-left-color: #667eea; }
+.stat-card-info { border-left-color: #17a2b8; }
+.stat-card-success { border-left-color: #38c172; }
+
+.stat-card-body {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+}
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: #f5f6fa;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #222;
+    line-height: 1.2;
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 2px;
+}
+
+/* Dark Header */
+.dark-header {
+    background: #1e293b;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.dark-header .card-title {
+    color: white;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Document Cards */
+.document-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+.document-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    background: white;
+}
+.document-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.document-meta {
+    font-size: 0.75rem;
+}
+.document-actions .btn {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+}
+
+/* Activity Feed */
+.activity-feed {
+    max-height: 350px;
+    overflow-y: auto;
+}
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+.activity-item:hover {
+    background: #f8f9fa;
+}
+.activity-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.bg-info-soft { background: rgba(23, 162, 184, 0.1); }
+.bg-success-soft { background: rgba(40, 167, 69, 0.1); }
+.activity-content {
+    flex: 1;
+}
+.activity-text {
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+}
+.activity-details {
+    font-size: 0.75rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+.empty-state i {
+    color: #dee2e6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 1.4rem;
+    }
+    .welcome-card {
+        padding: 18px;
+        text-align: center;
+    }
+    .stat-card-body {
+        padding: 15px;
+    }
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    .stat-value {
+        font-size: 1.2rem;
+    }
+}
+</style>
 
 <script>
 // Search functionality
