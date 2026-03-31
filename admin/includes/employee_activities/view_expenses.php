@@ -136,7 +136,7 @@ $stats = mysqli_fetch_assoc($stats_result);
                                 <td><span class="badge bg-<?php echo $status_color; ?>"><?php echo $exp['status']; ?></span></td>
                                 <td>
                                     <?php if($exp['receipt_file']): ?>
-                                        <a href="../../uploads/expenses/<?php echo $exp['receipt_file']; ?>" class="btn btn-sm btn-outline-info" target="_blank">
+                                        <a href="/operations/uploads/expenses/<?php echo $exp['receipt_file']; ?>" class="btn btn-sm btn-outline-info" target="_blank">
                                             <i class="bi bi-receipt"></i>
                                         </a>
                                     <?php endif; ?>
