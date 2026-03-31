@@ -335,7 +335,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Active Users Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card flex-fill">
+                <div class="stat-card flex-fill" onclick="window.location.href='users.php?status=active'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-success-soft">
                             <i class="bi bi-person-check-fill text-success"></i>
@@ -390,7 +390,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Overdue Engagements Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card flex-fill <?php echo $engagement_stats['overdue_engagements'] > 0 ? 'border-danger' : ''; ?>">
+                <div class="stat-card flex-fill <?php echo $engagement_stats['overdue_engagements'] > 0 ? 'border-danger' : ''; ?>" onclick="window.location.href='engagements.php?filter=overdue'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-danger-soft">
                             <i class="bi bi-exclamation-triangle-fill text-danger"></i>
@@ -408,7 +408,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Completion Rate Card -->
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card flex-fill">
+                <div class="stat-card flex-fill" onclick="window.location.href='engagements.php?filter=year_to_date'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-secondary-soft">
                             <i class="bi bi-pie-chart-fill text-secondary"></i>
@@ -429,7 +429,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
         <div class="row g-4 mb-4">
             <!-- Total Points Card -->
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 d-flex">
-                <div class="stat-card flex-fill">
+                <div class="stat-card flex-fill" onclick="window.location.href='points_ledger.php'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-purple-soft">
                             <i class="bi bi-trophy-fill text-purple"></i>
@@ -501,7 +501,7 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
 
             <!-- Quick Stats - Placeholder for future -->
             <div class="col-xl-4 col-md-8">
-                <div class="stat-card flex-fill bg-light">
+                <div class="stat-card flex-fill bg-light" onclick="window.location.href='engagements.php?filter=year_to_date'" style="cursor: pointer;">
                     <div class="stat-card-body">
                         <div class="stat-icon bg-secondary-soft">
                             <i class="bi bi-graph-up text-secondary"></i>
