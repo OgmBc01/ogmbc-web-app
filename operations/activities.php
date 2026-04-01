@@ -168,7 +168,12 @@ $current_week = date('W');
                             <select name="client_id" class="form-select" required>
                                 <option value="">Select Client</option>
                                 <?php
-                                $clients_query = "SELECT client_id, company_name FROM clients ORDER BY company_name";
+                                // Only show clients related to engagements assigned to the current user
+                                $clients_query = "SELECT DISTINCT c.client_id, c.company_name
+                                    FROM clients c
+                                    INNER JOIN engagements e ON c.client_id = e.client_id
+                                    WHERE e.assigned_to = $user_id
+                                    ORDER BY c.company_name";
                                 $clients_result = mysqli_query($connection, $clients_query);
                                 while($client = mysqli_fetch_assoc($clients_result)) {
                                     echo "<option value='{$client['client_id']}'>" . htmlspecialchars($client['company_name']) . "</option>";

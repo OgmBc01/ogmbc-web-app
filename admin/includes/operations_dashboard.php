@@ -223,7 +223,7 @@ $pending = mysqli_fetch_assoc($pending_result);
         </div>
         
         <div class="col-xl-2 col-md-4 col-sm-6">
-            <div class="kpi-card" onclick="window.location.href='reports.php?type=points'" style="cursor: pointer;">
+            <div class="kpi-card" onclick="window.location.href='points_ledger.php?source=view_ledger'" style="cursor: pointer;">
                 <div class="kpi-icon bg-info-soft">
                     <i class="bi bi-trophy text-info"></i>
                 </div>
@@ -236,7 +236,7 @@ $pending = mysqli_fetch_assoc($pending_result);
         </div>
         
         <div class="col-xl-2 col-md-4 col-sm-6">
-            <div class="kpi-card" onclick="window.location.href='feedback.php'" style="cursor: pointer;">
+            <div class="kpi-card" onclick="window.location.href='client_feedback.php'" style="cursor: pointer;">
                 <div class="kpi-icon bg-danger-soft">
                     <i class="bi bi-star text-danger"></i>
                 </div>
@@ -249,7 +249,7 @@ $pending = mysqli_fetch_assoc($pending_result);
         </div>
         
         <div class="col-xl-2 col-md-4 col-sm-6">
-            <div class="kpi-card" onclick="window.location.href='reports.php?type=deadlines'" style="cursor: pointer;">
+            <div class="kpi-card">
                 <div class="kpi-icon bg-secondary-soft">
                     <i class="bi bi-calendar-check text-secondary"></i>
                 </div>
@@ -893,14 +893,39 @@ function toggleChartData(type) {
     /* Remove fixed height to allow content to size naturally */
 }
 
+/* Updated: Chart card headers use dark blue background */
 .chart-card .card-header {
-    background: transparent;
+    background: linear-gradient(135deg, #0a2240 0%, #1a3a5a 100%);
+    color: #fff;
     border-bottom: 1px solid rgba(0,0,0,0.05);
     padding: 10px 16px 10px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     min-height: 0;
+}
+
+/* Ensure card titles and badges are readable on dark background */
+.chart-card .card-header .card-title,
+.chart-card .card-header .badge,
+.chart-card .card-header .btn,
+.chart-card .card-header .btn-group .btn {
+    color: #fff !important;
+}
+
+.chart-card .card-header .btn.btn-outline-primary,
+.chart-card .card-header .btn.btn-outline-success,
+.chart-card .card-header .btn.btn-outline-warning {
+    border-color: #fff;
+    color: #fff !important;
+}
+
+.chart-card .card-header .btn.btn-outline-primary.active,
+.chart-card .card-header .btn.btn-outline-success.active,
+.chart-card .card-header .btn.btn-outline-warning.active {
+    background: rgba(255,255,255,0.15);
+    color: #fff !important;
+    border-color: #fff;
 }
 
 .chart-card .card-title {
@@ -959,13 +984,34 @@ function toggleChartData(type) {
     border: 1px solid rgba(0,0,0,0.05);
 }
 
+/* Updated: Data table card headers use dark blue background */
 .data-table-card .card-header {
-    background: transparent;
+    background: linear-gradient(135deg, #0a2240 0%, #1a3a5a 100%);
+    color: #fff;
     border-bottom: 1px solid rgba(0,0,0,0.05);
     padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* Ensure card titles and buttons are readable on dark background */
+.data-table-card .card-header .card-title,
+.data-table-card .card-header .btn {
+    color: #fff !important;
+}
+
+.data-table-card .card-header .btn.btn-outline-warning,
+.data-table-card .card-header .btn.btn-outline-success {
+    border-color: #fff;
+    color: #fff !important;
+}
+
+.data-table-card .card-header .btn.btn-outline-warning.active,
+.data-table-card .card-header .btn.btn-outline-success.active {
+    background: rgba(255,255,255,0.15);
+    color: #fff !important;
+    border-color: #fff;
 }
 
 .data-table-card .card-title {

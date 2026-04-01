@@ -183,21 +183,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         $message = "Invalid status transition from {$engagement['status']} to $new_status.";
         $message_type = "danger";
     } else {
-        // Check if checklist is required for closing
         if ($new_status == 'CLOSED' && $requires_checklist) {
             $checklist_valid = true;
             $missing_items = [];
-            // DEBUG: Uncomment to see POST data
-            echo '<pre>'; print_r($_POST); echo '</pre>';
             foreach ($checklist_items as $key => $item) {
                 if ($item['required']) {
-                    $post_key = 'checklist_' . $key;
-                    $value = isset($_POST[$post_key]) ? trim($_POST[$post_key]) : '';
-                    // Special debug for report_delivered
-                    if ($key === 'report_delivered') { echo 'report_delivered POST: '; var_dump($value); }
-                    if ($value === '' || $value === null) {
-                        $checklist_valid = false;
-                        $missing_items[] = $item['label'];
+                    // For accounting, payroll, transactions: check radio+date
+                    if (in_array($item['category'], ['accounting', 'payroll', 'transactions'])) {
+                        $yn = $_POST['checklist_' . $key . '_yn'] ?? '';
+                        $date = $_POST['checklist_' . $key . '_date'] ?? '';
+                        if ($yn !== 'Yes') {
+                            $value = 'No';
+                        } else {
+                            $value = $date;
+                        }
+                        if ($yn !== 'Yes' && $yn !== 'No') {
+                            $checklist_valid = false;
+                            $missing_items[] = $item['label'];
+                        } else if ($yn === 'Yes' && empty($date)) {
+                            $checklist_valid = false;
+                            $missing_items[] = $item['label'] . ' (date required)';
+                        }
+                    } else {
+                        $post_key = 'checklist_' . $key;
+                        $value = isset($_POST[$post_key]) ? trim($_POST[$post_key]) : '';
+                        if ($value === '' || $value === null) {
+                            $checklist_valid = false;
+                            $missing_items[] = $item['label'];
+                        }
                     }
                 }
             }
@@ -209,7 +222,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
                 // Save checklist data
                 $checklist_data_save = [];
                 foreach ($checklist_items as $key => $item) {
-                    $value = isset($_POST['checklist_' . $key]) ? mysqli_real_escape_string($connection, trim($_POST['checklist_' . $key])) : '';
+                    if (in_array($item['category'], ['accounting', 'payroll', 'transactions'])) {
+                        $yn = $_POST['checklist_' . $key . '_yn'] ?? '';
+                        $date = $_POST['checklist_' . $key . '_date'] ?? '';
+                        if ($yn === 'Yes' && $date) {
+                            $value = mysqli_real_escape_string($connection, $date);
+                        } else {
+                            $value = 'No';
+                        }
+                    } else {
+                        $value = isset($_POST['checklist_' . $key]) ? mysqli_real_escape_string($connection, trim($_POST['checklist_' . $key])) : '';
+                    }
                     $checklist_data_save[$key] = $value;
                 }
                 
@@ -445,9 +468,38 @@ if (ob_get_level() > 0) {
                                                         <?php echo $item['label']; ?>
                                                         <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
                                                     </label>
-                                                    <input type="text" class="form-control" name="checklist_<?php echo $key; ?>" 
-                                                           placeholder="Enter <?php echo strtolower($item['label']); ?>"
-                                                           value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                    <?php 
+                                                    $val = $checklist_data[$key] ?? '';
+                                                    $is_yes = ($val && $val !== 'No') ? 'checked' : '';
+                                                    $is_no = ($val === 'No' || $val === '') ? 'checked' : '';
+                                                    $date_val = ($is_yes && $val && $val !== 'Yes') ? $val : '';
+                                                    ?>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="checklist_<?php echo $key; ?>_yn" id="<?php echo $key; ?>_yes" value="Yes" <?php echo $is_yes; ?>>
+                                                        <label class="form-check-label" for="<?php echo $key; ?>_yes">Yes, done</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="checklist_<?php echo $key; ?>_yn" id="<?php echo $key; ?>_no" value="No" <?php echo $is_no; ?>>
+                                                        <label class="form-check-label" for="<?php echo $key; ?>_no">No</label>
+                                                    </div>
+                                                    <div class="mt-2" id="<?php echo $key; ?>_date_wrap" style="display:<?php echo $is_yes ? 'block' : 'none'; ?>;">
+                                                        <input type="date" class="form-control" name="checklist_<?php echo $key; ?>_date" value="<?php echo htmlspecialchars($date_val); ?>" placeholder="Completion date">
+                                                    </div>
+                                                    <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        var yesRadio = document.getElementById('<?php echo $key; ?>_yes');
+                                                        var noRadio = document.getElementById('<?php echo $key; ?>_no');
+                                                        var dateWrap = document.getElementById('<?php echo $key; ?>_date_wrap');
+                                                        if (yesRadio && noRadio && dateWrap) {
+                                                            yesRadio.addEventListener('change', function() {
+                                                                if (this.checked) dateWrap.style.display = 'block';
+                                                            });
+                                                            noRadio.addEventListener('change', function() {
+                                                                if (this.checked) dateWrap.style.display = 'none';
+                                                            });
+                                                        }
+                                                    });
+                                                    </script>
                                                 </div>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
@@ -468,9 +520,38 @@ if (ob_get_level() > 0) {
                                                         <?php echo $item['label']; ?>
                                                         <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
                                                     </label>
-                                                    <input type="text" class="form-control" name="checklist_<?php echo $key; ?>" 
-                                                           placeholder="Enter <?php echo strtolower($item['label']); ?>"
-                                                           value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                    <?php 
+                                                    $val = $checklist_data[$key] ?? '';
+                                                    $is_yes = ($val && $val !== 'No') ? 'checked' : '';
+                                                    $is_no = ($val === 'No' || $val === '') ? 'checked' : '';
+                                                    $date_val = ($is_yes && $val && $val !== 'Yes') ? $val : '';
+                                                    ?>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="checklist_<?php echo $key; ?>_yn" id="<?php echo $key; ?>_yes" value="Yes" <?php echo $is_yes; ?>>
+                                                        <label class="form-check-label" for="<?php echo $key; ?>_yes">Yes, done</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="checklist_<?php echo $key; ?>_yn" id="<?php echo $key; ?>_no" value="No" <?php echo $is_no; ?>>
+                                                        <label class="form-check-label" for="<?php echo $key; ?>_no">No</label>
+                                                    </div>
+                                                    <div class="mt-2" id="<?php echo $key; ?>_date_wrap" style="display:<?php echo $is_yes ? 'block' : 'none'; ?>;">
+                                                        <input type="date" class="form-control" name="checklist_<?php echo $key; ?>_date" value="<?php echo htmlspecialchars($date_val); ?>" placeholder="Completion date">
+                                                    </div>
+                                                    <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        var yesRadio = document.getElementById('<?php echo $key; ?>_yes');
+                                                        var noRadio = document.getElementById('<?php echo $key; ?>_no');
+                                                        var dateWrap = document.getElementById('<?php echo $key; ?>_date_wrap');
+                                                        if (yesRadio && noRadio && dateWrap) {
+                                                            yesRadio.addEventListener('change', function() {
+                                                                if (this.checked) dateWrap.style.display = 'block';
+                                                            });
+                                                            noRadio.addEventListener('change', function() {
+                                                                if (this.checked) dateWrap.style.display = 'none';
+                                                            });
+                                                        }
+                                                    });
+                                                    </script>
                                                 </div>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
@@ -491,9 +572,38 @@ if (ob_get_level() > 0) {
                                                         <?php echo $item['label']; ?>
                                                         <?php if ($item['required']): ?><span class="text-danger">*</span><?php endif; ?>
                                                     </label>
-                                                    <input type="text" class="form-control" name="checklist_<?php echo $key; ?>" 
-                                                           placeholder="Enter <?php echo strtolower($item['label']); ?>"
-                                                           value="<?php echo htmlspecialchars($checklist_data[$key] ?? ''); ?>">
+                                                    <?php 
+                                                    $val = $checklist_data[$key] ?? '';
+                                                    $is_yes = ($val && $val !== 'No') ? 'checked' : '';
+                                                    $is_no = ($val === 'No' || $val === '') ? 'checked' : '';
+                                                    $date_val = ($is_yes && $val && $val !== 'Yes') ? $val : '';
+                                                    ?>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="checklist_<?php echo $key; ?>_yn" id="<?php echo $key; ?>_yes" value="Yes" <?php echo $is_yes; ?>>
+                                                        <label class="form-check-label" for="<?php echo $key; ?>_yes">Yes, done</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="checklist_<?php echo $key; ?>_yn" id="<?php echo $key; ?>_no" value="No" <?php echo $is_no; ?>>
+                                                        <label class="form-check-label" for="<?php echo $key; ?>_no">No</label>
+                                                    </div>
+                                                    <div class="mt-2" id="<?php echo $key; ?>_date_wrap" style="display:<?php echo $is_yes ? 'block' : 'none'; ?>;">
+                                                        <input type="date" class="form-control" name="checklist_<?php echo $key; ?>_date" value="<?php echo htmlspecialchars($date_val); ?>" placeholder="Completion date">
+                                                    </div>
+                                                    <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        var yesRadio = document.getElementById('<?php echo $key; ?>_yes');
+                                                        var noRadio = document.getElementById('<?php echo $key; ?>_no');
+                                                        var dateWrap = document.getElementById('<?php echo $key; ?>_date_wrap');
+                                                        if (yesRadio && noRadio && dateWrap) {
+                                                            yesRadio.addEventListener('change', function() {
+                                                                if (this.checked) dateWrap.style.display = 'block';
+                                                            });
+                                                            noRadio.addEventListener('change', function() {
+                                                                if (this.checked) dateWrap.style.display = 'none';
+                                                            });
+                                                        }
+                                                    });
+                                                    </script>
                                                 </div>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
