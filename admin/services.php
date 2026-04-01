@@ -212,14 +212,25 @@ document.getElementById('confirmDeleteBtn')?.addEventListener('click', function(
     showAlert('Deleting...', 'info');
     
     let url = '';
+    let fetchOptions = {};
     if (deleteType === 'service') {
-        url = 'includes/ajax/delete_service.php?id=' + deleteId;
+        url = 'includes/ajax/delete_service.php';
+        fetchOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'service_id=' + encodeURIComponent(deleteId)
+        };
     } else {
-        url = 'includes/ajax/delete_service_rule.php?id=' + deleteId;
+        url = 'includes/ajax/delete_service_rule.php';
+        fetchOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'rule_id=' + encodeURIComponent(deleteId)
+        };
     }
-    
+
     // Send AJAX request
-    fetch(url)
+    fetch(url, fetchOptions)
     .then(response => response.json())
     .then(data => {
         if (data.success) {

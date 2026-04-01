@@ -25,3 +25,21 @@ try {
     http_response_code(500);
     exit('Database connection unavailable.');
 }
+
+
+// <?php
+// $host = "localhost";
+// $username = "u395261815_omni";
+// $password = "OgmBc@6449";
+// $database = "u395261815_omniogm";
+
+// $connection = mysqli_connect($host, $username, $password, $database);
+
+// if (!$connection) {
+//     die("Connection failed: " . mysqli_connect_error());
+// }
+// if (!mysqli_set_charset($connection, 'utf8mb4')) {
+//     error_log("Database charset set failed: " . mysqli_error($connection));
+// }
+// echo "";
+// ?>
