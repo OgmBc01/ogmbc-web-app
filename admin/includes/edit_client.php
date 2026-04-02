@@ -1,6 +1,4 @@
 <?php
-insert_clients();
-
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
@@ -20,6 +18,73 @@ $client_status = 'New Lead';
 $message = '';
 $message_type = '';
 $show_success_modal = false;
+
+// ============================================
+// HANDLE FORM SUBMISSION WITH VALIDATION FIRST
+// ============================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_client'])) {
+    
+    // Sanitize inputs first
+    $company_name_check = mysqli_real_escape_string($connection, trim($_POST['company_name']));
+    $contact_name_check = mysqli_real_escape_string($connection, trim($_POST['contact_name']));
+    $contact_mobile_check = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
+    $contact_email_check = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
+    
+    // ============================================
+    // FIRST: Check for empty required fields
+    // ============================================
+    if (empty($company_name_check) || empty($contact_name_check) || empty($contact_mobile_check) || empty($contact_email_check)) {
+        $message = "Please fill in all required fields.";
+        $message_type = "danger";
+    }
+    // ============================================
+    // SECOND: Check for duplicate company name (excluding current client)
+    // ============================================
+    else {
+        $dup_query = "SELECT client_id FROM clients WHERE company_name = '$company_name_check' AND client_id != $client_id";
+        $dup_result = mysqli_query($connection, $dup_query);
+        if (mysqli_num_rows($dup_result) > 0) {
+            $message = "A client with the company name '$company_name_check' already exists. Please use a different name.";
+            $message_type = "danger";
+        }
+        // ============================================
+        // THIRD: Check for duplicate contact email (excluding current client)
+        // ============================================
+        else {
+            $email_check = "SELECT client_id FROM clients WHERE contact_email = '$contact_email_check' AND client_id != $client_id";
+            $email_result = mysqli_query($connection, $email_check);
+            if (mysqli_num_rows($email_result) > 0) {
+                $message = "A client with the email '$contact_email_check' already exists. Please use a different email.";
+                $message_type = "danger";
+            }
+            // ============================================
+            // FOURTH: Check for duplicate contact mobile (excluding current client)
+            // ============================================
+            else {
+                $mobile_check = "SELECT client_id FROM clients WHERE contact_mobile = '$contact_mobile_check' AND client_id != $client_id";
+                $mobile_result = mysqli_query($connection, $mobile_check);
+                if (mysqli_num_rows($mobile_result) > 0) {
+                    $message = "A client with the mobile number '$contact_mobile_check' already exists. Please use a different number.";
+                    $message_type = "danger";
+                }
+                // ============================================
+                // FIFTH: Validate email format
+                // ============================================
+                elseif (!filter_var($contact_email_check, FILTER_VALIDATE_EMAIL)) {
+                    $message = "Please enter a valid email address.";
+                    $message_type = "danger";
+                }
+                // ============================================
+                // SIXTH: All validations passed - call update function
+                // ============================================
+                else {
+                    // Call update_client AFTER validation
+                    update_client();
+                }
+            }
+        }
+    }
+}
 
 // Fetch client data if editing existing client
 if ($client_id > 0) {
@@ -83,6 +148,48 @@ $industries_query = "SELECT industry_name, category FROM industries WHERE is_act
 $industries_result = mysqli_query($connection, $industries_query);
 ?>
 
+<?php if ($show_success_modal): ?>
+<!-- Success Modal -->
+<div class="modal fade" id="clientSuccessModal" tabindex="-1" aria-labelledby="clientSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="clientSuccessModalLabel">
+          <i class="bi bi-check-circle-fill me-2"></i>Success!
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+        <h5 class="mt-3">Client Updated Successfully!</h5>
+        <p class="text-muted mb-0">The client "<?php echo htmlspecialchars($company_name); ?>" has been updated.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pt-0">
+        <a href="clients.php" class="btn btn-success px-4">
+          <i class="bi bi-list-ul me-2"></i>View All Clients
+        </a>
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" id="continueEditingBtn">
+          <i class="bi bi-pencil me-2"></i>Continue Editing
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      var modalElement = document.getElementById('clientSuccessModal');
+      if (modalElement) {
+          var modal = new bootstrap.Modal(modalElement, {
+              backdrop: 'static',
+              keyboard: false
+          });
+          modal.show();
+      }
+  });
+</script>
+<?php endif; ?>
+
 <div class="main-content" id="mainContent">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -99,39 +206,12 @@ $industries_result = mysqli_query($connection, $industries_query);
                         <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Client Information</h5>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($message)): ?>
-                        <div class="alert alert-<?php echo $message_type == 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
-                            <?php echo $message; ?>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        <?php endif; ?>
-
-                        <!-- Success Modal -->
-                        <div class="modal fade" id="clientSuccessModal" tabindex="-1" aria-labelledby="clientSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-success text-white">
-                                        <h5 class="modal-title" id="clientSuccessModalLabel">
-                                            <i class="bi bi-check-circle-fill me-2"></i>Success!
-                                        </h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-center py-4">
-                                        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-                                        <h5 class="mt-3">Client Updated Successfully!</h5>
-                                        <p class="text-muted mb-0">The client "<?php echo htmlspecialchars($company_name); ?>" has been updated.</p>
-                                    </div>
-                                    <div class="modal-footer justify-content-center border-0 pt-0">
-                                        <a href="clients.php" class="btn btn-success px-4">
-                                            <i class="bi bi-list-ul me-2"></i>View All Clients
-                                        </a>
-                                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
-                                            <i class="bi bi-pencil me-2"></i>Continue Editing
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                                <?php if (!empty($message)): ?>
+                                                <div class="alert alert-<?php echo $message_type == 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
+                                                        <?php echo $message; ?>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                </div>
+                                                <?php endif; ?>
 
                         <form method="POST" action="" id="clientForm">
                             <input type="hidden" name="submit_client" value="1">
@@ -438,115 +518,53 @@ $industries_result = mysqli_query($connection, $industries_query);
     </div>
 </div>
 
+<?php if ($show_success_modal): ?>
+<!-- Success Modal -->
+<div class="modal fade" id="clientSuccessModal" tabindex="-1" aria-labelledby="clientSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="clientSuccessModalLabel">
+          <i class="bi bi-check-circle-fill me-2"></i>Success!
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+        <h5 class="mt-3">Client Updated Successfully!</h5>
+        <p class="text-muted mb-0">The client "<?php echo htmlspecialchars($company_name); ?>" has been updated.</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pt-0">
+        <a href="clients.php" class="btn btn-success px-4">
+          <i class="bi bi-list-ul me-2"></i>View All Clients
+        </a>
+        <button type="button" class="btn btn-outline-secondary px-4 continue-btn" id="continueEditingBtn">
+          <i class="bi bi-pencil me-2"></i>Continue Editing
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-// Country-State/Emirate mapping
-const countryZones = {
-    'United Arab Emirates': ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'],
-    'Saudi Arabia': ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam', 'Khobar', 'Dhahran'],
-    'Qatar': ['Doha', 'Al Rayyan', 'Umm Salal', 'Al Wakrah', 'Al Khor'],
-    'Oman': ['Muscat', 'Salalah', 'Sohar', 'Nizwa', 'Sur'],
-    'Kuwait': ['Kuwait City', 'Hawalli', 'Farwaniya', 'Mubarak Al-Kabeer', 'Ahmadi'],
-    'Bahrain': ['Manama', 'Riffa', 'Muharraq', 'Hamad Town', 'Isa Town'],
-    'United Kingdom': ['England', 'Scotland', 'Wales', 'Northern Ireland'],
-    'United States': ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'],
-    'Germany': ['Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hesse', 'Lower Saxony', 'Mecklenburg-Vorpommern', 'North Rhine-Westphalia', 'Rhineland-Palatinate', 'Saarland', 'Saxony', 'Saxony-Anhalt', 'Schleswig-Holstein', 'Thuringia'],
-    'France': ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Nouvelle-Aquitaine', 'Occitanie', 'Hauts-de-France', 'Grand Est', 'Provence-Alpes-Côte d\'Azur', 'Pays de la Loire', 'Normandy', 'Brittany', 'Centre-Val de Loire', 'Bourgogne-Franche-Comté', 'Corsica'],
-    'China': ['Beijing', 'Shanghai', 'Guangdong', 'Zhejiang', 'Jiangsu', 'Tianjin', 'Chongqing', 'Shandong', 'Sichuan', 'Hubei', 'Fujian', 'Henan', 'Hunan', 'Shaanxi', 'Liaoning', 'Jiangxi', 'Anhui', 'Hebei', 'Heilongjiang', 'Jilin'],
-    'Japan': ['Tokyo', 'Osaka', 'Kyoto', 'Hokkaido', 'Okinawa', 'Aichi', 'Kanagawa', 'Hyogo', 'Fukuoka', 'Hiroshima', 'Miyagi', 'Shizuoka', 'Chiba', 'Saitama', 'Niigata', 'Gunma'],
-    'India': ['Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'Uttar Pradesh', 'Gujarat', 'Rajasthan', 'West Bengal', 'Telangana', 'Andhra Pradesh', 'Madhya Pradesh', 'Kerala', 'Haryana', 'Punjab', 'Bihar', 'Odisha', 'Assam', 'Jharkhand', 'Chhattisgarh', 'Uttarakhand'],
-    'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Chelyabinsk', 'Samara', 'Omsk', 'Rostov-on-Don', 'Ufa', 'Krasnoyarsk', 'Voronezh', 'Perm', 'Volgograd']
-};
-
-// Initialize emirate/zone based on current country
-document.addEventListener('DOMContentLoaded', function() {
-    const country = document.getElementById('country').value;
-    const emirateSelect = document.getElementById('emirate_zone');
-    const currentEmirate = '<?php echo $emirate_zone; ?>';
-    
-    if (country && countryZones[country]) {
-        countryZones[country].forEach(zone => {
-            const option = document.createElement('option');
-            option.value = zone;
-            option.textContent = zone;
-            if (zone === currentEmirate) {
-                option.selected = true;
-            }
-            emirateSelect.appendChild(option);
-        });
-    }
-    
-    // If no zones for country, add current emirate as option
-    if (currentEmirate && !emirateSelect.querySelector(`option[value="${currentEmirate}"]`)) {
-        const option = document.createElement('option');
-        option.value = currentEmirate;
-        option.textContent = currentEmirate;
-        option.selected = true;
-        emirateSelect.appendChild(option);
-    }
-    
-    // Show success modal if flag is set
-    <?php if ($show_success_modal): ?>
-    var successModal = new bootstrap.Modal(document.getElementById('clientSuccessModal'), {
-        backdrop: 'static',
-        keyboard: false
-    });
-    successModal.show();
-    <?php endif; ?>
-});
-
-// Update emirate/zone options when country changes
-document.getElementById('country').addEventListener('change', function() {
-    const country = this.value;
-    const emirateSelect = document.getElementById('emirate_zone');
-    const jurisdictionSelect = document.getElementById('jurisdiction');
-    
-    // Update emirate/zone dropdown
-    emirateSelect.innerHTML = '<option value="">Select Emirate/Zone/State</option>';
-    if (country && countryZones[country]) {
-        countryZones[country].forEach(zone => {
-            const option = document.createElement('option');
-            option.value = zone;
-            option.textContent = zone;
-            emirateSelect.appendChild(option);
-        });
-    }
-    
-    // Filter jurisdictions based on selected country via AJAX
-    if (country) {
-        fetch(`get_jurisdictions.php?country=${encodeURIComponent(country)}`)
-            .then(response => response.json())
-            .then(data => {
-                jurisdictionSelect.innerHTML = '<option value="">Select Jurisdiction</option>';
-                if (data.success && data.jurisdictions) {
-                    data.jurisdictions.forEach(jur => {
-                        const option = document.createElement('option');
-                        option.value = jur.jurisdiction_name;
-                        option.textContent = jur.jurisdiction_name;
-                        jurisdictionSelect.appendChild(option);
-                    });
-                }
-            })
-            .catch(error => console.error('Error fetching jurisdictions:', error));
-    }
-});
-
-// Form validation
-document.getElementById('clientForm').addEventListener('submit', function(e) {
-    const email = document.getElementById('contact_email').value;
-    const mobile = document.getElementById('contact_mobile').value;
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        e.preventDefault();
-        alert('Please enter a valid email address');
-        return;
-    }
-    
-    const mobileRegex = /^[0-9+\-\s]{8,}$/;
-    if (!mobileRegex.test(mobile)) {
-        e.preventDefault();
-        alert('Please enter a valid mobile number (at least 8 digits)');
-        return;
-    }
-});
+  // Simple modal initialization - no conflicts
+  (function() {
+      var modalElement = document.getElementById('clientSuccessModal');
+      if (modalElement) {
+          var modal = new bootstrap.Modal(modalElement, {
+              backdrop: 'static',
+              keyboard: false
+          });
+          modal.show();
+          
+          // Handle continue button
+          var continueBtn = document.getElementById('continueEditingBtn');
+          if (continueBtn) {
+              continueBtn.addEventListener('click', function() {
+                  modal.hide();
+              });
+          }
+      }
+  })();
 </script>
+<?php endif; ?>

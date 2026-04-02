@@ -226,7 +226,45 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
                                         <button class="btn btn-sm btn-info" onclick="viewUser(<?php echo $user['user_id']; ?>)" title="View Details">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <a href="users.php?source=edit_user&id=<?php echo $user['user_id']; ?>" class="btn btn-sm btn-warning" title="Edit">
+                                        <?php
+                                        // Determine edit link based on type_name (case-insensitive)
+                                        $edit_link = '';
+                                        $type = isset($user['type_name']) ? strtolower(trim($user['type_name'])) : '';
+                                        if ($type === 'client') {
+                                            // Lookup client_id from clients table using user_id
+                                            $client_id = null;
+                                            $client_lookup = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = " . intval($user['user_id']) . " LIMIT 1");
+                                            if ($client_lookup && mysqli_num_rows($client_lookup) > 0) {
+                                                $client_row = mysqli_fetch_assoc($client_lookup);
+                                                $client_id = $client_row['client_id'];
+                                            }
+                                            if ($client_id) {
+                                                $edit_link = 'clients.php?source=edit_client&id=' . $client_id;
+                                            } else {
+                                                $edit_link = '#'; // fallback if not found
+                                            }
+                                        } elseif ($type === 'operations') {
+                                            // Lookup employee_id from employees table using user_id
+                                            $employee_id = null;
+                                            $employee_lookup = mysqli_query($connection, "SELECT employee_id FROM employees WHERE user_id = " . intval($user['user_id']) . " LIMIT 1");
+                                            if ($employee_lookup && mysqli_num_rows($employee_lookup) > 0) {
+                                                $employee_row = mysqli_fetch_assoc($employee_lookup);
+                                                $employee_id = $employee_row['employee_id'];
+                                            }
+                                            if ($employee_id) {
+                                                $edit_link = 'employees.php?source=edit_employee&id=' . $employee_id;
+                                            } else {
+                                                $edit_link = '#'; // fallback if not found
+                                            }
+                                        } elseif (in_array($type, ['partner', 'vendor', 'guest'])) {
+                                            // For partner, vendor, or guest, always open edit_user.php
+                                            $edit_link = 'users.php?source=edit_user&id=' . $user['user_id'];
+                                        } else {
+                                            // For any other user type, route through users.php switch
+                                            $edit_link = 'users.php?source=edit_user&id=' . $user['user_id'];
+                                        }
+                                        ?>
+                                        <a href="<?php echo $edit_link; ?>" class="btn btn-sm btn-warning" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <?php if ($user['user_id'] != $_SESSION['user_id']): ?>

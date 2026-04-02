@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Initialize variables with empty values
+// Initialize variables
 $company_name = $trade_license_no = $country = $emirate_zone = $business_activity = $address = '';
 $contact_title = $contact_name = $contact_designation = $contact_mobile = $contact_email = '';
 $service_id = $service_description = $expected_start_date = '';
@@ -15,71 +15,85 @@ $service_total_fee = '0.00';
 $lead_source = 'website';
 $message = '';
 $message_type = '';
+$show_toast = false;
 
-// Handle form submission (inline, like add_department.php)
-if (isset($_POST['submit_client'])) {
-    $company_name = mysqli_real_escape_string($connection, $_POST['company_name']);
-    $trade_license_no = mysqli_real_escape_string($connection, $_POST['trade_license_no']);
-    $country = mysqli_real_escape_string($connection, $_POST['country']);
-    $jurisdiction = mysqli_real_escape_string($connection, $_POST['jurisdiction']);
-    $emirate_zone = mysqli_real_escape_string($connection, $_POST['emirate_zone']);
-    $business_activity = mysqli_real_escape_string($connection, $_POST['business_activity']);
-    $industry = mysqli_real_escape_string($connection, $_POST['industry']);
-    $address = mysqli_real_escape_string($connection, $_POST['address']);
-    $contact_title = mysqli_real_escape_string($connection, $_POST['contact_title']);
-    $contact_name = mysqli_real_escape_string($connection, $_POST['contact_name']);
-    $contact_designation = mysqli_real_escape_string($connection, $_POST['contact_designation']);
-    $contact_mobile = mysqli_real_escape_string($connection, $_POST['contact_mobile']);
-    $contact_email = mysqli_real_escape_string($connection, $_POST['contact_email']);
-    $service_id = isset($_POST['service_id']) && $_POST['service_id'] !== '' ? intval($_POST['service_id']) : 'NULL';
-    $service_description = mysqli_real_escape_string($connection, $_POST['service_description']);
-    $expected_start_date = mysqli_real_escape_string($connection, $_POST['expected_start_date']);
-    $payment_currency = mysqli_real_escape_string($connection, $_POST['payment_currency']);
-    $payment_term = mysqli_real_escape_string($connection, $_POST['payment_term']);
-    $service_total_fee = mysqli_real_escape_string($connection, $_POST['service_total_fee']);
-    $lead_source = mysqli_real_escape_string($connection, $_POST['lead_source']);
-
-    // Validate required fields
-    if (empty($company_name) || empty($contact_name) || empty($contact_mobile) || empty($contact_email)) {
+// ============================================
+// HANDLE FORM SUBMISSION WITH VALIDATION FIRST
+// ============================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_client'])) {
+    
+    // Sanitize inputs first
+    $company_name_check = mysqli_real_escape_string($connection, trim($_POST['company_name']));
+    $contact_name_check = mysqli_real_escape_string($connection, trim($_POST['contact_name']));
+    $contact_mobile_check = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
+    $contact_email_check = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
+    
+    // ============================================
+    // FIRST: Check for empty required fields
+    // ============================================
+    if (empty($company_name_check) || empty($contact_name_check) || empty($contact_mobile_check) || empty($contact_email_check)) {
         $message = "Please fill in all required fields.";
         $message_type = "danger";
-    } else if (!filter_var($contact_email, FILTER_VALIDATE_EMAIL)) {
-        $message = "Please enter a valid email address.";
-        $message_type = "danger";
-    } else if (!empty($service_id)) {
-        // Check if service_id exists in categories
-        $check_service = mysqli_query($connection, "SELECT cat_id FROM categories WHERE cat_id = '$service_id'");
-        if (mysqli_num_rows($check_service) == 0) {
-            $message = "Selected service does not exist.";
+    } 
+    // ============================================
+    // SECOND: Check for duplicate company name
+    // ============================================
+    else {
+        $dup_query = "SELECT client_id FROM clients WHERE company_name = '$company_name_check'";
+        $dup_result = mysqli_query($connection, $dup_query);
+        if (mysqli_num_rows($dup_result) > 0) {
+            $message = "A client with the company name '$company_name_check' already exists. Please use a different name.";
             $message_type = "danger";
         }
-    }
-
-    // Only proceed if no error
-    if (empty($message)) {
-        // Generate a random password for the client
-        $plain_password = bin2hex(random_bytes(4));
-        $hashed_password = password_hash($plain_password, PASSWORD_DEFAULT);
-
-        $insert_query = "INSERT INTO clients (
-            company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
-            contact_title, contact_name, contact_designation, contact_mobile, contact_email, client_password,
-            service_id, service_description, expected_start_date, payment_currency, payment_term, service_total_fee, lead_source, client_status
-        ) VALUES (
-            '$company_name', '$trade_license_no', '$country', '$jurisdiction', '$emirate_zone', '$business_activity', '$industry', '$address',
-            '$contact_title', '$contact_name', '$contact_designation', '$contact_mobile', '$contact_email', '$hashed_password',
-            $service_id, '$service_description', " . ($expected_start_date ? "'$expected_start_date'" : "NULL") . ",
-            '$payment_currency', '$payment_term', '$service_total_fee', '$lead_source', 'New Lead'
-        )";
-
-        if (mysqli_query($connection, $insert_query)) {
-            echo "<script>window.location.href = 'clients.php?added=true';</script>";
-            exit();
-        } else {
-            $message = "Error adding client: " . mysqli_error($connection);
-            $message_type = "danger";
+        // ============================================
+        // THIRD: Check for duplicate contact email
+        // ============================================
+        else {
+            $email_check = "SELECT client_id FROM clients WHERE contact_email = '$contact_email_check'";
+            $email_result = mysqli_query($connection, $email_check);
+            if (mysqli_num_rows($email_result) > 0) {
+                $message = "A client with the email '$contact_email_check' already exists. Please use a different email.";
+                $message_type = "danger";
+            }
+            // ============================================
+            // FOURTH: Check for duplicate contact mobile
+            // ============================================
+            else {
+                $mobile_check = "SELECT client_id FROM clients WHERE contact_mobile = '$contact_mobile_check'";
+                $mobile_result = mysqli_query($connection, $mobile_check);
+                if (mysqli_num_rows($mobile_result) > 0) {
+                    $message = "A client with the mobile number '$contact_mobile_check' already exists. Please use a different number.";
+                    $message_type = "danger";
+                }
+                // ============================================
+                // FIFTH: Validate email format
+                // ============================================
+                elseif (!filter_var($contact_email_check, FILTER_VALIDATE_EMAIL)) {
+                    $message = "Please enter a valid email address.";
+                    $message_type = "danger";
+                }
+                // ============================================
+                // SIXTH: All validations passed - call insert function
+                // ============================================
+                else {
+                    // Call insert_client AFTER validation
+                    insert_client();
+                }
+            }
         }
     }
+}
+
+// Check for success flag
+if (isset($_SESSION['client_add_success'])) {
+    $show_toast = true;
+    unset($_SESSION['client_add_success']);
+}
+// Check for error message
+if (isset($_SESSION['error_message'])) {
+    $message = $_SESSION['error_message'];
+    $message_type = "danger";
+    unset($_SESSION['error_message']);
 }
 ?>
 
@@ -480,15 +494,17 @@ document.getElementById('clientForm').addEventListener('submit', function(e) {
     }
 });
 
-// Show toast and redirect after successful client addition using session variable
+// Show toast and redirect after successful client addition
 document.addEventListener('DOMContentLoaded', function() {
-    <?php if (!empty($_SESSION['client_update_success'])): ?>
-        const toastElement = document.getElementById('clientSuccessToast');
-        const toast = new bootstrap.Toast(toastElement);
+    <?php if ($show_toast): ?>
+        const toastElement = document.getElementById('successToast');
+        const toast = new bootstrap.Toast(toastElement, {
+            autohide: false
+        });
         toast.show();
         setTimeout(function() {
             window.location.href = 'clients.php';
-        }, 2000);
-    <?php unset($_SESSION['client_update_success']); endif; ?>
+        }, 3000);
+    <?php endif; ?>
 });
 </script>

@@ -1,4 +1,39 @@
 // ================================
+// Fix Bootstrap dropdown-submenu for touch/click
+// ================================
+document.addEventListener("DOMContentLoaded", function () {
+  // Target only submenu toggles
+  document.querySelectorAll(".dropdown-submenu > .dropdown-toggle").forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();  // stop link navigation
+      e.stopPropagation(); // stop Bootstrap from closing parent
+
+      // close any other open submenus inside the same parent
+      let parentMenu = this.closest(".dropdown-menu");
+      parentMenu.querySelectorAll(".dropdown-menu.show").forEach(function (submenu) {
+        if (submenu !== el.nextElementSibling) {
+          submenu.classList.remove("show");
+        }
+      });
+
+      // toggle the submenu
+      let submenu = this.nextElementSibling;
+      if (submenu) {
+        submenu.classList.toggle("show");
+      }
+    });
+  });
+
+  // Close submenus when main dropdown closes
+  document.querySelectorAll(".dropdown").forEach(function (dd) {
+    dd.addEventListener("hide.bs.dropdown", function () {
+      this.querySelectorAll(".dropdown-menu.show").forEach(function (submenu) {
+        submenu.classList.remove("show");
+      });
+    });
+  });
+});
+// ================================
 // Script.js — Navbar + Carousel
 // ================================
 document.addEventListener("DOMContentLoaded", () => {

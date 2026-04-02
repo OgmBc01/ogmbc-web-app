@@ -216,7 +216,7 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 </div>
 
-<!-- Client Details Modal (SINGLE MODAL - REMOVED FROM CLIENTS.PHP) -->
+<!-- Client Details Modal -->
 <style>
     #clientDetailsModal .modal-dialog {
         max-width: 90vw;
@@ -239,7 +239,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <div class="modal fade" id="clientDetailsModal" tabindex="-1" aria-labelledby="clientDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: var(--dark-blue); color: var(--gold);">
+            <div class="modal-header" style="background: #0a2240; color: #f1bf70;">
                 <h5 class="modal-title" id="clientDetailsModalLabel">
                     <i class="bi bi-building me-2"></i>Client Details
                 </h5>
@@ -263,146 +263,195 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteClientModal" tabindex="-1" aria-labelledby="deleteClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #dc3545; color: white;">
+                <h5 class="modal-title" id="deleteClientModalLabel">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete client: <strong><span id="deleteClientName"></span></strong>?</p>
+                <p class="text-danger"><small>This action cannot be undone. This will also delete the associated user account.</small></p>
+                <div id="deleteWarning" class="alert alert-warning mt-2" style="display: none;">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    This client has related records. Deleting will also remove all associated data.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="bi bi-trash me-1"></i>Delete Client
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Toasts -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span id="successMessage">Client deleted successfully!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span id="errorMessage">An error occurred!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
 <script>
 // Initialize filters with current values
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
-    
-    // Set filter values from URL
     document.getElementById('status_filter').value = urlParams.get('status_filter') || '';
     document.getElementById('service_filter').value = urlParams.get('service_filter') || '';
     document.getElementById('date_from').value = urlParams.get('date_from') || '';
     document.getElementById('date_to').value = urlParams.get('date_to') || '';
 });
 
-// Enhanced filtering function
 function filterClients() {
     const status = document.getElementById('status_filter').value;
     const service = document.getElementById('service_filter').value;
     const dateFrom = document.getElementById('date_from').value;
     const dateTo = document.getElementById('date_to').value;
-    
     let url = 'clients.php?';
     const params = [];
-    
     if (status) params.push(`status_filter=${encodeURIComponent(status)}`);
     if (service) params.push(`service_filter=${encodeURIComponent(service)}`);
     if (dateFrom) params.push(`date_from=${encodeURIComponent(dateFrom)}`);
     if (dateTo) params.push(`date_to=${encodeURIComponent(dateTo)}`);
-    
     window.location.href = url + params.join('&');
 }
 
-// Function to load client details
 function loadClientDetails(clientId) {
     const modalEl = document.getElementById('clientDetailsModal');
     const modalBody = document.getElementById('clientDetailsModalBody');
     const editBtn = document.getElementById('editClientBtn');
-    
     if (!modalEl || !modalBody) return;
-
-    // Show loading state
     modalBody.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading client details...</p></div>';
-    
-    // Update edit button
     editBtn.href = 'clients.php?source=edit_client&id=' + clientId;
-
-    // Show Bootstrap modal
     const bsModal = new bootstrap.Modal(modalEl);
     bsModal.show();
-
-    // Fetch client details using Fetch API (no jQuery dependency)
     fetch('get_client_details.php?id=' + encodeURIComponent(clientId), {
         credentials: 'same-origin',
-        headers: { 
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        modalBody.innerHTML = html;
+    })
+    .catch(err => {
+        console.error('Error fetching client details:', err);
+        modalBody.innerHTML = '<div class="alert alert-danger">Failed to load client details</div>';
+    });
+}
+
+// Delete client function
+let deleteClientId = null;
+
+function confirmDelete(clientId, companyName) {
+    deleteClientId = clientId;
+    document.getElementById('deleteClientName').textContent = companyName;
+    document.getElementById('deleteWarning').style.display = 'none';
+    // Check if client has related records
+    fetch('check_client_dependencies.php?id=' + clientId)
+        .then(response => response.json())
+        .then(data => {
+            if (data.has_dependencies) {
+                document.getElementById('deleteWarning').style.display = 'block';
+                document.getElementById('deleteWarning').innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                    'This client has related records: ' + data.dependencies.join(', ') + 
+                    '. Deleting will also remove all associated data.';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking dependencies:', error);
+        });
+    const modal = new bootstrap.Modal(document.getElementById('deleteClientModal'));
+    modal.show();
+}
+
+document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
+    if (!deleteClientId) return;
+    const deleteBtn = this;
+    const originalText = deleteBtn.innerHTML;
+    deleteBtn.disabled = true;
+    deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
+    fetch('delete_client.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: deleteClientId })
     })
     .then(response => {
         if (!response.ok) {
             throw new Error('Server returned ' + response.status);
         }
-        return response.text();
+        return response.json();
     })
-    .then(html => {
-        modalBody.innerHTML = html;
-        
-        // Reinitialize any event listeners for document upload
-        initializeDocumentUpload();
-    })
-    .catch(err => {
-        console.error('Error fetching client details:', err);
-        modalBody.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load client details. ' + (err.message || '') + '</div>';
-    });
-}
-
-// Function to initialize document upload handlers
-function initializeDocumentUpload() {
-    // Add document field
-    const addBtn = document.getElementById('addDocumentField');
-    if (addBtn) {
-        addBtn.onclick = function() {
-            let wrapper = document.getElementById('documentFieldsWrapper');
-            let firstSet = document.querySelector('.document-field-set');
-            if (firstSet) {
-                let clone = firstSet.cloneNode(true);
-                clone.querySelectorAll('input').forEach(input => input.value = '');
-                clone.querySelectorAll('select').forEach(select => select.value = 'trade_license');
-                let removeBtn = clone.querySelector('.removeFieldBtn');
-                if (removeBtn) removeBtn.style.display = 'inline-block';
-                wrapper.appendChild(clone);
+    .then(data => {
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteClientModal'));
+            modal.hide();
+            showSuccess(data.message);
+            const row = document.getElementById('client-row-' + deleteClientId);
+            if (row) {
+                row.style.opacity = '0';
+                row.style.transition = 'opacity 0.4s';
+                setTimeout(() => {
+                    row.remove();
+                }, 400);
             }
-        };
-    }
-    
-    // Remove document field
-    document.querySelectorAll('.removeFieldBtn').forEach(btn => {
-        btn.onclick = function() {
-            this.closest('.document-field-set').remove();
-        };
+            deleteClientId = null;
+        } else {
+            showError(data.message || 'Failed to delete client');
+        }
+    })
+    .catch(error => {
+        console.error('Delete error:', error);
+        showError('Error: ' + error.message);
+    })
+    .finally(() => {
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = originalText;
     });
-    
-    // Handle form submission
-    const uploadForm = document.getElementById('documentUploadForm');
-    if (uploadForm) {
-        uploadForm.onsubmit = function(e) {
-            e.preventDefault();
-            
-            let formData = new FormData(this);
-            let submitBtn = this.querySelector('button[type="submit"]');
-            let originalText = submitBtn.innerHTML;
-            
-            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Uploading...';
-            submitBtn.disabled = true;
-            
-            fetch('upload_document.php', {
-                method: 'POST',
-                body: formData,
-                credentials: 'same-origin'
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    alert(result.message);
-                    this.reset();
-                    // Reload client details to show new document
-                    let clientId = this.querySelector('input[name="client_id"]').value;
-                    loadClientDetails(clientId);
-                } else {
-                    alert('Error: ' + result.message);
-                }
-            })
-            .catch(error => {
-                alert('Upload failed: ' + error);
-            })
-            .finally(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
-        };
-    }
+});
+
+function showSuccess(message) {
+    const toastEl = document.getElementById('successToast');
+    document.getElementById('successMessage').textContent = message;
+    const toast = new bootstrap.Toast(toastEl, { autohide: false });
+    toast.show();
+    setTimeout(() => toast.hide(), 3000);
 }
 
-// Make function globally available
+function showError(message) {
+    const toastEl = document.getElementById('errorToast');
+    document.getElementById('errorMessage').textContent = message;
+    const toast = new bootstrap.Toast(toastEl, { autohide: false });
+    toast.show();
+    setTimeout(() => toast.hide(), 3000);
+}
+
 window.loadClientDetails = loadClientDetails;
+window.confirmDelete = confirmDelete;
 </script>

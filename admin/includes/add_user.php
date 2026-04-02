@@ -45,118 +45,182 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
     // Password strength validation
     $password_strength = validatePasswordStrength($password);
     
-    // Validation
+    // Reset message
+    $message = '';
+    $message_type = '';
+    $can_proceed = true;
+    
+    // ============================================
+    // FIRST: Check for empty required fields
+    // ============================================
     if (empty($username) || empty($first_name) || empty($last_name) || empty($user_email) || empty($password)) {
         $message = "Please fill in all required fields.";
         $message_type = "danger";
-    } elseif (!filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
+        $can_proceed = false;
+    }
+    
+    // ============================================
+    // SECOND: Validate username format
+    // ============================================
+    if ($can_proceed && !preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+        $message = "Username can only contain letters, numbers, and underscores.";
+        $message_type = "danger";
+        $can_proceed = false;
+    }
+    
+    // ============================================
+    // THIRD: Validate email format
+    // ============================================
+    if ($can_proceed && !filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
         $message = "Please enter a valid email address.";
         $message_type = "danger";
-    } elseif ($password_strength['score'] < 3) {
+        $can_proceed = false;
+    }
+    
+    // ============================================
+    // FOURTH: Validate password strength
+    // ============================================
+    if ($can_proceed && $password_strength['score'] < 3) {
         $message = "Password is too weak. Please use a stronger password.<br>
                     <small>Requirements: " . implode(", ", $password_strength['requirements']) . "</small>";
         $message_type = "danger";
-    } elseif ($password !== $confirm_password) {
+        $can_proceed = false;
+    }
+    
+    // ============================================
+    // FIFTH: Check if passwords match
+    // ============================================
+    if ($can_proceed && $password !== $confirm_password) {
         $message = "Passwords do not match.";
         $message_type = "danger";
-    } else {
-        
-        // Check if username exists
+        $can_proceed = false;
+    }
+    
+    // ============================================
+    // SIXTH: Check for duplicate username
+    // ============================================
+    if ($can_proceed) {
         $check_username = "SELECT user_id FROM users WHERE username = '$username'";
         $username_result = mysqli_query($connection, $check_username);
-        
-        // Check if email exists
-        $check_email = "SELECT user_id FROM users WHERE user_email = '$user_email'";
-        $email_result = mysqli_query($connection, $check_email);
-        
         if (mysqli_num_rows($username_result) > 0) {
             $message = "Username already exists. Please choose another.";
             $message_type = "danger";
-        } elseif (mysqli_num_rows($email_result) > 0) {
+            $can_proceed = false;
+        }
+    }
+    
+    // ============================================
+    // SEVENTH: Check for duplicate email
+    // ============================================
+    if ($can_proceed) {
+        $check_email = "SELECT user_id FROM users WHERE user_email = '$user_email'";
+        $email_result = mysqli_query($connection, $check_email);
+        if (mysqli_num_rows($email_result) > 0) {
             $message = "Email already exists. Please use another email.";
             $message_type = "danger";
-        } else {
-            // Upload image
-            if (!empty($user_image)) {
-                $target_dir = "../images/";
-                if (!file_exists($target_dir)) {
-                    mkdir($target_dir, 0777, true);
-                }
-                $image_name = time() . '_' . basename($user_image);
-                $target_file = $target_dir . $image_name;
-                if (move_uploaded_file($user_image_temp, $target_file)) {
-                    $user_image = $image_name;
-                } else {
-                    $user_image = '';
-                }
+            $can_proceed = false;
+        }
+    }
+    
+    // ============================================
+    // EIGHTH: Check for duplicate first + last name
+    // ============================================
+    if ($can_proceed && !empty($first_name) && !empty($last_name)) {
+        $dup_query = "SELECT user_id FROM users WHERE first_name = '$first_name' AND last_name = '$last_name'";
+        $dup_result = mysqli_query($connection, $dup_query);
+        if (mysqli_num_rows($dup_result) > 0) {
+            $message = "A user with the name '$first_name $last_name' already exists. Please use a different name.";
+            $message_type = "danger";
+            $can_proceed = false;
+        }
+    }
+    
+    // ============================================
+    // NINTH: All validations passed - proceed with insertion
+    // ============================================
+    if ($can_proceed) {
+        // Upload image
+        if (!empty($user_image)) {
+            $target_dir = "../images/";
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+            $image_name = time() . '_' . basename($user_image);
+            $target_file = $target_dir . $image_name;
+            if (move_uploaded_file($user_image_temp, $target_file)) {
+                $user_image = $image_name;
             } else {
                 $user_image = '';
             }
+        } else {
+            $user_image = '';
+        }
+        
+        // Hash password
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        
+        // Insert user
+        $role_id_value = ($role_id !== 'NULL') ? $role_id : 'NULL';
+        $type_id_value = ($type_id !== 'NULL') ? $type_id : 'NULL';
+        
+        $insert_query = "INSERT INTO users (username, first_name, last_name, user_email, password, 
+                          user_image, role_id, type_id, user_status) 
+                         VALUES ('$username', '$first_name', '$last_name', '$user_email', '$hashed_password', 
+                                 '$user_image', $role_id_value, $type_id_value, '$user_status')";
+        
+        if (mysqli_query($connection, $insert_query)) {
+            $new_user_id = mysqli_insert_id($connection);
             
-            // Hash password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            
-            // Insert user
-            $role_id_value = ($role_id !== 'NULL') ? $role_id : 'NULL';
-            $type_id_value = ($type_id !== 'NULL') ? $type_id : 'NULL';
-            
-            $insert_query = "INSERT INTO users (username, first_name, last_name, user_email, password, 
-                              user_image, role_id, type_id, user_status) 
-                             VALUES ('$username', '$first_name', '$last_name', '$user_email', '$hashed_password', 
-                                     '$user_image', $role_id_value, $type_id_value, '$user_status')";
-            
-            if (mysqli_query($connection, $insert_query)) {
-                $new_user_id = mysqli_insert_id($connection);
-                // Only insert into employees table if user type is 'operations' (type_id=1)
-                $is_operations = false;
-                $is_client = false;
-                $type_name = '';
-                if ($type_id !== 'NULL') {
-                    // Fetch the type_name for the selected type_id
-                    $type_check_query = "SELECT type_name FROM user_types WHERE type_id = $type_id LIMIT 1";
-                    $type_check_result = mysqli_query($connection, $type_check_query);
-                    if ($type_check_result && $type_row = mysqli_fetch_assoc($type_check_result)) {
-                        $type_name = strtolower($type_row['type_name']);
-                        if ($type_name === 'operations' || $type_id == 1) {
-                            $is_operations = true;
-                        } else if ($type_name === 'client' || $type_id == 2) {
-                            $is_client = true;
-                        }
+            // Only insert into employees table if user type is 'operations' (type_id=1)
+            $is_operations = false;
+            $is_client = false;
+            $type_name = '';
+            if ($type_id !== 'NULL') {
+                // Fetch the type_name for the selected type_id
+                $type_check_query = "SELECT type_name FROM user_types WHERE type_id = $type_id LIMIT 1";
+                $type_check_result = mysqli_query($connection, $type_check_query);
+                if ($type_check_result && $type_row = mysqli_fetch_assoc($type_check_result)) {
+                    $type_name = strtolower($type_row['type_name']);
+                    if ($type_name === 'operations' || $type_id == 1) {
+                        $is_operations = true;
+                    } else if ($type_name === 'client' || $type_id == 2) {
+                        $is_client = true;
                     }
                 }
-                if ($is_operations) {
-                    $emp_insert_query = "INSERT INTO employees (user_id, user_email, password, first_name, last_name, user_image, department_id, created_at, user_type) VALUES (?, ?, ?, ?, ?, ?, NULL, NOW(), ?)";
-                    $emp_stmt = $connection->prepare($emp_insert_query);
-                    $user_type = 'operations';
-                    $emp_stmt->bind_param("issssss", $new_user_id, $user_email, $hashed_password, $first_name, $last_name, $user_image, $user_type);
-                    $emp_stmt->execute();
-                    $emp_stmt->close();
-                }
-                // Insert into clients table if user type is 'client'
-                if ($is_client) {
-                    $contact_name = trim($first_name . ' ' . $last_name);
-                    $company_name = $contact_name; // or use a placeholder
-                    $country = 'UAE'; // or use a relevant default
-                    $contact_mobile = '0000000000'; // placeholder, should be updated later
-                    $client_password = $hashed_password;
-                    $contact_email = $user_email;
-                    // Insert required NOT NULL columns, let others default to NULL/default
-                    $client_insert_query = "INSERT INTO clients (user_id, company_name, country, contact_name, contact_mobile, contact_email, client_password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
-                    $client_stmt = $connection->prepare($client_insert_query);
-                    $client_stmt->bind_param("issssss", $new_user_id, $company_name, $country, $contact_name, $contact_mobile, $contact_email, $client_password);
-                    $client_stmt->execute();
-                    $client_stmt->close();
-                }
-                $showSuccessModal = true;
-                // Clear form data
-                $username = $first_name = $last_name = $user_email = '';
-                $role_id = $type_id = '';
-                $user_status = 'active';
-                // No redirect
-            } else {
-                $message = "Error adding user: " . mysqli_error($connection);
-                $message_type = "danger";
             }
+            
+            if ($is_operations) {
+                $emp_insert_query = "INSERT INTO employees (user_id, user_email, password, first_name, last_name, user_image, department_id, created_at, user_type) VALUES (?, ?, ?, ?, ?, ?, NULL, NOW(), ?)";
+                $emp_stmt = $connection->prepare($emp_insert_query);
+                $user_type = 'operations';
+                $emp_stmt->bind_param("issssss", $new_user_id, $user_email, $hashed_password, $first_name, $last_name, $user_image, $user_type);
+                $emp_stmt->execute();
+                $emp_stmt->close();
+            }
+            
+            // Insert into clients table if user type is 'client'
+            if ($is_client) {
+                $contact_name = trim($first_name . ' ' . $last_name);
+                $company_name = $contact_name;
+                $country = 'UAE';
+                $contact_mobile = '0000000000';
+                $client_password = $hashed_password;
+                $contact_email = $user_email;
+                $client_insert_query = "INSERT INTO clients (user_id, company_name, country, contact_name, contact_mobile, contact_email, client_password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+                $client_stmt = $connection->prepare($client_insert_query);
+                $client_stmt->bind_param("issssss", $new_user_id, $company_name, $country, $contact_name, $contact_mobile, $contact_email, $client_password);
+                $client_stmt->execute();
+                $client_stmt->close();
+            }
+            
+            $showSuccessModal = true;
+            // Clear form data
+            $username = $first_name = $last_name = $user_email = '';
+            $role_id = $type_id = '';
+            $user_status = 'active';
+        } else {
+            $message = "Error adding user: " . mysqli_error($connection);
+            $message_type = "danger";
         }
     }
 }
@@ -241,6 +305,8 @@ function validatePasswordStrength($password) {
 
 ob_end_flush();
 ?>
+
+<!-- Rest of your HTML remains the same -->
 
 <div class="container-fluid">
     <div class="row justify-content-center">

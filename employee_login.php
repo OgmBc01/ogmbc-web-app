@@ -32,9 +32,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($auth['success']) {
             // Check if this is an employee (type_id 1 or 7)
             if ($auth['user']['type_id'] == 1 || $auth['user']['type_id'] == 7) {
-                $redirect = getRedirectUrl($auth['user']);
-                header("Location: $redirect");
-                exit();
+                // Also check for admin (role_id 1, type_id 7) or (role_id 2, type_id 1)
+                if (
+                    ($auth['user']['role_id'] == 1 && $auth['user']['type_id'] == 7) ||
+                    ($auth['user']['role_id'] == 2 && $auth['user']['type_id'] == 1)
+                ) {
+                    header("Location: admin/dashboard.php");
+                    exit();
+                } elseif (isOperations()) {
+                    header("Location: operations/operations_dashboard.php");
+                    exit();
+                } else {
+                    // If logged in but not employee, logout and show employee login
+                    logout();
+                    $error = "This portal is for employees only. Please use the client login.";
+                }
             } else {
                 // Clear session if wrong portal
                 logout();

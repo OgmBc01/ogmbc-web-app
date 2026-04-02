@@ -1,16 +1,8 @@
 <?php
-// Centralized Session & Authentication Functions for Admin Area
-// Include this file at the top of all admin pages that need session/authentication
-
 // Initialize session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-/**
- * Initialize session with security settings
- * Call this at the beginning of all pages that need session
- */
 function initSession() {
     // Regenerate session ID periodically for security
     if (!isset($_SESSION['CREATED'])) {
@@ -68,8 +60,11 @@ function getCurrentTypeId() {
  * @return bool
  */
 function isAdmin() {
-    return (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 1 && 
-            isset($_SESSION['type_id']) && $_SESSION['type_id'] == 7);
+    return (
+        (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 1 && isset($_SESSION['type_id']) && $_SESSION['type_id'] == 7)
+        ||
+        (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 2 && isset($_SESSION['type_id']) && $_SESSION['type_id'] == 1)
+    );
 }
 
 /**
@@ -532,13 +527,19 @@ function is_password_unique($connection, $password) {
     return true;
 }
 
-function insert_clients() {
+// Function to insert new client
+function insert_client() {
     global $connection;
 
     if (isset($_POST['submit_client'])) {
-        $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-        // Sanitize and validate inputs
         $client_id = intval($_POST['client_id'] ?? 0);
+        
+        // Only proceed for new client (client_id = 0)
+        if ($client_id > 0) {
+            return; // This function is only for new clients
+        }
+        
+        // Sanitize and validate inputs
         $company_name = mysqli_real_escape_string($connection, trim($_POST['company_name']));
         $trade_license_no = mysqli_real_escape_string($connection, trim($_POST['trade_license_no'] ?? ''));
         $country = mysqli_real_escape_string($connection, trim($_POST['country']));
@@ -572,79 +573,124 @@ function insert_clients() {
             return;
         }
 
-        if ($client_id > 0) {
-            // Update existing client
-            $query = "UPDATE clients SET 
-                     company_name = '{$company_name}', 
-                     trade_license_no = '{$trade_license_no}', 
-                     country = '{$country}', 
-                     jurisdiction = '{$jurisdiction}', 
-                     emirate_zone = '{$emirate_zone}', 
-                     business_activity = '{$business_activity}', 
-                     industry = '{$industry}', 
-                     address = '{$address}', 
-                     contact_title = '{$contact_title}', 
-                     contact_name = '{$contact_name}', 
-                     contact_designation = '{$contact_designation}', 
-                     contact_mobile = '{$contact_mobile}', 
-                     contact_email = '{$contact_email}', 
-                     service_id = {$service_id}, 
-                     service_description = '{$service_description}', 
-                     expected_start_date = " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
-                     payment_currency = '{$payment_currency}', 
-                     payment_term = '{$payment_term}', 
-                     service_total_fee = {$service_total_fee}, 
-                     lead_source = '{$lead_source}',
-                     client_status = '{$client_status}'
-                     WHERE client_id = {$client_id}";
+        // Generate a unique password for new client
+        $plain_password = generate_client_password($company_name, $contact_name);
+        $hashed_password = password_hash($plain_password, PASSWORD_DEFAULT);
+        
+        // Insert new client with password
+        $query = "INSERT INTO clients (
+                    company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
+                    contact_title, contact_name, contact_designation, contact_mobile, contact_email, client_password,
+                    service_id, service_description, expected_start_date, payment_currency, payment_term, 
+                    service_total_fee, lead_source, client_status
+                ) VALUES (
+                    '{$company_name}', '{$trade_license_no}', '{$country}', '{$jurisdiction}', '{$emirate_zone}', '{$business_activity}', '{$industry}', '{$address}',
+                    '{$contact_title}', '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', '{$hashed_password}',
+                    {$service_id}, '{$service_description}', " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
+                    '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
+                )";
 
-            $success_message = "Client updated successfully!";
+        if (mysqli_query($connection, $query)) {
+            $new_client_id = mysqli_insert_id($connection);
+            // Send welcome email with credentials
+            send_client_welcome_email($contact_email, $company_name, $plain_password);
+            // Store password in session for modal display
+            $_SESSION['new_client_password'] = $plain_password;
+            $_SESSION['new_client_email'] = $contact_email;
+            $_SESSION['new_client_name'] = $company_name;
+            // Set success flag - NO REDIRECT HERE
+            $_SESSION['client_add_success'] = true;
         } else {
-            // Generate a unique password for new client
-            $plain_password = generate_client_password($company_name, $contact_name);
-            
-            // Hash the password for storage
-            $hashed_password = password_hash($plain_password, PASSWORD_DEFAULT);
-            
-            // Insert new client with password
-            $query = "INSERT INTO clients (
-                        company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
-                        contact_title, contact_name, contact_designation, contact_mobile, contact_email, client_password,
-                        service_id, service_description, expected_start_date, payment_currency, payment_term, 
-                        service_total_fee, lead_source, client_status
-                    ) VALUES (
-                        '{$company_name}', '{$trade_license_no}', '{$country}', '{$jurisdiction}', '{$emirate_zone}', '{$business_activity}', '{$industry}', '{$address}',
-                        '{$contact_title}', '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', '{$hashed_password}',
-                        {$service_id}, '{$service_description}', " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
-                        '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
-                    )";
+            $_SESSION['error_message'] = 'Query Failed: ' . mysqli_error($connection);
+        }
+    }
+}
 
-            $success_message = "Client added successfully!";
+// Function to update existing client
+function update_client() {
+    global $connection;
+
+    if (isset($_POST['update_client'])) {
+        $client_id = intval($_POST['client_id'] ?? 0);
+        
+        // Only proceed for existing client
+        if ($client_id <= 0) {
+            return;
+        }
+        
+        // Sanitize and validate inputs
+        $company_name = mysqli_real_escape_string($connection, trim($_POST['company_name']));
+        $trade_license_no = mysqli_real_escape_string($connection, trim($_POST['trade_license_no'] ?? ''));
+        $country = mysqli_real_escape_string($connection, trim($_POST['country']));
+        $jurisdiction = mysqli_real_escape_string($connection, trim($_POST['jurisdiction'] ?? ''));
+        $emirate_zone = mysqli_real_escape_string($connection, trim($_POST['emirate_zone'] ?? ''));
+        $business_activity = mysqli_real_escape_string($connection, trim($_POST['business_activity'] ?? ''));
+        $industry = mysqli_real_escape_string($connection, trim($_POST['industry'] ?? ''));
+        $address = mysqli_real_escape_string($connection, trim($_POST['address'] ?? ''));
+        $contact_title = mysqli_real_escape_string($connection, trim($_POST['contact_title'] ?? ''));
+        $contact_name = mysqli_real_escape_string($connection, trim($_POST['contact_name']));
+        $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation'] ?? ''));
+        $contact_mobile = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
+        $contact_email = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
+        $service_id = intval($_POST['service_id'] ?? 0);
+        $service_description = mysqli_real_escape_string($connection, trim($_POST['service_description'] ?? ''));
+        $expected_start_date = mysqli_real_escape_string($connection, trim($_POST['expected_start_date'] ?? ''));
+        $payment_currency = mysqli_real_escape_string($connection, trim($_POST['payment_currency'] ?? 'AED'));
+        $payment_term = mysqli_real_escape_string($connection, trim($_POST['payment_term'] ?? 'Monthly'));
+        $service_total_fee = floatval($_POST['service_total_fee'] ?? 0.00);
+        $lead_source = mysqli_real_escape_string($connection, trim($_POST['lead_source'] ?? 'website'));
+        $client_status = mysqli_real_escape_string($connection, trim($_POST['client_status'] ?? 'New Lead'));
+
+        // Validation
+        if (empty($company_name) || empty($contact_name) || empty($contact_mobile) || empty($contact_email)) {
+            $_SESSION['error_message'] = 'Please fill in all required fields';
+            return;
         }
 
-        $client_query = mysqli_query($connection, $query);
-
-        if (!$client_query) {
-            $_SESSION['error_message'] = 'Query Failed: ' . mysqli_error($connection);
+        if (!filter_var($contact_email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error_message'] = 'Please enter a valid email address';
             return;
+        }
+        
+        // Check if email exists (excluding current client)
+        $check_email = "SELECT client_id FROM clients WHERE contact_email = '$contact_email' AND client_id != $client_id";
+        $email_result = mysqli_query($connection, $check_email);
+        
+        if (mysqli_num_rows($email_result) > 0) {
+            $_SESSION['error_message'] = 'Email already exists. Please use another email.';
+            return;
+        }
+        
+        // Update existing client
+        $query = "UPDATE clients SET 
+                 company_name = '{$company_name}', 
+                 trade_license_no = '{$trade_license_no}', 
+                 country = '{$country}', 
+                 jurisdiction = '{$jurisdiction}', 
+                 emirate_zone = '{$emirate_zone}', 
+                 business_activity = '{$business_activity}', 
+                 industry = '{$industry}', 
+                 address = '{$address}', 
+                 contact_title = '{$contact_title}', 
+                 contact_name = '{$contact_name}', 
+                 contact_designation = '{$contact_designation}', 
+                 contact_mobile = '{$contact_mobile}', 
+                 contact_email = '{$contact_email}', 
+                 service_id = {$service_id}, 
+                 service_description = '{$service_description}', 
+                 expected_start_date = " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
+                 payment_currency = '{$payment_currency}', 
+                 payment_term = '{$payment_term}', 
+                 service_total_fee = {$service_total_fee}, 
+                 lead_source = '{$lead_source}',
+                 client_status = '{$client_status}'
+                 WHERE client_id = {$client_id}";
+
+        if (mysqli_query($connection, $query)) {
+            // Set success flag - NO REDIRECT HERE
+            $_SESSION['client_update_success'] = true;
         } else {
-            // Get the newly created client ID if new
-            if ($client_id == 0) {
-                $new_client_id = mysqli_insert_id($connection);
-                // Send welcome email with credentials
-                send_client_welcome_email($contact_email, $company_name, $plain_password);
-                // Store password in session for modal display
-                $_SESSION['new_client_password'] = $plain_password;
-                $_SESSION['new_client_email'] = $contact_email;
-                $_SESSION['new_client_name'] = $company_name;
-                // Set success flag
-                $_SESSION['client_update_success'] = true;
-                // No redirect, let the page reload naturally
-            } else {
-                // For updates, set success flag
-                $_SESSION['client_update_success'] = true;
-                // No redirect, let the page reload naturally
-            }
+            $_SESSION['error_message'] = 'Query Failed: ' . mysqli_error($connection);
         }
     }
 }
@@ -732,7 +778,7 @@ function findAllClients() {
         // Status badge color
         $status_class = getStatusBadgeClass($client_status);
 
-        echo "<tr>";
+        echo "<tr id='client-row-{$client_id}'>";
         echo "<td>{$client_id}</td>";
         echo "<td><strong>{$company_name}</strong></td>";
         echo "<td>{$formatted_contact}</td>"; // Now shows "Mr. John Smith" format
@@ -749,22 +795,27 @@ function findAllClients() {
         
         // Action buttons container - icon only version
         echo "<div class='d-flex gap-1'>";
-            
+        
         // View button
         echo "<button onclick='loadClientDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='View Details' data-bs-toggle='tooltip'>
-                <i class='bi bi-eye text-primary'></i>
+            <i class='bi bi-eye text-primary'></i>
               </button>";
         
         // Edit button
         echo "<a href='clients.php?source=edit_client&id={$client_id}' class='btn btn-light btn-sm rounded-circle p-2' title='Edit' data-bs-toggle='tooltip'>
-                <i class='bi bi-pencil text-info'></i>
+            <i class='bi bi-pencil text-info'></i>
               </a>";
-        
+
+        // Delete button with data attributes
+        echo "<button onclick='confirmDelete({$client_id}, \"" . addslashes($company_name) . "\")' class='btn btn-light btn-sm rounded-circle p-2' title='Delete' data-bs-toggle='tooltip' data-client-id='{$client_id}' data-client-name='" . htmlspecialchars($company_name, ENT_QUOTES) . "'>
+            <i class='bi bi-trash text-danger'></i>
+              </button>";
+
         // Review button (for Manager/CEO)
         if (function_exists('shouldShowReviewButton') && shouldShowReviewButton($row)) {
             echo "<button onclick='loadReviewDetails({$client_id})' class='btn btn-light btn-sm rounded-circle p-2' title='Review' data-bs-toggle='tooltip'>
-                    <i class='bi bi-clipboard-check text-warning'></i>
-                  </button>";
+                <i class='bi bi-clipboard-check text-warning'></i>
+              </button>";
         }
 
         echo "</div>";

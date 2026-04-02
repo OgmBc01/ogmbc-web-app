@@ -73,8 +73,11 @@ function getCurrentTypeId() {
  * @return bool
  */
 function isAdmin() {
-    return (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 1 && 
-            isset($_SESSION['type_id']) && $_SESSION['type_id'] == 7);
+    return (
+        (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 1 && isset($_SESSION['type_id']) && $_SESSION['type_id'] == 7)
+        ||
+        (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 2 && isset($_SESSION['type_id']) && $_SESSION['type_id'] == 1)
+    );
 }
 
 /**
