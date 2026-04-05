@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 $client_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $company_name = $trade_license_no = $country = $jurisdiction = $emirate_zone = $business_activity = $industry = $address = '';
 $contact_title = $contact_name = $contact_designation = $contact_mobile = $contact_email = '';
-$service_id = $service_description = $expected_start_date = '';
+$service_description = $contract_start_date = $contract_end_date = '';
 $payment_currency = 'AED';
 $payment_term = 'Monthly';
 $service_total_fee = '0.00';
@@ -109,9 +109,10 @@ if ($client_id > 0) {
         $contact_designation = $client['contact_designation'] ?? '';
         $contact_mobile = $client['contact_mobile'] ?? '';
         $contact_email = $client['contact_email'] ?? '';
-        $service_id = $client['service_id'] ?? '';
+        // $service_id removed
         $service_description = $client['service_description'] ?? '';
-        $expected_start_date = $client['expected_start_date'] ?? '';
+        $contract_start_date = $client['contract_start_date'] ?? '';
+        $contract_end_date = $client['contract_end_date'] ?? '';
         $payment_currency = $client['payment_currency'] ?? 'AED';
         $payment_term = $client['payment_term'] ?? 'Monthly';
         $service_total_fee = $client['service_total_fee'] ?? '0.00';
@@ -409,24 +410,6 @@ $industries_result = mysqli_query($connection, $industries_query);
                                     </h6>
                                 </div>
                                 
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="service_id" class="form-label">Service Type</label>
-                                        <select id="service_id" name="service_id" class="form-control">
-                                            <option value="">Select Service</option>
-                                            <?php
-                                            $services_query = "SELECT * FROM categories ORDER BY cat_title";
-                                            $services_result = mysqli_query($connection, $services_query);
-                                            if ($services_result) {
-                                                while($service = mysqli_fetch_assoc($services_result)) {
-                                                    $selected = ($service_id == $service['cat_id']) ? 'selected' : '';
-                                                    echo "<option value='{$service['cat_id']}' {$selected}>{$service['cat_title']} - AED {$service['cat_price']}</option>";
-                                                }
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
                                 
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -436,11 +419,19 @@ $industries_result = mysqli_query($connection, $industries_query);
                                     </div>
                                 </div>
                                 
+
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="expected_start_date" class="form-label">Expected Start Date</label>
-                                        <input type="date" id="expected_start_date" name="expected_start_date" class="form-control" 
-                                               value="<?php echo htmlspecialchars($expected_start_date); ?>">
+                                        <label for="contract_start_date" class="form-label">Contract Start Date</label>
+                                        <input type="date" id="contract_start_date" name="contract_start_date" class="form-control" 
+                                               value="<?php echo htmlspecialchars($contract_start_date); ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="contract_end_date" class="form-label">Contract End Date</label>
+                                        <input type="date" id="contract_end_date" name="contract_end_date" class="form-control" 
+                                               value="<?php echo htmlspecialchars($contract_end_date); ?>">
                                     </div>
                                 </div>
                                 
@@ -488,7 +479,8 @@ $industries_result = mysqli_query($connection, $industries_query);
                                                 'New Lead', 'Contacted', 'Qualified', 'Proposal Drafted',
                                                 'Under Manager Review', 'Rejected by Manager', 'Approved by Manager',
                                                 'Under CEO Review', 'Rejected by CEO', 'Final Proposal Ready',
-                                                'Proposal Sent to Client', 'Awaiting Client Action', 'Signed – Move to Finance'
+                                                'Proposal Sent to Client', 'Awaiting Client Action', 'Signed – Move to Finance',
+                                                'Inactive'
                                             ];
                                             foreach ($statuses as $statusOption) {
                                                 $selected = ($client_status == $statusOption) ? 'selected' : '';

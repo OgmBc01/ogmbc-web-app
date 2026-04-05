@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 // Initialize variables
 $company_name = $trade_license_no = $country = $emirate_zone = $business_activity = $address = '';
 $contact_title = $contact_name = $contact_designation = $contact_mobile = $contact_email = '';
-$service_id = $service_description = $expected_start_date = '';
+$service_id = $service_description = $contract_start_date = $contract_end_date = '';
 $payment_currency = 'AED';
 $payment_term = 'Monthly';
 $service_total_fee = '0.00';
@@ -303,21 +303,6 @@ if (isset($_SESSION['error_message'])) {
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="service_id" class="form-label">Service Type</label>
-                                        <select id="service_id" name="service_id" class="form-control">
-                                            <option value="">Select Service</option>
-                                            <?php
-                                            $services_query = "SELECT * FROM categories ORDER BY cat_title";
-                                            $services_result = mysqli_query($connection, $services_query);
-                                            while($service = mysqli_fetch_assoc($services_result)) {
-                                                echo "<option value='{$service['cat_id']}'>{$service['cat_title']} - AED {$service['cat_price']}</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
                                         <label for="service_total_fee" class="form-label">Service Total Fee (AED)</label>
                                         <input type="number" id="service_total_fee" name="service_total_fee" class="form-control" 
                                                value="<?php echo htmlspecialchars($service_total_fee); ?>" step="0.01" min="0">
@@ -326,9 +311,16 @@ if (isset($_SESSION['error_message'])) {
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="expected_start_date" class="form-label">Expected Start Date</label>
-                                        <input type="date" id="expected_start_date" name="expected_start_date" class="form-control" 
-                                               value="<?php echo htmlspecialchars($expected_start_date); ?>">
+                                             <label for="contract_start_date" class="form-label">Contract Start Date</label>
+                                             <input type="date" id="contract_start_date" name="contract_start_date" class="form-control" 
+                                                 value="<?php echo htmlspecialchars($contract_start_date); ?>">
+                                         </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                         <div class="mb-3">
+                                             <label for="contract_end_date" class="form-label">Contract End Date</label>
+                                             <input type="date" id="contract_end_date" name="contract_end_date" class="form-control" 
+                                                 value="<?php echo htmlspecialchars($contract_end_date); ?>">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -455,24 +447,6 @@ document.getElementById('country').addEventListener('change', function() {
         .catch(error => console.error('Error fetching jurisdictions:', error));
 });
 
-// Auto-fill service price when service is selected
-document.getElementById('service_id').addEventListener('change', function() {
-    const serviceId = this.value;
-    const serviceFeeInput = document.getElementById('service_total_fee');
-    
-    if (serviceId) {
-        fetch('get_service_price.php?service_id=' + serviceId)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.price > 0) {
-                    serviceFeeInput.value = data.price;
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching service price:', error);
-            });
-    }
-});
 
 // Form validation
 document.getElementById('clientForm').addEventListener('submit', function(e) {

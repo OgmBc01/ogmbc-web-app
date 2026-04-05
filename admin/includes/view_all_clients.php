@@ -130,19 +130,6 @@ if (session_status() === PHP_SESSION_NONE) {
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="service_filter" class="form-label">Service Type</label>
-                        <select name="service_filter" id="service_filter" class="form-control">
-                            <option value="">All Services</option>
-                            <?php
-                            $services_query = "SELECT * FROM categories ORDER BY cat_title";
-                            $services_result = mysqli_query($connection, $services_query);
-                            while($service = mysqli_fetch_assoc($services_result)) {
-                                echo "<option value='{$service['cat_id']}'>{$service['cat_title']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
                         <label for="date_from" class="form-label">Date From</label>
                         <input type="date" name="date_from" id="date_from" class="form-control">
                     </div>
@@ -176,9 +163,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <th>Country</th>
                                 <th>Jurisdiction</th>
                                 <th>Industry</th>
-                                <th>Service</th>
                                 <th>Status</th>
-                                <th>Sales Person</th>
                                 <th>Created Date</th>
                                 <th>Actions</th>
                             </tr>
@@ -188,7 +173,29 @@ if (session_status() === PHP_SESSION_NONE) {
                             // Call the function to display all clients
                             if (!function_exists('findAllClients')) include dirname(__DIR__) . '/functions.php';
                             if (function_exists('findAllClients')) {
-                                findAllClients();
+                                // Custom version of findAllClients without the Service column
+                                $query = "SELECT c.client_id, c.company_name, c.contact_name, c.contact_email, c.contact_mobile, c.country, c.jurisdiction, c.industry, c.client_status, c.created_at FROM clients c ORDER BY c.client_id DESC";
+                                $result = mysqli_query($connection, $query);
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<tr id='client-row-{$row['client_id']}'>";
+                                    echo "<td>" . htmlspecialchars($row['client_id']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['company_name']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['contact_name']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['contact_email']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['contact_mobile']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['country']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['jurisdiction'] ?? '') . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['industry'] ?? '') . "</td>";
+                                    // Service column removed
+                                    echo "<td>" . htmlspecialchars($row['client_status']) . "</td>";
+                                    echo "<td>" . htmlspecialchars(date('M j, Y', strtotime($row['created_at']))) . "</td>";
+                                    echo "<td>";
+                                    echo "<button class='btn btn-sm btn-info' onclick='loadClientDetails({$row['client_id']})'><i class='bi bi-eye'></i></button> ";
+                                    echo "<a href='clients.php?source=edit_client&id={$row['client_id']}' class='btn btn-sm btn-primary'><i class='bi bi-pencil'></i></a> ";
+                                    echo "<button class='btn btn-sm btn-danger' onclick=\"confirmDelete({$row['client_id']},'" . htmlspecialchars(addslashes($row['company_name'])) . "')\"><i class='bi bi-trash'></i></button>";
+                                    echo "</td>";
+                                    echo "</tr>";
+                                }
                             }
                             ?>
                         </tbody>
@@ -321,7 +328,6 @@ if (session_status() === PHP_SESSION_NONE) {
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     document.getElementById('status_filter').value = urlParams.get('status_filter') || '';
-    document.getElementById('service_filter').value = urlParams.get('service_filter') || '';
     document.getElementById('date_from').value = urlParams.get('date_from') || '';
     document.getElementById('date_to').value = urlParams.get('date_to') || '';
 });
@@ -334,7 +340,6 @@ function filterClients() {
     let url = 'clients.php?';
     const params = [];
     if (status) params.push(`status_filter=${encodeURIComponent(status)}`);
-    if (service) params.push(`service_filter=${encodeURIComponent(service)}`);
     if (dateFrom) params.push(`date_from=${encodeURIComponent(dateFrom)}`);
     if (dateTo) params.push(`date_to=${encodeURIComponent(dateTo)}`);
     window.location.href = url + params.join('&');

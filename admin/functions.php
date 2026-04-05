@@ -555,7 +555,8 @@ function insert_client() {
         $contact_email = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
         $service_id = intval($_POST['service_id'] ?? 0);
         $service_description = mysqli_real_escape_string($connection, trim($_POST['service_description'] ?? ''));
-        $expected_start_date = mysqli_real_escape_string($connection, trim($_POST['expected_start_date'] ?? ''));
+        $contract_start_date = mysqli_real_escape_string($connection, trim($_POST['contract_start_date'] ?? ''));
+        $contract_end_date = mysqli_real_escape_string($connection, trim($_POST['contract_end_date'] ?? ''));
         $payment_currency = mysqli_real_escape_string($connection, trim($_POST['payment_currency'] ?? 'AED'));
         $payment_term = mysqli_real_escape_string($connection, trim($_POST['payment_term'] ?? 'Monthly'));
         $service_total_fee = floatval($_POST['service_total_fee'] ?? 0.00);
@@ -581,12 +582,12 @@ function insert_client() {
         $query = "INSERT INTO clients (
                     company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
                     contact_title, contact_name, contact_designation, contact_mobile, contact_email, client_password,
-                    service_id, service_description, expected_start_date, payment_currency, payment_term, 
+                    service_id, service_description, contract_start_date, contract_end_date, payment_currency, payment_term, 
                     service_total_fee, lead_source, client_status
                 ) VALUES (
                     '{$company_name}', '{$trade_license_no}', '{$country}', '{$jurisdiction}', '{$emirate_zone}', '{$business_activity}', '{$industry}', '{$address}',
                     '{$contact_title}', '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', '{$hashed_password}',
-                    {$service_id}, '{$service_description}', " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
+                    {$service_id}, '{$service_description}', " . ($contract_start_date ? "'{$contract_start_date}'" : "NULL") . ", " . ($contract_end_date ? "'{$contract_end_date}'" : "NULL") . ",
                     '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
                 )";
 
@@ -632,9 +633,9 @@ function update_client() {
         $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation'] ?? ''));
         $contact_mobile = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
         $contact_email = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
-        $service_id = intval($_POST['service_id'] ?? 0);
         $service_description = mysqli_real_escape_string($connection, trim($_POST['service_description'] ?? ''));
-        $expected_start_date = mysqli_real_escape_string($connection, trim($_POST['expected_start_date'] ?? ''));
+        $contract_start_date = mysqli_real_escape_string($connection, trim($_POST['contract_start_date'] ?? ''));
+        $contract_end_date = mysqli_real_escape_string($connection, trim($_POST['contract_end_date'] ?? ''));
         $payment_currency = mysqli_real_escape_string($connection, trim($_POST['payment_currency'] ?? 'AED'));
         $payment_term = mysqli_real_escape_string($connection, trim($_POST['payment_term'] ?? 'Monthly'));
         $service_total_fee = floatval($_POST['service_total_fee'] ?? 0.00);
@@ -663,28 +664,28 @@ function update_client() {
         
         // Update existing client
         $query = "UPDATE clients SET 
-                 company_name = '{$company_name}', 
-                 trade_license_no = '{$trade_license_no}', 
-                 country = '{$country}', 
-                 jurisdiction = '{$jurisdiction}', 
-                 emirate_zone = '{$emirate_zone}', 
-                 business_activity = '{$business_activity}', 
-                 industry = '{$industry}', 
-                 address = '{$address}', 
-                 contact_title = '{$contact_title}', 
-                 contact_name = '{$contact_name}', 
-                 contact_designation = '{$contact_designation}', 
-                 contact_mobile = '{$contact_mobile}', 
-                 contact_email = '{$contact_email}', 
-                 service_id = {$service_id}, 
-                 service_description = '{$service_description}', 
-                 expected_start_date = " . ($expected_start_date ? "'{$expected_start_date}'" : "NULL") . ", 
-                 payment_currency = '{$payment_currency}', 
-                 payment_term = '{$payment_term}', 
-                 service_total_fee = {$service_total_fee}, 
-                 lead_source = '{$lead_source}',
-                 client_status = '{$client_status}'
-                 WHERE client_id = {$client_id}";
+             company_name = '{$company_name}', 
+             trade_license_no = '{$trade_license_no}', 
+             country = '{$country}', 
+             jurisdiction = '{$jurisdiction}', 
+             emirate_zone = '{$emirate_zone}', 
+             business_activity = '{$business_activity}', 
+             industry = '{$industry}', 
+             address = '{$address}', 
+             contact_title = '{$contact_title}', 
+             contact_name = '{$contact_name}', 
+             contact_designation = '{$contact_designation}', 
+             contact_mobile = '{$contact_mobile}', 
+             contact_email = '{$contact_email}', 
+             service_description = '{$service_description}', 
+             contract_start_date = " . ($contract_start_date ? "'{$contract_start_date}'" : "NULL") . ", 
+             contract_end_date = " . ($contract_end_date ? "'{$contract_end_date}'" : "NULL") . ", 
+             payment_currency = '{$payment_currency}', 
+             payment_term = '{$payment_term}', 
+             service_total_fee = {$service_total_fee}, 
+             lead_source = '{$lead_source}',
+             client_status = '{$client_status}'
+             WHERE client_id = {$client_id}";
 
         if (mysqli_query($connection, $query)) {
             // Set success flag - NO REDIRECT HERE

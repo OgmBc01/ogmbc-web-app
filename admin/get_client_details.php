@@ -231,11 +231,15 @@ if (isset($_GET['id'])) {
                                     <strong>Payment Term:</strong><br>
                                     <?php echo htmlspecialchars($client['payment_term']); ?>
                                 </div>
-                                <div class="col-md-6 mt-3">
-                                    <strong>Expected Start Date:</strong><br>
-                                    <?php echo !empty($client['expected_start_date']) ? date('M j, Y', strtotime($client['expected_start_date'])) : 'N/A'; ?>
+                                <div class="col-md-4 mt-3">
+                                    <strong>Contract Start Date:</strong><br>
+                                    <?php echo !empty($client['contract_start_date']) ? date('M j, Y', strtotime($client['contract_start_date'])) : 'N/A'; ?>
                                 </div>
-                                <div class="col-md-6 mt-3">
+                                <div class="col-md-4 mt-3">
+                                    <strong>Contract End Date:</strong><br>
+                                    <?php echo !empty($client['contract_end_date']) ? date('M j, Y', strtotime($client['contract_end_date'])) : 'N/A'; ?>
+                                </div>
+                                <div class="col-md-4 mt-3">
                                     <strong>Payment Currency:</strong><br>
                                     <?php echo htmlspecialchars($client['payment_currency']); ?>
                                 </div>
