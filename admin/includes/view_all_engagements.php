@@ -1,4 +1,3 @@
-</style>
 <style>
 .welcome-card {
     background: linear-gradient(135deg, #0a2240 0%, #1a3a5a 100%);
@@ -15,7 +14,34 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Get statistics
+// Build filter conditions for stats (reuse filter logic)
+$stats_where_conditions = [];
+if (!empty($_GET['status'])) {
+    $status = mysqli_real_escape_string($connection, $_GET['status']);
+    $stats_where_conditions[] = "status = '$status'";
+}
+if (!empty($_GET['employee_id'])) {
+    $employee_id = (int)$_GET['employee_id'];
+    $stats_where_conditions[] = "assigned_to = $employee_id";
+}
+if (!empty($_GET['client_id'])) {
+    $client_id = (int)$_GET['client_id'];
+    $stats_where_conditions[] = "client_id = $client_id";
+}
+if (!empty($_GET['date_from'])) {
+    $date_from = mysqli_real_escape_string($connection, $_GET['date_from']);
+    $stats_where_conditions[] = "start_date >= '$date_from'";
+}
+if (!empty($_GET['date_to'])) {
+    $date_to = mysqli_real_escape_string($connection, $_GET['date_to']);
+    $stats_where_conditions[] = "start_date <= '$date_to'";
+}
+$stats_where_clause = '';
+if (!empty($stats_where_conditions)) {
+    $stats_where_clause = 'WHERE ' . implode(' AND ', $stats_where_conditions);
+}
+
+// Get statistics with filters
 $stats_query = "SELECT 
                 COUNT(*) as total_engagements,
                 SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned,
@@ -24,14 +50,23 @@ $stats_query = "SELECT
                 SUM(CASE WHEN status = 'SUBMITTED' THEN 1 ELSE 0 END) as submitted,
                 SUM(CASE WHEN status = 'CLOSED' THEN 1 ELSE 0 END) as closed,
                 SUM(CASE WHEN status = 'REJECTED' THEN 1 ELSE 0 END) as rejected
-                FROM engagements";
+                FROM engagements $stats_where_clause";
 $stats_result = mysqli_query($connection, $stats_query);
 $stats = mysqli_fetch_assoc($stats_result);
 
-// Get overdue count
-$overdue_query = "SELECT COUNT(*) as overdue FROM engagements 
-                  WHERE status NOT IN ('CLOSED', 'SUBMITTED')
-                  AND COALESCE(approved_deadline, original_deadline) < CURDATE()";
+// Get overdue count with filters
+
+// Build overdue query with correct WHERE/AND logic
+if (!empty($stats_where_clause)) {
+    $overdue_query = "SELECT COUNT(*) as overdue FROM engagements 
+        $stats_where_clause
+        AND status NOT IN ('CLOSED', 'SUBMITTED')
+        AND COALESCE(approved_deadline, original_deadline) < CURDATE()";
+} else {
+    $overdue_query = "SELECT COUNT(*) as overdue FROM engagements 
+        WHERE status NOT IN ('CLOSED', 'SUBMITTED')
+        AND COALESCE(approved_deadline, original_deadline) < CURDATE()";
+}
 $overdue_result = mysqli_query($connection, $overdue_query);
 $overdue = mysqli_fetch_assoc($overdue_result);
 ?>
@@ -99,6 +134,20 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label for="client_filter" class="form-label">Client</label>
+                    <select id="client_filter" name="client_id" class="form-control">
+                        <option value="">All Clients</option>
+                        <?php
+                        $client_query = "SELECT client_id, company_name FROM clients ORDER BY company_name";
+                        $client_result = mysqli_query($connection, $client_query);
+                        while ($client = mysqli_fetch_assoc($client_result)) {
+                            $selected = (isset($_GET['client_id']) && $_GET['client_id'] == $client['client_id']) ? 'selected' : '';
+                            echo "<option value='{$client['client_id']}' $selected>" . htmlspecialchars($client['company_name']) . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label for="employee_filter" class="form-label">Assigned To</label>
                     <select id="employee_filter" name="employee_id" class="form-control">
                         <option value="">All Employees</option>
@@ -142,7 +191,6 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                         <tr class="table-dark">
                             <th>Engagement ID</th>
                             <th>Client</th>
-                            <th>Service</th>
                             <th>Assigned To</th>
                             <th>Start Date</th>
                             <th>Deadline</th>
@@ -163,6 +211,10 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                             $employee_id = (int)$_GET['employee_id'];
                             $where_conditions[] = "e.assigned_to = $employee_id";
                         }
+                        if (!empty($_GET['client_id'])) {
+                            $client_id = (int)$_GET['client_id'];
+                            $where_conditions[] = "e.client_id = $client_id";
+                        }
                         if (!empty($_GET['date_from'])) {
                             $date_from = mysqli_real_escape_string($connection, $_GET['date_from']);
                             $where_conditions[] = "e.start_date >= '$date_from'";
@@ -179,12 +231,10 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                         
                         $query = "SELECT e.*, 
                                  c.company_name,
-                                 s.service_name,
                                  CONCAT(u.first_name, ' ', u.last_name) as assigned_to_name,
                                  DATEDIFF(CURDATE(), COALESCE(e.approved_deadline, e.original_deadline)) as days_overdue
                                  FROM engagements e
-                                 JOIN clients c ON e.client_id = c.client_id
-                                 JOIN service_types s ON e.service_id = s.service_id
+                                 LEFT JOIN clients c ON e.client_id = c.client_id
                                  LEFT JOIN users u ON e.assigned_to = u.user_id
                                  $where_clause
                                  ORDER BY e.created_at DESC";
@@ -233,9 +283,8 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                                             </span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?php echo htmlspecialchars($engagement['company_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($engagement['service_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($engagement['assigned_to_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($engagement['company_name'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($engagement['assigned_to_name'] ?? ''); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($engagement['start_date'])); ?></td>
                                     <td>
                                         <?php echo date('M d, Y', strtotime($deadline)); ?>
