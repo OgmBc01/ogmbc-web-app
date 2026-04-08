@@ -1,449 +1,584 @@
 <?php
-// client/includes/view_engagement_details.php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once __DIR__ . '/../../includes/database.php';
-
-if (!isset($_SESSION['client_id'])) {
-    header('Location: ../login.php');
+// Check if ID is provided
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    echo "<script>window.location.href = 'engagements.php';</script>";
     exit();
 }
 
-$client_id = (int)$_SESSION['client_id'];
-$engagement_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if (!$engagement_id) {
-    echo '<div class="alert alert-danger">Invalid engagement ID.</div>';
-    exit();
-}
+$engagement_id = (int)$_GET['id'];
+$user_id = $_SESSION['user_id'];
 
-// Handle new comment submission - MOVED TO TOP BEFORE ANY HTML OUTPUT
-$comment_submitted = false;
-$comment_error = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_submit'])) {
-    if (isset($_POST['comment']) && trim($_POST['comment']) !== '') {
-        $comment = mysqli_real_escape_string($connection, trim($_POST['comment']));
-        $user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
-        
-        if ($user_id > 0 && $engagement_id > 0) {
-            $insert = "INSERT INTO task_comments (engagement_id, user_id, comment, created_at) 
-                       VALUES ($engagement_id, $user_id, '$comment', NOW())";
-            if (mysqli_query($connection, $insert)) {
-                $comment_submitted = true;
-            } else {
-                $comment_error = 'Failed to add comment: ' . mysqli_error($connection);
-            }
-        }
-    } else {
-        $comment_error = 'Comment cannot be empty';
-    }
-}
+// Fetch engagement details and verify ownership
+$query = "SELECT 
+    e.*,
+    c.company_name,
+    c.contact_name,
+    c.contact_email,
+    c.contact_mobile,
+    c.country,
+    s.service_name,
+    s.service_category,
+    r.base_points,
+    r.points_within_deadline,
+    r.points_tier_1,
+    r.points_tier_2,
+    r.points_tier_3,
+    r.rule_version,
+    CONCAT(assigned.first_name, ' ', assigned.last_name) as assigned_to_name,
+    assigned.user_email as assigned_email,
+    CONCAT(reviewer.first_name, ' ', reviewer.last_name) as reviewer_name,
+    CONCAT(creator.first_name, ' ', creator.last_name) as created_by_name,
+    DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining
+    FROM engagements e
+    JOIN clients c ON e.client_id = c.client_id
+    JOIN service_types s ON e.service_id = s.service_id
+    JOIN service_point_rules r ON e.rule_version_id = r.rule_id
+    LEFT JOIN users assigned ON e.assigned_to = assigned.user_id
+    LEFT JOIN users reviewer ON e.reviewer_id = reviewer.user_id
+    LEFT JOIN users creator ON e.created_by = creator.user_id
+    WHERE e.engagement_id = $engagement_id AND e.assigned_to = $user_id";
 
-// Fetch engagement details
-$query = "SELECT e.*, s.service_name, 
-          CONCAT(u.first_name, ' ', u.last_name) as assigned_to_name, 
-          u.user_email as assigned_email 
-          FROM engagements e 
-          JOIN service_types s ON e.service_id = s.service_id 
-          LEFT JOIN users u ON e.assigned_to = u.user_id 
-          WHERE e.engagement_id = $engagement_id AND e.client_id = $client_id LIMIT 1";
 $result = mysqli_query($connection, $query);
+
 if (!$result || mysqli_num_rows($result) == 0) {
-    echo '<div class="alert alert-danger">Engagement not found or access denied.</div>';
+    echo "<script>window.location.href = 'engagements.php';</script>";
     exit();
 }
-$eng = mysqli_fetch_assoc($result);
 
-// Comments (from task_comments)
 
-$comments = [];
+$engagement = mysqli_fetch_assoc($result);
+
+// Fetch all documents for this engagement (assignment-specific)
+$docs_query = "SELECT * FROM client_files WHERE engagement_id = $engagement_id ORDER BY uploaded_at DESC";
+$docs_result = mysqli_query($connection, $docs_query);
+
+// Fetch all documents uploaded by this client (across all their engagements)
+$client_id = (int)$engagement['client_id'];
+$client_docs_query = "SELECT * FROM client_files WHERE client_id = $client_id ORDER BY uploaded_at DESC";
+$client_docs_result = mysqli_query($connection, $client_docs_query);
+
+// Get evidence
+$evidence_query = "SELECT * FROM evidence WHERE engagement_id = $engagement_id ORDER BY uploaded_at DESC";
+$evidence_result = mysqli_query($connection, $evidence_query);
+
+// Get comments
 $comments_query = "SELECT c.*, CONCAT(u.first_name, ' ', u.last_name) as user_name
                    FROM task_comments c
-                   LEFT JOIN users u ON c.user_id = u.user_id
+                   JOIN users u ON c.user_id = u.user_id
                    WHERE c.engagement_id = $engagement_id
-                   ORDER BY c.created_at ASC";
+                   ORDER BY c.created_at DESC";
 $comments_result = mysqli_query($connection, $comments_query);
-if ($comments_result) {
-    while ($row = mysqli_fetch_assoc($comments_result)) {
-        $comments[] = $row;
-    }
 
+// Get deadline change requests
+$requests_query = "SELECT r.*, 
+                  CONCAT(ru.first_name, ' ', ru.last_name) as requested_by_name,
+                  CONCAT(ru2.first_name, ' ', ru2.last_name) as reviewed_by_name
+                  FROM deadline_change_requests r
+                  LEFT JOIN users ru ON r.requested_by = ru.user_id
+                  LEFT JOIN users ru2 ON r.reviewed_by = ru2.user_id
+                  WHERE r.engagement_id = $engagement_id
+                  ORDER BY r.created_at DESC";
+$requests_result = mysqli_query($connection, $requests_query);
+
+// Get status history
+$history_query = "SELECT h.*, CONCAT(u.first_name, ' ', u.last_name) as changed_by_name
+                  FROM engagement_status_history h
+                  JOIN users u ON h.changed_by = u.user_id
+                  WHERE h.engagement_id = $engagement_id
+                  ORDER BY h.changed_at DESC";
+$history_result = mysqli_query($connection, $history_query);
+
+// Determine status color
+$status_class = 'secondary';
+$status_icon = 'bell';
+switch($engagement['status']) {
+    case 'ASSIGNED':
+        $status_class = 'secondary';
+        $status_icon = 'bell';
+        break;
+    case 'IN_PROGRESS':
+        $status_class = 'primary';
+        $status_icon = 'play-circle';
+        break;
+    case 'AWAITING_REVIEW':
+        $status_class = 'warning';
+        $status_icon = 'clock-history';
+        break;
+    case 'SUBMITTED':
+        $status_class = 'success';
+        $status_icon = 'check-circle';
+        break;
+    case 'CLOSED':
+        $status_class = 'dark';
+        $status_icon = 'check2-all';
+        break;
 }
 
-// Deadline change requests
-$deadlines = [];
-$dl_query = "SELECT d.*, 
-             CONCAT(u.first_name, ' ', u.last_name) as requested_by_name, 
-             CONCAT(r.first_name, ' ', r.last_name) as reviewed_by_name 
-             FROM deadline_change_requests d 
-             LEFT JOIN users u ON d.requested_by = u.user_id 
-             LEFT JOIN users r ON d.reviewed_by = r.user_id 
-             WHERE d.engagement_id = $engagement_id 
-             ORDER BY d.created_at DESC";
-$dl_result = mysqli_query($connection, $dl_query);
-if ($dl_result) {
-    while ($row = mysqli_fetch_assoc($dl_result)) {
-        $deadlines[] = $row;
-    }
-}
-
-// Files uploaded (client_files)
-$files = [];
-$file_query = "SELECT * FROM client_files WHERE engagement_id = $engagement_id ORDER BY uploaded_at DESC";
-$file_result = mysqli_query($connection, $file_query);
-if ($file_result) {
-    while ($row = mysqli_fetch_assoc($file_result)) {
-        $files[] = $row;
-    }
-}
-
-// Evidence
-$evidence = [];
-$ev_query = "SELECT e.*, CONCAT(u.first_name, ' ', u.last_name) as uploaded_by_name 
-             FROM evidence e 
-             LEFT JOIN users u ON e.uploaded_by = u.user_id 
-             WHERE e.engagement_id = $engagement_id 
-             ORDER BY e.uploaded_at DESC";
-$ev_result = mysqli_query($connection, $ev_query);
-if ($ev_result) {
-    while ($row = mysqli_fetch_assoc($ev_result)) {
-        $evidence[] = $row;
-    }
-}
-
-// Calculate deadline status
-$deadline_date = $eng['approved_deadline'] ?: $eng['original_deadline'];
-$days_remaining = floor((strtotime($deadline_date) - time()) / (60 * 60 * 24));
-$deadline_class = 'success';
-$deadline_text = 'On Track';
-if ($days_remaining < 0) {
-    $deadline_class = 'danger';
-    $deadline_text = 'Overdue by ' . abs($days_remaining) . ' days';
-} elseif ($days_remaining <= 3) {
-    $deadline_class = 'warning';
-    $deadline_text = 'Due in ' . $days_remaining . ' days';
-}
+$is_overdue = ($engagement['days_remaining'] < 0 && $engagement['status'] != 'CLOSED' && $engagement['status'] != 'SUBMITTED');
+$overdue_days = abs($engagement['days_remaining']);
 ?>
 
 <div class="container-fluid">
-    <!-- Header -->
+    <!-- Header with Actions -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="page-title">Engagement Details</h1>
+            <h4 class="mb-2"><?php echo htmlspecialchars($engagement['title']); ?></h4>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="engagements.php">My Engagements</a></li>
-                    <li class="breadcrumb-item active">#<?php echo $engagement_id; ?></li>
+                    <li class="breadcrumb-item"><a href="engagements.php">Engagements</a></li>
+                    <li class="breadcrumb-item active">Engagement #<?php echo $engagement_id; ?></li>
                 </ol>
             </nav>
         </div>
         <div>
-            <a href="engagements.php" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>Back to Engagements
+            <a href="engagements.php" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left me-1"></i>Back to List
             </a>
+            <?php if ($engagement['status'] != 'CLOSED' && $engagement['status'] != 'SUBMITTED'): ?>
+                <a href="engagements.php?source=update_status&id=<?php echo $engagement_id; ?>" class="btn btn-warning me-2">
+                    <i class="bi bi-arrow-repeat me-1"></i>Update Status
+                </a>
+                <a href="engagements.php?source=upload_evidence&id=<?php echo $engagement_id; ?>" class="btn btn-success">
+                    <i class="bi bi-cloud-upload me-1"></i>Upload Evidence
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Success/Error Messages -->
-    <?php if ($comment_submitted): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i>Comment added successfully!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <?php endif; ?>
-    
-    <?php if (!empty($comment_error)): ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle me-2"></i><?php echo $comment_error; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <?php endif; ?>
-
-    <!-- Engagement Header Card -->
-    <div class="card shadow-sm mb-4" style="border-left: 4px solid #f1bf70;">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h4 class="mb-2" style="color: #0a2240;"><?php echo htmlspecialchars($eng['title']); ?></h4>
-                    <div class="d-flex flex-wrap gap-3">
-                        <span class="badge bg-<?php 
-                            echo $eng['status'] == 'CLOSED' ? 'dark' : 
-                                ($eng['status'] == 'SUBMITTED' ? 'success' : 
-                                ($eng['status'] == 'AWAITING_REVIEW' ? 'warning' : 
-                                ($eng['status'] == 'IN_PROGRESS' ? 'primary' : 'info'))); 
-                        ?> px-3 py-2">Status: <?php echo $eng['status']; ?></span>
-                        
-                        <span class="badge bg-<?php echo $deadline_class; ?> px-3 py-2">
-                            <i class="bi bi-clock me-1"></i><?php echo $deadline_text; ?>
-                        </span>
-                        
-                        <span class="text-muted">
-                            <i class="bi bi-calendar3 me-1"></i>Deadline: <?php echo date('M d, Y', strtotime($deadline_date)); ?>
-                        </span>
+    <!-- Status Banner -->
+    <div class="status-banner mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center">
+                    <div class="status-icon me-3">
+                        <i class="bi bi-<?php echo $status_icon; ?> text-<?php echo $status_class; ?>" style="font-size: 2.5rem;"></i>
                     </div>
-                </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <div class="p-3 rounded" style="background: #f8f9fa;">
-                        <small class="text-muted d-block">Service Type</small>
-                        <strong class="fs-5" style="color: #0a2240;"><?php echo htmlspecialchars($eng['service_name']); ?></strong>
+                    <div>
+                        <h5 class="mb-1">
+                            Status: <span class="badge bg-<?php echo $status_class; ?> px-3 py-2"><?php echo str_replace('_', ' ', $engagement['status']); ?></span>
+                        </h5>
+                        <?php if ($is_overdue): ?>
+                            <p class="text-danger mb-0">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Overdue by <?php echo $overdue_days; ?> day<?php echo $overdue_days > 1 ? 's' : ''; ?>
+                            </p>
+                        <?php elseif ($engagement['days_remaining'] == 0 && $engagement['status'] != 'CLOSED'): ?>
+                            <p class="text-warning mb-0">
+                                <i class="bi bi-clock me-1"></i>
+                                Due today
+                            </p>
+                        <?php elseif ($engagement['days_remaining'] > 0 && $engagement['status'] != 'CLOSED'): ?>
+                            <p class="text-success mb-0">
+                                <i class="bi bi-clock me-1"></i>
+                                <?php echo $engagement['days_remaining']; ?> day<?php echo $engagement['days_remaining'] > 1 ? 's' : ''; ?> remaining
+                            </p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
+            <?php if ($engagement['points_awarded']): ?>
+            <div class="col-md-4 text-md-end">
+                <div class="points-awarded">
+                    <span class="points-label">Points Awarded</span>
+                    <span class="points-value"><?php echo $engagement['points_awarded']; ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Assignment Info -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header" style="background: #0a2240; color: #f1bf70;">
-                    <h6 class="mb-0"><i class="bi bi-person-badge me-2"></i>Assignment Details</h6>
+    <!-- Main Content Grid -->
+    <div class="row">
+        <!-- Left Column - Client & Assignment -->
+        <div class="col-lg-4">
+            <!-- Client Info Card -->
+            <div class="info-card mb-4">
+                <h6 class="info-title">
+                    <i class="bi bi-building me-2"></i>Client Information
+                </h6>
+                <div class="info-content">
+                    <p class="mb-2"><strong><?php echo htmlspecialchars($engagement['company_name']); ?></strong></p>
+                    <p class="mb-2">
+                        <i class="bi bi-person me-2 text-muted"></i>
+                        <?php echo htmlspecialchars($engagement['contact_name']); ?>
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-envelope me-2 text-muted"></i>
+                        <a href="mailto:<?php echo $engagement['contact_email']; ?>"><?php echo $engagement['contact_email']; ?></a>
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-telephone me-2 text-muted"></i>
+                        <?php echo $engagement['contact_mobile']; ?>
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-geo-alt me-2 text-muted"></i>
+                        <?php echo htmlspecialchars($engagement['country']); ?>
+                    </p>
                 </div>
-                <div class="card-body">
-                    <table class="table table-sm table-borderless">
-                        <tr>
-                            <td width="120" class="text-muted">Assigned To:</td>
-                            <td class="fw-bold"><?php echo htmlspecialchars($eng['assigned_to_name']); ?></td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Email:</td>
-                            <td><a href="mailto:<?php echo $eng['assigned_email']; ?>" style="color: #f1bf70;"><?php echo $eng['assigned_email']; ?></a></td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Assigned On:</td>
-                            <td><?php echo date('M d, Y', strtotime($eng['assigned_at'])); ?></td>
-                        </tr>
-                    </table>
+            </div>
+
+            <!-- Assignment Card -->
+            <div class="info-card mb-4">
+                <h6 class="info-title">
+                    <i class="bi bi-people me-2"></i>Assignment
+                </h6>
+                <div class="info-content">
+                    <p class="mb-2"><strong>Assigned to:</strong> <?php echo htmlspecialchars($engagement['assigned_to_name']); ?></p>
+                    <p class="mb-2"><strong>Reviewer:</strong> <?php echo $engagement['reviewer_name'] ? htmlspecialchars($engagement['reviewer_name']) : '<span class="text-muted">Not assigned</span>'; ?></p>
+                    <p class="mb-2"><strong>Created by:</strong> <?php echo htmlspecialchars($engagement['created_by_name']); ?></p>
+                    <p class="mb-0"><strong>Assigned on:</strong> <?php echo date('M d, Y', strtotime($engagement['assigned_at'])); ?></p>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="info-card">
+                <h6 class="info-title">
+                    <i class="bi bi-lightning-charge me-2"></i>Quick Actions
+                </h6>
+                <div class="d-grid gap-2">
+                    <?php if ($engagement['status'] != 'CLOSED' && $engagement['status'] != 'SUBMITTED'): ?>
+                        <a href="engagements.php?source=update_status&id=<?php echo $engagement_id; ?>" class="btn btn-outline-warning">
+                            <i class="bi bi-arrow-repeat me-2"></i>Update Status
+                        </a>
+                        <a href="engagements.php?source=upload_evidence&id=<?php echo $engagement_id; ?>" class="btn btn-outline-success">
+                            <i class="bi bi-cloud-upload me-2"></i>Upload Evidence
+                        </a>
+                        <a href="engagements.php?source=request_deadline&id=<?php echo $engagement_id; ?>" class="btn btn-outline-primary">
+                            <i class="bi bi-calendar-plus me-2"></i>Request Deadline Change
+                        </a>
+                    <?php endif; ?>
+                    <button class="btn btn-outline-secondary" onclick="scrollToComments()">
+                        <i class="bi bi-chat me-2"></i>Add Comment
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header" style="background: #0a2240; color: #f1bf70;">
-                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Quick Info</h6>
+
+        <!-- Right Column - Details & Activity -->
+        <div class="col-lg-8">
+            <!-- Dates Card -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="date-card">
+                        <span class="date-label">Start Date</span>
+                        <span class="date-value"><?php echo date('M d, Y', strtotime($engagement['start_date'])); ?></span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <table class="table table-sm table-borderless">
-                        <tr>
-                            <td width="120" class="text-muted">Start Date:</td>
-                            <td><?php echo date('M d, Y', strtotime($eng['start_date'])); ?></td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Original Deadline:</td>
-                            <td><?php echo date('M d, Y', strtotime($eng['original_deadline'])); ?></td>
-                        </tr>
-                        <?php if ($eng['approved_deadline']): ?>
-                        <tr>
-                            <td class="text-muted">Approved Deadline:</td>
-                            <td class="text-success"><?php echo date('M d, Y', strtotime($eng['approved_deadline'])); ?></td>
-                        </tr>
-                        <?php endif; ?>
-                        <?php if ($eng['points_awarded']): ?>
-                        <tr>
-                            <td class="text-muted">Points Awarded:</td>
-                            <td><span class="badge bg-success"><?php echo $eng['points_awarded']; ?> pts</span></td>
-                        </tr>
-                        <?php endif; ?>
-                    </table>
+                <div class="col-md-4">
+                    <div class="date-card">
+                        <span class="date-label">Original Deadline</span>
+                        <span class="date-value"><?php echo date('M d, Y', strtotime($engagement['original_deadline'])); ?></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="date-card">
+                        <span class="date-label">Current Deadline</span>
+                        <span class="date-value <?php echo $engagement['approved_deadline'] ? 'text-success' : ''; ?>">
+                            <?php echo $engagement['approved_deadline'] ? date('M d, Y', strtotime($engagement['approved_deadline'])) . ' <i class="bi bi-check-circle-fill text-success" title="Approved change"></i>' : date('M d, Y', strtotime($engagement['original_deadline'])); ?>
+                        </span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Description -->
-    <?php if (!empty($eng['description'])): ?>
-    <div class="card shadow-sm mb-4">
-        <div class="card-header" style="background: #0a2240; color: #f1bf70;">
-            <h6 class="mb-0"><i class="bi bi-file-text me-2"></i>Description</h6>
-        </div>
-        <div class="card-body">
-            <p class="mb-0"><?php echo nl2br(htmlspecialchars($eng['description'])); ?></p>
-        </div>
-    </div>
-    <?php endif; ?>
-
-    <!-- Comments and Deadline Requests -->
-    <div class="row g-4 mb-4">
-        <!-- Comments -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background: #0a2240; color: #f1bf70;">
-                    <h6 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Comments</h6>
-                    <span class="badge bg-light text-dark"><?php echo count($comments); ?> total</span>
+            <!-- Service & Points Card -->
+            <div class="info-card mb-4">
+                <h6 class="info-title">
+                    <i class="bi bi-trophy me-2"></i>Service & Points (Version <?php echo $engagement['rule_version']; ?>)
+                </h6>
+                <div class="info-content">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Service:</strong> <?php echo htmlspecialchars($engagement['service_name']); ?></p>
+                            <p class="mb-0"><strong>Category:</strong> <span class="badge bg-info"><?php echo $engagement['service_category']; ?></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Base Points:</strong> <?php echo $engagement['base_points']; ?></p>
+                            <p class="mb-0"><strong>Rule Version:</strong> v<?php echo $engagement['rule_version']; ?></p>
+                        </div>
+                    </div>
+                    
+                    <div class="points-grid">
+                        <div class="points-tier">
+                            <span class="tier-label">On Time</span>
+                            <span class="tier-value"><?php echo $engagement['points_within_deadline']; ?></span>
+                        </div>
+                        <div class="points-tier">
+                            <span class="tier-label">5-15 Days</span>
+                            <span class="tier-value"><?php echo $engagement['points_tier_1']; ?></span>
+                        </div>
+                        <div class="points-tier">
+                            <span class="tier-label">16-25 Days</span>
+                            <span class="tier-value"><?php echo $engagement['points_tier_2']; ?></span>
+                        </div>
+                        <div class="points-tier">
+                            <span class="tier-label">>25 Days</span>
+                            <span class="tier-value"><?php echo $engagement['points_tier_3']; ?></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-                    <!-- Add Comment Form - FIXED: Added proper action and method -->
-                    <form id="addCommentForm" class="mb-3" method="post" action="">
-                        <input type="hidden" name="comment_submit" value="1">
+            </div>
+
+            <!-- Description -->
+            <?php if (!empty($engagement['description'])): ?>
+            <div class="info-card mb-4">
+                <h6 class="info-title">
+                    <i class="bi bi-file-text me-2"></i>Description
+                </h6>
+                <div class="info-content">
+                    <?php echo nl2br(htmlspecialchars($engagement['description'])); ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Assignment/Engagement Documents Section -->
+            <div class="info-card mb-4">
+                <h6 class="info-title">
+                    <i class="bi bi-folder2-open me-2"></i>Documents for This Engagement
+                </h6>
+                <div class="info-content">
+                    <?php if ($docs_result && mysqli_num_rows($docs_result) > 0): ?>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Description</th>
+                                        <th>Uploaded By</th>
+                                        <th>Type</th>
+                                        <th>Size</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while($doc = mysqli_fetch_assoc($docs_result)): ?>
+                                    <tr>
+                                        <td><strong><?php echo htmlspecialchars($doc['file_name']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars($doc['description']); ?></td>
+                                        <td>
+                                            <span class="badge bg-<?php echo $doc['uploaded_by'] === 'client' ? 'primary' : 'secondary'; ?>">
+                                                <?php echo ucfirst($doc['uploaded_by']); ?> 
+                                            </span>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($doc['file_type']); ?></td>
+                                        <td><?php echo $doc['file_size'] ? round($doc['file_size']/1024, 1) . ' KB' : '-'; ?></td>
+                                        <td><?php echo date('M d, Y H:i', strtotime($doc['uploaded_at'])); ?></td>
+                                        <td>
+                                            <a href="../../../../uploads/client_files/<?php echo rawurlencode($doc['file_path']); ?>" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted text-center mb-0">No documents uploaded for this engagement.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- All Client Documents Section -->
+            <div class="info-card mb-4">
+                <h6 class="info-title">
+                    <i class="bi bi-folder-symlink me-2"></i>All Documents Uploaded by This Client
+                </h6>
+                <div class="info-content">
+                    <?php if ($client_docs_result && mysqli_num_rows($client_docs_result) > 0): ?>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Description</th>
+                                        <th>Engagement</th>
+                                        <th>Uploaded By</th>
+                                        <th>Type</th>
+                                        <th>Size</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while($doc = mysqli_fetch_assoc($client_docs_result)): ?>
+                                    <tr>
+                                        <td><strong><?php echo htmlspecialchars($doc['file_name']); ?></strong></td>
+                                        <td><?php echo htmlspecialchars($doc['description']); ?></td>
+                                        <td>
+                                            <?php if ($doc['engagement_id']): ?>
+                                                <a href="view_engagement_details.php?id=<?php echo (int)$doc['engagement_id']; ?>">#<?php echo (int)$doc['engagement_id']; ?></a>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-<?php echo $doc['uploaded_by'] === 'client' ? 'primary' : 'secondary'; ?>">
+                                                <?php echo ucfirst($doc['uploaded_by']); ?> 
+                                            </span>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($doc['file_type']); ?></td>
+                                        <td><?php echo $doc['file_size'] ? round($doc['file_size']/1024, 1) . ' KB' : '-'; ?></td>
+                                        <td><?php echo date('M d, Y H:i', strtotime($doc['uploaded_at'])); ?></td>
+                                        <td>
+                                            <a href="../../../../uploads/client_files/<?php echo rawurlencode($doc['file_path']); ?>" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted text-center mb-0">No documents uploaded by this client.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Evidence Section -->
+            <div class="info-card mb-4">
+                <h6 class="info-title">
+                    <i class="bi bi-file-earmark me-2"></i>Evidence
+                    <a href="engagements.php?source=upload_evidence&id=<?php echo $engagement_id; ?>" class="btn btn-sm btn-success float-end">
+                        <i class="bi bi-cloud-upload me-1"></i>Upload
+                    </a>
+                </h6>
+                <div class="info-content">
+                    <?php if ($evidence_result && mysqli_num_rows($evidence_result) > 0): ?>
+                        <div class="evidence-list">
+                            <?php while($file = mysqli_fetch_assoc($evidence_result)): ?>
+                            <div class="evidence-item">
+                                <?php
+                                $ext = strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
+                                $icon = 'file-earmark';
+                                if ($ext == 'pdf') $icon = 'file-earmark-pdf';
+                                elseif (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) $icon = 'file-earmark-image';
+                                elseif (in_array($ext, ['doc', 'docx'])) $icon = 'file-earmark-word';
+                                ?>
+                                <i class="bi bi-<?php echo $icon; ?> file-icon"></i>
+                                <div class="file-info">
+                                    <span class="file-name"><?php echo htmlspecialchars($file['file_name']); ?></span>
+                                    <small class="text-muted">
+                                        Uploaded on <?php echo date('M d, Y H:i', strtotime($file['uploaded_at'])); ?>
+                                    </small>
+                                </div>
+                                <a href="../uploads/evidence/<?php echo $file['file_path']; ?>" class="btn btn-sm btn-outline-primary" download>
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </div>
+                            <?php endwhile; ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted text-center py-3">No evidence uploaded yet.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="info-card mb-4" id="commentsSection">
+                <h6 class="info-title">
+                    <i class="bi bi-chat me-2"></i>Comments
+                </h6>
+                <div class="info-content">
+                    <!-- Comment Form -->
+                    <form class="comment-form mb-3" onsubmit="return addComment(event, <?php echo $engagement_id; ?>);">
                         <div class="input-group">
-                            <input type="text" name="comment" id="commentInput" class="form-control" placeholder="Add a comment..." required maxlength="1000">
-                            <button class="btn btn-primary" type="submit" style="background: #f1bf70; border-color: #f1bf70; color: #0a2240;">
-                                <i class="bi bi-send me-1"></i>Post
+                            <input type="text" class="form-control" id="commentText" placeholder="Add a comment..." required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-send"></i>
                             </button>
                         </div>
                     </form>
                     
-                    <?php if (count($comments) > 0): ?>
-                        <div class="timeline">
-                            <?php foreach ($comments as $c): ?>
-                            <div class="communication-item mb-3">
-                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                    <div></div>
-                                    <small class="text-muted"><?php echo date('M d, Y H:i', strtotime($c['created_at'])); ?></small>
+                    <!-- Comments List -->
+                    <div class="comments-list" id="commentsList">
+                        <?php if ($comments_result && mysqli_num_rows($comments_result) > 0): ?>
+                            <?php while($comment = mysqli_fetch_assoc($comments_result)): ?>
+                            <div class="comment-item">
+                                <div class="d-flex justify-content-between">
+                                    <strong><?php echo htmlspecialchars($comment['user_name']); ?></strong>
+                                    <small class="text-muted"><?php echo date('M d, H:i', strtotime($comment['created_at'])); ?></small>
                                 </div>
-                                <p class="fw-bold text-primary mb-1" style="font-size: 1.08rem; color: #0a2240 !important;">
-                                    <?php echo htmlspecialchars($c['user_name']); ?>
-                                </p>
-                                <div class="bg-light p-2 rounded mt-1" style="font-size: 1.13rem; color: #222; font-weight: 500;">
-                                    <?php echo nl2br(htmlspecialchars($c['comment'])); ?>
-                                </div>
+                                <p class="mb-0 mt-1"><?php echo htmlspecialchars($comment['comment']); ?></p>
                             </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="text-center py-4">
-                            <i class="bi bi-chat display-4 text-muted"></i>
-                            <p class="text-muted mt-2">No comments yet. Start the conversation!</p>
-                        </div>
-                    <?php endif; ?>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <p class="text-muted text-center py-3">No comments yet. Start the conversation!</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Deadline Change Requests -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background: #0a2240; color: #f1bf70;">
-                    <h6 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Deadline Change Requests</h6>
-                    <span class="badge bg-light text-dark"><?php echo count($deadlines); ?> total</span>
-                </div>
-                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-                    <?php if (count($deadlines) > 0): ?>
-                        <div class="timeline">
-                            <?php foreach ($deadlines as $d): ?>
-                            <div class="deadline-item mb-3 p-3 rounded" style="background: #f8f9fa;">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge bg-<?php 
-                                        echo $d['status'] == 'APPROVED' ? 'success' : 
-                                            ($d['status'] == 'REJECTED' ? 'danger' : 'warning'); 
-                                    ?>"><?php echo $d['status']; ?></span>
-                                    <small class="text-muted"><?php echo date('M d, Y', strtotime($d['created_at'])); ?></small>
-                                </div>
-                                <p class="mb-2">
-                                    <strong>Requested Date:</strong> <?php echo date('M d, Y', strtotime($d['requested_date'])); ?>
-                                </p>
-                                <p class="small mb-1">
-                                    <i class="bi bi-person me-1"></i>By <?php echo htmlspecialchars($d['requested_by_name']); ?>
-                                </p>
-                                <p class="small mb-2">
-                                    <strong>Reason:</strong> <?php echo ucfirst($d['reason_code']); ?>
-                                    <?php if (!empty($d['reason_notes'])): ?>
-                                    <br><span class="text-muted">"<?php echo htmlspecialchars($d['reason_notes']); ?>"</span>
-                                    <?php endif; ?>
-                                </p>
-                                <?php if ($d['reviewed_by_name']): ?>
-                                <div class="border-top pt-2 mt-2 small text-muted">
-                                    <i class="bi bi-check-circle me-1"></i>
-                                    Reviewed by <?php echo htmlspecialchars($d['reviewed_by_name']); ?> 
-                                    on <?php echo date('M d, Y H:i', strtotime($d['reviewed_at'])); ?>
-                                    <?php if (!empty($d['review_notes'])): ?>
-                                    <br><span class="fst-italic">"<?php echo htmlspecialchars($d['review_notes']); ?>"</span>
-                                    <?php endif; ?>
-                                </div>
-                                <?php endif; ?>
+            <!-- Deadline Change Requests -->
+            <?php if ($requests_result && mysqli_num_rows($requests_result) > 0): ?>
+            <div class="info-card mb-4">
+                <h6 class="info-title">
+                    <i class="bi bi-calendar-plus me-2"></i>Deadline Change Requests
+                </h6>
+                <div class="info-content">
+                    <?php while($req = mysqli_fetch_assoc($requests_result)): 
+                        $status_class = 'warning';
+                        $status_text = 'Pending';
+                        if ($req['status'] == 'APPROVED') {
+                            $status_class = 'success';
+                            $status_text = 'Approved';
+                        } elseif ($req['status'] == 'REJECTED') {
+                            $status_class = 'danger';
+                            $status_text = 'Rejected';
+                        }
+                    ?>
+                    <div class="request-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>Requested: <?php echo date('M d, Y', strtotime($req['requested_date'])); ?></strong>
+                                <span class="badge bg-<?php echo $status_class; ?> ms-2"><?php echo $status_text; ?></span>
                             </div>
-                            <?php endforeach; ?>
+                            <small class="text-muted"><?php echo date('M d, Y', strtotime($req['created_at'])); ?></small>
                         </div>
-                    <?php else: ?>
-                        <div class="text-center py-4">
-                            <i class="bi bi-calendar-x display-4 text-muted"></i>
-                            <p class="text-muted mt-2">No deadline change requests</p>
-                        </div>
-                    <?php endif; ?>
+                        <p class="mb-0 mt-2"><strong>Reason:</strong> <?php echo ucfirst($req['reason_code']); ?></p>
+                        <?php if (!empty($req['reason_notes'])): ?>
+                            <p class="mb-0 text-muted small mt-1"><?php echo htmlspecialchars($req['reason_notes']); ?></p>
+                        <?php endif; ?>
+                    </div>
+                    <?php endwhile; ?>
                 </div>
             </div>
-        </div>
-    </div>
+            <?php endif; ?>
 
-    <!-- Files and Evidence -->
-    <div class="row g-4">
-        <!-- Client Files -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background: #0a2240; color: #f1bf70;">
-                    <h6 class="mb-0"><i class="bi bi-files me-2"></i>Files Uploaded</h6>
-                    <span class="badge bg-light text-dark"><?php echo count($files); ?> files</span>
-                </div>
-                <div class="card-body">
-                    <?php if (count($files) > 0): ?>
-                        <div class="list-group">
-                            <?php foreach ($files as $f): ?>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="bi bi-file-earmark me-2" style="color: #f1bf70;"></i>
-                                    <span><?php echo htmlspecialchars($f['file_name']); ?></span>
-                                    <span class="badge bg-<?php echo $f['uploaded_by'] == 'client' ? 'primary' : 'secondary'; ?> ms-2">
-                                        <?php echo ucfirst($f['uploaded_by']); ?>
-                                    </span>
-                                    <small class="text-muted d-block mt-1">
-                                        <i class="bi bi-calendar3 me-1"></i><?php echo date('M d, Y H:i', strtotime($f['uploaded_at'])); ?>
-                                    </small>
+            <!-- Status History -->
+            <div class="info-card">
+                <h6 class="info-title">
+                    <i class="bi bi-clock-history me-2"></i>Status History
+                </h6>
+                <div class="info-content">
+                    <?php if ($history_result && mysqli_num_rows($history_result) > 0): ?>
+                        <div class="history-timeline">
+                            <?php while($history = mysqli_fetch_assoc($history_result)): ?>
+                            <div class="history-item">
+                                <div class="history-badge">
+                                    <i class="bi bi-record-circle"></i>
                                 </div>
-                                <a href="../../uploads/client_files/<?php echo rawurlencode($f['file_path']); ?>" 
-                                   class="btn btn-sm" style="background: #f1bf70; color: #0a2240;" target="_blank">
-                                    <i class="bi bi-eye me-1"></i>View
-                                </a>
+                                <div class="history-content">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <strong>
+                                                <?php echo $history['old_status'] ?: 'New'; ?> 
+                                                <i class="bi bi-arrow-right mx-2"></i> 
+                                                <?php echo $history['new_status']; ?>
+                                            </strong>
+                                        </div>
+                                        <small class="text-muted"><?php echo date('M d, H:i', strtotime($history['changed_at'])); ?></small>
+                                    </div>
+                                    <p class="mb-0 small text-muted">
+                                        by <?php echo htmlspecialchars($history['changed_by_name']); ?>
+                                        <?php if (!empty($history['notes'])): ?>
+                                            <br><i class="bi bi-chat me-1"></i><?php echo htmlspecialchars($history['notes']); ?>
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
                             </div>
-                            <?php endforeach; ?>
+                            <?php endwhile; ?>
                         </div>
                     <?php else: ?>
-                        <div class="text-center py-4">
-                            <i class="bi bi-folder-x display-4 text-muted"></i>
-                            <p class="text-muted mt-2">No files uploaded</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Evidence -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background: #0a2240; color: #f1bf70;">
-                    <h6 class="mb-0"><i class="bi bi-file-earmark-check me-2"></i>Evidence Uploaded</h6>
-                    <span class="badge bg-light text-dark"><?php echo count($evidence); ?> items</span>
-                </div>
-                <div class="card-body">
-                    <?php if (count($evidence) > 0): ?>
-                        <div class="list-group">
-                            <?php foreach ($evidence as $ev): ?>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="bi bi-file-earmark-check me-2" style="color: #f1bf70;"></i>
-                                    <span><?php echo htmlspecialchars($ev['file_name']); ?></span>
-                                    <span class="badge bg-<?php 
-                                        echo $ev['status'] == 'APPROVED' ? 'success' : 
-                                            ($ev['status'] == 'REJECTED' ? 'danger' : 'warning'); 
-                                    ?> ms-2"><?php echo ucfirst($ev['status']); ?></span>
-                                    <small class="text-muted d-block mt-1">
-                                        <i class="bi bi-person me-1"></i>By <?php echo htmlspecialchars($ev['uploaded_by_name']); ?>
-                                        <br><i class="bi bi-calendar3 me-1"></i><?php echo date('M d, Y H:i', strtotime($ev['uploaded_at'])); ?>
-                                    </small>
-                                </div>
-                                <a href="../../uploads/evidence/<?php echo rawurlencode($ev['file_path']); ?>" 
-                                   class="btn btn-sm" style="background: #f1bf70; color: #0a2240;" target="_blank">
-                                    <i class="bi bi-eye me-1"></i>View
-                                </a>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="text-center py-4">
-                            <i class="bi bi-file-earmark-x display-4 text-muted"></i>
-                            <p class="text-muted mt-2">No evidence uploaded yet</p>
-                        </div>
+                        <p class="text-muted text-center py-3">No status history available.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -451,152 +586,357 @@ if ($days_remaining < 0) {
     </div>
 </div>
 
-<script>
-// Prevent form resubmission on page refresh
-if (window.history.replaceState) {
-    window.history.replaceState(null, null, window.location.href);
-}
-
-// Optional: Clear comment input after successful submission
-<?php if ($comment_submitted): ?>
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('commentInput').value = '';
-});
-<?php endif; ?>
-</script>
+<!-- Pro Tip Card -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="pro-tip-card">
+            <div class="row align-items-center">
+                <div class="col-md-9">
+                    <h6 class="text-white mb-2">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Engagement Tips
+                    </h6>
+                    <p class="text-white-50 small mb-md-0">
+                        ✅ Update status regularly to keep track of progress<br>
+                        ✅ Upload evidence immediately after completing tasks<br>
+                        ✅ Request deadline extensions early if needed<br>
+                        ✅ Add comments to communicate with team members
+                    </p>
+                </div>
+                <div class="col-md-3 text-md-end">
+                    <i class="bi bi-briefcase display-4 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <style>
-/* Theme Colors */
-:root {
-    --dark-blue: #0a2240;
-    --gold: #f1bf70;
+.status-banner {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 20px;
+    border-left: 4px solid;
+    border-left-color: <?php 
+        echo $engagement['status'] == 'IN_PROGRESS' ? '#0d6efd' : 
+            ($engagement['status'] == 'AWAITING_REVIEW' ? '#ffc107' : 
+            ($engagement['status'] == 'SUBMITTED' ? '#198754' : 
+            ($engagement['status'] == 'CLOSED' ? '#212529' : '#6c757d'))); 
+    ?>;
 }
 
-/* Page Title */
-.page-title {
-    color: var(--dark-blue);
+.points-awarded {
+    background: #d4edda;
+    border-radius: 12px;
+    padding: 10px 15px;
+    display: inline-block;
+}
+
+.points-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #155724;
+}
+
+.points-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #155724;
+    line-height: 1.2;
+}
+
+.info-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    height: fit-content;
+}
+
+.info-title {
+    font-size: 0.9rem;
     font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.info-content {
     margin-bottom: 0;
 }
 
-/* Breadcrumb */
-.breadcrumb {
-    background: transparent;
-    padding: 0;
-    margin-top: 8px;
-}
-.breadcrumb-item a {
-    color: var(--gold);
-    text-decoration: none;
-}
-.breadcrumb-item a:hover {
-    text-decoration: underline;
-}
-.breadcrumb-item.active {
-    color: #6c757d;
+.info-content p:last-child {
+    margin-bottom: 0;
 }
 
-/* Cards */
-.card {
-    border: none;
-    border-radius: 12px;
-    overflow: hidden;
-}
-.card.shadow-sm {
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-.card-header {
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 1rem 1.25rem;
-}
-.card-header h6 {
-    font-weight: 600;
-}
-
-/* Timeline Items */
-.communication-item, .deadline-item {
-    position: relative;
-    padding-left: 15px;
-}
-.communication-item:not(:last-child)::before,
-.deadline-item:not(:last-child)::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 24px;
-    bottom: -15px;
-    width: 2px;
-    background: var(--gold);
-    opacity: 0.3;
-}
-
-/* Badge Styles */
-.badge {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.6rem;
-    font-weight: 500;
-}
-
-/* List Group */
-.list-group-item {
-    border: 1px solid rgba(0,0,0,0.05);
-    margin-bottom: 8px;
-    border-radius: 8px !important;
-    transition: transform 0.2s;
-}
-.list-group-item:hover {
-    transform: translateX(5px);
+.date-card {
     background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-/* Buttons */
-.btn-outline-secondary {
-    border-color: var(--gold);
-    color: var(--dark-blue);
-}
-.btn-outline-secondary:hover {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: var(--dark-blue);
+.date-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 5px;
 }
 
-/* Primary Button */
-.btn-primary {
-    background: var(--gold) !important;
-    border-color: var(--gold) !important;
-    color: var(--dark-blue) !important;
+.date-value {
+    font-size: 1rem;
     font-weight: 600;
-}
-.btn-primary:hover {
-    background: #e5b465 !important;
-    border-color: #e5b465 !important;
+    color: #2c3e50;
 }
 
-/* Status Badges in Header */
-.badge.bg-primary { background: var(--dark-blue) !important; }
-.badge.bg-success { background: #28a745 !important; }
-.badge.bg-warning { background: #ffc107 !important; color: var(--dark-blue); }
-.badge.bg-danger { background: #dc3545 !important; }
-.badge.bg-info { background: #17a2b8 !important; }
-
-/* Links */
-a {
-    color: var(--gold);
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
+.points-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 15px;
 }
 
-/* Responsive */
+.points-tier {
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.tier-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.tier-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #f1bf70;
+}
+
+.evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.evidence-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.evidence-item .file-icon {
+    font-size: 1.3rem;
+    color: #f1bf70;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.comment-item {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.request-item {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.request-item:last-child {
+    margin-bottom: 0;
+}
+
+.history-timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.history-item {
+    position: relative;
+    margin-bottom: 15px;
+    display: flex;
+    gap: 15px;
+}
+
+.history-item:last-child {
+    margin-bottom: 0;
+}
+
+.history-badge {
+    position: absolute;
+    left: -20px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 2px solid #f1bf70;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f1bf70;
+    z-index: 1;
+}
+
+.history-content {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    margin-left: 10px;
+}
+
+.pro-tip-card {
+    background: linear-gradient(135deg, #2c3e50 0%, #1a2634 100%);
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+}
+
 @media (max-width: 768px) {
-    .page-title {
-        font-size: 1.5rem;
+    .points-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
-    .card-header {
-        flex-direction: column;
-        align-items: start !important;
-        gap: 10px;
+    
+    .status-banner .row {
+        gap: 15px;
+    }
+    
+    .points-awarded {
+        text-align: left;
     }
 }
 </style>
+
+<script>
+function addComment(event, engagementId) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    const commentTextInput = document.getElementById('commentText');
+    const commentText = commentTextInput.value.trim();
+    
+    if (!commentText) {
+        alert('Please enter a comment');
+        return false;
+    }
+    
+    // Disable the submit button to prevent multiple submissions
+    const submitBtn = event ? event.target.querySelector('button[type="submit"]') : document.querySelector('.comment-form button[type="submit"]');
+    if (!submitBtn) return false;
+    
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Sending...';
+    
+    fetch('includes/ajax/add_comment.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'engagement_id=' + engagementId + '&comment=' + encodeURIComponent(commentText)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Clear input
+            commentTextInput.value = '';
+            // Get the comments list container
+            const commentsList = document.getElementById('commentsList');
+            if (commentsList) {
+                // Create new comment element
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment-item';
+                commentDiv.style.opacity = '0';
+                commentDiv.style.transform = 'translateY(-10px)';
+                commentDiv.style.transition = 'all 0.3s ease';
+                const userName = data.user_name || 'You';
+                const dateString = data.created_at || new Date().toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                commentDiv.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <strong>${escapeHtml(userName)}</strong>
+                        <small class="text-muted">${escapeHtml(dateString)}</small>
+                    </div>
+                    <p class="mb-0 mt-1">${escapeHtml(commentText)}</p>
+                `;
+                // Remove 'No comments yet' message if present
+                const noComments = commentsList.querySelector('.text-muted.text-center');
+                if (noComments && noComments.innerText.includes('No comments yet')) {
+                    noComments.remove();
+                }
+                // Insert at the top of the list
+                commentsList.insertBefore(commentDiv, commentsList.firstChild);
+                // Animate the new comment
+                setTimeout(() => {
+                    commentDiv.style.opacity = '1';
+                    commentDiv.style.transform = 'translateY(0)';
+                }, 10);
+            }
+        } else {
+            alert('Error adding comment: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding comment. Please try again.');
+    })
+    .finally(() => {
+        // Re-enable the submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    });
+    
+    return false;
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function scrollToComments() {
+    var commentsSection = document.getElementById('commentsSection');
+    if (commentsSection) {
+        commentsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function() {
+            var commentInput = document.getElementById('commentText');
+            if (commentInput) commentInput.focus();
+        }, 400);
+    }
+}
+</script>

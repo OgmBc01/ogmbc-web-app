@@ -31,27 +31,40 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../../includes/database.php';
 header('Content-Type: application/json');
 
+// Check if user is logged in
+
+// Debug: Output session and POST info for troubleshooting
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Unauthorized',
+        'debug' => [
+            'session' => $_SESSION,
+            'post' => $_POST,
+            'cookies' => $_COOKIE,
+            'session_id' => session_id(),
+        ]
+    ]);
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
 
-if (!isset($_POST['engagement_id']) || !is_numeric($_POST['engagement_id']) || !isset($_POST['comment'])) {
-    echo json_encode(['success' => false, 'message' => 'Invalid request']);
+// Get POST data
+if (!isset($_POST['engagement_id']) || !is_numeric($_POST['engagement_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid engagement ID']);
+    exit;
+}
+
+if (!isset($_POST['comment']) || empty(trim($_POST['comment']))) {
+    echo json_encode(['success' => false, 'message' => 'Comment cannot be empty']);
     exit;
 }
 
 $engagement_id = (int)$_POST['engagement_id'];
 $comment = mysqli_real_escape_string($connection, trim($_POST['comment']));
 
-if (empty($comment)) {
-    echo json_encode(['success' => false, 'message' => 'Comment cannot be empty']);
-    exit;
-}
-
-// Verify engagement exists
+// Verify engagement exists (open to any logged-in user)
 $check_query = "SELECT engagement_id FROM engagements WHERE engagement_id = $engagement_id";
 $check_result = mysqli_query($connection, $check_query);
 
@@ -65,7 +78,21 @@ $insert_query = "INSERT INTO task_comments (engagement_id, user_id, comment, cre
                  VALUES ($engagement_id, $user_id, '$comment', NOW())";
 
 if (mysqli_query($connection, $insert_query)) {
-    echo json_encode(['success' => true, 'message' => 'Comment added successfully']);
+    // Get the user's name for the response
+    $user_query = "SELECT CONCAT(first_name, ' ', last_name) as user_name FROM users WHERE user_id = $user_id";
+    $user_result = mysqli_query($connection, $user_query);
+    $user_name = 'You';
+    if ($user_result && $row = mysqli_fetch_assoc($user_result)) {
+        $user_name = htmlspecialchars($row['user_name']);
+    }
+    
+    echo json_encode([
+        'success' => true, 
+        'message' => 'Comment added successfully',
+        'comment_id' => mysqli_insert_id($connection),
+        'user_name' => $user_name,
+        'created_at' => date('M d, H:i')
+    ]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($connection)]);
 }

@@ -9,6 +9,7 @@ $engagement_id = (int)$_GET['id'];
 $user_id = $_SESSION['user_id'];
 
 // Fetch engagement details and verify ownership
+
 $query = "SELECT 
     e.*,
     c.company_name,
@@ -36,11 +37,18 @@ $query = "SELECT
     LEFT JOIN users assigned ON e.assigned_to = assigned.user_id
     LEFT JOIN users reviewer ON e.reviewer_id = reviewer.user_id
     LEFT JOIN users creator ON e.created_by = creator.user_id
-    WHERE e.engagement_id = $engagement_id AND e.assigned_to = $user_id";
+    WHERE e.engagement_id = $engagement_id";
 
 $result = mysqli_query($connection, $query);
 
 if (!$result || mysqli_num_rows($result) == 0) {
+    // If this is an AJAX request, return a 403 and stop (no redirect)
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        http_response_code(403);
+        echo 'Forbidden';
+        exit();
+    }
+    // Otherwise, normal browser load: redirect
     echo "<script>window.location.href = 'engagements.php';</script>";
     exit();
 }
@@ -216,11 +224,7 @@ $overdue_days = abs($engagement['days_remaining']);
                         <?php echo htmlspecialchars($engagement['country']); ?>
                     </p>
                 </div>
-                <div class="info-actions mt-3">
-                    <button class="btn btn-sm btn-outline-success w-100" onclick="quickComm(<?php echo $engagement['client_id']; ?>, '<?php echo htmlspecialchars($engagement['company_name'], ENT_QUOTES); ?>')">
-                        <i class="bi bi-chat-dots me-1"></i>Quick Communication
-                    </button>
-                </div>
+                <!-- Quick Communication button removed -->
             </div>
 
             <!-- Assignment Card -->
@@ -477,13 +481,13 @@ $overdue_days = abs($engagement['days_remaining']);
             </div>
 
             <!-- Comments Section -->
-            <div class="info-card mb-4">
+            <div class="info-card mb-4" id="commentsSection">
                 <h6 class="info-title">
                     <i class="bi bi-chat me-2"></i>Comments
                 </h6>
                 <div class="info-content">
                     <!-- Comment Form -->
-                    <form class="comment-form mb-3" onsubmit="addComment(event, <?php echo $engagement_id; ?>)">
+                    <form class="comment-form mb-3" id="commentForm" onsubmit="return addComment(event, <?php echo $engagement_id; ?>)">
                         <div class="input-group">
                             <input type="text" class="form-control" id="commentText" placeholder="Add a comment..." required>
                             <button class="btn btn-primary" type="submit">
@@ -840,9 +844,28 @@ $overdue_days = abs($engagement['days_remaining']);
 
 <script>
 function addComment(event, engagementId) {
-    event.preventDefault();
-    const commentText = document.getElementById('commentText').value;
-    
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    const commentTextInput = document.getElementById('commentText');
+    const commentText = commentTextInput.value.trim();
+    if (!commentText) {
+        alert('Please enter a comment');
+        return false;
+    }
+    // Defensive: find the submit button
+    let submitBtn = null;
+    if (event && event.target) {
+        submitBtn = event.target.querySelector('button[type="submit"]');
+    }
+    if (!submitBtn) {
+        submitBtn = document.querySelector('.comment-form button[type="submit"]');
+    }
+    if (!submitBtn) return false;
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Sending...';
     fetch('includes/ajax/add_comment.php', {
         method: 'POST',
         headers: {
@@ -850,20 +873,71 @@ function addComment(event, engagementId) {
         },
         body: 'engagement_id=' + engagementId + '&comment=' + encodeURIComponent(commentText)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            // Clear input
-            document.getElementById('commentText').value = '';
-            
-            // Refresh comments list (simplified - reload page for now)
-            location.reload();
+            commentTextInput.value = '';
+            const commentsList = document.getElementById('commentsList');
+            if (commentsList) {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment-item';
+                commentDiv.style.opacity = '0';
+                commentDiv.style.transform = 'translateY(-10px)';
+                commentDiv.style.transition = 'all 0.3s ease';
+                const userName = data.user_name || 'You';
+                const dateString = data.created_at || new Date().toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                commentDiv.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <strong>${escapeHtml(userName)}</strong>
+                        <small class="text-muted">${escapeHtml(dateString)}</small>
+                    </div>
+                    <p class="mb-0 mt-1">${escapeHtml(commentText)}</p>
+                `;
+                const noComments = commentsList.querySelector('.text-muted.text-center');
+                if (noComments && noComments.innerText.includes('No comments yet')) {
+                    noComments.remove();
+                }
+                commentsList.insertBefore(commentDiv, commentsList.firstChild);
+                setTimeout(() => {
+                    commentDiv.style.opacity = '1';
+                    commentDiv.style.transform = 'translateY(0)';
+                }, 10);
+            }
         } else {
             alert('Error adding comment: ' + data.message);
         }
     })
     .catch(error => {
-        alert('Error adding comment');
+        console.error('Error:', error);
+        alert('Error adding comment. Please try again.');
+    })
+    .finally(() => {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
     });
+    return false;
 }
-</script>
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+window.scrollToComments = function() {
+    var commentsSection = document.getElementById('commentsSection');
+    if (commentsSection) {
+        commentsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function() {
+            var commentInput = document.getElementById('commentText');
+            if (commentInput) commentInput.focus();
+        }, 400);
+    }
+}

@@ -164,70 +164,76 @@ $satisfaction_rate = $feedback['total_feedback'] > 0
         <div class="row g-4 mb-4">
             <!-- Active Engagements Card -->
             <div class="col-xl-3 col-md-6">
-                <div class="stat-card">
-                    <div class="stat-card-body">
-                        <div class="stat-icon bg-primary-soft">
-                            <i class="bi bi-briefcase-fill text-primary"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value"><?php echo $active_stats['total'] ?? 0; ?></h3>
-                            <p class="stat-label">Active Engagements</p>
-                            <div class="stat-progress">
-                                <span class="badge bg-info-soft text-info me-2">
-                                    <i class="bi bi-play-circle me-1"></i><?php echo $active_stats['in_progress'] ?? 0; ?> In Progress
-                                </span>
-                                <span class="badge bg-warning-soft text-warning">
-                                    <i class="bi bi-clock me-1"></i><?php echo $active_stats['awaiting_review'] ?? 0; ?> Review
-                                </span>
+                <a href="engagements.php" class="stat-card-link">
+                    <div class="stat-card">
+                        <div class="stat-card-body">
+                            <div class="stat-icon bg-primary-soft">
+                                <i class="bi bi-briefcase-fill text-primary"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value"><?php echo $active_stats['total'] ?? 0; ?></h3>
+                                <p class="stat-label">Active Engagements</p>
+                                <div class="stat-progress">
+                                    <span class="badge bg-info-soft text-info me-2">
+                                        <i class="bi bi-play-circle me-1"></i><?php echo $active_stats['in_progress'] ?? 0; ?> In Progress
+                                    </span>
+                                    <span class="badge bg-warning-soft text-warning">
+                                        <i class="bi bi-clock me-1"></i><?php echo $active_stats['awaiting_review'] ?? 0; ?> Review
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- Points Card -->
             <div class="col-xl-3 col-md-6">
-                <div class="stat-card">
-                    <div class="stat-card-body">
-                        <div class="stat-icon bg-success-soft">
-                            <i class="bi bi-trophy-fill text-success"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value"><?php echo number_format($points['total_points']); ?></h3>
-                            <p class="stat-label">Total Points Earned</p>
-                            <div class="stat-progress">
-                                <span class="badge bg-success-soft text-success">
-                                    <i class="bi bi-calendar-check me-1"></i><?php echo number_format($points['month_points']); ?> This Month
-                                </span>
+                <a href="http://localhost:8010/operations/wallet.php" class="stat-card-link">
+                    <div class="stat-card">
+                        <div class="stat-card-body">
+                            <div class="stat-icon bg-success-soft">
+                                <i class="bi bi-trophy-fill text-success"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value"><?php echo number_format($points['total_points']); ?></h3>
+                                <p class="stat-label">Total Points Earned</p>
+                                <div class="stat-progress">
+                                    <span class="badge bg-success-soft text-success">
+                                        <i class="bi bi-calendar-check me-1"></i><?php echo number_format($points['month_points']); ?> This Month
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- CDP Records Card -->
             <div class="col-xl-3 col-md-6">
-                <div class="stat-card">
-                    <div class="stat-card-body">
-                        <div class="stat-icon bg-info-soft">
-                            <i class="bi bi-mortarboard-fill text-info"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-value"><?php echo $cdp_stats['total'] ?? 0; ?></h3>
-                            <p class="stat-label">CDP Records</p>
-                            <div class="stat-progress">
-                                <span class="badge bg-success-soft text-success me-2">
-                                    <i class="bi bi-check-circle me-1"></i><?php echo $cdp_stats['approved'] ?? 0; ?> Approved
-                                </span>
-                                <?php if (($cdp_stats['pending'] ?? 0) > 0): ?>
-                                <span class="badge bg-warning-soft text-warning">
-                                    <i class="bi bi-hourglass me-1"></i><?php echo $cdp_stats['pending']; ?> Pending
-                                </span>
-                                <?php endif; ?>
+                <a href="cdp.php" class="stat-card-link">
+                    <div class="stat-card">
+                        <div class="stat-card-body">
+                            <div class="stat-icon bg-info-soft">
+                                <i class="bi bi-mortarboard-fill text-info"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value"><?php echo $cdp_stats['total'] ?? 0; ?></h3>
+                                <p class="stat-label">CDP Records</p>
+                                <div class="stat-progress">
+                                    <span class="badge bg-success-soft text-success me-2">
+                                        <i class="bi bi-check-circle me-1"></i><?php echo $cdp_stats['approved'] ?? 0; ?> Approved
+                                    </span>
+                                    <?php if (($cdp_stats['pending'] ?? 0) > 0): ?>
+                                    <span class="badge bg-warning-soft text-warning">
+                                        <i class="bi bi-hourglass me-1"></i><?php echo $cdp_stats['pending']; ?> Pending
+                                    </span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- Performance Card -->
@@ -249,6 +255,19 @@ $satisfaction_rate = $feedback['total_feedback'] > 0
                     </div>
                 </div>
             </div>
+        <style>
+        .stat-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: box-shadow 0.2s;
+        }
+        .stat-card-link:focus .stat-card,
+        .stat-card-link:hover .stat-card {
+            box-shadow: 0 10px 30px rgba(10, 34, 64, 0.12);
+            transform: translateY(-3px);
+        }
+        </style>
         </div>
 
         <!-- Main Content Row -->
