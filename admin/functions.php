@@ -608,6 +608,7 @@ function insert_client() {
 }
 
 // Function to update existing client
+// Function to update existing client
 function update_client() {
     global $connection;
 
@@ -653,15 +654,6 @@ function update_client() {
             return;
         }
         
-        // Check if email exists (excluding current client)
-        $check_email = "SELECT client_id FROM clients WHERE contact_email = '$contact_email' AND client_id != $client_id";
-        $email_result = mysqli_query($connection, $check_email);
-        
-        if (mysqli_num_rows($email_result) > 0) {
-            $_SESSION['error_message'] = 'Email already exists. Please use another email.';
-            return;
-        }
-        
         // Update existing client
         $query = "UPDATE clients SET 
              company_name = '{$company_name}', 
@@ -695,7 +687,7 @@ function update_client() {
         }
     }
 }
-}
+// Note: Only ONE closing brace here - removed the extra one
 
 // Function to send welcome email with credentials
 function send_client_welcome_email($email, $company_name, $plain_password) {
@@ -956,5 +948,6 @@ function getDueDescription($payment_term, $installment) {
     ];
     
     return $descriptions[$payment_term] ?? "Payment $installment";
+    }
 }
 ?>
