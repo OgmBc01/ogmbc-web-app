@@ -662,7 +662,7 @@ if ($previous_period_stats['active_employees'] > 0) {
                             <i class="bi bi-list-ul me-2 text-primary"></i>
                             How Rankings Work
                         </h5>
-                        <a href="points_ledger.php" class="btn btn-sm btn-outline-primary">View Full Ledger</a>
+                        <a href="/operations/wallet.php" class="btn btn-sm btn-outline-primary">View Full Ledger</a>
                     </div>
                     <div class="card-body">
                         <div class="ranking-info">

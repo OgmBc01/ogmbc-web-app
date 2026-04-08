@@ -488,7 +488,7 @@ $satisfaction_rate = $feedback['total_feedback'] > 0
                                 Stay organized by uploading evidence as soon as tasks are completed.
                             <?php endif; ?>
                         </p>
-                        <a href="performance.php" class="btn btn-sm btn-light mt-2">
+                        <a href="wallet.php" class="btn btn-sm btn-light mt-2">
                             View Full Performance <i class="bi bi-arrow-right ms-1"></i>
                         </a>
                     </div>
