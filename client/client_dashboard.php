@@ -3,15 +3,28 @@ include 'includes/client_header.php';
 include 'includes/client_nav.php';
 include 'includes/client_sidebar.php';
 
-// Set client_id from session (user_id for clients)
-$client_id = $_SESSION['user_id'];
+
+// Get the logged-in user's client_id (not just user_id)
+$user_id = $_SESSION['user_id'];
+$client_id = null;
+// Lookup client_id from clients table using user_id
+$client_lookup = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = " . intval($user_id) . " LIMIT 1");
+if ($client_lookup && mysqli_num_rows($client_lookup) > 0) {
+    $client_row = mysqli_fetch_assoc($client_lookup);
+    $client_id = $client_row['client_id'];
+}
+if (!$client_id) {
+    // fallback: use user_id as client_id (legacy)
+    $client_id = $user_id;
+}
 $today = date('Y-m-d');
 
 // ============================================
 // DASHBOARD STATISTICS QUERIES
 // ============================================
 
-// 1. Active Engagements Count
+
+// 1. Active Engagements Count (for this client)
 $active_engagements_query = "SELECT 
     COUNT(*) as total,
     SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
@@ -21,17 +34,20 @@ $active_engagements_query = "SELECT
 $active_result = mysqli_query($connection, $active_engagements_query);
 $active_stats = mysqli_fetch_assoc($active_result) ?: ['total' => 0, 'in_progress' => 0, 'awaiting_review' => 0];
 
-// 2. Files Count
+
+// 2. Files Count (for this client)
 $files_query = "SELECT COUNT(*) as total FROM client_files WHERE client_id = $client_id";
 $files_result = mysqli_query($connection, $files_query);
 $files_count = mysqli_fetch_assoc($files_result)['total'] ?? 0;
 
-// 3. Unread Notifications
+
+// 3. Unread Notifications (for this client)
 $notifications_query = "SELECT COUNT(*) as total FROM client_notifications WHERE client_id = $client_id AND is_read = 0";
 $notifications_result = mysqli_query($connection, $notifications_query);
 $unread_notifications = mysqli_fetch_assoc($notifications_result)['total'] ?? 0;
 
-// 4. Recent Activity
+
+// 4. Recent Activity (for this client)
 $activity_query = "SELECT 
     'engagement' as type,
     e.title as description,
@@ -63,7 +79,8 @@ $activity_query = "SELECT
     LIMIT 10";
 $activity_result = mysqli_query($connection, $activity_query);
 
-// 5. Engagement Status Distribution
+
+// 5. Engagement Status Distribution (for this client)
 $status_query = "SELECT 
     status,
     COUNT(*) as count
@@ -72,7 +89,8 @@ $status_query = "SELECT
     GROUP BY status";
 $status_result = mysqli_query($connection, $status_query);
 
-// 6. Monthly Engagement Trends (Last 6 months)
+
+// 6. Monthly Engagement Trends (Last 6 months, for this client)
 $monthly_query = "SELECT 
     DATE_FORMAT(created_at, '%Y-%m') as month,
     COUNT(*) as count
@@ -83,7 +101,8 @@ $monthly_query = "SELECT
     ORDER BY month ASC";
 $monthly_result = mysqli_query($connection, $monthly_query);
 
-// 7. Upcoming Deadlines (Next 5)
+
+// 7. Upcoming Deadlines (Next 5, for this client)
 $upcoming_query = "SELECT 
     e.engagement_id,
     e.title,
@@ -97,7 +116,8 @@ $upcoming_query = "SELECT
     LIMIT 5";
 $upcoming_result = mysqli_query($connection, $upcoming_query);
 
-// 8. Team Members (Assigned Staff)
+
+// 8. Team Members (Assigned Staff, for this client)
 $team_query = "SELECT DISTINCT 
     u.user_id, 
     u.first_name, 
@@ -114,14 +134,16 @@ $team_query = "SELECT DISTINCT
     LIMIT 4";
 $team_result = mysqli_query($connection, $team_query);
 
-// 9. Recent Files
+
+// 9. Recent Files (for this client)
 $recent_files_query = "SELECT * FROM client_files 
                        WHERE client_id = $client_id 
                        ORDER BY uploaded_at DESC 
                        LIMIT 5";
 $recent_files_result = mysqli_query($connection, $recent_files_query);
 
-// 10. Client Info
+
+// 10. Client Info (for this client)
 $client_info_query = "SELECT * FROM clients WHERE client_id = $client_id";
 $client_info_result = mysqli_query($connection, $client_info_query);
 $client_info = mysqli_fetch_assoc($client_info_result);
@@ -340,12 +362,15 @@ $current_year = date('Y');
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div>
                                                 <h6 class="task-title">
-                                                    <a href="view_engagement.php?id=<?php echo $task['engagement_id']; ?>" class="text-decoration-none">
+                                                    <a href="engagements.php?source=view_details&id=<?php echo $task['engagement_id']; ?>" class="text-decoration-none">
                                                         <?php echo htmlspecialchars($task['title']); ?>
                                                     </a>
                                                 </h6>
                                                 <p class="task-client">
-                                                    <i class="bi bi-tag me-1"></i>Engagement #<?php echo $task['engagement_id']; ?>
+                                                    <i class="bi bi-tag me-1"></i>
+                                                    <a href="engagements.php?source=view_details&id=<?php echo $task['engagement_id']; ?>" class="text-decoration-underline">
+                                                        ENG-<?php echo date('dmy', strtotime($task['deadline'])); ?>-<?php echo $task['engagement_id']; ?>
+                                                    </a>
                                                 </p>
                                             </div>
                                             <span class="badge bg-<?php echo $status_class; ?>"><?php echo $task['status']; ?></span>
@@ -743,6 +768,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 /* Statistics Cards */
+
 .stat-card {
     background: white;
     border-radius: 20px;
@@ -751,6 +777,11 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: all 0.3s ease;
     border: 1px solid rgba(0, 0, 0, 0.05);
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    min-width: 0;
 }
 
 .stat-card:hover {
@@ -763,6 +794,10 @@ document.addEventListener('DOMContentLoaded', function() {
     display: flex;
     align-items: center;
     gap: 20px;
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    overflow: hidden;
 }
 
 .stat-icon {
@@ -781,7 +816,9 @@ document.addEventListener('DOMContentLoaded', function() {
 .stat-icon.bg-info-soft { background: rgba(13, 202, 240, 0.1); }
 
 .stat-content {
-    flex: 1;
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .stat-value {
@@ -790,18 +827,26 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-bottom: 2px;
     line-height: 1.2;
     color: var(--dark-blue);
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .stat-label {
     color: #6c757d;
     margin-bottom: 5px;
     font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .stat-progress {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 /* Dashboard Cards */
@@ -815,6 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
     min-height: 320px;
     display: flex;
     flex-direction: column;
+    padding-bottom: 24px; /* Added for extra space at bottom */
 }
 
 .card-header {

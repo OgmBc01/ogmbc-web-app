@@ -194,7 +194,6 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                         <div class="mb-2">
                             <strong>Assigned to:</strong><br>
                             <?php echo htmlspecialchars($eng['assigned_to_name']); ?>
-                            <small class="text-muted">(<?php echo ucfirst($eng['assigned_role'] ?? 'Staff'); ?>)</small>
                         </div>
                         
                         <div class="mb-2">
@@ -214,9 +213,9 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                     </div>
                     <div class="card-footer bg-transparent">
                         <div class="btn-group w-100">
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewEngagement(<?php echo $eng['engagement_id']; ?>)">
+                            <a href="engagements.php?source=view_details&id=<?php echo $eng['engagement_id']; ?>" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-eye"></i> Details
-                            </button>
+                            </a>
                             <?php if ($is_active): ?>
                             <a href="engagements.php?source=upload_file&id=<?php echo $eng['engagement_id']; ?>" class="btn btn-sm btn-outline-success">
                                 <i class="bi bi-cloud-upload"></i> Upload

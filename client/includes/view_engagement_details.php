@@ -1,14 +1,10 @@
 <?php
-// Check if ID is provided
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    echo "<script>window.location.href = 'engagements.php';</script>";
-    exit();
-}
+
 
 $engagement_id = (int)$_GET['id'];
-$user_id = $_SESSION['user_id'];
+$client_id = $_SESSION['client_id'] ?? null;
 
-// Fetch engagement details and verify ownership
+// Fetch engagement details and verify client ownership
 $query = "SELECT 
     e.*,
     c.company_name,
@@ -36,7 +32,7 @@ $query = "SELECT
     LEFT JOIN users assigned ON e.assigned_to = assigned.user_id
     LEFT JOIN users reviewer ON e.reviewer_id = reviewer.user_id
     LEFT JOIN users creator ON e.created_by = creator.user_id
-    WHERE e.engagement_id = $engagement_id AND e.assigned_to = $user_id";
+    WHERE e.engagement_id = $engagement_id AND e.client_id = $client_id";
 
 $result = mysqli_query($connection, $query);
 

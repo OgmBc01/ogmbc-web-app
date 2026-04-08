@@ -13,14 +13,6 @@ $client_id = $_SESSION['client_id'];
 
 <div class="main-content" id="mainContent">
     <div class="container-fluid">
-        <!-- Breadcrumb Navigation -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item active">My Engagements</li>
-            </ol>
-        </nav>
-
         <div class="row">
             <div class="col-md-12">
                 <?php
@@ -43,7 +35,7 @@ $client_id = $_SESSION['client_id'];
                     default:
                         include "includes/view_engagements.php";
                         break;
-                }
+                    }
                 ?>
             </div>
         </div>
