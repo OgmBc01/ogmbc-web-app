@@ -208,6 +208,7 @@ $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
                         <tr class="table-dark">
                             <th>Engagement ID</th>
                             <th>Client</th>
+                            <th>Assignment</th>
                             <th>Assigned To</th>
                             <th>Start Date</th>
                             <th>Deadline</th>
@@ -249,10 +250,12 @@ $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
                         $query = "SELECT e.*, 
                                  c.company_name,
                                  CONCAT(u.first_name, ' ', u.last_name) as assigned_to_name,
+                                 st.service_name,
                                  DATEDIFF(CURDATE(), COALESCE(e.approved_deadline, e.original_deadline)) as days_overdue
                                  FROM engagements e
                                  LEFT JOIN clients c ON e.client_id = c.client_id
                                  LEFT JOIN users u ON e.assigned_to = u.user_id
+                                 LEFT JOIN service_types st ON e.service_id = st.service_id
                                  $where_clause
                                  ORDER BY e.created_at DESC";
                         
@@ -301,6 +304,7 @@ $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
                                         <?php endif; ?>
                                     </td>
                                     <td><?php echo htmlspecialchars($engagement['company_name'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($engagement['service_name'] ?? ''); ?></td>
                                     <td><?php echo htmlspecialchars($engagement['assigned_to_name'] ?? ''); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($engagement['start_date'])); ?></td>
                                     <td>
