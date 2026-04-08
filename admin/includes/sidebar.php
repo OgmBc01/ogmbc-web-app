@@ -33,7 +33,6 @@
     // Determine if user is manager (role_id = 2)
     $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
     ?>
-    
 
     <ul class="nav flex-column">
         <!-- Dashboard - Visible to all -->

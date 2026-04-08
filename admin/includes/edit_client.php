@@ -61,16 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_client'])) {
             // FOURTH: Check for duplicate contact mobile (excluding current client)
             // ============================================
             else {
-                $mobile_check = "SELECT client_id FROM clients WHERE contact_mobile = '$contact_mobile_check' AND client_id != $client_id";
-                $mobile_result = mysqli_query($connection, $mobile_check);
-                if (mysqli_num_rows($mobile_result) > 0) {
-                    $message = "A client with the mobile number '$contact_mobile_check' already exists. Please use a different number.";
-                    $message_type = "danger";
-                }
                 // ============================================
                 // FIFTH: Validate email format
                 // ============================================
-                elseif (!filter_var($contact_email_check, FILTER_VALIDATE_EMAIL)) {
+                if (!filter_var($contact_email_check, FILTER_VALIDATE_EMAIL)) {
                     $message = "Please enter a valid email address.";
                     $message_type = "danger";
                 }

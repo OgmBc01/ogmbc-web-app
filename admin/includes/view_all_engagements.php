@@ -72,6 +72,23 @@ $overdue = mysqli_fetch_assoc($overdue_result);
 ?>
 
 <div class="container-fluid">
+
+<?php
+// Get current user's role for access control (same logic as sidebar.php)
+$current_user_id = $_SESSION['user_id'] ?? 0;
+$user_role_id = null;
+$user_role_name = null;
+if ($current_user_id > 0) {
+    $role_query = "SELECT r.role_id, r.role_name FROM users u LEFT JOIN user_roles r ON u.role_id = r.role_id WHERE u.user_id = $current_user_id";
+    $role_result = mysqli_query($connection, $role_query);
+    if ($role_result && mysqli_num_rows($role_result) > 0) {
+        $user_role = mysqli_fetch_assoc($role_result);
+        $user_role_id = $user_role['role_id'];
+        $user_role_name = $user_role['role_name'];
+    }
+}
+$is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
+?>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="page-title">Engagement Management</h1>
         <div>
@@ -315,9 +332,11 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                                                 <i class="bi bi-calendar-plus"></i>
                                             </a>
                                         <?php endif; ?>
-                                        <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $engagement['engagement_id']; ?>, '<?php echo htmlspecialchars($engagement['title'], ENT_QUOTES); ?>')" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                            <?php if (!$is_manager): ?>
+                                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $engagement['engagement_id']; ?>, '<?php echo htmlspecialchars($engagement['title'], ENT_QUOTES); ?>')" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                            <?php endif; ?>
                                     </td>
                                 </tr>
                                 <?php

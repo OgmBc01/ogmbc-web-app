@@ -30,6 +30,23 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
 ?>
 
 <div class="container-fluid">
+
+<?php
+// Get current user's role for access control (same logic as sidebar.php)
+$current_user_id = $_SESSION['user_id'] ?? 0;
+$user_role_id = null;
+$user_role_name = null;
+if ($current_user_id > 0) {
+    $role_query = "SELECT r.role_id, r.role_name FROM users u LEFT JOIN user_roles r ON u.role_id = r.role_id WHERE u.user_id = $current_user_id";
+    $role_result = mysqli_query($connection, $role_query);
+    if ($role_result && mysqli_num_rows($role_result) > 0) {
+        $user_role = mysqli_fetch_assoc($role_result);
+        $user_role_id = $user_role['role_id'];
+        $user_role_name = $user_role['role_name'];
+    }
+}
+$is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
+?>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="page-title">User Management</h1>
         <div>
@@ -264,13 +281,17 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
                                             $edit_link = 'users.php?source=edit_user&id=' . $user['user_id'];
                                         }
                                         ?>
+                                        <?php if (!$is_manager): ?>
                                         <a href="<?php echo $edit_link; ?>" class="btn btn-sm btn-warning" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        <?php endif; ?>
                                         <?php if ($user['user_id'] != $_SESSION['user_id']): ?>
-                                        <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $user['user_id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                            <?php if (!$is_manager): ?>
+                                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $user['user_id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -305,9 +326,11 @@ $type_stats_result = mysqli_query($connection, $type_stats_query);
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <?php if (!$is_manager): ?>
                 <a href="#" id="editUserBtn" class="btn btn-primary" style="background: #f1bf70; border-color: #f1bf70; color: #0a2240;">
                     <i class="bi bi-pencil me-1"></i>Edit User
                 </a>
+                <?php endif; ?>
             </div>
         </div>
     </div>
