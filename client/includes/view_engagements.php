@@ -397,13 +397,13 @@ if (!empty($client_ids)) {
         font-size: 1.4rem;
     }
 }
-</style>
 
 /* Gold company link hover */
 .company-link:hover {
     color: #c89a3c;
     text-decoration: underline;
 }
+</style>
 
 <script>
 // Filter engagements by status

@@ -140,14 +140,22 @@ ob_end_flush();
 
 
             <!-- Status Banner -->
-            <div class="alert alert-<?php 
-                echo $engagement['status'] == 'CLOSED' ? 'success' : 
-                    ($engagement['status'] == 'SUBMITTED' ? 'info' : 
-                    ($engagement['status'] == 'AWAITING_REVIEW' ? 'warning' : 
-                    ($engagement['status'] == 'REJECTED' ? 'danger' : 'primary'))); 
+            <div class="alert <?php
+                if ($engagement['status'] == 'CLOSED') echo 'alert-success';
+                elseif ($engagement['status'] == 'SUBMITTED') echo 'alert-info';
+                elseif ($engagement['status'] == 'AWAITING_REVIEW') echo 'alert-warning';
+                elseif ($engagement['status'] == 'REJECTED' || $engagement['status'] == 'EVIDENCE_REJECTED') echo 'alert-danger evidence-rejected-banner';
+                elseif ($engagement['status'] == 'EVIDENCE_APPROVED') echo 'alert-success evidence-approved-banner';
+                else echo 'alert-primary';
             ?> d-flex justify-content-between align-items-center">
                 <div>
-                    <strong>Status:</strong> <?php echo $engagement['status']; ?>
+                    <strong>Status:</strong> 
+                    <span class="status-badge 
+                        <?php if ($engagement['status'] == 'EVIDENCE_APPROVED') echo 'evidence-approved'; ?>
+                        <?php if ($engagement['status'] == 'EVIDENCE_REJECTED') echo 'evidence-rejected'; ?>
+                    ">
+                        <?php echo str_replace('_', ' ', $engagement['status']); ?>
+                    </span>
                     <?php if ($engagement['days_overdue'] > 0 && $engagement['status'] != 'CLOSED'): ?>
                         <span class="badge bg-danger ms-2">Overdue by <?php echo $engagement['days_overdue']; ?> days</span>
                     <?php endif; ?>
@@ -527,6 +535,36 @@ ob_end_flush();
     background: #e5b465;
 }
 </style>
+
+/* Evidence status custom styles */
+.evidence-approved-banner {
+    background: #e6f9ed !important;
+    color: #198754 !important;
+    border-color: #b6f2d2 !important;
+}
+.evidence-rejected-banner {
+    background: #fdeaea !important;
+    color: #dc3545 !important;
+    border-color: #f5bcbc !important;
+}
+.status-badge.evidence-approved {
+    background: #198754;
+    color: #fff;
+    border-radius: 6px;
+    padding: 2px 10px;
+    margin-left: 4px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.status-badge.evidence-rejected {
+    background: #dc3545;
+    color: #fff;
+    border-radius: 6px;
+    padding: 2px 10px;
+    margin-left: 4px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
 
             <!-- Evidence Section -->
                         <!-- Assignment/Engagement Documents Section -->

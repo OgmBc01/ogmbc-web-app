@@ -56,25 +56,40 @@ $reason_sql = $reason ? ("'" . mysqli_real_escape_string($connection, $reason) .
 $hist = "INSERT INTO evidence_approval_history (evidence_id, action, reviewed_by, reviewed_at, reason) VALUES ($evidence_id, '$action', $user_id, '$now', $reason_sql)";
 mysqli_query($connection, $hist);
 
+
 $msg = $action === 'APPROVED' ? 'Evidence approved successfully!' : 'Evidence rejected.';
+$engagement_id = (int)$evidence['engagement_id'];
+
+// Update engagement status to EVIDENCE_APPROVED or EVIDENCE_REJECTED if not already CLOSED or SUBMITTED
+$get_status_q = "SELECT status FROM engagements WHERE engagement_id = $engagement_id";
+$get_status_r = mysqli_query($connection, $get_status_q);
+$eng = mysqli_fetch_assoc($get_status_r);
+if ($eng && !in_array($eng['status'], ['CLOSED','SUBMITTED'])) {
+    $old_status = $eng['status'];
+    $new_status = ($action === 'APPROVED') ? 'EVIDENCE_APPROVED' : 'EVIDENCE_REJECTED';
+    $update_eng = "UPDATE engagements SET status = '$new_status' WHERE engagement_id = $engagement_id";
+    mysqli_query($connection, $update_eng);
+    $history_query = "INSERT INTO engagement_status_history (engagement_id, old_status, new_status, changed_by, notes) VALUES ($engagement_id, '" . mysqli_real_escape_string($connection, $old_status) . "', '$new_status', $user_id, 'Evidence $action by reviewer.')";
+    mysqli_query($connection, $history_query);
+}
+
 // If evidence was approved, check if all required evidence for this engagement is now approved
 if ($action === 'APPROVED') {
-    $engagement_id = (int)$evidence['engagement_id'];
     // Check if all evidence for this engagement is approved
     $all_approved_q = "SELECT COUNT(*) as total, SUM(status='APPROVED') as approved FROM evidence WHERE engagement_id = $engagement_id";
     $all_approved_r = mysqli_query($connection, $all_approved_q);
     $row = mysqli_fetch_assoc($all_approved_r);
     if ($row && $row['total'] > 0 && $row['total'] == $row['approved']) {
         // All evidence approved, update engagement status if not already SUBMITTED
-        $get_status_q = "SELECT status FROM engagements WHERE engagement_id = $engagement_id";
-        $get_status_r = mysqli_query($connection, $get_status_q);
-        $eng = mysqli_fetch_assoc($get_status_r);
-        if ($eng && $eng['status'] != 'SUBMITTED') {
-            $old_status = $eng['status'];
-            $update_eng = "UPDATE engagements SET status = 'SUBMITTED' WHERE engagement_id = $engagement_id";
-            mysqli_query($connection, $update_eng);
-            $history_query = "INSERT INTO engagement_status_history (engagement_id, old_status, new_status, changed_by, notes) VALUES ($engagement_id, '" . mysqli_real_escape_string($connection, $old_status) . "', 'SUBMITTED', $user_id, 'All evidence approved, engagement auto-submitted.')";
-            mysqli_query($connection, $history_query);
+        $get_status_q2 = "SELECT status FROM engagements WHERE engagement_id = $engagement_id";
+        $get_status_r2 = mysqli_query($connection, $get_status_q2);
+        $eng2 = mysqli_fetch_assoc($get_status_r2);
+        if ($eng2 && $eng2['status'] != 'SUBMITTED') {
+            $old_status2 = $eng2['status'];
+            $update_eng2 = "UPDATE engagements SET status = 'SUBMITTED' WHERE engagement_id = $engagement_id";
+            mysqli_query($connection, $update_eng2);
+            $history_query2 = "INSERT INTO engagement_status_history (engagement_id, old_status, new_status, changed_by, notes) VALUES ($engagement_id, '" . mysqli_real_escape_string($connection, $old_status2) . "', 'SUBMITTED', $user_id, 'All evidence approved, engagement auto-submitted.')";
+            mysqli_query($connection, $history_query2);
         }
     }
 }
