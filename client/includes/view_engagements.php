@@ -3,22 +3,30 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Check if user is logged in as client
-if (!isset($_SESSION['client_id'])) {
+
+// Check if user is logged in as client (using user_id)
+if (!isset($_SESSION['user_id'])) {
     // Debug: Check what's in session
     echo "<!-- Debug: Session content: " . print_r($_SESSION, true) . " -->";
     header("Location: ../login.php");
     exit();
 }
 
-$client_id = (int)$_SESSION['client_id'];
+$user_id = (int)$_SESSION['user_id'];
+// Debug: Output user ID
+echo "<!-- Debug: User ID from session: " . $user_id . " -->";
 
-// Debug: Output client ID
-echo "<!-- Debug: Client ID from session: " . $client_id . " -->";
+// Get all client_ids for this user
+$client_ids = [];
+$client_result = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = $user_id");
+while ($row = mysqli_fetch_assoc($client_result)) {
+    $client_ids[] = $row['client_id'];
+}
 
-// Get all engagements for this client
-
-$query = "SELECT e.*, 
+if (!empty($client_ids)) {
+    $client_ids_str = implode(',', array_map('intval', $client_ids));
+    // Get all engagements for these client_ids
+    $query = "SELECT e.*, 
                     s.service_name,
                     c.company_name,
                     CONCAT(u.first_name, ' ', u.last_name) as assigned_to_name,
@@ -31,7 +39,7 @@ $query = "SELECT e.*,
                     JOIN clients c ON e.client_id = c.client_id
                     LEFT JOIN users u ON e.assigned_to = u.user_id
                     LEFT JOIN user_roles r ON u.role_id = r.role_id
-                    WHERE e.client_id = $client_id
+                    WHERE e.client_id IN ($client_ids_str)
                     ORDER BY 
                         CASE e.status 
                                 WHEN 'IN_PROGRESS' THEN 1
@@ -42,39 +50,40 @@ $query = "SELECT e.*,
                                 ELSE 6
                         END,
                         e.created_at DESC";
-
-// Debug: Output query
-echo "<!-- Debug: Query: " . $query . " -->";
-
-$result = mysqli_query($connection, $query);
-
-// Debug: Check if query executed
-if (!$result) {
-    echo "<!-- Debug: Query failed: " . mysqli_error($connection) . " -->";
+    // Debug: Output query
+    echo "<!-- Debug: Query: " . $query . " -->";
+    $result = mysqli_query($connection, $query);
+    // Debug: Check if query executed
+    if (!$result) {
+        echo "<!-- Debug: Query failed: " . mysqli_error($connection) . " -->";
+    } else {
+        echo "<!-- Debug: Query returned " . mysqli_num_rows($result) . " rows -->";
+    }
+    // Get statistics
+    $stats_query = "SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
+                    SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
+                    SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned,
+                    SUM(CASE WHEN status = 'CLOSED' THEN 1 ELSE 0 END) as closed,
+                    SUM(CASE WHEN status = 'SUBMITTED' THEN 1 ELSE 0 END) as submitted
+                    FROM engagements 
+                    WHERE client_id IN ($client_ids_str)";
+    $stats_result = mysqli_query($connection, $stats_query);
+    $stats = mysqli_fetch_assoc($stats_result);
+    // Get overdue count
+    $overdue_query = "SELECT COUNT(*) as overdue FROM engagements 
+                      WHERE client_id IN ($client_ids_str)
+                      AND status NOT IN ('CLOSED', 'SUBMITTED')
+                      AND COALESCE(approved_deadline, original_deadline) < CURDATE()";
+    $overdue_result = mysqli_query($connection, $overdue_query);
+    $overdue = mysqli_fetch_assoc($overdue_result);
 } else {
-    echo "<!-- Debug: Query returned " . mysqli_num_rows($result) . " rows -->";
+    // No companies for this user
+    $result = false;
+    $stats = [ 'total' => 0, 'in_progress' => 0, 'awaiting_review' => 0, 'assigned' => 0, 'closed' => 0, 'submitted' => 0 ];
+    $overdue = [ 'overdue' => 0 ];
 }
-
-// Get statistics
-$stats_query = "SELECT 
-                COUNT(*) as total,
-                SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
-                SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
-                SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned,
-                SUM(CASE WHEN status = 'CLOSED' THEN 1 ELSE 0 END) as closed,
-                SUM(CASE WHEN status = 'SUBMITTED' THEN 1 ELSE 0 END) as submitted
-                FROM engagements 
-                WHERE client_id = $client_id";
-$stats_result = mysqli_query($connection, $stats_query);
-$stats = mysqli_fetch_assoc($stats_result);
-
-// Get overdue count
-$overdue_query = "SELECT COUNT(*) as overdue FROM engagements 
-                  WHERE client_id = $client_id
-                  AND status NOT IN ('CLOSED', 'SUBMITTED')
-                  AND COALESCE(approved_deadline, original_deadline) < CURDATE()";
-$overdue_result = mysqli_query($connection, $overdue_query);
-$overdue = mysqli_fetch_assoc($overdue_result);
 ?>
 
 <!-- Debug output (remove in production) -->

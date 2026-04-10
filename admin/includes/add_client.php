@@ -46,40 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_client'])) {
             $message_type = "danger";
         }
         // ============================================
-        // THIRD: Check for duplicate contact email
+        // THIRD: Validate email format
+        // ============================================
+        elseif (!filter_var($contact_email_check, FILTER_VALIDATE_EMAIL)) {
+            $message = "Please enter a valid email address.";
+            $message_type = "danger";
+        }
+        // ============================================
+        // FOURTH: All validations passed - call insert function
         // ============================================
         else {
-            $email_check = "SELECT client_id FROM clients WHERE contact_email = '$contact_email_check'";
-            $email_result = mysqli_query($connection, $email_check);
-            if (mysqli_num_rows($email_result) > 0) {
-                $message = "A client with the email '$contact_email_check' already exists. Please use a different email.";
-                $message_type = "danger";
-            }
-            // ============================================
-            // FOURTH: Check for duplicate contact mobile
-            // ============================================
-            else {
-                $mobile_check = "SELECT client_id FROM clients WHERE contact_mobile = '$contact_mobile_check'";
-                $mobile_result = mysqli_query($connection, $mobile_check);
-                if (mysqli_num_rows($mobile_result) > 0) {
-                    $message = "A client with the mobile number '$contact_mobile_check' already exists. Please use a different number.";
-                    $message_type = "danger";
-                }
-                // ============================================
-                // FIFTH: Validate email format
-                // ============================================
-                elseif (!filter_var($contact_email_check, FILTER_VALIDATE_EMAIL)) {
-                    $message = "Please enter a valid email address.";
-                    $message_type = "danger";
-                }
-                // ============================================
-                // SIXTH: All validations passed - call insert function
-                // ============================================
-                else {
-                    // Call insert_client AFTER validation
-                    insert_client();
-                }
-            }
+            // Call insert_client AFTER validation
+            insert_client();
         }
     }
 }
