@@ -17,28 +17,31 @@ $client_id = (int)$_SESSION['client_id'];
 echo "<!-- Debug: Client ID from session: " . $client_id . " -->";
 
 // Get all engagements for this client
+
 $query = "SELECT e.*, 
-          s.service_name,
-          CONCAT(u.first_name, ' ', u.last_name) as assigned_to_name,
-          r.role_name as assigned_role,
-          DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining,
-          (SELECT COUNT(*) FROM client_files WHERE engagement_id = e.engagement_id AND uploaded_by = 'client') as my_files,
-          (SELECT COUNT(*) FROM client_files WHERE engagement_id = e.engagement_id AND uploaded_by = 'staff') as staff_files
-          FROM engagements e
-          JOIN service_types s ON e.service_id = s.service_id
-          LEFT JOIN users u ON e.assigned_to = u.user_id
-          LEFT JOIN user_roles r ON u.role_id = r.role_id
-          WHERE e.client_id = $client_id
-          ORDER BY 
-            CASE e.status 
-                WHEN 'IN_PROGRESS' THEN 1
-                WHEN 'AWAITING_REVIEW' THEN 2
-                WHEN 'ASSIGNED' THEN 3
-                WHEN 'SUBMITTED' THEN 4
-                WHEN 'CLOSED' THEN 5
-                ELSE 6
-            END,
-            e.created_at DESC";
+                    s.service_name,
+                    c.company_name,
+                    CONCAT(u.first_name, ' ', u.last_name) as assigned_to_name,
+                    r.role_name as assigned_role,
+                    DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining,
+                    (SELECT COUNT(*) FROM client_files WHERE engagement_id = e.engagement_id AND uploaded_by = 'client') as my_files,
+                    (SELECT COUNT(*) FROM client_files WHERE engagement_id = e.engagement_id AND uploaded_by = 'staff') as staff_files
+                    FROM engagements e
+                    JOIN service_types s ON e.service_id = s.service_id
+                    JOIN clients c ON e.client_id = c.client_id
+                    LEFT JOIN users u ON e.assigned_to = u.user_id
+                    LEFT JOIN user_roles r ON u.role_id = r.role_id
+                    WHERE e.client_id = $client_id
+                    ORDER BY 
+                        CASE e.status 
+                                WHEN 'IN_PROGRESS' THEN 1
+                                WHEN 'AWAITING_REVIEW' THEN 2
+                                WHEN 'ASSIGNED' THEN 3
+                                WHEN 'SUBMITTED' THEN 4
+                                WHEN 'CLOSED' THEN 5
+                                ELSE 6
+                        END,
+                        e.created_at DESC";
 
 // Debug: Output query
 echo "<!-- Debug: Query: " . $query . " -->";
@@ -188,8 +191,12 @@ $overdue = mysqli_fetch_assoc($overdue_result);
                         </a>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($eng['title']); ?></h5>
-                        <p class="card-text small text-muted"><?php echo htmlspecialchars($eng['service_name']); ?></p>
+                        <h5 class="card-title mb-1"><?php echo htmlspecialchars($eng['title']); ?></h5>
+                        <p class="card-text small text-muted mb-1"><?php echo htmlspecialchars($eng['service_name']); ?></p>
+                        <div class="company-pill mb-2">
+                            <i class="bi bi-building me-1"></i>
+                            <span class="fw-bold text-primary" style="font-size:1.1rem;letter-spacing:0.5px;"><?php echo htmlspecialchars($eng['company_name']); ?></span>
+                        </div>
                         
                         <div class="mb-2">
                             <strong>Assigned to:</strong><br>
@@ -329,6 +336,16 @@ $overdue = mysqli_fetch_assoc($overdue_result);
 }
 .engagement-card .btn {
     border-radius: 8px;
+}
+.company-pill {
+    display: inline-flex;
+    align-items: center;
+    background: #eef4fb;
+    border-radius: 20px;
+    padding: 4px 14px 4px 10px;
+    font-size: 1rem;
+    margin-bottom: 2px;
+    box-shadow: 0 1px 4px rgba(102,126,234,0.07);
 }
 
 /* Empty State */
