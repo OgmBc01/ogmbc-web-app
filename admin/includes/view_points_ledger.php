@@ -20,9 +20,9 @@ $source_filter = $filter_applied && isset($_GET['source']) ? $_GET['source'] : '
 $month_filter = $filter_applied && isset($_GET['month']) ? (int)$_GET['month'] : 0;
 $year_filter = $filter_applied && isset($_GET['year']) ? (int)$_GET['year'] : 0;
 
-
-
 // In admin, always show all transactions by default
+
+// Join with users table to get employee name for the filtered transactions
 $where = ["1=1"];
 
 if (!empty($type_filter)) {
@@ -40,6 +40,20 @@ if ($month_filter > 0) {
 $where_clause = implode(' AND ', $where);
 
 // Get total points for period
+
+// Get employee name for the filtered transactions (if only one employee, show their name; if multiple, show 'Multiple Employees')
+$employee_name = '';
+$employee_query = "SELECT DISTINCT u.user_id, CONCAT(u.first_name, ' ', u.last_name) as employee_name FROM points_ledger pl LEFT JOIN users u ON pl.employee_id = u.user_id WHERE $where_clause";
+$employee_result = mysqli_query($connection, $employee_query);
+if ($employee_result && mysqli_num_rows($employee_result) === 1) {
+    $row = mysqli_fetch_assoc($employee_result);
+    $employee_name = $row['employee_name'];
+} elseif ($employee_result && mysqli_num_rows($employee_result) > 1) {
+    $employee_name = 'Multiple Employees';
+} else {
+    $employee_name = 'Unknown Employee';
+}
+
 $total_query = "SELECT 
     COALESCE(SUM(CASE WHEN points_type IN ('EARNED', 'ADJUSTMENT') THEN points ELSE 0 END), 0) as total_earned,
     COALESCE(SUM(CASE WHEN points_type = 'DEDUCTED' THEN points ELSE 0 END), 0) as total_deducted,
@@ -84,9 +98,9 @@ if ($count_result) {
 $total_pages = $total_records > 0 ? ceil($total_records / $per_page) : 0;
 
 // Get transactions
-$transactions_query = "SELECT * FROM points_ledger 
+$transactions_query = "SELECT pl.*, CONCAT(u.first_name, ' ', u.last_name) as employee_name FROM points_ledger pl LEFT JOIN users u ON pl.employee_id = u.user_id 
                        WHERE $where_clause 
-                       ORDER BY created_at DESC 
+                       ORDER BY pl.created_at DESC 
                        LIMIT $offset, $per_page";
 $transactions_result = mysqli_query($connection, $transactions_query);
 ?>
@@ -116,6 +130,7 @@ $transactions_result = mysqli_query($connection, $transactions_query);
     <?php endif; ?>
 
     <!-- Period Summary Card -->
+
     <div class="summary-card mb-4">
         <div class="row g-3">
             <div class="col-md-4">
@@ -124,6 +139,9 @@ $transactions_result = mysqli_query($connection, $transactions_query);
                     <span class="summary-value <?php echo $net >= 0 ? 'text-success' : 'text-danger'; ?>">
                         <?php echo $net >= 0 ? '+' : ''; ?><?php echo number_format($net); ?>
                     </span>
+                    <div class="mt-2">
+                        <span class="badge bg-info text-dark">Employee: <?php echo htmlspecialchars($employee_name); ?></span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
@@ -244,6 +262,7 @@ $transactions_result = mysqli_query($connection, $transactions_query);
                     <table class="table table-hover mb-0" id="transactions-table">
                         <thead class="table-light">
                             <tr>
+                                <th>Employee</th>
                                 <th>Date</th>
                                 <th>Source</th>
                                 <th>Description</th>
@@ -279,8 +298,12 @@ $transactions_result = mysqli_query($connection, $transactions_query);
                                              (($trans['points_type'] ?? '') == 'DEDUCTED' ? 'danger' : 'warning');
                                 $sign = ($trans['points_type'] ?? '') == 'EARNED' ? '+' : 
                                        (($trans['points_type'] ?? '') == 'DEDUCTED' ? '-' : '±');
+                                $employee_name = !empty($trans['employee_name']) ? $trans['employee_name'] : 'Unknown';
                             ?>
                             <tr>
+                                <td>
+                                    <?php echo htmlspecialchars($employee_name); ?>
+                                </td>
                                 <td>
                                     <small class="text-muted">
                                         <?php echo date('M d, Y', strtotime($trans['created_at'] ?? 'now')); ?>
