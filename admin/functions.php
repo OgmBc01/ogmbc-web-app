@@ -527,8 +527,7 @@ function is_password_unique($connection, $password) {
     return true;
 }
 
-
-// Function to insert new client (without service_id)
+// Function to insert new client
 function insert_client() {
     global $connection;
 
@@ -554,6 +553,7 @@ function insert_client() {
         $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation'] ?? ''));
         $contact_mobile = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
         $contact_email = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
+        $user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : 'NULL';
         $service_description = mysqli_real_escape_string($connection, trim($_POST['service_description'] ?? ''));
         $contract_start_date = mysqli_real_escape_string($connection, trim($_POST['contract_start_date'] ?? ''));
         $contract_end_date = mysqli_real_escape_string($connection, trim($_POST['contract_end_date'] ?? ''));
@@ -574,29 +574,37 @@ function insert_client() {
             return;
         }
 
-        // Generate a unique password for new client
+        // Generate a unique password for new client (only if no user_id is linked)
         $plain_password = generate_client_password($company_name, $contact_name);
         $hashed_password = password_hash($plain_password, PASSWORD_DEFAULT);
         
-        // Insert new client - service_id set to NULL by default
+        // If user_id is provided, use that; otherwise set to NULL
+        $user_id_value = ($user_id !== 'NULL') ? $user_id : 'NULL';
+        
+        // Insert new client with user_id
         $query = "INSERT INTO clients (
                     company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
                     contact_title, contact_name, contact_designation, contact_mobile, contact_email, client_password,
                     service_description, contract_start_date, contract_end_date, payment_currency, payment_term, 
-                    service_total_fee, lead_source, client_status, service_id
+                    service_total_fee, lead_source, client_status, service_id, user_id
                 ) VALUES (
                     '$company_name', '$trade_license_no', '$country', '$jurisdiction', '$emirate_zone', '$business_activity', '$industry', '$address',
                     '$contact_title', '$contact_name', '$contact_designation', '$contact_mobile', '$contact_email', '$hashed_password',
-                    '$service_description', " . ($contract_start_date ? "'$contract_start_date'" : "NULL") . ", " . ($contract_end_date ? "'$contract_end_date'" : "NULL") . ",
-                    '$payment_currency', '$payment_term', $service_total_fee, '$lead_source', '$client_status', NULL
+                    '$service_description', " . ($contract_start_date ? "'{$contract_start_date}'" : "NULL") . ", " . ($contract_end_date ? "'{$contract_end_date}'" : "NULL") . ",
+                    '$payment_currency', '$payment_term', $service_total_fee, '$lead_source', '$client_status', NULL, $user_id_value
                 )";
 
         if (mysqli_query($connection, $query)) {
             $new_client_id = mysqli_insert_id($connection);
-            send_client_welcome_email($contact_email, $company_name, $plain_password);
-            $_SESSION['new_client_password'] = $plain_password;
-            $_SESSION['new_client_email'] = $contact_email;
-            $_SESSION['new_client_name'] = $company_name;
+            
+            // Only send welcome email if no user_id was linked
+            if ($user_id_value === 'NULL') {
+                send_client_welcome_email($contact_email, $company_name, $plain_password);
+                $_SESSION['new_client_password'] = $plain_password;
+                $_SESSION['new_client_email'] = $contact_email;
+                $_SESSION['new_client_name'] = $company_name;
+            }
+            
             $_SESSION['client_add_success'] = true;
         } else {
             $_SESSION['error_message'] = 'Query Failed: ' . mysqli_error($connection);
@@ -605,7 +613,7 @@ function insert_client() {
 }
 
 
-// Function to update existing client (without service_id)
+// Function to update existing client
 function update_client() {
     global $connection;
 
@@ -631,6 +639,7 @@ function update_client() {
         $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation'] ?? ''));
         $contact_mobile = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
         $contact_email = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
+        $user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : 'NULL';
         $service_description = mysqli_real_escape_string($connection, trim($_POST['service_description'] ?? ''));
         $contract_start_date = mysqli_real_escape_string($connection, trim($_POST['contract_start_date'] ?? ''));
         $contract_end_date = mysqli_real_escape_string($connection, trim($_POST['contract_end_date'] ?? ''));
@@ -651,7 +660,10 @@ function update_client() {
             return;
         }
         
-        // Update existing client - service_id set to NULL
+        // Set user_id value
+        $user_id_value = ($user_id !== 'NULL') ? $user_id : 'NULL';
+        
+        // Update existing client - including user_id
         $query = "UPDATE clients SET 
              company_name = '{$company_name}', 
              trade_license_no = '{$trade_license_no}', 
@@ -674,7 +686,8 @@ function update_client() {
              service_total_fee = {$service_total_fee}, 
              lead_source = '{$lead_source}',
              client_status = '{$client_status}',
-             service_id = NULL
+             service_id = NULL,
+             user_id = $user_id_value
              WHERE client_id = {$client_id}";
 
         if (mysqli_query($connection, $query)) {

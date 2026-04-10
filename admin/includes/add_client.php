@@ -13,9 +13,18 @@ $payment_currency = 'AED';
 $payment_term = 'Monthly';
 $service_total_fee = '0.00';
 $lead_source = 'website';
+$selected_user_id = '';
 $message = '';
 $message_type = '';
 $show_toast = false;
+
+// Fetch users with type_id = 2 (client type) for dropdown
+$users_query = "SELECT u.user_id, u.first_name, u.last_name, u.user_email, u.username 
+                FROM users u
+                LEFT JOIN user_types ut ON u.type_id = ut.type_id
+                WHERE u.type_id = 2 OR ut.type_name = 'client'
+                ORDER BY u.first_name, u.last_name";
+$users_result = mysqli_query($connection, $users_query);
 
 // ============================================
 // HANDLE FORM SUBMISSION WITH VALIDATION FIRST
@@ -27,6 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_client'])) {
     $contact_name_check = mysqli_real_escape_string($connection, trim($_POST['contact_name']));
     $contact_mobile_check = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
     $contact_email_check = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
+    $selected_user_id = !empty($_POST['user_id']) ? intval($_POST['user_id']) : null;
+    
+    $validation_passed = true;
     
     // ============================================
     // FIRST: Check for empty required fields
@@ -34,31 +46,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_client'])) {
     if (empty($company_name_check) || empty($contact_name_check) || empty($contact_mobile_check) || empty($contact_email_check)) {
         $message = "Please fill in all required fields.";
         $message_type = "danger";
-    } 
+        $validation_passed = false;
+    }
+    
     // ============================================
     // SECOND: Check for duplicate company name
     // ============================================
-    else {
+    if ($validation_passed) {
         $dup_query = "SELECT client_id FROM clients WHERE company_name = '$company_name_check'";
         $dup_result = mysqli_query($connection, $dup_query);
         if (mysqli_num_rows($dup_result) > 0) {
             $message = "A client with the company name '$company_name_check' already exists. Please use a different name.";
             $message_type = "danger";
+            $validation_passed = false;
         }
-        // ============================================
-        // THIRD: Validate email format
-        // ============================================
-        elseif (!filter_var($contact_email_check, FILTER_VALIDATE_EMAIL)) {
-            $message = "Please enter a valid email address.";
+    }
+    
+    // ============================================
+    // THIRD: Validate email format
+    // ============================================
+    if ($validation_passed && !filter_var($contact_email_check, FILTER_VALIDATE_EMAIL)) {
+        $message = "Please enter a valid email address.";
+        $message_type = "danger";
+        $validation_passed = false;
+    }
+    
+    // ============================================
+    // FOURTH: Check if selected user exists and is a client
+    // ============================================
+    if ($validation_passed && !empty($selected_user_id)) {
+        $user_check_query = "SELECT user_id FROM users WHERE user_id = $selected_user_id AND (type_id = 2 OR type_id IN (SELECT type_id FROM user_types WHERE type_name = 'client'))";
+        $user_check_result = mysqli_query($connection, $user_check_query);
+        if (mysqli_num_rows($user_check_result) == 0) {
+            $message = "Selected user does not exist or is not a client.";
             $message_type = "danger";
+            $validation_passed = false;
         }
-        // ============================================
-        // FOURTH: All validations passed - call insert function
-        // ============================================
-        else {
-            // Call insert_client AFTER validation
-            insert_client();
-        }
+    }
+    
+    // ============================================
+    // FIFTH: All validations passed - call insert function
+    // ============================================
+    if ($validation_passed) {
+        insert_client();
     }
 }
 
@@ -101,10 +131,42 @@ if (isset($_SESSION['error_message'])) {
                         <form method="POST" action="" id="clientForm">
                             <input type="hidden" name="submit_client" value="1">
                             
+                            <!-- Select Existing User (Client) -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="border-bottom pb-2" style="color: #f1bf70;">
+                                        <i class="bi bi-person-badge me-2"></i>Link to Existing User (Optional)
+                                    </h6>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="user_id" class="form-label">Select Client User</label>
+                                        <select id="user_id" name="user_id" class="form-control select2-search" style="width: 100%;">
+                                            <option value="">-- Select an existing client user --</option>
+                                            <?php 
+                                            if ($users_result && mysqli_num_rows($users_result) > 0) {
+                                                mysqli_data_seek($users_result, 0);
+                                                while($user = mysqli_fetch_assoc($users_result)) {
+                                                    $user_name = trim($user['first_name'] . ' ' . $user['last_name']);
+                                                    if (empty($user_name)) {
+                                                        $user_name = $user['username'];
+                                                    }
+                                                    $selected = ($selected_user_id == $user['user_id']) ? 'selected' : '';
+                                                    echo "<option value='" . $user['user_id'] . "' {$selected}>" 
+                                                         . htmlspecialchars($user_name) . " (" . htmlspecialchars($user['user_email']) . ")</option>";
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                        <div class="form-text">Optionally link this client to an existing user account. This will associate the client with the selected user.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <!-- Company Information -->
                             <div class="row mb-4">
                                 <div class="col-12">
-                                    <h6 class="border-bottom pb-2 text-primary">
+                                    <h6 class="border-bottom pb-2" style="color: #f1bf70;">
                                         <i class="bi bi-building me-2"></i>Company Information
                                     </h6>
                                 </div>
@@ -224,7 +286,7 @@ if (isset($_SESSION['error_message'])) {
                             <!-- Contact Person Information -->
                             <div class="row mb-4">
                                 <div class="col-12">
-                                    <h6 class="border-bottom pb-2 text-primary">
+                                    <h6 class="border-bottom pb-2" style="color: #f1bf70;">
                                         <i class="bi bi-person me-2"></i>Contact Person Information
                                     </h6>
                                 </div>
@@ -275,7 +337,7 @@ if (isset($_SESSION['error_message'])) {
                             <!-- Service Details -->
                             <div class="row mb-4">
                                 <div class="col-12">
-                                    <h6 class="border-bottom pb-2 text-primary">
+                                    <h6 class="border-bottom pb-2" style="color: #f1bf70;">
                                         <i class="bi bi-briefcase me-2"></i>Service Details
                                     </h6>
                                 </div>
@@ -289,16 +351,16 @@ if (isset($_SESSION['error_message'])) {
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                             <label for="contract_start_date" class="form-label">Contract Start Date</label>
-                                             <input type="date" id="contract_start_date" name="contract_start_date" class="form-control" 
-                                                 value="<?php echo htmlspecialchars($contract_start_date); ?>">
-                                         </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                         <div class="mb-3">
-                                             <label for="contract_end_date" class="form-label">Contract End Date</label>
-                                             <input type="date" id="contract_end_date" name="contract_end_date" class="form-control" 
-                                                 value="<?php echo htmlspecialchars($contract_end_date); ?>">
+                                        <label for="contract_start_date" class="form-label">Contract Start Date</label>
+                                        <input type="date" id="contract_start_date" name="contract_start_date" class="form-control" 
+                                            value="<?php echo htmlspecialchars($contract_start_date); ?>">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="contract_end_date" class="form-label">Contract End Date</label>
+                                        <input type="date" id="contract_end_date" name="contract_end_date" class="form-control" 
+                                            value="<?php echo htmlspecialchars($contract_end_date); ?>">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -425,7 +487,6 @@ document.getElementById('country').addEventListener('change', function() {
         .catch(error => console.error('Error fetching jurisdictions:', error));
 });
 
-
 // Form validation
 document.getElementById('clientForm').addEventListener('submit', function(e) {
     const email = document.getElementById('contact_email').value;
@@ -458,5 +519,33 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = 'clients.php';
         }, 3000);
     <?php endif; ?>
+    
+    // Initialize Select2 for searchable dropdown (if jQuery and Select2 are loaded)
+    if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
+        jQuery('#user_id').select2({
+            placeholder: '-- Select an existing client user --',
+            allowClear: true,
+            width: '100%'
+        });
+    } else {
+        // Fallback: Add search capability to native select
+        const select = document.getElementById('user_id');
+        if (select) {
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Search users...';
+            searchInput.className = 'form-control mb-2';
+            searchInput.style.marginBottom = '5px';
+            select.parentNode.insertBefore(searchInput, select);
+            
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                for(let i = 0; i < select.options.length; i++) {
+                    const text = select.options[i].text.toLowerCase();
+                    select.options[i].style.display = text.includes(filter) ? '' : 'none';
+                }
+            });
+        }
+    }
 });
 </script>
