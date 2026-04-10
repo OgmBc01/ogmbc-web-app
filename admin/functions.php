@@ -527,7 +527,8 @@ function is_password_unique($connection, $password) {
     return true;
 }
 
-// Function to insert new client
+
+// Function to insert new client (without service_id)
 function insert_client() {
     global $connection;
 
@@ -536,7 +537,7 @@ function insert_client() {
         
         // Only proceed for new client (client_id = 0)
         if ($client_id > 0) {
-            return; // This function is only for new clients
+            return;
         }
         
         // Sanitize and validate inputs
@@ -553,7 +554,6 @@ function insert_client() {
         $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation'] ?? ''));
         $contact_mobile = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
         $contact_email = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
-        $service_id = intval($_POST['service_id'] ?? 0);
         $service_description = mysqli_real_escape_string($connection, trim($_POST['service_description'] ?? ''));
         $contract_start_date = mysqli_real_escape_string($connection, trim($_POST['contract_start_date'] ?? ''));
         $contract_end_date = mysqli_real_escape_string($connection, trim($_POST['contract_end_date'] ?? ''));
@@ -578,28 +578,25 @@ function insert_client() {
         $plain_password = generate_client_password($company_name, $contact_name);
         $hashed_password = password_hash($plain_password, PASSWORD_DEFAULT);
         
-        // Insert new client with password
+        // Insert new client - service_id set to NULL by default
         $query = "INSERT INTO clients (
                     company_name, trade_license_no, country, jurisdiction, emirate_zone, business_activity, industry, address,
                     contact_title, contact_name, contact_designation, contact_mobile, contact_email, client_password,
-                    service_id, service_description, contract_start_date, contract_end_date, payment_currency, payment_term, 
-                    service_total_fee, lead_source, client_status
+                    service_description, contract_start_date, contract_end_date, payment_currency, payment_term, 
+                    service_total_fee, lead_source, client_status, service_id
                 ) VALUES (
-                    '{$company_name}', '{$trade_license_no}', '{$country}', '{$jurisdiction}', '{$emirate_zone}', '{$business_activity}', '{$industry}', '{$address}',
-                    '{$contact_title}', '{$contact_name}', '{$contact_designation}', '{$contact_mobile}', '{$contact_email}', '{$hashed_password}',
-                    {$service_id}, '{$service_description}', " . ($contract_start_date ? "'{$contract_start_date}'" : "NULL") . ", " . ($contract_end_date ? "'{$contract_end_date}'" : "NULL") . ",
-                    '{$payment_currency}', '{$payment_term}', {$service_total_fee}, '{$lead_source}', '{$client_status}'
+                    '$company_name', '$trade_license_no', '$country', '$jurisdiction', '$emirate_zone', '$business_activity', '$industry', '$address',
+                    '$contact_title', '$contact_name', '$contact_designation', '$contact_mobile', '$contact_email', '$hashed_password',
+                    '$service_description', " . ($contract_start_date ? "'$contract_start_date'" : "NULL") . ", " . ($contract_end_date ? "'$contract_end_date'" : "NULL") . ",
+                    '$payment_currency', '$payment_term', $service_total_fee, '$lead_source', '$client_status', NULL
                 )";
 
         if (mysqli_query($connection, $query)) {
             $new_client_id = mysqli_insert_id($connection);
-            // Send welcome email with credentials
             send_client_welcome_email($contact_email, $company_name, $plain_password);
-            // Store password in session for modal display
             $_SESSION['new_client_password'] = $plain_password;
             $_SESSION['new_client_email'] = $contact_email;
             $_SESSION['new_client_name'] = $company_name;
-            // Set success flag - NO REDIRECT HERE
             $_SESSION['client_add_success'] = true;
         } else {
             $_SESSION['error_message'] = 'Query Failed: ' . mysqli_error($connection);
@@ -607,8 +604,8 @@ function insert_client() {
     }
 }
 
-// Function to update existing client
-// Function to update existing client
+
+// Function to update existing client (without service_id)
 function update_client() {
     global $connection;
 
@@ -654,7 +651,7 @@ function update_client() {
             return;
         }
         
-        // Update existing client
+        // Update existing client - service_id set to NULL
         $query = "UPDATE clients SET 
              company_name = '{$company_name}', 
              trade_license_no = '{$trade_license_no}', 
@@ -676,18 +673,18 @@ function update_client() {
              payment_term = '{$payment_term}', 
              service_total_fee = {$service_total_fee}, 
              lead_source = '{$lead_source}',
-             client_status = '{$client_status}'
+             client_status = '{$client_status}',
+             service_id = NULL
              WHERE client_id = {$client_id}";
 
         if (mysqli_query($connection, $query)) {
-            // Set success flag - NO REDIRECT HERE
             $_SESSION['client_update_success'] = true;
         } else {
             $_SESSION['error_message'] = 'Query Failed: ' . mysqli_error($connection);
         }
     }
 }
-// Note: Only ONE closing brace here - removed the extra one
+
 
 // Function to send welcome email with credentials
 function send_client_welcome_email($email, $company_name, $plain_password) {
@@ -711,7 +708,7 @@ function send_client_welcome_email($email, $company_name, $plain_password) {
         
         <p>For security reasons, we recommend changing your password after first login.</p>
         
-        <p>Best regards,<br>Your Company Name</p>
+        <p>Best regards,<br>OGM Business Consultants</p>
     </body>
     </html>
     ";
@@ -719,7 +716,7 @@ function send_client_welcome_email($email, $company_name, $plain_password) {
     // Set content-type headers for HTML email
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: noreply@yourdomain.com" . "\r\n";
+    $headers .= "From: noreply@ogmbc.ae" . "\r\n";
     
     // Send email
     return mail($email, $subject, $message, $headers);
