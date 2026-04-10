@@ -53,17 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_evidence'])) {
         $file_size = $file['size'];
         $file_type = $file['type'];
         
-        // Validate file type
-        $allowed_types = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'application/msword', 
-                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        $allowed_ext = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'doc', 'docx'];
-        
+        // Allow all file types, only check file size
         $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-        
-        if (!in_array($file_type, $allowed_types) && !in_array($ext, $allowed_ext)) {
-            $message = "File type not allowed. Allowed: PDF, JPG, PNG, GIF, DOC, DOCX";
-            $message_type = "danger";
-        } elseif ($file_size > 10 * 1024 * 1024) { // 10MB max
+        if ($file_size > 10 * 1024 * 1024) { // 10MB max
             $message = "File size too large. Maximum size: 10MB";
             $message_type = "danger";
         } else {
@@ -165,8 +157,7 @@ ob_end_flush();
                                     <label for="evidence_file" class="btn btn-primary disabled" aria-disabled="true">
                                         <i class="bi bi-folder2-open me-2"></i>Browse Files
                                     </label>
-                                    <input type="file" id="evidence_file" name="evidence_file" style="display: none;" disabled 
-                                           accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
+                                     <input type="file" id="evidence_file" name="evidence_file" style="display: none;" disabled>
                                     <p class="text-muted small mt-3">
                                         <i class="bi bi-info-circle me-1"></i>
                                         Max file size: 10MB | Allowed: PDF, JPG, PNG, GIF, DOC, DOCX
@@ -188,11 +179,10 @@ ob_end_flush();
                                     <label for="evidence_file" class="btn btn-primary">
                                         <i class="bi bi-folder2-open me-2"></i>Browse Files
                                     </label>
-                                    <input type="file" id="evidence_file" name="evidence_file" style="display: none;" 
-                                           accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx">
+                                     <input type="file" id="evidence_file" name="evidence_file" style="display: none;">
                                     <p class="text-muted small mt-3">
                                         <i class="bi bi-info-circle me-1"></i>
-                                        Max file size: 10MB | Allowed: PDF, JPG, PNG, GIF, DOC, DOCX
+                                        Max file size: 10MB | Any file type allowed
                                     </p>
                                     <div id="fileInfo" class="mt-3 text-start" style="display: none;"></div>
                                 </div>
@@ -392,16 +382,7 @@ function handleFileSelect(file) {
     if (file) {
         const fileSize = (file.size / 1024 / 1024).toFixed(2);
         const fileExt = file.name.split('.').pop().toLowerCase();
-        const allowedExts = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'doc', 'docx'];
-        
-        if (!allowedExts.includes(fileExt)) {
-            alert('File type not allowed. Please select a valid file type.');
-            fileInput.value = '';
-            uploadBtn.disabled = true;
-            fileInfo.style.display = 'none';
-            return;
-        }
-        
+        // No extension restriction, only check file size
         if (file.size > 10 * 1024 * 1024) {
             alert('File size too large. Maximum size is 10MB.');
             fileInput.value = '';

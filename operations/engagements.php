@@ -10,15 +10,57 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-?>
 
+// --- Evidence Stat Cards Logic ---
+// Get all engagement IDs assigned to this user
+$engagement_ids = [];
+$eid_result = mysqli_query($connection, "SELECT engagement_id FROM engagements WHERE assigned_to = $user_id");
+while ($row = mysqli_fetch_assoc($eid_result)) {
+    $engagement_ids[] = (int)$row['engagement_id'];
+}
+$engagement_ids_str = implode(',', $engagement_ids);
+
+$approved_count = 0;
+$rejected_count = 0;
+$new_approved = 0;
+$new_rejected = 0;
+
+if (!empty($engagement_ids)) {
+    // Count approved and rejected evidences
+    $evidence_stats_query = "SELECT status, COUNT(*) as cnt FROM evidence WHERE engagement_id IN ($engagement_ids_str) GROUP BY status";
+    $evidence_stats_result = mysqli_query($connection, $evidence_stats_query);
+    while ($row = mysqli_fetch_assoc($evidence_stats_result)) {
+        $status = strtolower($row['status']);
+        if ($status === 'accepted' || $status === 'approved') $approved_count += (int)$row['cnt'];
+        elseif ($status === 'rejected') $rejected_count += (int)$row['cnt'];
+    }
+
+    // Detect new approvals/rejections since last visit (simple session-based notification)
+    if (!isset($_SESSION['evidence_seen'])) $_SESSION['evidence_seen'] = [];
+    $seen = $_SESSION['evidence_seen'];
+    $new_approved = 0;
+    $new_rejected = 0;
+    $evidence_new_query = "SELECT evidence_id, status FROM evidence WHERE engagement_id IN ($engagement_ids_str)";
+    $evidence_new_result = mysqli_query($connection, $evidence_new_query);
+    while ($row = mysqli_fetch_assoc($evidence_new_result)) {
+        $eid = $row['evidence_id'];
+        $status = strtolower($row['status']);
+        if (!isset($seen[$eid]) && ($status === 'accepted' || $status === 'approved')) $new_approved++;
+        if (!isset($seen[$eid]) && $status === 'rejected') $new_rejected++;
+        // Mark as seen for next time
+        $seen[$eid] = $status;
+    }
+    $_SESSION['evidence_seen'] = $seen;
+}
+?>
 
 <div class="main-content" id="mainContent">
     <div class="container-fluid">
-        <!-- Welcome Card (optional, for consistency) -->
+
+        <!-- Welcome Card and Stat Cards -->
         <div class="row g-4 mb-4">
             <div class="col-12">
-                <div class="welcome-card d-flex flex-column flex-md-row align-items-center justify-content-between mb-3"></nav>
+                <div class="welcome-card d-flex flex-column flex-md-row align-items-center justify-content-between mb-3">
                     <div>
                         <div class="welcome-title mb-1">Engagements</div>
                         <div class="welcome-subtitle">Manage and track all your assigned engagements here.</div>
@@ -231,6 +273,53 @@ function showSuccess(message) {
 .card-body {
     padding: 20px;
 }
+/* Stat Cards Row Styling */
+.stat-cards-row .stat-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    padding: 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0;
+    border: 1px solid #f1bf70;
+    min-height: 70px;
+    transition: box-shadow 0.2s;
+}
+.stat-cards-row .stat-card:hover {
+    box-shadow: 0 4px 16px rgba(241,191,112,0.12);
+}
+.stat-cards-row .stat-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.stat-cards-row .stat-info {
+    flex: 1;
+}
+.stat-cards-row .stat-label {
+    font-size: 0.92rem;
+    color: #888;
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+.stat-cards-row .stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+.evidence-approved .stat-icon {
+    background: #198754;
+}
+.evidence-rejected .stat-icon {
+    background: #dc3545;
+}
 @media (max-width: 768px) {
     .welcome-title {
         font-size: 1.4rem;
@@ -243,6 +332,15 @@ function showSuccess(message) {
     }
     .welcome-card {
         padding: 18px;
+    }
+    .stat-card {
+        padding: 16px 10px;
+        font-size: 1rem;
+    }
+    .stat-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 1.3rem;
     }
 }
 </style>

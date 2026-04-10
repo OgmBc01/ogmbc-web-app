@@ -30,6 +30,7 @@ $stats_query = "SELECT
     SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
     SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
     SUM(CASE WHEN status = 'SUBMITTED' THEN 1 ELSE 0 END) as submitted,
+    SUM(CASE WHEN status = 'CLOSED' THEN 1 ELSE 0 END) as closed,
     SUM(CASE WHEN COALESCE(approved_deadline, original_deadline) < CURDATE() AND status NOT IN ('CLOSED', 'SUBMITTED') THEN 1 ELSE 0 END) as overdue
     FROM engagements 
     WHERE $where_clause";
@@ -68,74 +69,177 @@ $engagements_query = "SELECT
         END,
         COALESCE(approved_deadline, original_deadline) ASC";
 $engagements_result = mysqli_query($connection, $engagements_query);
+
+// Evidence stats from session if available (set in engagements.php)
+// --- Evidence Stat Cards Logic (moved from engagements.php) ---
+$approved_count = 0;
+$rejected_count = 0;
+$new_approved = 0;
+$new_rejected = 0;
+// Get all engagement IDs assigned to this user
+$engagement_ids = [];
+$eid_result = mysqli_query($connection, "SELECT engagement_id FROM engagements WHERE assigned_to = $user_id");
+while ($row = mysqli_fetch_assoc($eid_result)) {
+    $engagement_ids[] = (int)$row['engagement_id'];
+}
+$engagement_ids_str = implode(',', $engagement_ids);
+
+if (!empty($engagement_ids)) {
+    // Count approved and rejected evidences
+    $evidence_stats_query = "SELECT status, COUNT(*) as cnt FROM evidence WHERE engagement_id IN ($engagement_ids_str) GROUP BY status";
+    $evidence_stats_result = mysqli_query($connection, $evidence_stats_query);
+    while ($row = mysqli_fetch_assoc($evidence_stats_result)) {
+        $status = strtolower($row['status']);
+        if ($status === 'accepted' || $status === 'approved') $approved_count += (int)$row['cnt'];
+        elseif ($status === 'rejected') $rejected_count += (int)$row['cnt'];
+    }
+
+    // Detect new approvals/rejections since last visit (simple session-based notification)
+    if (!isset($_SESSION['evidence_seen'])) $_SESSION['evidence_seen'] = [];
+    $seen = $_SESSION['evidence_seen'];
+    $new_approved = 0;
+    $new_rejected = 0;
+    $evidence_new_query = "SELECT evidence_id, status FROM evidence WHERE engagement_id IN ($engagement_ids_str)";
+    $evidence_new_result = mysqli_query($connection, $evidence_new_query);
+    while ($row = mysqli_fetch_assoc($evidence_new_result)) {
+        $eid = $row['evidence_id'];
+        $status = strtolower($row['status']);
+        if (!isset($seen[$eid]) && ($status === 'accepted' || $status === 'approved')) $new_approved++;
+        if (!isset($seen[$eid]) && $status === 'rejected') $new_rejected++;
+        // Mark as seen for next time
+        $seen[$eid] = $status;
+    }
+    $_SESSION['evidence_seen'] = $seen;
+}
 ?>
 
 <div class="container-fluid">
-    <!-- Statistics Cards -->
+    <!-- Statistics Cards - Uniform Row -->
     <div class="row g-4 mb-4">
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="stat-card-small">
-                <div class="stat-icon bg-primary-soft">
-                    <i class="bi bi-briefcase text-primary"></i>
+        <!-- Total Engagements -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-primary-soft">
+                    <i class="bi bi-briefcase-fill text-primary"></i>
                 </div>
-                <div class="stat-content">
-                    <h3 class="stat-value"><?php echo $stats['total'] ?? 0; ?></h3>
-                    <p class="stat-label">Total</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="stat-card-small">
-                <div class="stat-icon bg-info-soft">
-                    <i class="bi bi-play-circle text-info"></i>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-value"><?php echo $stats['in_progress'] ?? 0; ?></h3>
-                    <p class="stat-label">In Progress</p>
+                <div class="stat-info">
+                    <h4 class="stat-number"><?php echo $stats['total'] ?? 0; ?></h4>
+                    <p class="stat-name">Total</p>
                 </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="stat-card-small">
-                <div class="stat-icon bg-warning-soft">
+        
+        <!-- Assigned -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-secondary-soft">
+                    <i class="bi bi-bell-fill text-secondary"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 class="stat-number"><?php echo $stats['assigned'] ?? 0; ?></h4>
+                    <p class="stat-name">Assigned</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- In Progress -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-info-soft">
+                    <i class="bi bi-play-circle-fill text-info"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 class="stat-number"><?php echo $stats['in_progress'] ?? 0; ?></h4>
+                    <p class="stat-name">In Progress</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Awaiting Review -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-warning-soft">
                     <i class="bi bi-clock-history text-warning"></i>
                 </div>
-                <div class="stat-content">
-                    <h3 class="stat-value"><?php echo $stats['awaiting_review'] ?? 0; ?></h3>
-                    <p class="stat-label">Awaiting Review</p>
+                <div class="stat-info">
+                    <h4 class="stat-number"><?php echo $stats['awaiting_review'] ?? 0; ?></h4>
+                    <p class="stat-name">Awaiting Review</p>
                 </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="stat-card-small">
-                <div class="stat-icon bg-success-soft">
-                    <i class="bi bi-check-circle text-success"></i>
+        
+        <!-- Submitted -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-success-soft">
+                    <i class="bi bi-check-circle-fill text-success"></i>
                 </div>
-                <div class="stat-content">
-                    <h3 class="stat-value"><?php echo $stats['submitted'] ?? 0; ?></h3>
-                    <p class="stat-label">Submitted</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="stat-card-small">
-                <div class="stat-icon bg-secondary-soft">
-                    <i class="bi bi-check2-all text-secondary"></i>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-value"><?php echo $stats['assigned'] ?? 0; ?></h3>
-                    <p class="stat-label">Assigned</p>
+                <div class="stat-info">
+                    <h4 class="stat-number"><?php echo $stats['submitted'] ?? 0; ?></h4>
+                    <p class="stat-name">Submitted</p>
                 </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4 col-6">
-            <div class="stat-card-small">
-                <div class="stat-icon bg-danger-soft">
-                    <i class="bi bi-exclamation-triangle text-danger"></i>
+        
+        <!-- Closed -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-dark-soft">
+                    <i class="bi bi-check2-all text-dark"></i>
                 </div>
-                <div class="stat-content">
-                    <h3 class="stat-value"><?php echo $stats['overdue'] ?? 0; ?></h3>
-                    <p class="stat-label">Overdue</p>
+                <div class="stat-info">
+                    <h4 class="stat-number"><?php echo $stats['closed'] ?? 0; ?></h4>
+                    <p class="stat-name">Closed</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Overdue -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-danger-soft">
+                    <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 class="stat-number <?php echo ($stats['overdue'] ?? 0) > 0 ? 'text-danger' : ''; ?>">
+                        <?php echo $stats['overdue'] ?? 0; ?>
+                    </h4>
+                    <p class="stat-name">Overdue</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approved Evidence Stat Card (from engagements.php) -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-approved-soft">
+                    <i class="bi bi-patch-check-fill text-approved"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 class="stat-number">
+                        <?php echo $approved_count; ?>
+                        <?php if ($new_approved > 0): ?>
+                            <span class="badge bg-warning ms-1 new-badge">+<?php echo $new_approved; ?> new</span>
+                        <?php endif; ?>
+                    </h4>
+                    <p class="stat-name">Approved Evidence</p>
+                </div>
+            </div>
+        </div>
+        <!-- Rejected Evidence Stat Card (from engagements.php) -->
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="stat-card-mini">
+                <div class="stat-icon-mini bg-rejected-soft">
+                    <i class="bi bi-x-octagon-fill text-rejected"></i>
+                </div>
+                <div class="stat-info">
+                    <h4 class="stat-number">
+                        <?php echo $rejected_count; ?>
+                        <?php if ($new_rejected > 0): ?>
+                            <span class="badge bg-warning ms-1 new-badge">+<?php echo $new_rejected; ?> new</span>
+                        <?php endif; ?>
+                    </h4>
+                    <p class="stat-name">Rejected Evidence</p>
                 </div>
             </div>
         </div>
@@ -353,56 +457,76 @@ $engagements_result = mysqli_query($connection, $engagements_query);
 </div>
 
 <style>
-/* Engagements Welcome */
-.engagements-welcome {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-}
-
-/* Statistics Cards - Small */
-.stat-card-small {
+/* Statistics Cards - Uniform Mini Cards */
+.stat-card-mini {
     background: white;
     border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     border: 1px solid rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     transition: all 0.3s ease;
     height: 100%;
 }
 
-.stat-card-small:hover {
+.stat-card-mini:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
-.stat-card-small .stat-icon {
-    width: 45px;
-    height: 45px;
+.stat-icon-mini {
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     flex-shrink: 0;
 }
 
-.stat-card-small .stat-content {
+.stat-info {
     flex: 1;
 }
 
-.stat-card-small .stat-value {
-    font-size: 1.3rem;
+.stat-number {
+    font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 2px;
     line-height: 1.2;
+    color: #2c3e50;
 }
 
-.stat-card-small .stat-label {
+.stat-name {
     font-size: 0.75rem;
     color: #6c757d;
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Soft Background Colors */
+.bg-primary-soft { background: rgba(13, 110, 253, 0.1); }
+.bg-secondary-soft { background: rgba(108, 117, 125, 0.1); }
+.bg-info-soft { background: rgba(13, 202, 240, 0.1); }
+.bg-warning-soft { background: rgba(255, 193, 7, 0.1); }
+.bg-success-soft { background: rgba(25, 135, 84, 0.1); }
+.bg-dark-soft { background: rgba(33, 37, 41, 0.1); }
+.bg-danger-soft { background: rgba(220, 53, 69, 0.1); }
+.bg-approved-soft { background: rgba(32, 201, 151, 0.1); }
+.bg-rejected-soft { background: rgba(235, 87, 87, 0.1); }
+
+/* Text Colors */
+.text-approved { color: #20c997; }
+.text-rejected { color: #eb5757; }
+
+/* New Badge */
+.new-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    vertical-align: middle;
 }
 
 /* Filters Card */
@@ -515,8 +639,18 @@ $engagements_result = mysqli_query($connection, $engagements_query);
 
 /* Responsive */
 @media (max-width: 768px) {
-    .stat-card-small {
+    .stat-card-mini {
         padding: 12px;
+    }
+    
+    .stat-icon-mini {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .stat-number {
+        font-size: 1.2rem;
     }
     
     .engagement-footer {

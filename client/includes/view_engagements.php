@@ -204,7 +204,11 @@ if (!empty($client_ids)) {
                         <p class="card-text small text-muted mb-1"><?php echo htmlspecialchars($eng['service_name']); ?></p>
                         <div class="company-pill mb-2">
                             <i class="bi bi-building me-1"></i>
-                            <span class="fw-bold text-primary" style="font-size:1.1rem;letter-spacing:0.5px;"><?php echo htmlspecialchars($eng['company_name']); ?></span>
+                            <a href="engagements.php?source=view_details&id=<?php echo $eng['engagement_id']; ?>" 
+                               class="fw-bold company-link" 
+                               style="font-size:1.1rem;letter-spacing:0.5px;color:#f1bf70;text-decoration:none;">
+                                <?php echo htmlspecialchars($eng['company_name']); ?>
+                            </a>
                         </div>
                         
                         <div class="mb-2">
@@ -394,6 +398,12 @@ if (!empty($client_ids)) {
     }
 }
 </style>
+
+/* Gold company link hover */
+.company-link:hover {
+    color: #c89a3c;
+    text-decoration: underline;
+}
 
 <script>
 // Filter engagements by status

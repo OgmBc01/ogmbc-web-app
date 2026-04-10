@@ -1,10 +1,29 @@
 <?php
 
-
 $engagement_id = (int)$_GET['id'];
-$client_id = $_SESSION['client_id'] ?? null;
+$session_client_id = $_SESSION['client_id'] ?? null;
 
-// Fetch engagement details and verify client ownership
+// --- Allow access if the engagement belongs to ANY client record owned by this user ---
+// Find all client_ids for this logged-in user
+$client_ids = [];
+if (isset($_SESSION['user_id'])) {
+    $user_id = (int)$_SESSION['user_id'];
+    $res = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = $user_id");
+    while ($row = mysqli_fetch_assoc($res)) {
+        $client_ids[] = (int)$row['client_id'];
+    }
+}
+// Fallback: if no user_id in session, just use the session client_id
+if (empty($client_ids) && $session_client_id) {
+    $client_ids[] = (int)$session_client_id;
+}
+if (empty($client_ids)) {
+    echo "<script>window.location.href = 'engagements.php';</script>";
+    exit();
+}
+$client_ids_str = implode(',', $client_ids);
+
+// Fetch engagement details and verify client ownership (across all their companies)
 $query = "SELECT 
     e.*,
     c.company_name,
@@ -32,15 +51,13 @@ $query = "SELECT
     LEFT JOIN users assigned ON e.assigned_to = assigned.user_id
     LEFT JOIN users reviewer ON e.reviewer_id = reviewer.user_id
     LEFT JOIN users creator ON e.created_by = creator.user_id
-    WHERE e.engagement_id = $engagement_id AND e.client_id = $client_id";
+    WHERE e.engagement_id = $engagement_id AND e.client_id IN ($client_ids_str)";
 
 $result = mysqli_query($connection, $query);
-
 if (!$result || mysqli_num_rows($result) == 0) {
     echo "<script>window.location.href = 'engagements.php';</script>";
     exit();
 }
-
 
 $engagement = mysqli_fetch_assoc($result);
 

@@ -460,6 +460,20 @@ $overdue_days = abs($engagement['days_remaining']);
                                 if ($ext == 'pdf') $icon = 'file-earmark-pdf';
                                 elseif (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) $icon = 'file-earmark-image';
                                 elseif (in_array($ext, ['doc', 'docx'])) $icon = 'file-earmark-word';
+                                // Evidence status display
+                                $status = isset($file['status']) ? strtolower($file['status']) : '';
+                                $status_label = '';
+                                $status_class = '';
+                                if ($status === 'accepted' || $status === 'approved') {
+                                    $status_label = 'Accepted';
+                                    $status_class = 'success';
+                                } elseif ($status === 'rejected') {
+                                    $status_label = 'Rejected';
+                                    $status_class = 'danger';
+                                } else {
+                                    $status_label = 'Pending Review';
+                                    $status_class = 'secondary';
+                                }
                                 ?>
                                 <i class="bi bi-<?php echo $icon; ?> file-icon"></i>
                                 <div class="file-info">
@@ -467,6 +481,9 @@ $overdue_days = abs($engagement['days_remaining']);
                                     <small class="text-muted">
                                         Uploaded on <?php echo date('M d, Y H:i', strtotime($file['uploaded_at'])); ?>
                                     </small>
+                                    <div>
+                                        <span class="badge bg-<?php echo $status_class; ?> mt-1">Status: <?php echo $status_label; ?></span>
+                                    </div>
                                 </div>
                                 <a href="../uploads/evidence/<?php echo $file['file_path']; ?>" class="btn btn-sm btn-outline-primary" download>
                                     <i class="bi bi-download"></i>
