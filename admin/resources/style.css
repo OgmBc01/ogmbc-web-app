@@ -16,15 +16,15 @@
     padding: 1.5rem;
 }
 :root {
-            --dark-blue: #0f172a;
-            --medium-blue: #1e293b;
-            --light-blue: #334155;
-            --gold: #f1bf70;
-            --light-gold: #f8d7a4;
-            --text: #333333;
-            --muted: #666666;
-            --light-bg: #f8f9fa;
-            --border: #dee2e6;
+        --dark-blue: #0f172a;
+        --medium-blue: #1e293b;
+        --light-blue: #334155;
+        --gold: #f1bf70;
+        --light-gold: #f8d7a4;
+        --text: #333333;
+        --muted: #666666;
+        --light-bg: #f8f9fa;
+        --border: #dee2e6;
         }
         
         body {

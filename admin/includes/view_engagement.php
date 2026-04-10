@@ -534,7 +534,6 @@ ob_end_flush();
 .comments-timeline::-webkit-scrollbar-thumb:hover {
     background: #e5b465;
 }
-</style>
 
 /* Evidence status custom styles */
 .evidence-approved-banner {
@@ -565,6 +564,7 @@ ob_end_flush();
     font-weight: 600;
     letter-spacing: 0.5px;
 }
+</style>
 
             <!-- Evidence Section -->
                         <!-- Assignment/Engagement Documents Section -->
@@ -857,6 +857,136 @@ ob_end_flush();
                     <?php endif; ?>
                 </div>
             </div>
+
+            <!-- Admin Closure Section -->
+            <?php 
+            // Handle admin closure and points assignment
+            if (isset($_POST['close_engagement']) && $engagement['status'] == 'SUBMITTED') {
+                $points_awarded = intval($_POST['points_awarded']);
+                $closure_notes = mysqli_real_escape_string($connection, trim($_POST['closure_notes'] ?? ''));
+                
+                // Update engagement
+                $update_query = "UPDATE engagements SET 
+                     status = 'CLOSED',
+                     points_awarded = $points_awarded,
+                     completion_date = NOW()
+                     WHERE engagement_id = $engagement_id";
+                
+                if (mysqli_query($connection, $update_query)) {
+                    // Add points to ledger
+                    $ledger_query = "INSERT INTO points_ledger 
+                        (employee_id, source_type, source_id, points, points_type, description, awarded_by, created_by)
+                        VALUES (
+                            {$engagement['assigned_to']}, 
+                            'ENGAGEMENT', 
+                            $engagement_id, 
+                            $points_awarded, 
+                            'EARNED', 
+                            'Points awarded for completing engagement: {$engagement['title']}', 
+                            {$_SESSION['user_id']},
+                            {$_SESSION['user_id']}
+                        )";
+                    mysqli_query($connection, $ledger_query);
+                    
+                    // Add status history
+                    $history_query = "INSERT INTO engagement_status_history 
+                         (engagement_id, old_status, new_status, changed_by, notes)
+                         VALUES ($engagement_id, 'SUBMITTED', 'CLOSED', {$_SESSION['user_id']}, 'Engagement closed by admin. Points awarded: $points_awarded')";
+                    mysqli_query($connection, $history_query);
+                    
+                    echo '<script>window.location.reload();</script>';
+                    exit();
+                }
+            }
+
+            // Calculate suggested points based on deadline
+            $deadline = strtotime($engagement['approved_deadline'] ?? $engagement['original_deadline']);
+            $now = time();
+            $delay_days = max(0, floor(($now - $deadline) / (60 * 60 * 24)));
+
+            $suggested_points = $engagement['base_points'];
+            if ($delay_days == 0) {
+                $suggested_points = $engagement['points_within_deadline'] ?? $engagement['base_points'];
+            } elseif ($delay_days >= 5 && $delay_days <= 15) {
+                $suggested_points = $engagement['points_tier_1'] ?? $engagement['base_points'] * 0.7;
+            } elseif ($delay_days >= 16 && $delay_days <= 25) {
+                $suggested_points = $engagement['points_tier_2'] ?? $engagement['base_points'] * 0.5;
+            } elseif ($delay_days > 25) {
+                $suggested_points = $engagement['points_tier_3'] ?? $engagement['base_points'] * 0.3;
+            }
+            ?>
+
+            <?php if ($engagement['status'] == 'SUBMITTED'): ?>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header text-white">
+                    <h6 class="mb-0"><i class="bi bi-check2-circle me-2"></i>Admin: Close Engagement & Award Points</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        This engagement has been submitted for review. Please review all evidence and documentation before closing.
+                    </div>
+                    
+                    <!-- Evidence Summary -->
+                    <?php 
+                    $evidence_stats = ['total' => 0, 'approved_count' => 0, 'rejected_count' => 0];
+                    $evidence_check = "SELECT COUNT(*) as total, 
+                   SUM(CASE WHEN status = 'APPROVED' THEN 1 ELSE 0 END) as approved_count,
+                   SUM(CASE WHEN status = 'REJECTED' THEN 1 ELSE 0 END) as rejected_count
+                   FROM evidence WHERE engagement_id = $engagement_id";
+                    $evidence_result = mysqli_query($connection, $evidence_check);
+                    if ($evidence_result) $evidence_stats = mysqli_fetch_assoc($evidence_result);
+                    ?>
+                    <?php if ($evidence_stats['total'] > 0): ?>
+                    <div class="mb-4">
+                        <strong>Evidence Summary:</strong>
+                        <div class="mt-2">
+                            <span class="badge bg-success me-2">Approved: <?php echo $evidence_stats['approved_count']; ?></span>
+                            <span class="badge bg-danger me-2">Rejected: <?php echo $evidence_stats['rejected_count']; ?></span>
+                            <span class="badge bg-warning">Pending: <?php echo $evidence_stats['total'] - $evidence_stats['approved_count'] - $evidence_stats['rejected_count']; ?></span>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <form method="POST" action="" id="closeEngagementForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="points_awarded" class="form-label">Points to Award</label>
+                                    <input type="number" class="form-control" id="points_awarded" name="points_awarded" 
+                                           value="<?php echo $suggested_points; ?>" min="0" required>
+                                    <small class="text-muted">
+                                        Base Points: <?php echo $engagement['base_points']; ?> | 
+                                        On-Time: <?php echo $engagement['points_within_deadline'] ?? $engagement['base_points']; ?> |
+                                        Delay: <?php echo $delay_days; ?> days
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="closure_notes" class="form-label">Closure Notes (Optional)</label>
+                                    <textarea class="form-control" id="closure_notes" name="closure_notes" rows="2" 
+                                              placeholder="Add any notes about this closure..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Warning:</strong> Once closed, this engagement cannot be reopened. Points will be awarded to the employee.
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" name="close_engagement" class="btn btn-success btn-lg" 
+                                    onclick="return confirm('Are you sure you want to close this engagement? Points will be awarded and the engagement cannot be reopened.')">
+                                <i class="bi bi-check2-circle me-2"></i>Close Engagement & Award Points
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <?php endif; ?>
+            <!-- END Admin Closure Section -->
         </div>
     </div>
 </div>

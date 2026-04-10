@@ -399,11 +399,23 @@ if (ob_get_level() > 0) {
                             <label for="new_status" class="form-label">New Status</label>
                             <select class="form-select" id="new_status" name="new_status" required>
                                 <option value="">Select Status</option>
-                                <?php foreach ($allowed_transitions[$engagement['status']] ?? [] as $transition): ?>
-                                    <option value="<?php echo $transition; ?>">
-                                        <?php echo str_replace('_', ' ', $transition); ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <?php
+                                foreach ($allowed_transitions[$engagement['status']] ?? [] as $transition):
+                                    // For SUBMIT, check if the last evidence is approved
+                                    if ($transition === 'SUBMITTED') {
+                                        $last_evidence_query = "SELECT status FROM evidence WHERE engagement_id = $engagement_id ORDER BY evidence_id DESC LIMIT 1";
+                                        $last_evidence_result = mysqli_query($connection, $last_evidence_query);
+                                        $last_evidence_status = ($last_evidence_result && mysqli_num_rows($last_evidence_result) > 0)
+                                            ? mysqli_fetch_assoc($last_evidence_result)['status']
+                                            : '';
+                                        if ($last_evidence_status === 'APPROVED') {
+                                            echo '<option value="SUBMITTED">SUBMIT</option>';
+                                        }
+                                    } else {
+                                        echo '<option value="' . $transition . '">' . str_replace('_', ' ', $transition) . '</option>';
+                                    }
+                                endforeach;
+                                ?>
                             </select>
                             <small class="text-muted">
                                 Current status: <strong><?php echo str_replace('_', ' ', $engagement['status']); ?></strong>
