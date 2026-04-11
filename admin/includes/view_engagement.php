@@ -875,7 +875,7 @@ ob_end_flush();
                 if (mysqli_query($connection, $update_query)) {
                     // Add points to ledger
                     $ledger_query = "INSERT INTO points_ledger 
-                        (employee_id, source_type, source_id, points, points_type, description, awarded_by, created_by)
+                        (employee_id, source_type, source_id, points, points_type, description, notes, awarded_by, created_by)
                         VALUES (
                             {$engagement['assigned_to']}, 
                             'ENGAGEMENT', 
@@ -883,6 +883,7 @@ ob_end_flush();
                             $points_awarded, 
                             'EARNED', 
                             'Points awarded for completing engagement: {$engagement['title']}', 
+                            '" . mysqli_real_escape_string($connection, $closure_notes) . "',
                             {$_SESSION['user_id']},
                             {$_SESSION['user_id']}
                         )";
