@@ -188,8 +188,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_evidence'])) {
     if ($requires_checklist) {
         foreach ($checklist_items as $key => $item) {
             if ($item['required']) {
-                $value = null;
-                
                 switch ($item['type']) {
                     case 'radio_date':
                         $yn = isset($_POST['checklist_' . $key . '_yn']) ? $_POST['checklist_' . $key . '_yn'] : '';
@@ -407,9 +405,11 @@ ob_end_flush();
                     </div>
                     <?php endif; ?>
 
+                    <!-- START OF UPLOAD FORM -->
+                    <form method="POST" action="" enctype="multipart/form-data" id="uploadForm">
+                    
                     <!-- Checklist Section (for required engagement types) -->
                     <?php if ($requires_checklist): ?>
-                    <form method="POST" action="" enctype="multipart/form-data" id="uploadForm">
                     <div class="checklist-container mb-4">
                         <div class="d-flex align-items-center mb-3">
                             <i class="bi bi-clipboard-check fs-4 me-2 text-primary"></i>
@@ -624,27 +624,30 @@ ob_end_flush();
                             </div>
                         <?php endif; ?>
                         
-                            <div class="upload-box text-center p-5" id="dropZone" style="<?php echo $engagement['status'] === 'CLOSED' ? 'pointer-events: none; opacity: 0.6;' : ''; ?>">
-                                <i class="bi bi-cloud-arrow-up display-1 text-muted"></i>
-                                <h5 class="mt-3">Drag & Drop Files Here</h5>
-                                <p class="text-muted">or</p>
-                                <label for="evidence_file" class="btn btn-primary <?php echo $engagement['status'] === 'CLOSED' ? 'disabled' : ''; ?>">
-                                    <i class="bi bi-folder2-open me-2"></i>Browse Files
-                                </label>
-                                <input type="file" id="evidence_file" name="evidence_file" style="display: none;" <?php echo $engagement['status'] === 'CLOSED' ? 'disabled' : ''; ?>>
-                                <p class="text-muted small mt-3">
-                                    <i class="bi bi-info-circle me-1"></i>
-                                    Max file size: 10MB | Any file type allowed
-                                </p>
-                                <div id="fileInfo" class="mt-3 text-start" style="display: none;"></div>
-                            </div>
-                            <div class="text-center mt-4">
-                                <button type="submit" name="upload_evidence" class="btn btn-success btn-lg" id="uploadBtn" <?php echo $engagement['status'] === 'CLOSED' ? 'disabled' : ''; ?>>
-                                    <i class="bi bi-cloud-upload me-2"></i>Upload File
-                                </button>
-                            </div>
-                        </form>
+                        <div class="upload-box text-center p-5" id="dropZone" style="<?php echo $engagement['status'] === 'CLOSED' ? 'pointer-events: none; opacity: 0.6;' : ''; ?>">
+                            <i class="bi bi-cloud-arrow-up display-1 text-muted"></i>
+                            <h5 class="mt-3">Drag & Drop Files Here</h5>
+                            <p class="text-muted">or</p>
+                            <label for="evidence_file" class="btn btn-primary <?php echo $engagement['status'] === 'CLOSED' ? 'disabled' : ''; ?>">
+                                <i class="bi bi-folder2-open me-2"></i>Browse Files
+                            </label>
+                            <input type="file" id="evidence_file" name="evidence_file" style="display: none;" <?php echo $engagement['status'] === 'CLOSED' ? 'disabled' : ''; ?>>
+                            <p class="text-muted small mt-3">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Max file size: 10MB | Any file type allowed
+                            </p>
+                            <div id="fileInfo" class="mt-3 text-start" style="display: none;"></div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" name="upload_evidence" class="btn btn-success btn-lg" id="uploadBtn" <?php echo $engagement['status'] === 'CLOSED' ? 'disabled' : ''; ?>>
+                                <i class="bi bi-cloud-upload me-2"></i>Upload File
+                            </button>
+                        </div>
                     </div>
+                    
+                    </form>
+                    <!-- END OF UPLOAD FORM -->
+                    
                 </div>
             </div>
 
@@ -757,7 +760,7 @@ ob_end_flush();
     </div>
 </div>
 
-<!-- Add JavaScript for checklist radio button toggles -->
+<!-- JavaScript for checklist radio button toggles -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Function to toggle date field visibility
@@ -770,19 +773,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (dateContainer) {
             if (radio.checked && radio.value === 'Yes') {
-                // Show date field
                 dateContainer.style.display = 'block';
                 if (dateField) {
                     dateField.disabled = false;
-                    dateField.required = true;
                 }
             } else if (radio.checked && radio.value === 'No') {
-                // Hide and clear date field
                 dateContainer.style.display = 'none';
                 if (dateField) {
                     dateField.value = '';
                     dateField.disabled = true;
-                    dateField.required = false;
                 }
             }
         }
@@ -797,56 +796,13 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleDateField(this);
         });
         
-        // Initialize on page load - check if this radio is checked
+        // Initialize on page load
         if (radio.checked) {
             toggleDateField(radio);
         }
     });
     
-    // Form validation before submit
-    const uploadForm = document.getElementById('uploadForm');
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', function(e) {
-            // Ensure all required date fields are filled when Yes is selected
-            const radioGroups = {};
-            
-            // Group radio buttons by name
-            radioButtons.forEach(function(radio) {
-                const name = radio.name;
-                if (!radioGroups[name]) {
-                    radioGroups[name] = [];
-                }
-                radioGroups[name].push(radio);
-            });
-            
-            // Check each group
-            for (const [name, radios] of Object.entries(radioGroups)) {
-                let selectedValue = null;
-                for (const radio of radios) {
-                    if (radio.checked) {
-                        selectedValue = radio.value;
-                        break;
-                    }
-                }
-                
-                if (selectedValue === 'Yes') {
-                    // Get the key from the first radio in the group
-                    const key = radios[0].getAttribute('data-key');
-                    const dateField = document.getElementById(key + '_date');
-                    if (dateField && (!dateField.value || dateField.value.trim() === '')) {
-                        e.preventDefault();
-                        alert('Please enter a completion date for ' + dateField.closest('.checklist-item').querySelector('.form-label').innerText.replace('*', '').trim());
-                        dateField.focus();
-                        return false;
-                    }
-                }
-            }
-        });
-    }
-});
-
-// File upload handling
-document.addEventListener('DOMContentLoaded', function() {
+    // File upload handling
     const fileInput = document.getElementById('evidence_file');
     const fileInfo = document.getElementById('fileInfo');
     const dropZone = document.getElementById('dropZone');
@@ -931,7 +887,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php endif; ?>
 
 <style>
-/* Styles remain the same as your existing CSS */
 .engagement-summary {
     background: #f8f9fa;
     border-radius: 12px;
