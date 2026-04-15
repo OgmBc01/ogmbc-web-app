@@ -17,8 +17,8 @@ include 'includes/header-1.php'
         <div class="col-lg-10">
             <div class="profile-viewer-container">
                 <!-- Download PDF Button -->
-                <a href="resources/docs/OGMBC-Company-Profile-2025.pdf" class="btn btn-outline-primary ms-2" download>
-                    <i class="bi bi-download me-1"></i> Download PDF
+                <a href="resources/docs/OGMBC-Company-Profile-2026.pdf" class="btn btn-outline-primary ms-2" download>
+                  <i class="bi bi-download me-1"></i> Download PDF
                 </a>
             
                 <!-- Profile Viewer -->
@@ -55,7 +55,7 @@ include 'includes/header-1.php'
                     <button id="prev-page" class="btn btn-outline-secondary me-2" title="Previous Page">
                         <i class="bi bi-chevron-left"></i>
                     </button>
-                    <span id="page-indicator" class="mx-2">Page <span id="current-page">1</span> of <span id="total-pages">16</span></span>
+                    <span id="page-indicator" class="mx-2">Page <span id="current-page">1</span> of <span id="total-pages">10</span></span>
                     <button id="next-page" class="btn btn-outline-secondary me-2" title="Next Page">
                         <i class="bi bi-chevron-right"></i>
                     </button>
@@ -80,7 +80,7 @@ include 'includes/header-1.php'
 <script>
 // Configuration - Update these paths according to your file structure
 const PAGE_CONFIG = {
-  totalPages: 16,
+  totalPages: 10,
   imageBasePath: 'resources/img/profile-pages/',
   imageFormat: 'jpg', // or 'png', 'webp'
   imageQuality: 'high' // for naming convention if you have different quality versions
