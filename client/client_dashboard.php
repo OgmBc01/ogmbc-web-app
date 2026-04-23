@@ -3,7 +3,6 @@ include 'includes/client_header.php';
 include 'includes/client_nav.php';
 include 'includes/client_sidebar.php';
 
-
 // Get the logged-in user's client_id (not just user_id)
 $user_id = $_SESSION['user_id'];
 $client_id = null;
@@ -22,7 +21,6 @@ $today = date('Y-m-d');
 // ============================================
 // DASHBOARD STATISTICS QUERIES
 // ============================================
-
 
 // 1. Active Engagements Count (for this client)
 $active_engagements_query = "SELECT 

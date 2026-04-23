@@ -61,11 +61,15 @@ if (!empty($stats_where_clause)) {
     $overdue_query = "SELECT COUNT(*) as overdue FROM engagements 
         $stats_where_clause
         AND status NOT IN ('CLOSED', 'SUBMITTED')
-        AND COALESCE(approved_deadline, original_deadline) < CURDATE()";
+        AND COALESCE(approved_deadline, original_deadline) < CURDATE()
+        AND MONTH(COALESCE(approved_deadline, original_deadline)) = MONTH(CURDATE())
+        AND YEAR(COALESCE(approved_deadline, original_deadline)) = YEAR(CURDATE())";
 } else {
     $overdue_query = "SELECT COUNT(*) as overdue FROM engagements 
         WHERE status NOT IN ('CLOSED', 'SUBMITTED')
-        AND COALESCE(approved_deadline, original_deadline) < CURDATE()";
+        AND COALESCE(approved_deadline, original_deadline) < CURDATE()
+        AND MONTH(COALESCE(approved_deadline, original_deadline)) = MONTH(CURDATE())
+        AND YEAR(COALESCE(approved_deadline, original_deadline)) = YEAR(CURDATE())";
 }
 $overdue_result = mysqli_query($connection, $overdue_query);
 $overdue = mysqli_fetch_assoc($overdue_result);
@@ -148,6 +152,7 @@ $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
                         <option value="AWAITING_REVIEW" <?php echo (isset($_GET['status']) && $_GET['status'] == 'AWAITING_REVIEW') ? 'selected' : ''; ?>>Awaiting Review</option>
                         <option value="SUBMITTED" <?php echo (isset($_GET['status']) && $_GET['status'] == 'SUBMITTED') ? 'selected' : ''; ?>>Submitted</option>
                         <option value="CLOSED" <?php echo (isset($_GET['status']) && $_GET['status'] == 'CLOSED') ? 'selected' : ''; ?>>Closed</option>
+                        <option value="OVERDUE_MONTH" <?php echo (isset($_GET['status']) && $_GET['status'] == 'OVERDUE_MONTH') ? 'selected' : ''; ?>>Overdue (This Month)</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -223,7 +228,15 @@ $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
                         $where_conditions = [];
                         if (!empty($_GET['status'])) {
                             $status = mysqli_real_escape_string($connection, $_GET['status']);
-                            $where_conditions[] = "e.status = '$status'";
+                            if ($status === 'OVERDUE_MONTH') {
+                                // Overdue this month: not closed/submitted, deadline in current month and before today
+                                $where_conditions[] = "e.status NOT IN ('CLOSED', 'SUBMITTED')";
+                                $where_conditions[] = "COALESCE(e.approved_deadline, e.original_deadline) < CURDATE()";
+                                $where_conditions[] = "MONTH(COALESCE(e.approved_deadline, e.original_deadline)) = MONTH(CURDATE())";
+                                $where_conditions[] = "YEAR(COALESCE(e.approved_deadline, e.original_deadline)) = YEAR(CURDATE())";
+                            } else {
+                                $where_conditions[] = "e.status = '$status'";
+                            }
                         }
                         if (!empty($_GET['employee_id'])) {
                             $employee_id = (int)$_GET['employee_id'];

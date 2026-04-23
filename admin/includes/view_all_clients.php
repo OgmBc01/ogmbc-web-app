@@ -27,7 +27,12 @@ $date_to = isset($_GET['date_to']) && is_valid_date($_GET['date_to']) ? mysqli_r
 
 $where_clauses = [];
 if (!empty($status_filter)) {
-    $where_clauses[] = "client_status = '$status_filter'";
+    if ($status_filter === 'OVERDUE_MONTH') {
+        // Only show clients with at least one overdue engagement this month
+        $where_clauses[] = "EXISTS (SELECT 1 FROM engagements e WHERE e.client_id = c.client_id AND e.status NOT IN ('CLOSED', 'SUBMITTED') AND COALESCE(e.approved_deadline, e.original_deadline) < CURDATE() AND MONTH(COALESCE(e.approved_deadline, e.original_deadline)) = MONTH(CURDATE()) AND YEAR(COALESCE(e.approved_deadline, e.original_deadline)) = YEAR(CURDATE()))";
+    } else {
+        $where_clauses[] = "client_status = '$status_filter'";
+    }
 }
 if (!empty($date_from)) {
     $where_clauses[] = "DATE(created_at) >= '$date_from'";
@@ -58,6 +63,10 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                                 <div class="h5 mb-0">
                                     <?php
                                     $lead_where = $where_clauses;
+                                    // Remove EXISTS clause for stat cards to avoid alias error
+                                    $lead_where = array_filter($lead_where, function($clause) {
+                                        return strpos($clause, 'EXISTS (SELECT 1 FROM engagements') === false;
+                                    });
                                     $lead_where[] = "client_status = 'New Lead'";
                                     $lead_sql = !empty($lead_where) ? "WHERE " . implode(" AND ", $lead_where) : "";
                                     $query = "SELECT COUNT(*) as count FROM clients $lead_sql";
@@ -83,6 +92,9 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                                 <div class="h5 mb-0">
                                     <?php
                                     $pending_where = $where_clauses;
+                                    $pending_where = array_filter($pending_where, function($clause) {
+                                        return strpos($clause, 'EXISTS (SELECT 1 FROM engagements') === false;
+                                    });
                                     $pending_where[] = "client_status IN ('Under Manager Review', 'Under CEO Review')";
                                     $pending_sql = !empty($pending_where) ? "WHERE " . implode(" AND ", $pending_where) : "";
                                     $query = "SELECT COUNT(*) as count FROM clients $pending_sql";
@@ -108,6 +120,9 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                                 <div class="h5 mb-0">
                                     <?php
                                     $awaiting_where = $where_clauses;
+                                    $awaiting_where = array_filter($awaiting_where, function($clause) {
+                                        return strpos($clause, 'EXISTS (SELECT 1 FROM engagements') === false;
+                                    });
                                     $awaiting_where[] = "client_status = 'Awaiting Client Action'";
                                     $awaiting_sql = !empty($awaiting_where) ? "WHERE " . implode(" AND ", $awaiting_where) : "";
                                     $query = "SELECT COUNT(*) as count FROM clients $awaiting_sql";
@@ -133,6 +148,9 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                                 <div class="h5 mb-0">
                                     <?php
                                     $finance_where = $where_clauses;
+                                    $finance_where = array_filter($finance_where, function($clause) {
+                                        return strpos($clause, 'EXISTS (SELECT 1 FROM engagements') === false;
+                                    });
                                     $finance_where[] = "client_status = 'Signed – Move to Finance'";
                                     $finance_sql = !empty($finance_where) ? "WHERE " . implode(" AND ", $finance_where) : "";
                                     $query = "SELECT COUNT(*) as count FROM clients $finance_sql";
@@ -159,6 +177,10 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                                 <div class="h5 mb-0">
                                     <?php
                                     $expiring30_where = $where_clauses;
+                                    // Remove EXISTS clause for stat cards to avoid alias error
+                                    $expiring30_where = array_filter($expiring30_where, function($clause) {
+                                        return strpos($clause, 'EXISTS (SELECT 1 FROM engagements') === false;
+                                    });
                                     $expiring30_where[] = "contract_end_date IS NOT NULL";
                                     $expiring30_sql = !empty($expiring30_where) ? "WHERE " . implode(" AND ", $expiring30_where) : "";
                                     $expiring30_query = "SELECT COUNT(*) as count FROM clients $expiring30_sql AND contract_end_date >= CURDATE() AND contract_end_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)";
@@ -170,6 +192,30 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                             </div>
                             <div class="col-auto">
                                 <i class="bi bi-calendar-event fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Overdue Engagements (This Month) Stat Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-dark text-white mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Overdue Engagements (This Month)</div>
+                                <div class="h5 mb-0">
+                                    <?php
+                                    // Overdue engagements: deadline in current month, not closed/submitted, and before today
+                                    $overdue_sql = "SELECT COUNT(*) as count FROM engagements WHERE status NOT IN ('CLOSED', 'SUBMITTED') AND COALESCE(approved_deadline, original_deadline) < CURDATE() AND MONTH(COALESCE(approved_deadline, original_deadline)) = MONTH(CURDATE()) AND YEAR(COALESCE(approved_deadline, original_deadline)) = YEAR(CURDATE())";
+                                    $overdue_result = mysqli_query($connection, $overdue_sql);
+                                    $overdue_row = $overdue_result ? mysqli_fetch_assoc($overdue_result) : ['count' => 0];
+                                    echo $overdue_row['count'];
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-exclamation-triangle fa-2x"></i>
                             </div>
                         </div>
                     </div>
@@ -203,6 +249,7 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                             <option value="Awaiting Client Action">Awaiting Client Action</option>
                             <option value="Signed – Move to Finance">Signed – Move to Finance</option>
                             <option value="Inactive">Inactive</option>
+                            <option value="OVERDUE_MONTH" <?php echo ($status_filter == 'OVERDUE_MONTH') ? 'selected' : ''; ?>>Overdue (This Month)</option>
                         </select>
                     </div>
                     <div class="col-md-3">

@@ -294,43 +294,7 @@ $overdue_days = abs($engagement['days_remaining']);
                 </div>
             </div>
 
-            <!-- Service & Points Card -->
-            <div class="info-card mb-4">
-                <h6 class="info-title">
-                    <i class="bi bi-trophy me-2"></i>Service & Points (Version <?php echo $engagement['rule_version']; ?>)
-                </h6>
-                <div class="info-content">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <p class="mb-2"><strong>Service:</strong> <?php echo htmlspecialchars($engagement['service_name']); ?></p>
-                            <p class="mb-0"><strong>Category:</strong> <span class="badge bg-info"><?php echo $engagement['service_category']; ?></span></p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-2"><strong>Base Points:</strong> <?php echo $engagement['base_points']; ?></p>
-                            <p class="mb-0"><strong>Rule Version:</strong> v<?php echo $engagement['rule_version']; ?></p>
-                        </div>
-                    </div>
-                    
-                    <div class="points-grid">
-                        <div class="points-tier">
-                            <span class="tier-label">On Time</span>
-                            <span class="tier-value"><?php echo $engagement['points_within_deadline']; ?></span>
-                        </div>
-                        <div class="points-tier">
-                            <span class="tier-label">5-15 Days</span>
-                            <span class="tier-value"><?php echo $engagement['points_tier_1']; ?></span>
-                        </div>
-                        <div class="points-tier">
-                            <span class="tier-label">16-25 Days</span>
-                            <span class="tier-value"><?php echo $engagement['points_tier_2']; ?></span>
-                        </div>
-                        <div class="points-tier">
-                            <span class="tier-label">>25 Days</span>
-                            <span class="tier-value"><?php echo $engagement['points_tier_3']; ?></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Service & Points Card removed for client view -->
 
             <!-- Description -->
             <?php if (!empty($engagement['description'])): ?>

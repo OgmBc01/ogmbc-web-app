@@ -245,8 +245,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_evidence'])) {
         $file_size = $file['size'];
         
         $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-        if ($file_size > 10 * 1024 * 1024) { // 10MB max
-            $message = "File size too large. Maximum size: 10MB";
+        if ($file_size > 50 * 1024 * 1024) { // 50MB max
+            $message = "File size too large. Maximum size: 50MB";
             $message_type = "danger";
         } else {
             // Create upload directory
@@ -634,7 +634,7 @@ ob_end_flush();
                             <input type="file" id="evidence_file" name="evidence_file" style="display: none;" <?php echo $engagement['status'] === 'CLOSED' ? 'disabled' : ''; ?>>
                             <p class="text-muted small mt-3">
                                 <i class="bi bi-info-circle me-1"></i>
-                                Max file size: 10MB | Any file type allowed
+                                Max file size: 50MB | Any file type allowed
                             </p>
                             <div id="fileInfo" class="mt-3 text-start" style="display: none;"></div>
                         </div>
