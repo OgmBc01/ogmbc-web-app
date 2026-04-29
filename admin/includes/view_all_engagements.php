@@ -36,6 +36,7 @@ if (!empty($_GET['date_to'])) {
     $date_to = mysqli_real_escape_string($connection, $_GET['date_to']);
     $stats_where_conditions[] = "start_date <= '$date_to'";
 }
+$search_company = isset($_GET['search_company']) ? trim(mysqli_real_escape_string($connection, $_GET['search_company'])) : '';
 $stats_where_clause = '';
 if (!empty($stats_where_conditions)) {
     $stats_where_clause = 'WHERE ' . implode(' AND ', $stats_where_conditions);
@@ -155,6 +156,10 @@ $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
                         <option value="OVERDUE_MONTH" <?php echo (isset($_GET['status']) && $_GET['status'] == 'OVERDUE_MONTH') ? 'selected' : ''; ?>>Overdue (This Month)</option>
                     </select>
                 </div>
+                    <div class="col-md-3">
+                        <label for="search_company" class="form-label">Search Company</label>
+                        <input type="text" name="search_company" id="search_company" class="form-control" placeholder="Type company name..." value="<?php echo htmlspecialchars($search_company); ?>">
+                    </div>
                 <div class="col-md-3">
                     <label for="client_filter" class="form-label">Client</label>
                     <select id="client_filter" name="client_id" class="form-control">
@@ -246,6 +251,9 @@ $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
                             $client_id = (int)$_GET['client_id'];
                             $where_conditions[] = "e.client_id = $client_id";
                         }
+                        if (!empty($search_company)) {
+                            $where_conditions[] = "c.company_name LIKE '%$search_company%'";
+                        }
                         if (!empty($_GET['date_from'])) {
                             $date_from = mysqli_real_escape_string($connection, $_GET['date_from']);
                             $where_conditions[] = "e.start_date >= '$date_from'";
@@ -254,7 +262,6 @@ $is_manager = ($user_role_id == 2 || strtolower($user_role_name) == 'manager');
                             $date_to = mysqli_real_escape_string($connection, $_GET['date_to']);
                             $where_conditions[] = "e.start_date <= '$date_to'";
                         }
-                        
                         $where_clause = '';
                         if (!empty($where_conditions)) {
                             $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);

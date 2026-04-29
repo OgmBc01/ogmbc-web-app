@@ -22,6 +22,8 @@ function is_valid_date($date) {
     return preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) && strtotime($date) !== false;
 }
 
+
+$search_company = isset($_GET['search_company']) ? trim(mysqli_real_escape_string($connection, $_GET['search_company'])) : '';
 $date_from = isset($_GET['date_from']) && is_valid_date($_GET['date_from']) ? mysqli_real_escape_string($connection, $_GET['date_from']) : '';
 $date_to = isset($_GET['date_to']) && is_valid_date($_GET['date_to']) ? mysqli_real_escape_string($connection, $_GET['date_to']) : '';
 
@@ -30,9 +32,16 @@ if (!empty($status_filter)) {
     if ($status_filter === 'OVERDUE_MONTH') {
         // Only show clients with at least one overdue engagement this month
         $where_clauses[] = "EXISTS (SELECT 1 FROM engagements e WHERE e.client_id = c.client_id AND e.status NOT IN ('CLOSED', 'SUBMITTED') AND COALESCE(e.approved_deadline, e.original_deadline) < CURDATE() AND MONTH(COALESCE(e.approved_deadline, e.original_deadline)) = MONTH(CURDATE()) AND YEAR(COALESCE(e.approved_deadline, e.original_deadline)) = YEAR(CURDATE()))";
+    } else if ($status_filter === 'EXPIRING_MONTH') {
+        // Only show clients with contract_end_date in the next 30 days
+        $where_clauses[] = "contract_end_date IS NOT NULL AND contract_end_date >= CURDATE() AND contract_end_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)";
     } else {
         $where_clauses[] = "client_status = '$status_filter'";
     }
+}
+
+if (!empty($search_company)) {
+    $where_clauses[] = "company_name LIKE '%$search_company%'";
 }
 if (!empty($date_from)) {
     $where_clauses[] = "DATE(created_at) >= '$date_from'";
@@ -203,7 +212,7 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <div class="text-xs font-weight-bold text-uppercase mb-1">Overdue Engagements (This Month)</div>
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Over due Engagements (This Month)</div>
                                 <div class="h5 mb-0">
                                     <?php
                                     // Overdue engagements: deadline in current month, not closed/submitted, and before today
@@ -232,6 +241,10 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                 <form method="GET" action="" class="row g-3" id="filterForm">
                     <input type="hidden" name="source" value="view_all">
                     <div class="col-md-3">
+                        <label for="search_company" class="form-label">Search Company</label>
+                        <input type="text" name="search_company" id="search_company" class="form-control" placeholder="Type company name..." value="<?php echo htmlspecialchars($search_company); ?>">
+                    </div>
+                    <div class="col-md-3">
                         <label for="status_filter" class="form-label">Status</label>
                         <select name="status_filter" id="status_filter" class="form-control">
                             <option value="">All Statuses</option>
@@ -250,6 +263,7 @@ $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses
                             <option value="Signed – Move to Finance">Signed – Move to Finance</option>
                             <option value="Inactive">Inactive</option>
                             <option value="OVERDUE_MONTH" <?php echo ($status_filter == 'OVERDUE_MONTH') ? 'selected' : ''; ?>>Overdue (This Month)</option>
+                            <option value="EXPIRING_MONTH" <?php echo ($status_filter == 'EXPIRING_MONTH') ? 'selected' : ''; ?>>Expiring this month</option>
                         </select>
                     </div>
                     <div class="col-md-3">
