@@ -3,25 +3,33 @@ include 'includes/header.php';
 include 'includes/nav.php';
 include 'includes/sidebar.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+// Get performer user_id from query string
+if (!isset($_GET['user_id']) || !is_numeric($_GET['user_id'])) {
+    echo '<div class="alert alert-danger">Invalid performer selected.</div>';
+    include 'includes/footer.php';
     exit();
 }
+$performer_id = (int)$_GET['user_id'];
 
-// Fetch logged-in user details
-$user_id = $_SESSION['user_id'];
+// Fetch performer details
 $sql = "
-    SELECT u.*, e.field_of_study, e.qualification, e.highest_graduation, e.year_of_graduation, e.user_type 
+    SELECT u.*, e.field_of_study, e.qualification, e.highest_graduation, e.year_of_graduation 
     FROM users u
     LEFT JOIN employees e ON u.user_id = e.user_id
     WHERE u.user_id = ?
 ";
 $stmt = $connection->prepare($sql);
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param("i", $performer_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $stmt->close();
+
+if (!$user) {
+    echo '<div class="alert alert-danger">Performer not found.</div>';
+    include 'includes/footer.php';
+    exit();
+}
 ?>
 
 <!-- Main Content -->
@@ -35,11 +43,9 @@ $stmt->close();
                         <div class="text-center mb-4">
                           <div class="user-image-container mx-auto mb-3">
                                 <img src="<?php 
-                                    // Check if user has a profile image uploaded
                                     if (!empty($user['user_image']) && file_exists('../uploads/profiles/' . $user['user_image'])) {
                                         echo '../uploads/profiles/' . htmlspecialchars($user['user_image']);
                                     } else {
-                                        // Fallback to default avatar using UI Avatars API
                                         $name = urlencode(($user['first_name'] ?? '') . '+' . ($user['last_name'] ?? ''));
                                         echo "https://ui-avatars.com/api/?name=$name&background=f1bf70&color=0f172a&size=128";
                                     }
@@ -85,7 +91,12 @@ $stmt->close();
                                         <i class="bi bi-gear me-2"></i>Account Information
                                     </h5>
                                     <div class="info-item">
+                                        <span class="info-label"><i class="bi bi-shield me-2"></i>User Role</span>
+                                        <span class="info-value badge bg-primary"><?php echo htmlspecialchars($user['user_role'] ?? ''); ?></span>
+                                    </div>
+                                    <div class="info-item">
                                         <span class="info-label"><i class="bi bi-person-workspace me-2"></i>User Type</span>
+                                        <span class="info-value badge bg-info"><?php echo htmlspecialchars($user['user_type'] ?? ''); ?></span>
                                     </div>
                                     <div class="info-item">
                                         <span class="info-label"><i class="bi bi-circle-fill me-2"></i>Account Status</span>
@@ -132,10 +143,10 @@ $stmt->close();
                         </div>
                         <?php endif; ?>
 
-                        <!-- Edit Button -->
+                        <!-- Back Button -->
                         <div class="text-center mt-4">
-                            <a href="edit_profile.php" class="btn btn-warning btn-edit-profile">
-                                <i class="bi bi-pencil me-2"></i> Edit Profile
+                            <a href="performers.php" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i> Back to Performers
                             </a>
                         </div>
                     </div>
@@ -146,5 +157,5 @@ $stmt->close();
 </div> 
 
 <?php
-include 'includes/footer.php'
+include 'includes/footer.php';
 ?>

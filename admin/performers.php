@@ -462,8 +462,23 @@ if ($previous_period_stats['active_employees'] > 0) {
                                         <i class="bi bi-trophy-fill"></i>
                                         <span>2</span>
                                     </div>
-                                    <div class="performer-avatar bg-secondary-soft">
-                                        <i class="bi bi-person-circle fs-1 text-secondary"></i>
+                                    <div class="performer-avatar mx-auto mb-2">
+                                        <?php
+                                        if (!empty($top_performers[1]['user_id'])) {
+                                            $img_path = '../uploads/profiles/' . $top_performers[1]['user_id'] . '.jpg';
+                                            if (!empty($top_performers[1]['user_image']) && file_exists('../uploads/profiles/' . $top_performers[1]['user_image'])) {
+                                                $img_url = '../uploads/profiles/' . htmlspecialchars($top_performers[1]['user_image']);
+                                            } elseif (file_exists($img_path)) {
+                                                $img_url = $img_path;
+                                            } else {
+                                                $name = urlencode($top_performers[1]['employee_name']);
+                                                $img_url = "https://ui-avatars.com/api/?name=$name&background=f1bf70&color=0f172a&size=128";
+                                            }
+                                            echo '<img src="' . $img_url . '" alt="Profile" class="rounded-circle" style="width:70px;height:70px;object-fit:cover;">';
+                                        } else {
+                                            echo '<img src="https://ui-avatars.com/api/?name=No+Data&background=f1bf70&color=0f172a&size=128" alt="Profile" class="rounded-circle" style="width:70px;height:70px;object-fit:cover;">';
+                                        }
+                                        ?>
                                     </div>
                                     <h4 class="performer-name"><?php echo htmlspecialchars($top_performers[1]['employee_name']); ?></h4>
                                     <p class="performer-role"><?php echo htmlspecialchars($top_performers[1]['role_name'] ?? 'Employee'); ?></p>
@@ -482,7 +497,7 @@ if ($previous_period_stats['active_employees'] > 0) {
                                         </div>
                                     </div>
                                     <?php if ($top_performers[1]['user_id']): ?>
-                                        <a href="profile.php?user_id=<?php echo $top_performers[1]['user_id']; ?>" class="btn btn-outline-secondary btn-sm mt-3">
+                                        <a href="performer_profile.php?user_id=<?php echo $top_performers[1]['user_id']; ?>" class="btn btn-outline-secondary btn-sm mt-3">
                                             View Profile <i class="bi bi-arrow-right"></i>
                                         </a>
                                     <?php endif; ?>
@@ -496,8 +511,23 @@ if ($previous_period_stats['active_employees'] > 0) {
                                         <i class="bi bi-trophy-fill"></i>
                                         <span>1</span>
                                     </div>
-                                    <div class="performer-avatar bg-warning-soft">
-                                        <i class="bi bi-star-fill fs-1 text-warning"></i>
+                                    <div class="performer-avatar mx-auto mb-2">
+                                        <?php
+                                        if (!empty($top_performers[0]['user_id'])) {
+                                            $img_path = '../uploads/profiles/' . $top_performers[0]['user_id'] . '.jpg';
+                                            if (!empty($top_performers[0]['user_image']) && file_exists('../uploads/profiles/' . $top_performers[0]['user_image'])) {
+                                                $img_url = '../uploads/profiles/' . htmlspecialchars($top_performers[0]['user_image']);
+                                            } elseif (file_exists($img_path)) {
+                                                $img_url = $img_path;
+                                            } else {
+                                                $name = urlencode($top_performers[0]['employee_name']);
+                                                $img_url = "https://ui-avatars.com/api/?name=$name&background=f1bf70&color=0f172a&size=128";
+                                            }
+                                            echo '<img src="' . $img_url . '" alt="Profile" class="rounded-circle" style="width:80px;height:80px;object-fit:cover;">';
+                                        } else {
+                                            echo '<img src="https://ui-avatars.com/api/?name=No+Data&background=f1bf70&color=0f172a&size=128" alt="Profile" class="rounded-circle" style="width:80px;height:80px;object-fit:cover;">';
+                                        }
+                                        ?>
                                     </div>
                                     <h4 class="performer-name"><?php echo htmlspecialchars($top_performers[0]['employee_name']); ?></h4>
                                     <p class="performer-role"><?php echo htmlspecialchars($top_performers[0]['role_name'] ?? 'Employee'); ?></p>
@@ -520,7 +550,7 @@ if ($previous_period_stats['active_employees'] > 0) {
                                         </div>
                                     </div>
                                     <?php if ($top_performers[0]['user_id']): ?>
-                                        <a href="profile.php?user_id=<?php echo $top_performers[0]['user_id']; ?>" class="btn btn-warning btn-sm mt-3">
+                                        <a href="performer_profile.php?user_id=<?php echo $top_performers[0]['user_id']; ?>" class="btn btn-warning btn-sm mt-3">
                                             <i class="bi bi-crown"></i> View Champion
                                         </a>
                                     <?php endif; ?>
@@ -534,8 +564,23 @@ if ($previous_period_stats['active_employees'] > 0) {
                                         <i class="bi bi-trophy-fill"></i>
                                         <span>3</span>
                                     </div>
-                                    <div class="performer-avatar bg-secondary-soft">
-                                        <i class="bi bi-person-circle fs-1 text-secondary"></i>
+                                    <div class="performer-avatar mx-auto mb-2">
+                                        <?php
+                                        if (!empty($top_performers[2]['user_id'])) {
+                                            $img_path = '../uploads/profiles/' . $top_performers[2]['user_id'] . '.jpg';
+                                            if (!empty($top_performers[2]['user_image']) && file_exists('../uploads/profiles/' . $top_performers[2]['user_image'])) {
+                                                $img_url = '../uploads/profiles/' . htmlspecialchars($top_performers[2]['user_image']);
+                                            } elseif (file_exists($img_path)) {
+                                                $img_url = $img_path;
+                                            } else {
+                                                $name = urlencode($top_performers[2]['employee_name']);
+                                                $img_url = "https://ui-avatars.com/api/?name=$name&background=f1bf70&color=0f172a&size=128";
+                                            }
+                                            echo '<img src="' . $img_url . '" alt="Profile" class="rounded-circle" style="width:70px;height:70px;object-fit:cover;">';
+                                        } else {
+                                            echo '<img src="https://ui-avatars.com/api/?name=No+Data&background=f1bf70&color=0f172a&size=128" alt="Profile" class="rounded-circle" style="width:70px;height:70px;object-fit:cover;">';
+                                        }
+                                        ?>
                                     </div>
                                     <h4 class="performer-name"><?php echo htmlspecialchars($top_performers[2]['employee_name']); ?></h4>
                                     <p class="performer-role"><?php echo htmlspecialchars($top_performers[2]['role_name'] ?? 'Employee'); ?></p>
@@ -554,7 +599,7 @@ if ($previous_period_stats['active_employees'] > 0) {
                                         </div>
                                     </div>
                                     <?php if ($top_performers[2]['user_id']): ?>
-                                        <a href="profile.php?user_id=<?php echo $top_performers[2]['user_id']; ?>" class="btn btn-outline-secondary btn-sm mt-3">
+                                        <a href="performer_profile.php?user_id=<?php echo $top_performers[2]['user_id']; ?>" class="btn btn-outline-secondary btn-sm mt-3">
                                             View Profile <i class="bi bi-arrow-right"></i>
                                         </a>
                                     <?php endif; ?>
