@@ -42,17 +42,19 @@ if ($is_admin && isset($_GET['delete_band'])) {
 
 // Update Operations bands to match new requirements
 if ($is_admin) {
-    // Remove all old bands for Operations
+    // Remove all old bands for Operations and Sales
     mysqli_query($connection, "DELETE FROM salary_increment_bands WHERE department_type = 'OPERATIONS'");
-    // Insert new bands
-    $new_ops_bands = [
+    mysqli_query($connection, "DELETE FROM salary_increment_bands WHERE department_type = 'SALES'");
+    // Insert new bands (same for both)
+    $new_bands = [
         [60, 69, 5],
         [70, 79, 10],
         [80, 89, 15],
         [90.01, 100, 20], // >90% to 100%
     ];
-    foreach ($new_ops_bands as $band) {
+    foreach ($new_bands as $band) {
         mysqli_query($connection, "INSERT INTO salary_increment_bands (department_type, min_performance, max_performance, increment_percentage) VALUES ('OPERATIONS', {$band[0]}, {$band[1]}, {$band[2]})");
+        mysqli_query($connection, "INSERT INTO salary_increment_bands (department_type, min_performance, max_performance, increment_percentage) VALUES ('SALES', {$band[0]}, {$band[1]}, {$band[2]})");
     }
 }
 $ops_bands_query = "SELECT * FROM salary_increment_bands WHERE department_type = 'OPERATIONS' ORDER BY min_performance";
@@ -106,7 +108,7 @@ $sales_bands_result = mysqli_query($connection, $sales_bands_query);
         <!-- Operations Bands -->
         <div class="col-md-6">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header" style="background-color: #002147; color: #fff;">
                     <h5 class="mb-0"><i class="bi bi-building"></i> Operations Department</h5>
                 </div>
                 <div class="card-body">
@@ -143,7 +145,7 @@ $sales_bands_result = mysqli_query($connection, $sales_bands_query);
         <!-- Sales Bands -->
         <div class="col-md-6">
             <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
+                <div class="card-header" style="background-color: #002147; color: #fff;">
                     <h5 class="mb-0"><i class="bi bi-graph-up"></i> Sales Department</h5>
                 </div>
                 <div class="card-body">
@@ -180,7 +182,7 @@ $sales_bands_result = mysqli_query($connection, $sales_bands_query);
 
     <!-- Default Bands Info -->
     <div class="card mt-4">
-        <div class="card-header bg-light">
+        <div class="card-header" style="background-color: #002147; color: #fff;">
             <h6 class="mb-0"><i class="bi bi-info-circle"></i> Default Bands (from requirements)</h6>
         </div>
         <div class="card-body">
@@ -197,9 +199,10 @@ $sales_bands_result = mysqli_query($connection, $sales_bands_query);
                 <div class="col-md-6">
                     <h6>Sales</h6>
                     <ul>
-                        <li>65% - 80% → 25% increment</li>
-                        <li>81% - 90% → 30% increment</li>
-                        <li>91% - 100% → 35% increment</li>
+                        <li>60% - 69% → 5% increment</li>
+                        <li>70% - 79% → 10% increment</li>
+                        <li>80% - 89% → 15% increment</li>
+                        <li>90%+ → 20% increment</li>
                     </ul>
                 </div>
             </div>
