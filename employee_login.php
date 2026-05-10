@@ -12,6 +12,9 @@ if (isLoggedIn()) {
     } elseif (isOperations()) {
         header("Location: operations/operations_dashboard.php");
         exit();
+    } elseif (isSales()) {
+        header("Location: sales/sales_dashboard.php");
+        exit();
     } else {
         // If logged in but not employee, logout and show employee login
         logout();
@@ -30,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $auth = authenticateUser($username, $password, $connection);
         
         if ($auth['success']) {
-            // Check if this is an employee (type_id 1 or 7)
-            if ($auth['user']['type_id'] == 1 || $auth['user']['type_id'] == 7) {
+            // Check if this is an employee (type_id 1, 7, or 8)
+            if ($auth['user']['type_id'] == 1 || $auth['user']['type_id'] == 7 || $auth['user']['type_id'] == 8) {
                 // Also check for admin (role_id 1, type_id 7) or (role_id 2, type_id 1)
                 if (
                     ($auth['user']['role_id'] == 1 && $auth['user']['type_id'] == 7) ||
@@ -39,9 +42,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ) {
                     header("Location: admin/dashboard.php");
                     exit();
-                } elseif (isOperations()) {
+                } elseif ($auth['user']['role_id'] == 4 && $auth['user']['type_id'] == 1) {
                     header("Location: operations/operations_dashboard.php");
                     exit();
+                } elseif ($auth['user']['role_id'] == 4 && $auth['user']['type_id'] == 8) {
+                    // Set session variables for sales employee (check for 'user_id' existence)
+                    if (isset($auth['user']['user_id'])) {
+                        $_SESSION['user_id'] = $auth['user']['user_id'];
+                        $_SESSION['role_id'] = $auth['user']['role_id'];
+                        $_SESSION['type_id'] = $auth['user']['type_id'];
+                        // Ensure no output before header
+                        header("Location: sales/sales_dashboard.php");
+                        exit();
+                    } else {
+                        // If 'user_id' is missing, logout and show error
+                        logout();
+                        $error = "Login error: User ID missing. Please contact admin.";
+                    }
                 } else {
                     // If logged in but not employee, logout and show employee login
                     logout();

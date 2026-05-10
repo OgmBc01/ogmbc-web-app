@@ -90,6 +90,15 @@ function isOperations() {
 }
 
 /**
+ * Check if current user is sales department employee (role_id 4, type_id 8)
+ * @return bool
+ */
+function isSales() {
+    return (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 4 && 
+            isset($_SESSION['type_id']) && $_SESSION['type_id'] == 8);
+}
+
+/**
  * Check if current user is client (role_id 4, type_id 2)
  * @return bool
  */
