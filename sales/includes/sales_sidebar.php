@@ -169,12 +169,6 @@
                         <span class="nav-text">Change Password</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="profile.php?source=activity">
-                        <i class="bi bi-clock-history nav-icon"></i>
-                        <span class="nav-text">Activity Log</span>
-                    </a>
-                </li>
             </ul>
         </li>
     </ul>

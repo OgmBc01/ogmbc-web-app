@@ -196,8 +196,8 @@ $summary = mysqli_fetch_assoc($summary_result);
                             <thead>
                                 <tr>
                                     <th>Period</th>
-                                    <th>Target (₱)</th>
-                                    <th>Actual (₱)</th>
+                                    <th>Target (AED)</th>
+                                    <th>Actual (AED)</th>
                                     <th>Attainment</th>
                                     <th>Points</th>
                                     <th>Status</th>
@@ -250,10 +250,10 @@ $summary = mysqli_fetch_assoc($summary_result);
                                     <td>
                                         <strong><?php echo $period_name; ?></strong>
                                     </td>
-                                    <td>₱<?php echo number_format($target['target_value'], 2); ?></td>
+                                    <td>AED <?php echo number_format($target['target_value'], 2); ?></td>
                                     <td>
                                         <?php if ($target['actual_value']): ?>
-                                            ₱<?php echo number_format($target['actual_value'], 2); ?>
+                                            AED <?php echo number_format($target['actual_value'], 2); ?>
                                         <?php else: ?>
                                             <span class="text-muted">—</span>
                                         <?php endif; ?>
