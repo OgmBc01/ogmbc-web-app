@@ -11,6 +11,7 @@
         </div>
     </div>
     
+
     <ul class="nav flex-column">
         <!-- Dashboard -->
         <li class="nav-item">
@@ -18,6 +19,15 @@
                href="sales_dashboard.php">
                 <i class="bi bi-speedometer2 nav-icon"></i>
                 <span class="nav-text">Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Sales Targets -->
+        <li class="nav-item">
+            <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'sales_targets.php') ? 'active' : ''; ?>" 
+               href="sales_targets.php">
+                <i class="bi bi-bullseye nav-icon"></i>
+                <span class="nav-text">Sales Targets</span>
             </a>
         </li>
 

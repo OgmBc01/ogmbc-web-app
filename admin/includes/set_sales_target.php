@@ -32,10 +32,13 @@ $showSuccessModal = false;
 $new_target_id = null;
 
 // Get sales employees for dropdown (from employees table, but use user_id for value)
-$sales_query = "SELECT e.user_id, e.first_name, e.last_name 
-                FROM employees e
-                WHERE e.department_id = 4
-                ORDER BY e.first_name, e.last_name";
+
+// Get users with type_name 'sales' or type_id 8
+$sales_query = "SELECT u.user_id, u.first_name, u.last_name 
+                FROM users u
+                LEFT JOIN user_types t ON u.type_id = t.type_id
+                WHERE t.type_name = 'sales' OR u.type_id = 8
+                ORDER BY u.first_name, u.last_name";
 $sales_result = mysqli_query($connection, $sales_query);
 
 // Handle form submission

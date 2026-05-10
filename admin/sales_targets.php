@@ -168,7 +168,7 @@ if (isset($_GET['validate']) && $is_sales_manager) {
 <div class="modal fade" id="targetDetailsModal" tabindex="-1" aria-labelledby="targetDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0a2240 0%, #1a3a5a 100%); color: #fff;">
                 <h5 class="modal-title" id="targetDetailsModalLabel">Target Details</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
