@@ -189,10 +189,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_user'])) {
                 }
             }
             
-            if ($is_operations) {
+            if ($is_operations || $type_id == 8 || $type_name === 'sales') {
                 $emp_insert_query = "INSERT INTO employees (user_id, user_email, password, first_name, last_name, user_image, department_id, created_at, user_type) VALUES (?, ?, ?, ?, ?, ?, NULL, NOW(), ?)";
                 $emp_stmt = $connection->prepare($emp_insert_query);
-                $user_type = 'operations';
+                $user_type = ($is_operations ? 'operations' : 'sales');
                 $emp_stmt->bind_param("issssss", $new_user_id, $user_email, $hashed_password, $first_name, $last_name, $user_image, $user_type);
                 $emp_stmt->execute();
                 $emp_stmt->close();

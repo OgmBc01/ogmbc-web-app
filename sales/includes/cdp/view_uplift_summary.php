@@ -209,17 +209,6 @@ while ($row = mysqli_fetch_assoc($result)) {
         <div class="row">
             <div class="col-md-6">
                 <div class="guide-card">
-                    <h6>Operations Staff</h6>
-                    <ul class="list-unstyled">
-                        <li><span class="badge bg-success me-2">Certificates</span> +18% each</li>
-                        <li><span class="badge bg-info me-2">Courses</span> +7% each</li>
-                        <li><span class="badge bg-warning me-2">Loyalty</span> +3% each</li>
-                        <li><span class="badge bg-primary me-2">Behavior</span> +2% each</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="guide-card">
                     <h6>Sales Staff</h6>
                     <ul class="list-unstyled">
                         <li><span class="badge bg-success me-2">Certificates</span> +15% each</li>
