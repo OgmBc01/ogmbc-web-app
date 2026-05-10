@@ -20,31 +20,6 @@
                 <span class="nav-text">Dashboard</span>
             </a>
         </li>
-    
-        <!-- Clients -->
-        <li class="nav-item">
-            <a class="nav-link menu-toggle-btn <?php echo (basename($_SERVER['PHP_SELF']) == 'clients.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
-               href="#" data-menu="clients">
-                <i class="bi bi-people nav-icon"></i>
-                <span class="nav-text">My Clients</span>
-                <i class="bi bi-chevron-right menu-toggle"></i>
-            </a>
-            <ul class="sub-menu" id="clients-menu">
-                <li class="nav-item">
-                    <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'clients.php' && !isset($_GET['source'])) ? 'active' : ''; ?>" 
-                       href="clients.php">
-                        <i class="bi bi-list-ul nav-icon"></i>
-                        <span class="nav-text">All Clients</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="clients.php?filter=active">
-                        <i class="bi bi-chat-dots nav-icon"></i>
-                        <span class="nav-text">Recent Activity</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
 
         <!-- Activities / Timesheet -->
         <li class="nav-item">

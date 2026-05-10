@@ -397,8 +397,8 @@ $sales_progress_result = mysqli_query($connection, $sales_progress_query);
                         </div>
                         <div class="stat-content">
                             <h3 class="stat-value"><?php echo $engagement_stats['overdue_engagements']; ?></h3>
-                            <p class="stat-label">Overdue</p>
-                            <div class="stat-progress">
+                            <p class="stat-label">Missed Deadlines</p>
+                            <div class="stat-progress mb-2">
                                 <small class="text-danger">Need attention</small>
                             </div>
                         </div>
