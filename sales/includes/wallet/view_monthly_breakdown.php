@@ -1,10 +1,4 @@
 <?php
-// Ensure $user_id and $current_year are set
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
-$current_year = date('Y');
 // Get available years
 $years_query = "SELECT DISTINCT YEAR(created_at) as year 
                 FROM points_ledger 

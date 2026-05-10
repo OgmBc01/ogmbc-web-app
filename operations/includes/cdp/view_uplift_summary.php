@@ -177,7 +177,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <div class="impact-calculation">
                         <div class="calculation-item">
                             <span>Base points conversion:</span>
-                            <span>70% (Ops) / 75% (Sales)</span>
+                            <span>70% (Ops)</span>
                         </div>
                         <div class="calculation-item">
                             <span>CDP Uplift:</span>
@@ -185,7 +185,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                         </div>
                         <div class="calculation-item total">
                             <span>Potential Total:</span>
-                            <span><?php echo min(100, 70 + $yearly_total); ?>% (Ops) / <?php echo min(100, 75 + $yearly_total); ?>% (Sales)</span>
+                            <span><?php echo min(100, 70 + $yearly_total); ?>% (Ops)</span>
                         </div>
                     </div>
                 </div>
@@ -213,17 +213,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <ul class="list-unstyled">
                         <li><span class="badge bg-success me-2">Certificates</span> +18% each</li>
                         <li><span class="badge bg-info me-2">Courses</span> +7% each</li>
-                        <li><span class="badge bg-warning me-2">Loyalty</span> +3% each</li>
-                        <li><span class="badge bg-primary me-2">Behavior</span> +2% each</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="guide-card">
-                    <h6>Sales Staff</h6>
-                    <ul class="list-unstyled">
-                        <li><span class="badge bg-success me-2">Certificates</span> +15% each</li>
-                        <li><span class="badge bg-info me-2">Courses</span> +5% each</li>
                         <li><span class="badge bg-warning me-2">Loyalty</span> +3% each</li>
                         <li><span class="badge bg-primary me-2">Behavior</span> +2% each</li>
                     </ul>

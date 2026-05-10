@@ -1,12 +1,4 @@
 <?php
-// Ensure $user_id is set from session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
-// Ensure current month and year are set
-$current_month = date('n');
-$current_year = date('Y');
 // Get wallet statistics
 $stats_query = "SELECT 
     COALESCE(SUM(CASE WHEN points_type IN ('EARNED', 'ADJUSTMENT') THEN points ELSE 0 END), 0) as total_points,
