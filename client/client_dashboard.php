@@ -3,49 +3,53 @@ include 'includes/client_header.php';
 include 'includes/client_nav.php';
 include 'includes/client_sidebar.php';
 
-// Get the logged-in user's client_id (not just user_id)
-$user_id = $_SESSION['user_id'];
+// Get client_id for this user
+$user_id = (int)$_SESSION['user_id'];
 $client_id = null;
-// Lookup client_id from clients table using user_id
-$client_lookup = mysqli_query($connection, "SELECT client_id FROM clients WHERE user_id = " . intval($user_id) . " LIMIT 1");
-if ($client_lookup && mysqli_num_rows($client_lookup) > 0) {
-    $client_row = mysqli_fetch_assoc($client_lookup);
-    $client_id = $client_row['client_id'];
+
+// Get the client_id associated with this user
+$client_query = "SELECT client_id FROM clients WHERE user_id = $user_id LIMIT 1";
+$client_result = mysqli_query($connection, $client_query);
+if ($client_row = mysqli_fetch_assoc($client_result)) {
+    $client_id = (int)$client_row['client_id'];
 }
+
+// If no client found, try to find by user_id as client_id (legacy)
 if (!$client_id) {
-    // fallback: use user_id as client_id (legacy)
     $client_id = $user_id;
 }
+
 $today = date('Y-m-d');
 
 // ============================================
 // DASHBOARD STATISTICS QUERIES
 // ============================================
 
-// 1. Active Engagements Count (for this client)
+// 1. Active Engagements Count
 $active_engagements_query = "SELECT 
     COUNT(*) as total,
     SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
-    SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review
+    SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
+    SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned
     FROM engagements 
     WHERE client_id = $client_id AND status NOT IN ('CLOSED', 'SUBMITTED')";
 $active_result = mysqli_query($connection, $active_engagements_query);
-$active_stats = mysqli_fetch_assoc($active_result) ?: ['total' => 0, 'in_progress' => 0, 'awaiting_review' => 0];
+$active_stats = mysqli_fetch_assoc($active_result);
+if (!$active_stats) {
+    $active_stats = ['total' => 0, 'in_progress' => 0, 'awaiting_review' => 0, 'assigned' => 0];
+}
 
-
-// 2. Files Count (for this client)
+// 2. Files Count
 $files_query = "SELECT COUNT(*) as total FROM client_files WHERE client_id = $client_id";
 $files_result = mysqli_query($connection, $files_query);
 $files_count = mysqli_fetch_assoc($files_result)['total'] ?? 0;
 
-
-// 3. Unread Notifications (for this client)
+// 3. Unread Notifications
 $notifications_query = "SELECT COUNT(*) as total FROM client_notifications WHERE client_id = $client_id AND is_read = 0";
 $notifications_result = mysqli_query($connection, $notifications_query);
 $unread_notifications = mysqli_fetch_assoc($notifications_result)['total'] ?? 0;
 
-
-// 4. Recent Activity (for this client)
+// 4. Recent Activity
 $activity_query = "SELECT 
     'engagement' as type,
     e.title as description,
@@ -77,8 +81,7 @@ $activity_query = "SELECT
     LIMIT 10";
 $activity_result = mysqli_query($connection, $activity_query);
 
-
-// 5. Engagement Status Distribution (for this client)
+// 5. Engagement Status Distribution
 $status_query = "SELECT 
     status,
     COUNT(*) as count
@@ -87,8 +90,7 @@ $status_query = "SELECT
     GROUP BY status";
 $status_result = mysqli_query($connection, $status_query);
 
-
-// 6. Monthly Engagement Trends (Last 6 months, for this client)
+// 6. Monthly Engagement Trends (Last 6 months)
 $monthly_query = "SELECT 
     DATE_FORMAT(created_at, '%Y-%m') as month,
     COUNT(*) as count
@@ -99,8 +101,7 @@ $monthly_query = "SELECT
     ORDER BY month ASC";
 $monthly_result = mysqli_query($connection, $monthly_query);
 
-
-// 7. Upcoming Deadlines (Next 5, for this client)
+// 7. Upcoming Deadlines (Next 5)
 $upcoming_query = "SELECT 
     e.engagement_id,
     e.title,
@@ -109,13 +110,12 @@ $upcoming_query = "SELECT
     DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining
     FROM engagements e
     WHERE e.client_id = $client_id AND e.status NOT IN ('CLOSED', 'SUBMITTED')
-    HAVING days_remaining >= 0
+    HAVING days_remaining >= 0 OR days_remaining IS NULL
     ORDER BY deadline ASC
     LIMIT 5";
 $upcoming_result = mysqli_query($connection, $upcoming_query);
 
-
-// 8. Team Members (Assigned Staff, for this client)
+// 8. Team Members (Assigned Staff)
 $team_query = "SELECT DISTINCT 
     u.user_id, 
     u.first_name, 
@@ -132,22 +132,23 @@ $team_query = "SELECT DISTINCT
     LIMIT 4";
 $team_result = mysqli_query($connection, $team_query);
 
-
-// 9. Recent Files (for this client)
+// 9. Recent Files
 $recent_files_query = "SELECT * FROM client_files 
                        WHERE client_id = $client_id 
                        ORDER BY uploaded_at DESC 
                        LIMIT 5";
 $recent_files_result = mysqli_query($connection, $recent_files_query);
 
-
-// 10. Client Info (for this client)
+// 10. Client Info
 $client_info_query = "SELECT * FROM clients WHERE client_id = $client_id";
 $client_info_result = mysqli_query($connection, $client_info_query);
 $client_info = mysqli_fetch_assoc($client_info_result);
 
 // Get current year for display
 $current_year = date('Y');
+
+// Calculate total active engagements correctly
+$total_active_engagements = ($active_stats['in_progress'] ?? 0) + ($active_stats['assigned'] ?? 0);
 ?>
 
 <!-- Include Chart.js -->
@@ -190,11 +191,14 @@ $current_year = date('Y');
                             <i class="bi bi-briefcase-fill text-primary"></i>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-value"><?php echo $active_stats['total']; ?></h3>
+                            <h3 class="stat-value"><?php echo $total_active_engagements; ?></h3>
                             <p class="stat-label">Active Engagements</p>
                             <div class="stat-progress">
                                 <span class="badge bg-info-soft text-info me-2">
                                     <i class="bi bi-play-circle me-1"></i><?php echo $active_stats['in_progress']; ?> In Progress
+                                </span>
+                                <span class="badge bg-secondary-soft text-secondary me-2">
+                                    <i class="bi bi-person-lines-fill me-1"></i><?php echo $active_stats['assigned']; ?> Assigned
                                 </span>
                                 <span class="badge bg-warning-soft text-warning">
                                     <i class="bi bi-clock me-1"></i><?php echo $active_stats['awaiting_review']; ?> Review
@@ -279,6 +283,7 @@ $current_year = date('Y');
                         <span class="badge" style="background: #f1bf70; color: #0a2240;">Live</span>
                     </div>
                     <div class="card-body">
+                        <?php if ($status_result && mysqli_num_rows($status_result) > 0): ?>
                         <div style="display: flex; justify-content: center; align-items: center; min-height: 260px; overflow: visible;">
                             <canvas id="statusChart" style="height: 220px; width: 220px; max-width: 100%; max-height: 220px; display: block; z-index: 2;"></canvas>
                         </div>
@@ -290,7 +295,7 @@ $current_year = date('Y');
                                 'AWAITING_REVIEW' => '#ffc107',
                                 'SUBMITTED' => '#198754',
                                 'CLOSED' => '#0dcaf0',
-                                'REJECTED' => '#dc3545'
+                                'SENT_BACK' => '#dc3545'
                             ];
                             $total_engagements = 0;
                             $status_data = [];
@@ -311,6 +316,12 @@ $current_year = date('Y');
                             </div>
                             <?php endforeach; ?>
                         </div>
+                        <?php else: ?>
+                        <div class="empty-state py-4">
+                            <i class="bi bi-pie-chart display-4"></i>
+                            <p class="text-muted mt-2">No engagement data available.</p>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -351,7 +362,10 @@ $current_year = date('Y');
                         <?php if ($upcoming_result && mysqli_num_rows($upcoming_result) > 0): ?>
                             <div class="task-timeline">
                                 <?php while($task = mysqli_fetch_assoc($upcoming_result)): 
-                                    $days_class = $task['days_remaining'] <= 2 ? 'danger' : ($task['days_remaining'] <= 5 ? 'warning' : 'success');
+                                    $days_class = 'success';
+                                    if ($task['days_remaining'] !== null) {
+                                        $days_class = $task['days_remaining'] <= 2 ? 'danger' : ($task['days_remaining'] <= 5 ? 'warning' : 'success');
+                                    }
                                     $status_class = $task['status'] == 'IN_PROGRESS' ? 'primary' : ($task['status'] == 'AWAITING_REVIEW' ? 'warning' : 'secondary');
                                 ?>
                                 <div class="task-item">
@@ -367,13 +381,14 @@ $current_year = date('Y');
                                                 <p class="task-client">
                                                     <i class="bi bi-tag me-1"></i>
                                                     <a href="engagements.php?source=view_details&id=<?php echo $task['engagement_id']; ?>" class="text-decoration-underline">
-                                                        ENG-<?php echo date('dmy', strtotime($task['deadline'])); ?>-<?php echo $task['engagement_id']; ?>
+                                                        ENG-<?php echo date('dmy', strtotime($task['deadline'] ?? $today)); ?>-<?php echo $task['engagement_id']; ?>
                                                     </a>
                                                 </p>
                                             </div>
                                             <span class="badge bg-<?php echo $status_class; ?>"><?php echo $task['status']; ?></span>
                                         </div>
                                         <div class="task-meta">
+                                            <?php if ($task['days_remaining'] !== null): ?>
                                             <span class="deadline-badge bg-<?php echo $days_class; ?>-soft text-<?php echo $days_class; ?>">
                                                 <i class="bi bi-clock me-1"></i>
                                                 <?php 
@@ -385,6 +400,9 @@ $current_year = date('Y');
                                             <span class="text-muted">
                                                 <i class="bi bi-calendar3 me-1"></i><?php echo date('M d, Y', strtotime($task['deadline'])); ?>
                                             </span>
+                                            <?php else: ?>
+                                            <span class="text-muted">No deadline set</span>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -766,7 +784,6 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 /* Statistics Cards */
-
 .stat-card {
     background: white;
     border-radius: 20px;
@@ -854,11 +871,10 @@ document.addEventListener('DOMContentLoaded', function() {
     overflow: hidden;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
     border: 1px solid rgba(0, 0, 0, 0.05);
-    max-height: 400px;
     min-height: 320px;
     display: flex;
     flex-direction: column;
-    padding-bottom: 24px; /* Added for extra space at bottom */
+    padding-bottom: 24px;
 }
 
 .card-header {
@@ -879,6 +895,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .card-body {
     padding: 20px;
+    flex: 1;
+    overflow-y: auto;
 }
 
 /* Task Timeline */
@@ -940,6 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
     gap: 15px;
     align-items: center;
     font-size: 0.85rem;
+    flex-wrap: wrap;
 }
 
 .deadline-badge {

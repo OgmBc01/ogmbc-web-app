@@ -493,13 +493,13 @@ $overdue_days = abs($engagement['days_remaining']);
                 <div class="info-content">
                     <?php while($req = mysqli_fetch_assoc($requests_result)): 
                         $status_class = 'warning';
-                        $status_text = 'Pending';
+                        $status_text = 'Under Review';
                         if ($req['status'] == 'APPROVED') {
                             $status_class = 'success';
                             $status_text = 'Approved';
-                        } elseif ($req['status'] == 'REJECTED') {
+                        } elseif ($req['status'] == 'SENT_BACK') {
                             $status_class = 'danger';
-                            $status_text = 'Rejected';
+                            $status_text = 'Sent Back';
                         }
                     ?>
                     <div class="request-item">
