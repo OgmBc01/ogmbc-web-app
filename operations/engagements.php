@@ -32,7 +32,7 @@ if (!empty($engagement_ids)) {
     while ($row = mysqli_fetch_assoc($evidence_stats_result)) {
         $status = strtolower($row['status']);
         if ($status === 'accepted' || $status === 'approved') $approved_count += (int)$row['cnt'];
-        elseif ($status === 'sent_back') $rejected_count += (int)$row['cnt'];
+        elseif ($status === 'rejected') $rejected_count += (int)$row['cnt'];
     }
 
     // Detect new approvals/rejections since last visit (simple session-based notification)
@@ -46,7 +46,7 @@ if (!empty($engagement_ids)) {
         $eid = $row['evidence_id'];
         $status = strtolower($row['status']);
         if (!isset($seen[$eid]) && ($status === 'accepted' || $status === 'approved')) $new_approved++;
-        if (!isset($seen[$eid]) && $status === 'sent_back') $new_rejected++;
+        if (!isset($seen[$eid]) && $status === 'rejected') $new_rejected++;
         // Mark as seen for next time
         $seen[$eid] = $status;
     }

@@ -146,19 +146,6 @@ if (!empty($client_ids)) {
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card stat-card-danger">
-                <div class="stat-card-body d-flex align-items-center">
-                    <div class="stat-icon">
-                        <i class="bi bi-exclamation-triangle text-danger"></i>
-                    </div>
-                    <div class="stat-content ms-3">
-                        <h3 class="stat-value mb-0"><?php echo $overdue['overdue'] ?? 0; ?></h3>
-                        <p class="stat-label mb-0">Overdue</p>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Filter Tabs -->

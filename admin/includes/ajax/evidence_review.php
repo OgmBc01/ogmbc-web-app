@@ -21,7 +21,7 @@ $evidence_id = isset($_POST['evidence_id']) ? (int)$_POST['evidence_id'] : 0;
 $action = $_POST['action'] ?? '';
 $reason = trim($_POST['reason'] ?? '');
 
-if (!$evidence_id || !in_array($action, ['APPROVED','SENT_BACK'])) {
+if (!$evidence_id || !in_array($action, ['APPROVED','REJECTED'])) {
     echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
     exit;
 }
@@ -66,7 +66,7 @@ $get_status_r = mysqli_query($connection, $get_status_q);
 $eng = mysqli_fetch_assoc($get_status_r);
 if ($eng && !in_array($eng['status'], ['CLOSED','SUBMITTED'])) {
     $old_status = $eng['status'];
-    $new_status = ($action === 'APPROVED') ? 'EVIDENCE_APPROVED' : 'EVIDENCE_SENT_BACK';
+    $new_status = ($action === 'APPROVED') ? 'EVIDENCE_APPROVED' : 'EVIDENCE_REJECTED';
     $update_eng = "UPDATE engagements SET status = '$new_status' WHERE engagement_id = $engagement_id";
     mysqli_query($connection, $update_eng);
     $history_query = "INSERT INTO engagement_status_history (engagement_id, old_status, new_status, changed_by, notes) VALUES ($engagement_id, '" . mysqli_real_escape_string($connection, $old_status) . "', '$new_status', $user_id, 'Evidence $action by reviewer.')";

@@ -257,9 +257,6 @@ $overdue_days = abs($engagement['days_remaining']);
                         <a href="engagements.php?source=upload_evidence&id=<?php echo $engagement_id; ?>" class="btn btn-outline-success">
                             <i class="bi bi-cloud-upload me-2"></i>Upload Evidence
                         </a>
-                        <a href="engagements.php?source=request_deadline&id=<?php echo $engagement_id; ?>" class="btn btn-outline-primary">
-                            <i class="bi bi-calendar-plus me-2"></i>Request Deadline Change
-                        </a>
                     <?php endif; ?>
                     <button class="btn btn-outline-secondary" onclick="scrollToComments()">
                         <i class="bi bi-chat me-2"></i>Add Comment

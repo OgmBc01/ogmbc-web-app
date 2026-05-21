@@ -1,0 +1,20 @@
+@Html.ActionLink("Index", "Index", "Home",null, new { @class = "nav-link"})
+
+1. Open VS and reate MVC PROJECT
+	a. Make sure to select ASP .NET Web Application (.NET Framework)
+	b. Rename project and or change location, then click on 'Next'
+2. On the Create a new ASP.NET Web Application window, click on Empty and the check box next to MVC, then click 'Create'
+3. Inside the project environment, go to solution explorer and right click on Controller and Click Add, then click on Controller
+4. Next select MVC 5 Controller - Empty and click Add
+5. Rename to HomeController, that is it
+6. Now click on view and add on MVC 5 Layout Page (Razor)
+	a. Copy header parts source code from external index.html and paste inside the newly created LayoutPage1.chtml, just after the opening body tag. And head part should be replaced with auto-generated head of layout page
+	b. Also copy footer and js source codes part and page them just after the closing tag of @RenderBody()
+7. Now open controller page and create methods for all pages
+8. Now its time to add view. Simply right click on index and click on Add View, then click on 'MVC 5 View' and click 'Add'. Also name it as index
+9. On the Add View pop up box, select layout page by clicking the three dots, then click on the views folder and select LayoutPage1.chtml, OK.
+10. Now copy the body part and paste it in index.chtml. Make sure to replace code with h2 tag
+11. Now copy assets folder and paste inside the project
+12. Add tilder ~ before all links
+13. Run project and see
+
