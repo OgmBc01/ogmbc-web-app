@@ -3,154 +3,338 @@ include 'includes/client_header.php';
 include 'includes/client_nav.php';
 include 'includes/client_sidebar.php';
 
-// Get client_id for this user
+// Get client_ids for this user (a user can have multiple clients)
 $user_id = (int)$_SESSION['user_id'];
-$client_id = null;
+$client_ids = [];
 
-// Get the client_id associated with this user
-$client_query = "SELECT client_id FROM clients WHERE user_id = $user_id LIMIT 1";
+// Get all client_ids associated with this user
+$client_query = "SELECT client_id FROM clients WHERE user_id = $user_id";
 $client_result = mysqli_query($connection, $client_query);
-if ($client_row = mysqli_fetch_assoc($client_result)) {
-    $client_id = (int)$client_row['client_id'];
+while ($client_row = mysqli_fetch_assoc($client_result)) {
+    $client_ids[] = (int)$client_row['client_id'];
 }
 
-// If no client found, try to find by user_id as client_id (legacy)
-if (!$client_id) {
-    $client_id = $user_id;
+// If no clients found, try to find engagements directly by user_id (legacy)
+if (empty($client_ids)) {
+    // Fallback: check if there are engagements with assigned_to = user_id
+    $check_engagements = "SELECT COUNT(*) as count FROM engagements WHERE assigned_to = $user_id LIMIT 1";
+    $check_result = mysqli_query($connection, $check_engagements);
+    $check = mysqli_fetch_assoc($check_result);
+    
+    if ($check['count'] > 0) {
+        // Use a special flag to query by assigned_to instead
+        $query_by_assigned = true;
+    } else {
+        // Last resort: use user_id as client_id
+        $client_ids = [$user_id];
+        $query_by_assigned = false;
+    }
+} else {
+    $query_by_assigned = false;
 }
+
+// Convert client_ids array to comma-separated string for IN clause
+$client_ids_str = !empty($client_ids) ? implode(',', $client_ids) : '0';
 
 $today = date('Y-m-d');
+
+// Debug: Log the client IDs (remove in production)
+// error_log("User ID: $user_id, Client IDs: " . print_r($client_ids, true));
 
 // ============================================
 // DASHBOARD STATISTICS QUERIES
 // ============================================
 
-// 1. Active Engagements Count
-$active_engagements_query = "SELECT 
-    COUNT(*) as total,
-    SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
-    SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
-    SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned
-    FROM engagements 
-    WHERE client_id = $client_id AND status NOT IN ('CLOSED', 'SUBMITTED')";
+// 1. Active Engagements Count - Modified to handle multiple clients
+if ($query_by_assigned) {
+    // Query by assigned_to instead of client_id
+    $active_engagements_query = "SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
+        SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
+        SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned
+        FROM engagements 
+        WHERE assigned_to = $user_id AND status NOT IN ('CLOSED', 'SUBMITTED')";
+} else {
+    // Query by client_id(s)
+    $active_engagements_query = "SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
+        SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
+        SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned
+        FROM engagements 
+        WHERE client_id IN ($client_ids_str) AND status NOT IN ('CLOSED', 'SUBMITTED')";
+}
 $active_result = mysqli_query($connection, $active_engagements_query);
-$active_stats = mysqli_fetch_assoc($active_result);
-if (!$active_stats) {
+if (!$active_result) {
+    error_log("MySQL Error: " . mysqli_error($connection));
     $active_stats = ['total' => 0, 'in_progress' => 0, 'awaiting_review' => 0, 'assigned' => 0];
+} else {
+    $active_stats = mysqli_fetch_assoc($active_result);
+    if (!$active_stats) {
+        $active_stats = ['total' => 0, 'in_progress' => 0, 'awaiting_review' => 0, 'assigned' => 0];
+    }
 }
 
-// 2. Files Count
-$files_query = "SELECT COUNT(*) as total FROM client_files WHERE client_id = $client_id";
+// 2. Files Count - Modified to handle multiple clients
+if ($query_by_assigned) {
+    // For files, we need to get files from engagements assigned to this user
+    $files_query = "SELECT COUNT(DISTINCT cf.file_id) as total 
+                    FROM client_files cf
+                    JOIN engagements e ON cf.client_id = e.client_id
+                    WHERE e.assigned_to = $user_id";
+} else {
+    $files_query = "SELECT COUNT(*) as total FROM client_files WHERE client_id IN ($client_ids_str)";
+}
 $files_result = mysqli_query($connection, $files_query);
-$files_count = mysqli_fetch_assoc($files_result)['total'] ?? 0;
+$files_count = ($files_result && ($row = mysqli_fetch_assoc($files_result))) ? ($row['total'] ?? 0) : 0;
 
-// 3. Unread Notifications
-$notifications_query = "SELECT COUNT(*) as total FROM client_notifications WHERE client_id = $client_id AND is_read = 0";
+// 3. Unread Notifications - Modified to handle multiple clients
+if ($query_by_assigned) {
+    $notifications_query = "SELECT COUNT(DISTINCT cn.notification_id) as total 
+                            FROM client_notifications cn
+                            JOIN engagements e ON cn.client_id = e.client_id
+                            WHERE e.assigned_to = $user_id AND cn.is_read = 0";
+} else {
+    $notifications_query = "SELECT COUNT(*) as total FROM client_notifications 
+                            WHERE client_id IN ($client_ids_str) AND is_read = 0";
+}
 $notifications_result = mysqli_query($connection, $notifications_query);
-$unread_notifications = mysqli_fetch_assoc($notifications_result)['total'] ?? 0;
+$unread_notifications = ($notifications_result && ($row = mysqli_fetch_assoc($notifications_result))) ? ($row['total'] ?? 0) : 0;
 
-// 4. Recent Activity
-$activity_query = "SELECT 
-    'engagement' as type,
-    e.title as description,
-    e.updated_at as created_at,
-    e.status as details,
-    e.engagement_id
-    FROM engagements e
-    WHERE e.client_id = $client_id
-    UNION ALL
-    SELECT 
-    'file' as type,
-    CONCAT('File uploaded: ', file_name) as description,
-    uploaded_at as created_at,
-    uploaded_by as details,
-    NULL as engagement_id
-    FROM client_files 
-    WHERE client_id = $client_id
-    UNION ALL
-    SELECT 
-    'comment' as type,
-    LEFT(c.comment, 50) as description,
-    c.created_at,
-    CONCAT('Comment on engagement #', c.engagement_id) as details,
-    c.engagement_id
-    FROM task_comments c
-    JOIN engagements e ON c.engagement_id = e.engagement_id
-    WHERE e.client_id = $client_id
-    ORDER BY created_at DESC
-    LIMIT 10";
+// 4. Recent Activity - Modified to handle multiple clients
+if ($query_by_assigned) {
+    $activity_query = "SELECT 
+        'engagement' as type,
+        e.title as description,
+        e.updated_at as created_at,
+        e.status as details,
+        e.engagement_id
+        FROM engagements e
+        WHERE e.assigned_to = $user_id
+        UNION ALL
+        SELECT 
+        'file' as type,
+        CONCAT('File uploaded: ', cf.file_name) as description,
+        cf.uploaded_at as created_at,
+        cf.uploaded_by as details,
+        NULL as engagement_id
+        FROM client_files cf
+        JOIN engagements e ON cf.client_id = e.client_id
+        WHERE e.assigned_to = $user_id
+        UNION ALL
+        SELECT 
+        'comment' as type,
+        LEFT(c.comment, 50) as description,
+        c.created_at,
+        CONCAT('Comment on engagement #', c.engagement_id) as details,
+        c.engagement_id
+        FROM task_comments c
+        JOIN engagements e ON c.engagement_id = e.engagement_id
+        WHERE e.assigned_to = $user_id
+        ORDER BY created_at DESC
+        LIMIT 10";
+} else {
+    $activity_query = "SELECT 
+        'engagement' as type,
+        e.title as description,
+        e.updated_at as created_at,
+        e.status as details,
+        e.engagement_id
+        FROM engagements e
+        WHERE e.client_id IN ($client_ids_str)
+        UNION ALL
+        SELECT 
+        'file' as type,
+        CONCAT('File uploaded: ', file_name) as description,
+        uploaded_at as created_at,
+        uploaded_by as details,
+        NULL as engagement_id
+        FROM client_files 
+        WHERE client_id IN ($client_ids_str)
+        UNION ALL
+        SELECT 
+        'comment' as type,
+        LEFT(c.comment, 50) as description,
+        c.created_at,
+        CONCAT('Comment on engagement #', c.engagement_id) as details,
+        c.engagement_id
+        FROM task_comments c
+        JOIN engagements e ON c.engagement_id = e.engagement_id
+        WHERE e.client_id IN ($client_ids_str)
+        ORDER BY created_at DESC
+        LIMIT 10";
+}
 $activity_result = mysqli_query($connection, $activity_query);
 
-// 5. Engagement Status Distribution
-$status_query = "SELECT 
-    status,
-    COUNT(*) as count
-    FROM engagements 
-    WHERE client_id = $client_id
-    GROUP BY status";
+// 5. Engagement Status Distribution - Modified to handle multiple clients
+if ($query_by_assigned) {
+    $status_query = "SELECT 
+        status,
+        COUNT(*) as count
+        FROM engagements 
+        WHERE assigned_to = $user_id
+        GROUP BY status";
+} else {
+    $status_query = "SELECT 
+        status,
+        COUNT(*) as count
+        FROM engagements 
+        WHERE client_id IN ($client_ids_str)
+        GROUP BY status";
+}
 $status_result = mysqli_query($connection, $status_query);
 
-// 6. Monthly Engagement Trends (Last 6 months)
-$monthly_query = "SELECT 
-    DATE_FORMAT(created_at, '%Y-%m') as month,
-    COUNT(*) as count
-    FROM engagements 
-    WHERE client_id = $client_id 
-    AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-    GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-    ORDER BY month ASC";
+// 6. Monthly Engagement Trends - Modified to handle multiple clients
+if ($query_by_assigned) {
+    $monthly_query = "SELECT 
+        DATE_FORMAT(created_at, '%Y-%m') as month,
+        COUNT(*) as count
+        FROM engagements 
+        WHERE assigned_to = $user_id 
+        AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+        ORDER BY month ASC";
+} else {
+    $monthly_query = "SELECT 
+        DATE_FORMAT(created_at, '%Y-%m') as month,
+        COUNT(*) as count
+        FROM engagements 
+        WHERE client_id IN ($client_ids_str) 
+        AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+        ORDER BY month ASC";
+}
 $monthly_result = mysqli_query($connection, $monthly_query);
 
-// 7. Upcoming Deadlines (Next 5)
-$upcoming_query = "SELECT 
-    e.engagement_id,
-    e.title,
-    e.status,
-    COALESCE(e.approved_deadline, e.original_deadline) as deadline,
-    DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining
-    FROM engagements e
-    WHERE e.client_id = $client_id AND e.status NOT IN ('CLOSED', 'SUBMITTED')
-    HAVING days_remaining >= 0 OR days_remaining IS NULL
-    ORDER BY deadline ASC
-    LIMIT 5";
+// 7. Upcoming Deadlines - Modified to handle multiple clients
+if ($query_by_assigned) {
+    $upcoming_query = "SELECT 
+        e.engagement_id,
+        e.title,
+        e.status,
+        COALESCE(e.approved_deadline, e.original_deadline) as deadline,
+        DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining
+        FROM engagements e
+        WHERE e.assigned_to = $user_id AND e.status NOT IN ('CLOSED', 'SUBMITTED')
+        HAVING days_remaining >= 0 OR days_remaining IS NULL
+        ORDER BY deadline ASC
+        LIMIT 5";
+} else {
+    $upcoming_query = "SELECT 
+        e.engagement_id,
+        e.title,
+        e.status,
+        COALESCE(e.approved_deadline, e.original_deadline) as deadline,
+        DATEDIFF(COALESCE(e.approved_deadline, e.original_deadline), CURDATE()) as days_remaining
+        FROM engagements e
+        WHERE e.client_id IN ($client_ids_str) AND e.status NOT IN ('CLOSED', 'SUBMITTED')
+        HAVING days_remaining >= 0 OR days_remaining IS NULL
+        ORDER BY deadline ASC
+        LIMIT 5";
+}
 $upcoming_result = mysqli_query($connection, $upcoming_query);
 
-// 8. Team Members (Assigned Staff)
-$team_query = "SELECT DISTINCT 
-    u.user_id, 
-    u.first_name, 
-    u.last_name, 
-    u.user_email, 
-    u.user_image,
-    r.role_name,
-    COUNT(DISTINCT e.engagement_id) as engagement_count
-    FROM engagements e
-    JOIN users u ON e.assigned_to = u.user_id
-    LEFT JOIN user_roles r ON u.role_id = r.role_id
-    WHERE e.client_id = $client_id AND e.status != 'CLOSED'
-    GROUP BY u.user_id
-    LIMIT 4";
+// 8. Team Members - Modified to handle multiple clients
+if ($query_by_assigned) {
+    $team_query = "SELECT DISTINCT 
+        u.user_id, 
+        u.first_name, 
+        u.last_name, 
+        u.user_email, 
+        u.user_image,
+        r.role_name,
+        COUNT(DISTINCT e.engagement_id) as engagement_count
+        FROM engagements e
+        JOIN users u ON e.assigned_to = u.user_id
+        LEFT JOIN user_roles r ON u.role_id = r.role_id
+        WHERE e.assigned_to = u.user_id AND e.status != 'CLOSED'
+        GROUP BY u.user_id
+        LIMIT 4";
+} else {
+    $team_query = "SELECT DISTINCT 
+        u.user_id, 
+        u.first_name, 
+        u.last_name, 
+        u.user_email, 
+        u.user_image,
+        r.role_name,
+        COUNT(DISTINCT e.engagement_id) as engagement_count
+        FROM engagements e
+        JOIN users u ON e.assigned_to = u.user_id
+        LEFT JOIN user_roles r ON u.role_id = r.role_id
+        WHERE e.client_id IN ($client_ids_str) AND e.status != 'CLOSED'
+        GROUP BY u.user_id
+        LIMIT 4";
+}
 $team_result = mysqli_query($connection, $team_query);
 
-// 9. Recent Files
-$recent_files_query = "SELECT * FROM client_files 
-                       WHERE client_id = $client_id 
-                       ORDER BY uploaded_at DESC 
-                       LIMIT 5";
+// 9. Recent Files - Modified to handle multiple clients
+if ($query_by_assigned) {
+    $recent_files_query = "SELECT DISTINCT cf.* 
+                           FROM client_files cf
+                           JOIN engagements e ON cf.client_id = e.client_id
+                           WHERE e.assigned_to = $user_id
+                           ORDER BY cf.uploaded_at DESC 
+                           LIMIT 5";
+} else {
+    $recent_files_query = "SELECT * FROM client_files 
+                           WHERE client_id IN ($client_ids_str)
+                           ORDER BY uploaded_at DESC 
+                           LIMIT 5";
+}
 $recent_files_result = mysqli_query($connection, $recent_files_query);
 
-// 10. Client Info
-$client_info_query = "SELECT * FROM clients WHERE client_id = $client_id";
+// 10. Client Info - Get first client for display (or aggregate)
+if ($query_by_assigned) {
+    // Get client info from engagements
+    $client_info_query = "SELECT DISTINCT 
+        c.client_id,
+        c.company_name,
+        c.contact_name,
+        c.contact_email,
+        c.contact_mobile,
+        c.created_at
+        FROM clients c
+        JOIN engagements e ON c.client_id = e.client_id
+        WHERE e.assigned_to = $user_id
+        LIMIT 1";
+} else {
+    $client_info_query = "SELECT * FROM clients WHERE client_id IN ($client_ids_str) LIMIT 1";
+}
 $client_info_result = mysqli_query($connection, $client_info_query);
 $client_info = mysqli_fetch_assoc($client_info_result);
+
+// If still no client info, create default
+if (!$client_info) {
+    $client_info = [
+        'company_name' => 'Your Company',
+        'contact_name' => $_SESSION['client_name'] ?? 'Client',
+        'contact_email' => $_SESSION['user_email'] ?? '',
+        'contact_mobile' => '',
+        'created_at' => date('Y-m-d H:i:s')
+    ];
+}
 
 // Get current year for display
 $current_year = date('Y');
 
 // Calculate total active engagements correctly
 $total_active_engagements = ($active_stats['in_progress'] ?? 0) + ($active_stats['assigned'] ?? 0);
+
+// Debug info (remove in production)
+// Uncomment to debug:
+/*
+echo "<!-- Debug Info: 
+User ID: $user_id
+Client IDs: " . print_r($client_ids, true) . "
+Query by assigned: " . ($query_by_assigned ? 'Yes' : 'No') . "
+Active Stats: " . print_r($active_stats, true) . "
+-->";
+*/
 ?>
 
+<!-- Rest of your HTML remains the same from here -->
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
@@ -295,7 +479,7 @@ $total_active_engagements = ($active_stats['in_progress'] ?? 0) + ($active_stats
                                 'AWAITING_REVIEW' => '#ffc107',
                                 'SUBMITTED' => '#198754',
                                 'CLOSED' => '#0dcaf0',
-                                'SENT_BACK' => '#dc3545'
+                                'REJECTED' => '#dc3545'
                             ];
                             $total_engagements = 0;
                             $status_data = [];
@@ -643,7 +827,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if ($status_result && mysqli_num_rows($status_result) > 0) {
                 mysqli_data_seek($status_result, 0);
                 while($s = mysqli_fetch_assoc($status_result)) {
-                    $labels[] = "'" . $s['status'] . "'";
+                    $labels[] = "'" . addslashes($s['status']) . "'";
                     $counts[] = $s['count'];
                 }
             } else {
