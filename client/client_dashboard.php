@@ -285,9 +285,8 @@ if ($query_by_assigned) {
 }
 $recent_files_result = mysqli_query($connection, $recent_files_query);
 
-// 10. Client Info - Get first client for display (or aggregate)
+// 10. Client Info - Get all associated clients for display
 if ($query_by_assigned) {
-    // Get client info from engagements
     $client_info_query = "SELECT DISTINCT 
         c.client_id,
         c.company_name,
@@ -298,12 +297,27 @@ if ($query_by_assigned) {
         FROM clients c
         JOIN engagements e ON c.client_id = e.client_id
         WHERE e.assigned_to = $user_id
-        LIMIT 1";
+        ORDER BY c.company_name ASC, c.client_id ASC";
 } else {
-    $client_info_query = "SELECT * FROM clients WHERE client_id IN ($client_ids_str) LIMIT 1";
+    $client_info_query = "SELECT * FROM clients WHERE client_id IN ($client_ids_str) ORDER BY company_name ASC, client_id ASC";
 }
 $client_info_result = mysqli_query($connection, $client_info_query);
-$client_info = mysqli_fetch_assoc($client_info_result);
+$client_profiles = [];
+if ($client_info_result) {
+    while ($client_row = mysqli_fetch_assoc($client_info_result)) {
+        $client_profiles[] = $client_row;
+    }
+}
+
+$client_info = $client_profiles[0] ?? null;
+$company_names = [];
+foreach ($client_profiles as $client_profile) {
+    if (!empty($client_profile['company_name'])) {
+        $company_names[] = $client_profile['company_name'];
+    }
+}
+$company_names = array_values(array_unique($company_names));
+$company_count = count($company_names);
 
 // If still no client info, create default
 if (!$client_info) {
@@ -314,6 +328,8 @@ if (!$client_info) {
         'contact_mobile' => '',
         'created_at' => date('Y-m-d H:i:s')
     ];
+    $company_names = [$client_info['company_name']];
+    $company_count = 1;
 }
 
 // Get current year for display
@@ -351,9 +367,15 @@ Active Stats: " . print_r($active_stats, true) . "
                                 Welcome back, <?php echo htmlspecialchars($client_info['contact_name'] ?? $_SESSION['client_name'] ?? 'Client'); ?>! 👋
                             </h2>
                             <p class="welcome-subtitle">
-                                <?php echo htmlspecialchars($client_info['company_name'] ?? 'Your company'); ?> • 
                                 Member since <?php echo date('F Y', strtotime($client_info['created_at'] ?? 'now')); ?>
                             </p>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <?php foreach ($company_names as $company_name): ?>
+                                <span class="badge rounded-pill border border-light-subtle text-white px-3 py-2">
+                                    <?php echo htmlspecialchars($company_name); ?>
+                                </span>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                         <div class="col-md-4 text-md-end">
                             <span class="current-date">
@@ -800,7 +822,16 @@ Active Stats: " . print_r($active_stats, true) . "
                             Account Overview
                         </h6>
                         <div class="text-white-50 small mb-2">
-                            <p class="mb-1"><strong>Company:</strong> <?php echo htmlspecialchars($client_info['company_name'] ?? 'N/A'); ?></p>
+                            <div class="mb-2">
+                                <strong>Companies:</strong>
+                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                    <?php foreach ($company_names as $company_name): ?>
+                                    <span class="badge rounded-pill border border-light-subtle text-white px-3 py-2">
+                                        <?php echo htmlspecialchars($company_name); ?>
+                                    </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
                             <p class="mb-1"><strong>Contact:</strong> <?php echo htmlspecialchars($client_info['contact_name'] ?? 'N/A'); ?></p>
                             <p class="mb-1"><strong>Email:</strong> <?php echo htmlspecialchars($client_info['contact_email'] ?? 'N/A'); ?></p>
                             <p class="mb-1"><strong>Phone:</strong> <?php echo htmlspecialchars($client_info['contact_mobile'] ?? 'N/A'); ?></p>
