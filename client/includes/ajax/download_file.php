@@ -30,13 +30,13 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../../includes/database.php';
 
-if (!isset($_SESSION['client_id'])) {
+$client_id = isset($_SESSION['client_id']) ? (int) $_SESSION['client_id'] : (int) ($_SESSION['user_id'] ?? 0);
+
+if ($client_id <= 0) {
     header('HTTP/1.0 401 Unauthorized');
     echo 'Unauthorized';
     exit;
 }
-
-$client_id = $_SESSION['client_id'];
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('HTTP/1.0 400 Bad Request');
@@ -57,7 +57,7 @@ if (mysqli_num_rows($result) == 0) {
 }
 
 $file = mysqli_fetch_assoc($result);
-$file_path = __DIR__ . '/../../uploads/client_files/' . $file['file_path'];
+$file_path = __DIR__ . '/../../../uploads/client_files/' . $file['file_path'];
 
 if (!file_exists($file_path)) {
     header('HTTP/1.0 404 Not Found');

@@ -1,21 +1,43 @@
 <?php
 ob_start();
 
+// Resolve all client records available to the logged-in user.
+$session_client_id = (int) ($_SESSION['client_id'] ?? 0);
+$session_user_id = (int) ($_SESSION['user_id'] ?? 0);
+$clients = [];
 
-// Always set client_id from session
-$client_id = $_SESSION['client_id'] ?? 0;
-
-// Try to fetch client by user_id (primary mapping)
-$query = "SELECT * FROM clients WHERE user_id = " . intval($client_id);
-$result = mysqli_query($connection, $query);
-$client = ($result && mysqli_num_rows($result) > 0) ? mysqli_fetch_assoc($result) : null;
-
-// Fallback: try by client_id (legacy mapping)
-if (!$client) {
-    $query = "SELECT * FROM clients WHERE client_id = " . intval($client_id);
+if ($session_user_id > 0) {
+    $query = "SELECT * FROM clients WHERE user_id = " . $session_user_id . " ORDER BY company_name ASC, client_id ASC";
     $result = mysqli_query($connection, $query);
-    $client = ($result && mysqli_num_rows($result) > 0) ? mysqli_fetch_assoc($result) : null;
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $clients[] = $row;
+        }
+    }
 }
+
+if (empty($clients) && $session_client_id > 0) {
+    $query = "SELECT * FROM clients WHERE client_id = " . $session_client_id . " LIMIT 1";
+    $result = mysqli_query($connection, $query);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $clients[] = mysqli_fetch_assoc($result);
+    }
+}
+
+$clients_by_id = [];
+foreach ($clients as $client_row) {
+    $clients_by_id[(int) $client_row['client_id']] = $client_row;
+}
+
+$selected_client_id = isset($_POST['client_record_id'])
+    ? (int) $_POST['client_record_id']
+    : (isset($_GET['client_record_id']) ? (int) $_GET['client_record_id'] : 0);
+
+if ($selected_client_id <= 0 && !empty($clients)) {
+    $selected_client_id = (int) $clients[0]['client_id'];
+}
+
+$client = $clients_by_id[$selected_client_id] ?? null;
 
 if (!$client) {
     echo '<div class="alert alert-danger">Client not found</div>';
@@ -40,30 +62,35 @@ $showSuccessModal = false;
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-    
-    $company_name = mysqli_real_escape_string($connection, trim($_POST['company_name']));
-    $trade_license_no = mysqli_real_escape_string($connection, trim($_POST['trade_license_no']));
-    $country = mysqli_real_escape_string($connection, trim($_POST['country']));
-    $emirate_zone = mysqli_real_escape_string($connection, trim($_POST['emirate_zone']));
-    $business_activity = mysqli_real_escape_string($connection, trim($_POST['business_activity']));
-    $address = mysqli_real_escape_string($connection, trim($_POST['address']));
-    $contact_name = mysqli_real_escape_string($connection, trim($_POST['contact_name']));
-    $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation']));
-    $contact_mobile = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
-    $contact_email = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
-    
-    // Validate required fields
-    if (empty($company_name) || empty($country) || empty($contact_name) || empty($contact_mobile) || empty($contact_email)) {
-        $message = "Please fill in all required fields.";
-        $message_type = "danger";
-    } elseif (!filter_var($contact_email, FILTER_VALIDATE_EMAIL)) {
-        $message = "Please enter a valid email address.";
+    $selected_client_id = (int) ($_POST['client_record_id'] ?? $selected_client_id);
+    $client = $clients_by_id[$selected_client_id] ?? null;
+
+    if (!$client) {
+        $message = "Invalid company selected.";
         $message_type = "danger";
     } else {
-        // Update client (by user_id if possible, else by client_id)
-        $update_success = false;
-        // Try update by user_id
-        $update_query = "UPDATE clients SET 
+    
+        $company_name = mysqli_real_escape_string($connection, trim($_POST['company_name']));
+        $trade_license_no = mysqli_real_escape_string($connection, trim($_POST['trade_license_no']));
+        $country = mysqli_real_escape_string($connection, trim($_POST['country']));
+        $emirate_zone = mysqli_real_escape_string($connection, trim($_POST['emirate_zone']));
+        $business_activity = mysqli_real_escape_string($connection, trim($_POST['business_activity']));
+        $address = mysqli_real_escape_string($connection, trim($_POST['address']));
+        $contact_name = mysqli_real_escape_string($connection, trim($_POST['contact_name']));
+        $contact_designation = mysqli_real_escape_string($connection, trim($_POST['contact_designation']));
+        $contact_mobile = mysqli_real_escape_string($connection, trim($_POST['contact_mobile']));
+        $contact_email = mysqli_real_escape_string($connection, trim($_POST['contact_email']));
+    
+        // Validate required fields
+        if (empty($company_name) || empty($country) || empty($contact_name) || empty($contact_mobile) || empty($contact_email)) {
+            $message = "Please fill in all required fields.";
+            $message_type = "danger";
+        } elseif (!filter_var($contact_email, FILTER_VALIDATE_EMAIL)) {
+            $message = "Please enter a valid email address.";
+            $message_type = "danger";
+        } else {
+            $update_success = false;
+            $update_query = "UPDATE clients SET 
                         company_name = '$company_name',
                         trade_license_no = '$trade_license_no',
                         country = '$country',
@@ -74,43 +101,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                         contact_designation = '$contact_designation',
                         contact_mobile = '$contact_mobile',
                         contact_email = '$contact_email'
-                        WHERE user_id = " . intval($client_id);
-        if (mysqli_query($connection, $update_query) && mysqli_affected_rows($connection) > 0) {
-            $update_success = true;
-        } else {
-            // Fallback: update by client_id
-            $update_query = "UPDATE clients SET 
-                            company_name = '$company_name',
-                            trade_license_no = '$trade_license_no',
-                            country = '$country',
-                            emirate_zone = '$emirate_zone',
-                            business_activity = '$business_activity',
-                            address = '$address',
-                            contact_name = '$contact_name',
-                            contact_designation = '$contact_designation',
-                            contact_mobile = '$contact_mobile',
-                            contact_email = '$contact_email'
-                            WHERE client_id = " . intval($client_id);
-            if (mysqli_query($connection, $update_query) && mysqli_affected_rows($connection) > 0) {
+                        WHERE client_id = " . $selected_client_id . " LIMIT 1";
+            if (mysqli_query($connection, $update_query)) {
                 $update_success = true;
             }
-        }
-        if ($update_success) {
-            // Log activity
-            $log_check = mysqli_query($connection, "SHOW TABLES LIKE 'client_activity_log'");
-            if ($log_check && mysqli_num_rows($log_check) > 0) {
-                $log_query = "INSERT INTO client_activity_log 
-                             (client_id, activity_type, description, ip_address)
-                             VALUES 
-                             (" . intval($client['client_id']) . ", 'profile_update', 'Updated company profile information', '{$_SERVER['REMOTE_ADDR']}')";
-                mysqli_query($connection, $log_query);
+
+            if ($update_success) {
+                // Refresh the edited record used by the form.
+                $client_refresh_query = "SELECT * FROM clients WHERE client_id = " . $selected_client_id . " LIMIT 1";
+                $client_refresh_result = mysqli_query($connection, $client_refresh_query);
+                if ($client_refresh_result && mysqli_num_rows($client_refresh_result) > 0) {
+                    $client = mysqli_fetch_assoc($client_refresh_result);
+                    $clients_by_id[$selected_client_id] = $client;
+                    foreach ($clients as $index => $client_row) {
+                        if ((int) $client_row['client_id'] === $selected_client_id) {
+                            $clients[$index] = $client;
+                            break;
+                        }
+                    }
+                }
+
+                // Log activity
+                $log_check = mysqli_query($connection, "SHOW TABLES LIKE 'client_activity_log'");
+                if ($log_check && mysqli_num_rows($log_check) > 0) {
+                    $safe_company_name = mysqli_real_escape_string($connection, $company_name);
+                    $log_query = "INSERT INTO client_activity_log 
+                                 (client_id, activity_type, description, ip_address)
+                                 VALUES 
+                                 (" . $selected_client_id . ", 'profile_update', 'Updated company profile information for: $safe_company_name', '{$_SERVER['REMOTE_ADDR']}')";
+                    mysqli_query($connection, $log_query);
+                }
+
+                if ($session_client_id === $selected_client_id || count($clients) === 1) {
+                    $_SESSION['client_name'] = $company_name;
+                }
+                $showSuccessModal = true;
+            } else {
+                $message = "Error updating profile: " . mysqli_error($connection);
+                $message_type = "danger";
             }
-            // Update session name
-            $_SESSION['client_name'] = $company_name;
-            $showSuccessModal = true;
-        } else {
-            $message = "Error updating profile: " . mysqli_error($connection);
-            $message_type = "danger";
         }
     }
 }
@@ -145,7 +174,34 @@ ob_end_flush();
                     </div>
                     <?php endif; ?>
 
+                    <?php if (count($clients) > 1): ?>
+                    <div class="border rounded-3 px-3 py-3 mb-4 bg-light-subtle">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span class="badge text-bg-primary px-3 py-2">
+                                    Editing: <?php echo htmlspecialchars((string) $client['company_name']); ?>
+                                </span>
+                                <span class="badge bg-light text-dark border px-3 py-2">
+                                    <?php echo count($clients); ?> companies linked
+                                </span>
+                            </div>
+                            <form method="GET" action="profile.php" class="d-flex align-items-center gap-2 flex-wrap mb-0">
+                                <input type="hidden" name="source" value="edit">
+                                <label for="client_record_id" class="form-label mb-0 fw-semibold">Choose company:</label>
+                                <select class="form-select form-select-sm" id="client_record_id" name="client_record_id" onchange="this.form.submit()">
+                                    <?php foreach ($clients as $client_option): ?>
+                                    <option value="<?php echo (int) $client_option['client_id']; ?>" <?php echo ((int) $client_option['client_id'] === $selected_client_id) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars((string) $client_option['company_name']); ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                     <form method="POST" action="" id="profileForm">
+                        <input type="hidden" name="client_record_id" value="<?php echo $selected_client_id; ?>">
                         <div class="row">
                             <div class="col-md-12">
                                 <h6 class="border-bottom pb-2 text-primary mb-3">
@@ -248,6 +304,7 @@ ob_end_flush();
             <div class="modal-body text-center py-4">
                 <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
                 <h5 class="mt-3">Your profile has been updated successfully!</h5>
+                <p class="text-muted mb-0"><?php echo htmlspecialchars((string) $company_name); ?></p>
             </div>
             <div class="modal-footer justify-content-center">
                 <a href="profile.php" class="btn btn-success px-4">View Profile</a>

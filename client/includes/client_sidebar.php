@@ -1,3 +1,19 @@
+<?php
+$profile_edit_label = 'Edit Profile';
+
+if (isset($connection) && isset($_SESSION['user_id'])) {
+    $sidebar_user_id = (int) $_SESSION['user_id'];
+    $client_count_query = "SELECT COUNT(*) AS total FROM clients WHERE user_id = $sidebar_user_id";
+    $client_count_result = mysqli_query($connection, $client_count_query);
+
+    if ($client_count_result && ($client_count_row = mysqli_fetch_assoc($client_count_result))) {
+        if ((int) ($client_count_row['total'] ?? 0) > 1) {
+            $profile_edit_label = 'Edit Companies';
+        }
+    }
+}
+?>
+
     <!-- Sidebar Toggle Button -->
     <button class="sidebar-toggle" id="sidebarToggle">
         <i class="bi bi-list"></i>
@@ -146,7 +162,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="profile.php?source=edit">
                             <i class="bi bi-pencil nav-icon"></i>
-                            <span class="nav-text">Edit Profile</span>
+                            <span class="nav-text"><?php echo htmlspecialchars($profile_edit_label); ?></span>
                         </a>
                     </li>
                     <li class="nav-item">
