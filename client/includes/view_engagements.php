@@ -134,6 +134,19 @@ if (!empty($client_ids)) {
             </div>
         </div>
         <div class="col-md-3">
+            <div class="stat-card stat-card-success">
+                <div class="stat-card-body d-flex align-items-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-check-circle text-success"></i>
+                    </div>
+                    <div class="stat-content ms-3">
+                        <h3 class="stat-value mb-0"><?php echo $stats['closed'] ?? 0; ?></h3>
+                        <p class="stat-label mb-0">Closed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="stat-card stat-card-info">
                 <div class="stat-card-body d-flex align-items-center">
                     <div class="stat-icon">
@@ -277,6 +290,7 @@ if (!empty($client_ids)) {
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 .stat-card-primary { border-left-color: #667eea; }
+.stat-card-success { border-left-color: #198754; }
 .stat-card-warning { border-left-color: #ffc107; }
 .stat-card-info { border-left-color: #17a2b8; }
 .stat-card-danger { border-left-color: #dc3545; }

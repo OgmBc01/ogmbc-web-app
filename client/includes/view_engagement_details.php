@@ -82,17 +82,6 @@ $comments_query = "SELECT c.*, CONCAT(u.first_name, ' ', u.last_name) as user_na
                    ORDER BY c.created_at DESC";
 $comments_result = mysqli_query($connection, $comments_query);
 
-// Get deadline change requests
-$requests_query = "SELECT r.*, 
-                  CONCAT(ru.first_name, ' ', ru.last_name) as requested_by_name,
-                  CONCAT(ru2.first_name, ' ', ru2.last_name) as reviewed_by_name
-                  FROM deadline_change_requests r
-                  LEFT JOIN users ru ON r.requested_by = ru.user_id
-                  LEFT JOIN users ru2 ON r.reviewed_by = ru2.user_id
-                  WHERE r.engagement_id = $engagement_id
-                  ORDER BY r.created_at DESC";
-$requests_result = mysqli_query($connection, $requests_query);
-
 // Get status history
 $history_query = "SELECT h.*, CONCAT(u.first_name, ' ', u.last_name) as changed_by_name
                   FROM engagement_status_history h
@@ -480,42 +469,6 @@ $overdue_days = abs($engagement['days_remaining']);
                     </div>
                 </div>
             </div>
-
-            <!-- Deadline Change Requests -->
-            <?php if ($requests_result && mysqli_num_rows($requests_result) > 0): ?>
-            <div class="info-card mb-4">
-                <h6 class="info-title">
-                    <i class="bi bi-calendar-plus me-2"></i>Deadline Change Requests
-                </h6>
-                <div class="info-content">
-                    <?php while($req = mysqli_fetch_assoc($requests_result)): 
-                        $status_class = 'warning';
-                        $status_text = 'Under Review';
-                        if ($req['status'] == 'APPROVED') {
-                            $status_class = 'success';
-                            $status_text = 'Approved';
-                        } elseif ($req['status'] == 'SENT_BACK') {
-                            $status_class = 'danger';
-                            $status_text = 'Sent Back';
-                        }
-                    ?>
-                    <div class="request-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <strong>Requested: <?php echo date('M d, Y', strtotime($req['requested_date'])); ?></strong>
-                                <span class="badge bg-<?php echo $status_class; ?> ms-2"><?php echo $status_text; ?></span>
-                            </div>
-                            <small class="text-muted"><?php echo date('M d, Y', strtotime($req['created_at'])); ?></small>
-                        </div>
-                        <p class="mb-0 mt-2"><strong>Reason:</strong> <?php echo ucfirst($req['reason_code']); ?></p>
-                        <?php if (!empty($req['reason_notes'])): ?>
-                            <p class="mb-0 text-muted small mt-1"><?php echo htmlspecialchars($req['reason_notes']); ?></p>
-                        <?php endif; ?>
-                    </div>
-                    <?php endwhile; ?>
-                </div>
-            </div>
-            <?php endif; ?>
 
             <!-- Status History -->
             <div class="info-card">

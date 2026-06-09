@@ -653,7 +653,7 @@ Active Stats: " . print_r($active_stats, true) . "
                                                 <small class="activity-details text-muted">
                                                     <?php echo htmlspecialchars($activity['details']); ?>
                                                     <?php if ($activity['engagement_id']): ?>
-                                                        • <a href="view_engagement.php?id=<?php echo $activity['engagement_id']; ?>">View</a>
+                                                        • <a href="engagements.php?source=view_details&id=<?php echo $activity['engagement_id']; ?>">View</a>
                                                     <?php endif; ?>
                                                 </small>
                                             </div>
