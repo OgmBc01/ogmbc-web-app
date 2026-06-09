@@ -54,7 +54,7 @@ if ($query_by_assigned) {
         SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
         SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned
         FROM engagements 
-        WHERE assigned_to = $user_id AND status NOT IN ('CLOSED', 'SUBMITTED')";
+    WHERE assigned_to = $user_id AND status != 'CLOSED'";
 } else {
     // Query by client_id(s)
     $active_engagements_query = "SELECT 
@@ -63,7 +63,7 @@ if ($query_by_assigned) {
         SUM(CASE WHEN status = 'AWAITING_REVIEW' THEN 1 ELSE 0 END) as awaiting_review,
         SUM(CASE WHEN status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned
         FROM engagements 
-        WHERE client_id IN ($client_ids_str) AND status NOT IN ('CLOSED', 'SUBMITTED')";
+    WHERE client_id IN ($client_ids_str) AND status != 'CLOSED'";
 }
 $active_result = mysqli_query($connection, $active_engagements_query);
 if (!$active_result) {
@@ -336,7 +336,7 @@ if (!$client_info) {
 $current_year = date('Y');
 
 // Calculate total active engagements correctly
-$total_active_engagements = ($active_stats['in_progress'] ?? 0) + ($active_stats['assigned'] ?? 0);
+$total_active_engagements = (int)($active_stats['total'] ?? 0);
 
 // Debug info (remove in production)
 // Uncomment to debug:

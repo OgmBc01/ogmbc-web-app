@@ -1,4 +1,6 @@
 <?php
+$user_id = isset($user_id) ? (int)$user_id : (int)($_SESSION['user_id'] ?? 0);
+
 // Get all clients this user has engagements with
 $query = "SELECT DISTINCT 
     c.client_id,
